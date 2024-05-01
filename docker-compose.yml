@@ -1,0 +1,96 @@
+# docker-compose.yml
+# Apr-30-2024
+#
+# MIT License, Copyright (c) 2024 Heiko Lübbe
+# https://github.com/muhme/joomla-system-tests
+
+version: '3.1'
+
+services:
+
+  mysql:
+    container_name: jst_mysql
+    image: mysql # Joomla 5 needs >= 8.0.13, actual 8.1.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+
+  mysqladmin:
+    container_name: jst_mysqladmin
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: jst_mysql
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "7001:80"
+    restart: unless-stopped
+    depends_on:
+      - mysql
+
+  joomla_44:
+    container_name: jst_44
+    image: joomla:4
+    restart: unless-stopped
+    ports:
+      - 7044:80
+    volumes:
+      - ./branch_44:/var/www/html
+    environment:
+      JOOMLA_DB_HOST: mysql
+      JOOMLA_DB_PASSWORD: root
+    depends_on:
+      - mysql
+
+  joomla_51:
+    container_name: jst_51
+    image: joomla:5
+    restart: unless-stopped
+    ports:
+      - 7051:80
+    volumes:
+      - ./branch_51:/var/www/html
+    environment:
+      JOOMLA_DB_HOST: mysql
+      JOOMLA_DB_PASSWORD: root
+    depends_on:
+      - mysql
+
+  joomla_52:
+    container_name: jst_52
+    image: joomla:5
+    restart: unless-stopped
+    ports:
+      - 7052:80
+    volumes:
+      - ./branch_52:/var/www/html
+    environment:
+      JOOMLA_DB_HOST: mysql
+      JOOMLA_DB_PASSWORD: root
+    depends_on:
+      - mysql
+
+  joomla_60:
+    container_name: jst_60
+    image: joomla:5
+    restart: unless-stopped
+    ports:
+      - 7060:80
+    volumes:
+      - ./branch_60:/var/www/html
+    environment:
+      JOOMLA_DB_HOST: mysql
+      JOOMLA_DB_PASSWORD: root
+    depends_on:
+      - mysql
+
+  cypress:
+    container_name: jst_cypress
+    image: cypress/included # actual 13. + Chrome 116. + Edge 116. + Firefox 117.
+    restart: unless-stopped
+    entrypoint: ["sleep", "31536000"] # don't use cypress run, instead sleep one year
+    ports:
+      - 7099:80
+    volumes:
+      - ./branch_44:/branch_44
+      - ./branch_51:/branch_51
