@@ -25,7 +25,7 @@ This can be disabled by setting environment variable [NOCOLOR=1](https://no-colo
 The abbreviation `jst` stands for joomla system test:
 
 |Name|Port|Directory :eight_spoked_asterisk: |Comment|
-|----|----|-------|--------------------------|-------|
+|----|----|----------------------------------|-------|
 |jst_mysql| | | |
 |jst_cypress| host.docker.internal:7025 | | SMTP server is only running during test execution |
 |jst_mysqladmin|[7001](http://localhost:7001)| | |
