@@ -91,6 +91,7 @@ services:
     entrypoint: ["sleep", "31536000"] # don't use cypress run, instead sleep one year
     ports:
       - 7099:80
+      - 7025:7025 # smtp-tester port (only available during the test run)
     volumes:
       - ./branch_44:/branch_44
       - ./branch_51:/branch_51

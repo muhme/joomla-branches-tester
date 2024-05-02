@@ -70,12 +70,16 @@ do
   #   >     db_host: 'mysql',
   #   >     baseUrl: 'http://host.docker.internal:7044',
   #   >     db_password: 'root',
+  #   >     smtp_host: 'host.docker.internal',
+  #   >     smtp_port: '7025',
   docker exec -it "jst_${version}" bash -c "cd /var/www/html && sed \
     -e \"s/db_name: .*/db_name: 'test_joomla_${version}',/\" \
     -e \"s/db_prefix: .*/db_prefix: 'jos${version}_',/\" \
     -e \"s/db_host: .*/db_host: 'mysql',/\" \
     -e \"s/baseUrl: .*/baseUrl: 'http:\/\/host.docker.internal:70${version}\/',/\" \
     -e \"s/db_password: .*/db_password: 'root',/\" \
+    -e \"s/smtp_host: .*/smtp_host: 'host.docker.internal',/\" \
+    -e \"s/smtp_port: .*/smtp_port: '7025',/\" \
     cypress.config.dist.js > cypress.config.js"
 
   log "jst_${version} – Cypress based Joomla installation"

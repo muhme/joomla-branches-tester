@@ -2,7 +2,11 @@
 
 Running automated [Joomla system tests](https://github.com/joomla/joomla-cms/tree/4.4-dev/tests/System) with [Cypress](https://www.cypress.io/) in a [docker](https://www.docker.com/) container environment.
 
-The idea is to have all four branches running parallel in four containers, available in host directory and mounted in Cypress container. To simplify the live Joomla standard containers are used and overwritten with the branch versions. Joomla installation itself is executed by Cypress spec.
+The idea is to have the current four Joomla branches available in parallel for Joomla system tests.
+The installation takes place in Docker containers and is automated with scripts.
+
+To simplify life, Joomla standard containers are used as a starting point and overwritten with the Joomla
+source code from the various software branches. The Joomla installation itself is executed by Cypress spec.
 
 ## Installation
 
@@ -18,11 +22,13 @@ This can be disabled by setting environment variable [NOCOLOR=1](https://no-colo
 
 ## Containers
 
+The abbreviation `jst` stands for joomla system test:
+
 |Name|Port|Directory :eight_spoked_asterisk: |Comment|
-|----|----|-------|--------
-|jst_mysql| | |
-|jst_cypress| | |
-|jst_mysqladmin|[7001](http://localhost:7001)| |
+|----|----|-------|--------------------------|-------|
+|jst_mysql| | | |
+|jst_cypress| host.docker.internal:7025 | | SMTP server is only running during test execution |
+|jst_mysqladmin|[7001](http://localhost:7001)| | |
 |jst_44|[7044](http://localhost:7044)| /branch_44 | Joomla branch 4.4-dev |
 |jst_51|[7044](http://localhost:7044)| /branch_50 | Joomla branch 5.1-dev |
 |jst_52|[7044](http://localhost:7044)| /branch_51 | Joomla branch 5.2-dev |
@@ -34,8 +40,14 @@ And also one available in Joomla container and all together in `jst_cypress` con
 
 # Usage
 
+Test one spec with all four branches:
 ```
 scripts/test.sh tests/System/integration/administrator/components/com_privacy/Consent.cy.js
+```
+
+Test all site specs with branch 4.4-dev:
+```
+scripts/test.sh 44 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
 ```
 
 # Dependencies

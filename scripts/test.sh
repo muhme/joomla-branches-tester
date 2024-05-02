@@ -42,7 +42,7 @@ do
 done
 
 if [ ${failed} -eq 0 ] ; then
-  log "Completed ${successful} successful ${spec}"
+  log "Completed ${versionsToTest[@]} with ${successful} successful ${spec}"
 else
-  error "Completed ${failed} failed and ${successful} successful ${spec}"
+  error "Completed ${versionsToTest[@]} with ${failed} failed and ${successful} successful ${spec}"
 fi
