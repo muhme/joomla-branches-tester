@@ -12,9 +12,13 @@ cd joomla-system-test
 scripts/create.sh
 ```
 
+:point_right: The scripts use [ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code#Colors)
+to color their own log and error messages.
+This can be disabled by setting environment variable [NOCOLOR=1](https://no-color.org/).
+
 ## Containers
 
-|Name|Port|Directory|Comment|
+|Name|Port|Directory :eight_spoked_asterisk: |Comment|
 |----|----|-------|--------
 |jst_mysql| | |
 |jst_cypress| | |
@@ -23,6 +27,10 @@ scripts/create.sh
 |jst_51|[7044](http://localhost:7044)| /branch_50 | Joomla branch 5.1-dev |
 |jst_52|[7044](http://localhost:7044)| /branch_51 | Joomla branch 5.2-dev |
 |jst_60|[7044](http://localhost:7044)| /branch_52 | Joomla branch 6.0-dev |
+
+:eight_spoked_asterisk: The directories are available on Docker host e.g. to inspect and change the configuration
+files (`configuration.php` or `cypress.config.js`) or the test specifications below `tests/System`.
+And also one available in Joomla container and all together in `jst_cypress` container.
 
 # Usage
 

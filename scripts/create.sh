@@ -36,7 +36,7 @@ do
     }
   done
   if [ $i -ge $max_retries ]; then
-      log "Failed after $max_retries attempts, giving up"
+      error "Failed after $max_retries attempts, giving up"
       exit 1
   fi
   log "jst_${version} – Deleting orignal Joomla installation"
@@ -46,9 +46,10 @@ do
   docker exec -it "jst_${version}" bash -c 'apt-get update -qq && \
     apt-get upgrade -y && \
     curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
-    apt-get install -y git vim nodejs iputils-ping'
+    apt-get install -y git vim nodejs iputils-ping net-tools'
+  # aaditional having vim, ping, netstat
 
-  branch=$(echo $version | sed -E 's/([0-9])([0-9])/\1.\2-dev/')
+  branch=$(branchName "${version}")
   log "jst_${version} – cloning ${branch} branch into directory branch_${version}"
   docker exec -it "jst_${version}" bash -c "git clone -b ${branch} --depth 1 https://github.com/joomla/joomla-cms /var/www/html"
 
