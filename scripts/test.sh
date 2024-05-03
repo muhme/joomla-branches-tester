@@ -1,6 +1,8 @@
 #!/bin/bash
 #
 # test.sh - test cypress spec over on one or all branches, e.g.
+#   scripts/test.sh
+#   scripts/test.sh 44
 #   scripts/test.sh 51 tests/System/integration/site/components/com_contact/Categories.cy.js
 #   scripts/test.sh tests/System/integration/site/components/com_contact/Categories.cy.js
 #
@@ -8,12 +10,10 @@
 # https://github.com/muhme/joomla-system-tests
 
 source scripts/helper.sh
-versionsToTest=("${VERSIONS[@]}")
 
-if [ $# -eq 0 ] ; then
-  error "Missing test argument, e.g. tests/System/integration/site/components/com_privacy/Request.cy.js"
-  exit 1
-fi
+# all tests (w/o installation) as taken from cypress.config.js specPattern
+ALL_TESTS='tests/System/integration/administrator/**/*.cy.{js,jsx,ts,tsx},tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx},tests/System/integration/api/**/*.cy.{js,jsx,ts,tsx},tests/System/integration/plugins/**/*.cy.{js,jsx,ts,tsx}'
+versionsToTest=("${VERSIONS[@]}")
 
 if isValidVersion "$1"; then
    versionsToTest=($1)
@@ -21,11 +21,10 @@ if isValidVersion "$1"; then
 fi
 
 if [ $# -eq 0 ] ; then
-  error "Missing test argument, e.g. tests/System/integration/site/components/com_privacy/Request.cy.js"
-  exit 1
+  spec=${ALL_TESTS}
+else
+  spec="$1"
 fi
-
-spec="$1"
 
 failed=0
 successful=0
