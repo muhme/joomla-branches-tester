@@ -2,6 +2,8 @@
 
 Running automated [Joomla system tests](https://github.com/joomla/joomla-cms/tree/4.4-dev/tests/System) with [Cypress](https://www.cypress.io/) in a [docker](https://www.docker.com/) container environment.
 
+![scrupts/test.sh running screen shot](screen-shot.png)
+
 The idea is to have the current four Joomla branches (currently 4.4-dev, 5.1-dev, 5.2-dev and 6.0-dev)
 available in parallel for Joomla system tests. The only requirement is the ability to run a bash script and Docker.
 The installation takes place in Docker containers and is automated with scripts.
