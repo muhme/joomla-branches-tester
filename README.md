@@ -15,7 +15,7 @@ source code from the various software branches. The Joomla installation itself i
 ## Installation
 
 ```
-git clone https://github.com/muhme/joomla-system-test
+git clone https://github.com/muhme/joomla-system-tests
 cd joomla-system-test
 scripts/create.sh
 ```
