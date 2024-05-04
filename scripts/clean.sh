@@ -8,4 +8,4 @@
 source scripts/helper.sh
 
 log 'Removing all joomla system test docker containers jst_*'
-docker ps -a --format '{{.Names}}' | grep '^jst_' | xargs docker rm -f
+docker ps -a --format '{{.Names}}' | grep '^jst_' | xargs -r docker rm -f
