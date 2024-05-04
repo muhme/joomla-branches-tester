@@ -4,8 +4,6 @@
 # MIT License, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-system-tests
 
-version: '3.1'
-
 services:
 
   mysql:
