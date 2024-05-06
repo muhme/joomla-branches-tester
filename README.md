@@ -41,9 +41,9 @@ The abbreviation `jst` stands for joomla system test:
 
 |Name|Port|Directory :eight_spoked_asterisk: |Comment|
 |----|----|----------------------------------|-------|
-|jst_mysql| | | version 8.2 |
-|jst_cypress| host.docker.internal:7025 | | SMTP server is only running during test execution |
-|jst_mysqladmin|[7001](http://localhost:7001)| | |
+|jst_mysql| | | version 8.1 |
+|jst_cypress| SMTP host.docker.internal:7025 | | SMTP server is only running during test execution |
+|jst_mysqladmin|[7001](http://localhost:7001)| | user root / password root |
 |jst_44|[7044](http://localhost:7044)| /branch_44 | Joomla branch 4.4-dev<br />PHP 8.1 |
 |jst_51|[7044](http://localhost:7044)| /branch_50 | Joomla branch 5.1-dev<br />PHP 8.2 |
 |jst_52|[7044](http://localhost:7044)| /branch_51 | Joomla branch 5.2-dev<br />PHP 8.2 |

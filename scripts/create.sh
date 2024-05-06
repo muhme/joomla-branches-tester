@@ -93,8 +93,12 @@ do
     cypress.config.dist.js > cypress.config.js"
 
   log "jst_${version} – Cypress based Joomla installation"
+  # temporarily disable -e for chown as on macOS seen following, but it doesn't matter as these files are 444
+  #   chmod: changing permissions of '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
+  set +e
   # change root ownership to www-data
   docker exec -it "jst_${version}" chown -R www-data:www-data /var/www/html
+  set -e
   # Joomla container needs to be restarted
   docker stop "jst_${version}"
   docker start "jst_${version}"
