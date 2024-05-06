@@ -2,7 +2,7 @@
 
 Running automated [Joomla system tests](https://github.com/joomla/joomla-cms/tree/4.4-dev/tests/System) with [Cypress](https://www.cypress.io/) in a [docker](https://www.docker.com/) container environment.
 
-![scrupts/test.sh running screen shot](screen-shot.png)
+![scripts/test.sh running screen shot](screen-shot.png)
 
 The idea is to have the current four Joomla branches (currently 4.4-dev, 5.1-dev, 5.2-dev and 6.0-dev)
 available in parallel for Joomla system tests. The only requirement is the ability to run a bash script and Docker.
@@ -14,13 +14,20 @@ source code from the various software branches. The Joomla installation itself i
 
 ## Installation
 
+### Prerequisites
+
+[Git](https://git-scm.com/), [Docker](https://www.docker.com/) an a bash scripting environment are required and must be installed. `/etc/hosts` entry `127.0.0.1 host.docker.internal` must exist.
+
+The installation takes about 8.4 GB disk space.
+
+Tested with macOS 14 Sonoma and Ubuntu 22 Jammy Jellyfish.
+
 ```
 git clone https://github.com/muhme/joomla-system-tests
-cd joomla-system-test
+cd joomla-system-tests
 scripts/create.sh
 ```
 
-This takes about one hour and requires about 8.4 GB disk space.
 
 :point_right: The scripts use [ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code#Colors)
 to color their own log and error messages.
