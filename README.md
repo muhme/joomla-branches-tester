@@ -28,7 +28,6 @@ cd joomla-system-tests
 scripts/create.sh
 ```
 
-
 :point_right: The scripts use [ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code#Colors)
 to color their own log and error messages.
 This can be disabled by setting environment variable [NOCOLOR=1](https://no-color.org/).
@@ -52,6 +51,11 @@ files (`configuration.php` or `cypress.config.js`) or the test specifications be
 And also one available in Joomla container and all together in `jst_cypress` container.
 
 # Usage
+
+:point_right: On Ubuntu with default enabled Uncomplicated Firewall (UFW) you need to enable allow SMTP port:
+```
+ufw allow 7025
+```
 
 Test all (more than 100) specs in all four branches:
 ```
