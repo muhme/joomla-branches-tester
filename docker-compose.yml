@@ -8,8 +8,10 @@ services:
 
   mysql:
     container_name: jst_mysql
-    image: mysql # Joomla 5 needs >= 8.0.13, actual 8.1.0
+    # Joomla 5 needs >= 8.0.13, actual 8.1.0
+    # and hardwire as 8.1 as 8.4 needs mysql_native_password=ON
     restart: unless-stopped
+    image: mysql:8.1
     environment:
       MYSQL_ROOT_PASSWORD: root
 
