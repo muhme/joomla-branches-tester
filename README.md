@@ -55,7 +55,7 @@ And also one available in Joomla container and all together in `jst_cypress` con
 
 # Usage
 
-:point_right: On Ubuntu with default enabled Uncomplicated Firewall (UFW) you need to enable allow SMTP port:
+:point_right: On Ubuntu with default enabled Uncomplicated Firewall (UFW) you need to allow SMTP port:
 ```
 ufw allow 7025
 ```
@@ -79,11 +79,6 @@ Test all site specs with branch 4.4-dev:
 ```
 scripts/test.sh 44 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
 ```
-
-# Dependencies
-
-You need only Docker installed. Developed with macOS 14 Sonoma.
-Should basically run under Linux and Windows WSL2, please let me know if you have checked this.
 
 ## License
 
