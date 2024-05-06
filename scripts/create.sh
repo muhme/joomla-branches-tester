@@ -7,6 +7,16 @@
 
 source scripts/helper.sh
 
+# zeroth check host.docker.internal entry 
+HOSTS_FILE="/etc/hosts"
+EXPECTED_ENTRY="127.0.0.1[[:space:]]+host.docker.internal"
+if grep -Eq "${EXPECTED_ENTRY}" "$HOSTS_FILE"; then
+  log "Entry '${EXPECTED_ENTRY}' exists in file '${HOSTS_FILE}' - thx :)"
+else
+  error "Entry '${EXPECTED_ENTRY}' is missing in file '${HOSTS_FILE}' - please add"
+  exit 1
+fi
+
 # First delete all docker containters
 scripts/clean.sh
 
@@ -76,13 +86,15 @@ do
     -e \"s/db_name: .*/db_name: 'test_joomla_${version}',/\" \
     -e \"s/db_prefix: .*/db_prefix: 'jos${version}_',/\" \
     -e \"s/db_host: .*/db_host: 'mysql',/\" \
-    -e \"s/baseUrl: .*/baseUrl: 'http:\/\/host.docker.internal:70${version}\/',/\" \
+    -e \"s/baseUrl: .*/baseUrl: 'http:\/\/jst_${version}\/',/\" \
     -e \"s/db_password: .*/db_password: 'root',/\" \
     -e \"s/smtp_host: .*/smtp_host: 'host.docker.internal',/\" \
     -e \"s/smtp_port: .*/smtp_port: '7025',/\" \
     cypress.config.dist.js > cypress.config.js"
 
   log "jst_${version} – Cypress based Joomla installation"
+  # change root ownership to www-data
+  docker exec -it "jst_${version}" chown -R www-data:www-data /var/www/html
   # Joomla container needs to be restarted
   docker stop "jst_${version}"
   docker start "jst_${version}"
