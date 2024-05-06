@@ -16,11 +16,14 @@ source code from the various software branches. The Joomla installation itself i
 
 ### Prerequisites
 
-[Git](https://git-scm.com/), [Docker](https://www.docker.com/) an a bash scripting environment are required and must be installed. `/etc/hosts` entry `127.0.0.1 host.docker.internal` must exist.
+[Git](https://git-scm.com/), [Docker](https://www.docker.com/) an a bash scripting environment are required and must be installed. The following `/etc/hosts` entry must exist:
+```
+127.0.0.1 host.docker.internal
+```
 
-The installation takes about 8.4 GB disk space.
+The installation takes about 2 GB disk space.
 
-Tested with macOS 14 Sonoma and Ubuntu 22 Jammy Jellyfish.
+Tested with macOS 14 Sonoma and Ubuntu 22 Jammy Jellyfish. You can install as a user, it is not necessary to be `root`:
 
 ```
 git clone https://github.com/muhme/joomla-system-tests
