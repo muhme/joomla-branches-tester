@@ -23,7 +23,9 @@ source code from the various software branches. The Joomla installation itself i
 
 The installation takes about 2 GB disk space.
 
-Tested with macOS 14 Sonoma and Ubuntu 22 Jammy Jellyfish. You can install as a user, it is not necessary to be `root`:
+Tested with macOS 14 Sonoma and Ubuntu 22 Jammy Jellyfish (there is a script [ubuntu_setup.sh](scripts/ubuntu_setup.sh)).
+
+You can install with script [create.sh](scripts/create.sh) as a user, it is not necessary to be `root`:
 
 ```
 git clone https://github.com/muhme/joomla-system-tests
