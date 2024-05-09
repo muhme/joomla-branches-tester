@@ -4,10 +4,12 @@ Running automated [Joomla system tests](https://github.com/joomla/joomla-cms/tre
 
 ![scripts/test.sh running screen shot](screen-shot.png)
 
-The idea is to have the current four Joomla branches (currently 4.4-dev, 5.1-dev, 5.2-dev and 6.0-dev)
+The idea is to have the current four Joomla branches (4.4-dev, 5.1-dev, 5.2-dev and 6.0-dev)
 available in parallel for Joomla system tests. The only requirement is the ability to run a bash script and Docker.
 The installation takes place in Docker containers and is automated with scripts.
 The result is a pure Docker container installation without manual installations or configurations.
+
+The limitation (comparing to other test environments) is that there is only one PHP version and one database type.
 
 To simplify life, the standard Joomla images are used as starting point and overwritten with the Joomla
 source code from the various software branches. The Joomla installation itself is executed by Cypress spec.
