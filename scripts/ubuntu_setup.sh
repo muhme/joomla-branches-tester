@@ -13,15 +13,12 @@
 #   root# x11vnc -storepasswd yourPassword /home/user/.vnc/passwd
 #   root# passwd user
 
-# run with:
-#   root# su - user
-#   user$ git clone https://github.com/muhme/joomla-system-tests
-#   user$ exit
-#   root# ~user/joomla-system-tests/scripts/ubuntu_setup.sh
-#   root# su - user
-#   user$ cd joomla-system-tests
-#   user$ scripts/create.sh
-#   user$ scripts/test.sh
+# run as a user execute:
+#   git clone https://github.com/muhme/joomla-system-tests
+#   cd joomla-system-tests
+#   sudo scripts/ubuntu_setup.sh
+#   scripts/create.sh
+#   scripts/test.sh
 
 # prerequisites
 echo "127.0.0.1 host.docker.internal" >> /etc/hosts
@@ -37,4 +34,4 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg > /etc/apt/trusted.gpg.d
 add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 apt update
 apt install -y docker-ce
-usermod -aG docker user
+usermod -aG docker $USER

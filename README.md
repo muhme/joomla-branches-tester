@@ -25,9 +25,13 @@ source code from the various software branches. The Joomla installation itself i
 
 The installation takes about 2 GB disk space.
 
-Tested with macOS 14 Sonoma and Ubuntu 22 Jammy Jellyfish (there is a script [ubuntu_setup.sh](scripts/ubuntu_setup.sh)).
+Last tested with macOS 14 Sonoma, Windows 11 Pro WSL 2 and Ubuntu 24 Noble Numbat. For Ubuntu there is a script
+[ubuntu_setup.sh](scripts/ubuntu_setup.sh) to install Docker, open firewall port, set `host.docker.internal` etc.:
+```
+sudo scripts/ubuntu_setup.sh
+```
 
-You can install with script [create.sh](scripts/create.sh) as a user, it is not necessary to be `root`:
+You can create the Docker containers and install Joomla with script [create.sh](scripts/create.sh) as a user, it is not necessary to be `root`:
 
 ```
 git clone https://github.com/muhme/joomla-system-tests
