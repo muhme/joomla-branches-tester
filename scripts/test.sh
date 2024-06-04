@@ -11,8 +11,6 @@
 
 source scripts/helper.sh
 
-# all tests (w/o installation) as taken from cypress.config.js specPattern
-ALL_TESTS='tests/System/integration/administrator/**/*.cy.{js,jsx,ts,tsx},tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx},tests/System/integration/api/**/*.cy.{js,jsx,ts,tsx},tests/System/integration/plugins/**/*.cy.{js,jsx,ts,tsx}'
 versionsToTest=("${VERSIONS[@]}")
 
 if isValidVersion "$1"; then
@@ -20,10 +18,11 @@ if isValidVersion "$1"; then
    shift # 1st arg is eaten as the version number
 fi
 
+# Running all or having one test specification?
 if [ $# -eq 0 ] ; then
-  spec=${ALL_TESTS}
+  spec=""
 else
-  spec="$1"
+  spec="--spec $1"
 fi
 
 failed=0
@@ -32,7 +31,7 @@ for version in "${versionsToTest[@]}"
 do
   branch=$(branchName "${version}")
   log "Testing ${branch} ${spec}"
-  docker exec -it jst_cypress sh -c "cd /branch_${version} && cypress run --spec ${spec}"
+  docker exec -it jst_cypress sh -c "cd /branch_${version} && cypress run ${spec}"
   if [ $? -eq 0 ] ; then
     ((successful++))
   else
