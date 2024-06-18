@@ -88,6 +88,12 @@ Test all site specs with branch 4.4-dev:
 scripts/test.sh 44 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
 ```
 
+To show `console.log` messages from Electron browser by setting environment variable: 
+```
+export ELECTRON_ENABLE_LOGGING=1
+scripts/test.sh 44 tests/System/integration/administrator/components/com_actionlogs/Actionlogs.cy.js
+```
+
 ## License
 
 MIT License, Copyright (c) 2024 Heiko Lübbe, see [LICENSE](LICENSE)
