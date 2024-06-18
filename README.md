@@ -96,6 +96,8 @@ scripts/test.sh 44 tests/System/integration/administrator/components/com_actionl
 
 ## Limitations
 
+The different Joomla versions exist in parallel, but the test runs sequentially.
+
 The Docker based Joomla system tests are only intended for the headless operation of Cypress, the Cypress GUI is not available.
 
 The access to Joomla uses unattractively different URLs from the host and from the Docker containers. For example, for Joomla 4.4:
