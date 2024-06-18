@@ -94,6 +94,14 @@ export ELECTRON_ENABLE_LOGGING=1
 scripts/test.sh 44 tests/System/integration/administrator/components/com_actionlogs/Actionlogs.cy.js
 ```
 
+## Limitations
+
+The Docker based Joomla system tests are only intended for the headless operation of Cypress, a GUI is not available.
+
+The access to Joomla uses unattractively different URLs from the host and from the Docker image. For example, for Joomla 4.4:
+* http://localhost:7044/ - from host
+* https://jst_44 - from docker container
+
 ## License
 
 MIT License, Copyright (c) 2024 Heiko Lübbe, see [LICENSE](LICENSE)
