@@ -11,8 +11,8 @@ As a prerequisite, it is sufficient to be able to run git, Docker and a bash scr
 The installation takes place in seven Docker containers and is automated with scripts.
 The result is a pure Docker container installation without manual installations or configurations.
 
-To simplify life, the standard Joomla images are used as starting point and overwritten with the Joomla
-source code from the various software branches.
+To make life easier, the standard Docker Joomla images (`joomla:4` or `joomla:5`) are used as a starting point and
+then overwritten with the source code from the respective Joomla development branch.
 The Joomla installation itself is executed by the Cypress spec `Installation.cy.js` from the Joomla System Tests.
 
 ## Installation
