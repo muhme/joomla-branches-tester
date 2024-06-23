@@ -11,8 +11,6 @@ As a prerequisite, it is sufficient to be able to run git, Docker and a bash scr
 The installation takes place in seven Docker containers and is automated with scripts.
 The result is a pure Docker container installation without manual installations or configurations.
 
-The limitation (comparing to other test environments) is that there is only one PHP version and one database type.
-
 To simplify life, the standard Joomla images are used as starting point and overwritten with the Joomla
 source code from the various software branches.
 The Joomla installation itself is executed by the Cypress spec `Installation.cy.js` from the Joomla System Tests.
@@ -100,6 +98,8 @@ scripts/test.sh 44 tests/System/integration/administrator/components/com_actionl
 ## Limitations
 
 The different Joomla versions exist in parallel, but the test runs sequentially.
+
+Only one PHP version (each based on the Joomla Docker image) and one database type (currently MySQL 8.1) is used.
 
 The Docker based Joomla System Tests are only intended for the headless operation of Cypress, the Cypress GUI is not available.
 
