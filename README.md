@@ -1,18 +1,21 @@
 # Docker based Joomla System Tests
 
-Running automated [Joomla system tests](https://github.com/joomla/joomla-cms/tree/4.4-dev/tests/System) with [Cypress](https://www.cypress.io/) in a [docker](https://www.docker.com/) container environment.
+Running automated [Joomla System Tests](https://github.com/joomla/joomla-cms/tree/4.4-dev/tests/System) with [Cypress](https://www.cypress.io/) in a [Docker](https://www.docker.com/) container environment in all four development branches.
 
 ![scripts/test.sh running screen shot](screen-shot.png)
 
-The idea is to have the current four Joomla branches (4.4-dev, 5.1-dev, 5.2-dev and 6.0-dev)
-available in parallel for Joomla system tests. The only requirement is the ability to run a bash script and Docker.
-The installation takes place in Docker containers and is automated with scripts.
+The idea is to have all active Joomla development branches (currently 4.4-dev, 5.1-dev, 5.2-dev and 6.0-dev)
+available in parallel for Joomla System Tests. The test specifications are mostly branch-independent
+and you can quickly test a new test specification or an error on all four branches.
+As a prerequisite, it is sufficient to be able to run git, Docker and a bash script.
+The installation takes place in seven Docker containers and is automated with scripts.
 The result is a pure Docker container installation without manual installations or configurations.
 
 The limitation (comparing to other test environments) is that there is only one PHP version and one database type.
 
 To simplify life, the standard Joomla images are used as starting point and overwritten with the Joomla
-source code from the various software branches. The Joomla installation itself is executed by Cypress spec.
+source code from the various software branches.
+The Joomla installation itself is executed by the Cypress spec `Installation.cy.js` from the Joomla System Tests.
 
 ## Installation
 
@@ -45,7 +48,7 @@ This can be disabled by setting environment variable [NOCOLOR=1](https://no-colo
 
 ## Containers
 
-The abbreviation `jst` stands for joomla system test:
+The abbreviation `jst` stands for Joomla System Tests:
 
 |Name|Port|Directory :eight_spoked_asterisk: |Comment|
 |----|----|----------------------------------|-------|
@@ -59,7 +62,7 @@ The abbreviation `jst` stands for joomla system test:
 
 :eight_spoked_asterisk: The directories are available on Docker host e.g. to inspect and change the configuration
 files (`configuration.php` or `cypress.config.js`) or the test specifications below `tests/System`.
-And also one available in Joomla container and all together in `jst_cypress` container.
+And also one directory in each Joomla container and all together in `jst_cypress` container.
 
 # Usage
 
@@ -68,22 +71,22 @@ And also one available in Joomla container and all together in `jst_cypress` con
 ufw allow 7025
 ```
 
-Test all (more than 100) specs in all four branches:
+Test all (more than 100 – as defined in Cypress `specPattern`) specs in all four branches:
 ```
 scripts/test.sh
 ```
 
-Test all specs in branch 5.1-dev:
+Test all specs only in branch 5.1-dev:
 ```
 scripts/test.sh 51
 ```
 
-Test one spec with all four branches:
+Test one spec with all four branches (of course, the spec must exist in all branches) :
 ```
 scripts/test.sh tests/System/integration/administrator/components/com_privacy/Consent.cy.js
 ```
 
-Test all site specs with branch 4.4-dev:
+Test all site specs with branch 4.4-dev using a pattern:
 ```
 scripts/test.sh 44 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
 ```
@@ -98,7 +101,7 @@ scripts/test.sh 44 tests/System/integration/administrator/components/com_actionl
 
 The different Joomla versions exist in parallel, but the test runs sequentially.
 
-The Docker based Joomla system tests are only intended for the headless operation of Cypress, the Cypress GUI is not available.
+The Docker based Joomla System Tests are only intended for the headless operation of Cypress, the Cypress GUI is not available.
 
 The access to Joomla uses unattractively different URLs from the host and from the Docker containers. For example, for Joomla 4.4:
 * http://localhost:7044 - from host
