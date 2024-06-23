@@ -99,7 +99,7 @@ scripts/test.sh 44 tests/System/integration/administrator/components/com_actionl
 
 The different Joomla versions exist in parallel, but the test runs sequentially.
 
-Only one PHP version (each based on the Joomla Docker image) and one database type (currently MySQL 8.1) is used.
+Only one PHP version (the one from the Joomla Docker image) and one database type (currently MySQL 8.1) is used.
 
 The Docker based Joomla System Tests are only intended for the headless operation of Cypress, the Cypress GUI is not available.
 
