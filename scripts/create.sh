@@ -73,7 +73,17 @@ do
   log "jst_${version} – npm"
   docker exec -it "jst_${version}" bash -c 'cd /var/www/html && npm ci'
 
-  log "jst_${version} – create cypress.config.js"
+  # PR https://github.com/joomla/joomla-cms/pull/43676 – [4.4] Move the Cypress Tests to ESM
+  if [ -f "branch_${version}/cypress.config.dist.js" ]; then
+    extension="js"
+  elif [ -f "branch_${version}/cypress.config.dist.mjs" ]; then
+    extension="mjs"
+  else
+    error "No 'cypress.config.dist.*js' file found, please have a look" >&2
+    exit 1
+  fi
+
+  log "jst_${version} – create cypress.config.${extension}"
   # adopt e.g.:
   #   >     db_name: 'test_joomla_44'
   #   >     db_prefix: 'jos44_',
@@ -90,7 +100,7 @@ do
     -e \"s/db_password: .*/db_password: 'root',/\" \
     -e \"s/smtp_host: .*/smtp_host: 'host.docker.internal',/\" \
     -e \"s/smtp_port: .*/smtp_port: '7025',/\" \
-    cypress.config.dist.js > cypress.config.js"
+    cypress.config.dist.${extension} > cypress.config.${extension}"
 
   log "jst_${version} – Cypress based Joomla installation"
   # temporarily disable -e for chown as on macOS seen following, but it doesn't matter as these files are 444
