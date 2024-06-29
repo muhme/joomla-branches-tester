@@ -52,12 +52,16 @@ do
   log "jst_${version} – Deleting orignal Joomla installation"
   docker exec -it "jst_${version}" bash -c 'rm -rf /var/www/html/* && rm -rf /var/www/html/.??*'
 
+  # disable the disabled PHP error logging
+  log "jst_${version} – Show PHP warnings"
+  docker exec -it "jst_${version}" bash -c 'mv /usr/local/etc/php/conf.d/error-logging.ini /usr/local/etc/php/conf.d/error-logging.ini.DISABLED'
+
   log "jst_${version} – Installing packages"
   docker exec -it "jst_${version}" bash -c 'apt-get update -qq && \
     apt-get upgrade -y && \
     curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt-get install -y git vim nodejs iputils-ping net-tools'
-  # aaditional having vim, ping, netstat
+  # aditional having vim, ping, netstat
 
   branch=$(branchName "${version}")
   log "jst_${version} – cloning ${branch} branch into directory branch_${version}"
