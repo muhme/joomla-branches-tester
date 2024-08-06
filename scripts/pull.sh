@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# pull.sh - git pull on one or all branches, e.g.
+# pull.sh - Running git pull and git status on one or all branches, e.g.
 #   scripts/pull.sh
 #   scripts/pull.sh 52
 #

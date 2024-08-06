@@ -105,5 +105,6 @@ services:
       - ./branch_51:/branch_51
       - ./branch_52:/branch_52
       - ./branch_60:/branch_60
+      - ./scripts:/scripts
     extra_hosts:
       - "host.docker.internal:host-gateway"
