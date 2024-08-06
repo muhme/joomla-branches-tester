@@ -1,13 +1,20 @@
-# Docker based Joomla System Tests
+# Docker based Joomla Branches Tester
 
-Running automated [Joomla System Tests](https://github.com/joomla/joomla-cms/tree/4.4-dev/tests/System) with [Cypress](https://www.cypress.io/) in a [Docker](https://www.docker.com/) container environment in all four development branches.
+Having all four active Joomla branches running in parallel in a [Docker](https://www.docker.com/) container environment for:
+* Automated [Joomla System Tests](https://github.com/joomla/joomla-cms/tree/4.4-dev/tests/System) with [Cypress](https://www.cypress.io/) and
+* Automated installation of the [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester).
 
 ![scripts/test.sh running screen shot](screen-shot.png)
 
 The idea is to have all active Joomla development branches (currently 4.4-dev, 5.1-dev, 5.2-dev and 6.0-dev)
-available in parallel for Joomla System Tests. The test specifications are mostly branch-independent
+available in parallel for testing. First for Joomla System Tests.
+The test specifications are mostly branch-independent
 and you can quickly test a new test specification or an error on all four branches.
+
+And secondly, that the Joomla Patch Tester is automatically installed in all Joomla instances.
+
 As a prerequisite, it is sufficient to be able to run git, Docker and a bash script.
+Thanks to Docker, it is not necessary to install a database, Cypress, PHP, Node or Composer.
 The installation takes place in seven Docker containers and is automated with scripts.
 The result is a pure Docker container installation without manual installations or configurations.
 
@@ -108,6 +115,8 @@ The Docker based Joomla System Tests are only intended for the headless operatio
 The access to Joomla uses unattractively different URLs from the host and from the Docker containers. For example, for Joomla 4.4:
 * http://localhost:7044 - from host
 * [http://jst_44](http://jst_44) - from docker container
+
+The initial `create.sh` script runs about an hour and requires about 7 GB disk space.
 
 ## License
 
