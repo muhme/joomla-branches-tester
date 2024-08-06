@@ -15,6 +15,8 @@ To make life easier, the standard Docker Joomla images (`joomla:4` or `joomla:5`
 then overwritten with the source code from the respective Joomla development branch.
 The Joomla installation itself is executed by the Cypress spec `Installation.cy.js` from the Joomla System Tests.
 
+For the list of all Joomla Branches Tester scripts see [scripts/README.md](scripts/README.md).
+
 ## Installation
 
 ### Prerequisites
