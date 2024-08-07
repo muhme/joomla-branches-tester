@@ -7,15 +7,15 @@
 #   . 4 vCPU / 8 GB RAM / regular SSD
 #
 # MIT License, Copyright (c) 2024 Heiko Lübbe
-# https://github.com/muhme/joomla-system-tests
+# https://github.com/muhme/joomla-branches-tester
 
 # if you wish to replace the default random created passwords:
 #   root# x11vnc -storepasswd yourPassword /home/user/.vnc/passwd
 #   root# passwd user
 
-# run as a user execute:
+# run as a non-root user:
 #   git clone https://github.com/muhme/joomla-system-tests
-#   cd joomla-system-tests
+#   cd joomla-branches-tester
 #   sudo scripts/ubuntu_setup.sh
 #   scripts/create.sh
 #   scripts/test.sh

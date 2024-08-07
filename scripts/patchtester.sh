@@ -5,7 +5,7 @@
 #   scripts/patchtester.sh ghp_42g8n8uCZtplQNnbNrEWsTrFfQgYAU4711Tc
 #
 # MIT License, Copyright (c) 2024 Heiko Lübbe
-# https://github.com/muhme/joomla-system-tests
+# https://github.com/muhme/joomla-branches-tester
 
 source scripts/helper.sh
 
@@ -28,7 +28,7 @@ for version in "${versionsToInstall[@]}"
 do
   branch=$(branchName "${version}")
   log "Testing ${branch} ${spec}"
-  docker exec -it jst_cypress sh -c "cd /branch_${version} && cypress run --env token=$1 --config specPattern=/scripts/patchtester.cy.js"
+  docker exec -it jbt_cypress sh -c "cd /branch_${version} && cypress run --env token=$1 --config specPattern=/scripts/patchtester.cy.js"
   if [ $? -eq 0 ] ; then
     ((successful++))
   else

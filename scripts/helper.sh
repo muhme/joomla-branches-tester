@@ -1,7 +1,7 @@
 # helper.sh - bash script helper functions
 #
 # MIT License, Copyright (c) 2024 Heiko Lübbe
-# https://github.com/muhme/joomla-system-tests
+# https://github.com/muhme/joomla-branches-tester
 
 # as branches available Joomla versions, have to match the defined containers
 VERSIONS=(44 51 52 60)

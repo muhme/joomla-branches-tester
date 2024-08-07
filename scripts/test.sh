@@ -8,7 +8,7 @@
 #   ELECTRON_ENABLE_LOGGING=1 scripts/test.sh
 #
 # MIT License, Copyright (c) 2024 Heiko Lübbe
-# https://github.com/muhme/joomla-system-tests
+# https://github.com/muhme/joomla-branches-tester
 
 source scripts/helper.sh
 
@@ -38,7 +38,7 @@ for version in "${versionsToTest[@]}"
 do
   branch=$(branchName "${version}")
   log "Testing ${branch} ${spec}"
-  docker exec -it jst_cypress sh -c "cd /branch_${version} && ${eel1} cypress run ${spec}"
+  docker exec -it jbt_cypress sh -c "cd /branch_${version} && ${eel1} cypress run ${spec}"
   if [ $? -eq 0 ] ; then
     ((successful++))
   else

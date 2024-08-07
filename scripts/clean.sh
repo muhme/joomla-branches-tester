@@ -1,19 +1,11 @@
 #!/bin/bash
 #
-# clean.sh - delete all jst_* docker containers and the network
-#            (or user docker compose down)
+# clean.sh - delete all jbt_* Docker containers and the network joomla-branches-tester_default.
 #
 # MIT License, Copyright (c) 2024 Heiko Lübbe
-# https://github.com/muhme/joomla-system-tests
-
-NETWORK_NAME="joomla-system-tests_default"
+# https://github.com/muhme/joomla-branches-tester
 
 source scripts/helper.sh
 
-log 'Remove following Joomla System Tests Docker containers'
-docker ps -a --format '{{.Names}}' | grep '^jst_' | xargs -r docker rm -f
-
-log 'Remove following Docker network'
-if docker network inspect "$NETWORK_NAME" >/dev/null 2>&1; then
-  docker network rm "$NETWORK_NAME"
-fi
+log 'Stop and remove Joomla Branches Tester Docker containers and network'
+docker compose down

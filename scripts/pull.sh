@@ -5,7 +5,7 @@
 #   scripts/pull.sh 52
 #
 # MIT License, Copyright (c) 2024 Heiko Lübbe
-# https://github.com/muhme/joomla-system-tests
+# https://github.com/muhme/joomla-branches-tester
 
 source scripts/helper.sh
 
@@ -32,14 +32,14 @@ for version in "${versionsToTest[@]}"
 do
   branch=$(branchName "${version}")
   log "Running git pull on ${branch}"
-  docker exec -it "jst_${version}" sh -c "git config --global --add safe.directory /var/www/html && git pull"
+  docker exec -it "jbt_${version}" sh -c "git config --global --add safe.directory /var/www/html && git pull"
   if [ $? -eq 0 ] ; then
     ((successful++))
   else
     ((failed++))
   fi
   log "Showing git status on ${branch}"
-  docker exec -it "jst_${version}" sh -c "git status"
+  docker exec -it "jbt_${version}" sh -c "git status"
 done
 
 if [ ${failed} -eq 0 ] ; then

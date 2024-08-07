@@ -55,21 +55,21 @@ This can be disabled by setting environment variable [NOCOLOR=1](https://no-colo
 
 ## Containers
 
-The abbreviation `jst` stands for Joomla System Tests:
+The abbreviation `jbt` stands for Joomla Branches Tester:
 
 |Name|Port|Directory :eight_spoked_asterisk: |Comment|
 |----|----|----------------------------------|-------|
-|jst_mysql| | | version 8.1 |
-|jst_cypress| SMTP host.docker.internal:7025 | | SMTP server is only running during test execution |
-|jst_mysqladmin|[7001](http://localhost:7001)| | user root / password root |
-|jst_44|[7044](http://localhost:7044)| /branch_44 | Joomla branch 4.4-dev<br />PHP 8.1 |
-|jst_51|[7051](http://localhost:7051)| /branch_51 | Joomla branch 5.1-dev<br />PHP 8.2 |
-|jst_52|[7052](http://localhost:7052)| /branch_52 | Joomla branch 5.2-dev<br />PHP 8.2 |
-|jst_60|[7060](http://localhost:7060)| /branch_60 | Joomla branch 6.0-dev<br />PHP 8.2 |
+|jbt_mysql| | | version 8.1 |
+|jbt_cypress| SMTP host.docker.internal:7025 | | SMTP server is only running during test execution |
+|jbt_mysqladmin|[7001](http://localhost:7001)| | user root / password root |
+|jbt_44|[7044](http://localhost:7044)| /branch_44 | Joomla branch 4.4-dev<br />PHP 8.1 |
+|jbt_51|[7051](http://localhost:7051)| /branch_51 | Joomla branch 5.1-dev<br />PHP 8.2 |
+|jbt_52|[7052](http://localhost:7052)| /branch_52 | Joomla branch 5.2-dev<br />PHP 8.2 |
+|jbt_60|[7060](http://localhost:7060)| /branch_60 | Joomla branch 6.0-dev<br />PHP 8.2 |
 
 :eight_spoked_asterisk: The directories are available on Docker host e.g. to inspect and change the configuration
 files (`configuration.php` or `cypress.config.js`) or the test specifications below `tests/System`.
-And also one directory in each Joomla container and all together in `jst_cypress` container.
+And also one directory in each Joomla container and all together in `jbt_cypress` container.
 
 # Usage
 
@@ -114,7 +114,7 @@ The Docker based Joomla System Tests are only intended for the headless operatio
 
 The access to Joomla uses unattractively different URLs from the host and from the Docker containers. For example, for Joomla 4.4:
 * http://localhost:7044 - from host
-* [http://jst_44](http://jst_44) - from docker container
+* [http://jbt_44](http://jbt_44) - from docker container
 
 The initial `create.sh` script runs about an hour and requires about 7 GB disk space.
 
