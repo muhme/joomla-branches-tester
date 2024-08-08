@@ -4,7 +4,7 @@ Having all four active Joomla branches running in parallel in a [Docker](https:/
 * Automated [Joomla System Tests](https://github.com/joomla/joomla-cms/tree/4.4-dev/tests/System) with [Cypress](https://www.cypress.io/) and
 * Automated installation of the [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester).
 
-![Joomla Branches Software Architecture](images/joomla-branches-tester.png)
+![Joomla Branches Software Architecture](images/joomla-branches-tester.svg)
 
 The idea is to have all active Joomla development branches (currently 4.4-dev, 5.1-dev, 5.2-dev and 6.0-dev)
 available in parallel for testing. First for Joomla System Tests.
