@@ -14,3 +14,6 @@ This collection of scripts is the Joomla Branches Tester (see [../README.md](../
 | [scripts/helper.sh](helper.sh) | Some commonly used bash script functions and definitions. | |
 
 The scripts are used on the Mac command line and inside Docker container, but should also work on Linux and the Windows subsystem for Linux.
+
+
+![scripts/test.sh running screen shot](../images/screen-shot.png)

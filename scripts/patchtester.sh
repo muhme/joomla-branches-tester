@@ -27,7 +27,7 @@ successful=0
 for version in "${versionsToInstall[@]}"
 do
   branch=$(branchName "${version}")
-  log "Testing ${branch} ${spec}"
+  log "Install Joomla Patch Tester in ${branch} ${spec}"
   docker exec -it jbt_cypress sh -c "cd /branch_${version} && cypress run --env token=$1 --config specPattern=/scripts/patchtester.cy.js"
   if [ $? -eq 0 ] ; then
     ((successful++))

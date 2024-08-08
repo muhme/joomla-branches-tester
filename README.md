@@ -4,7 +4,7 @@ Having all four active Joomla branches running in parallel in a [Docker](https:/
 * Automated [Joomla System Tests](https://github.com/joomla/joomla-cms/tree/4.4-dev/tests/System) with [Cypress](https://www.cypress.io/) and
 * Automated installation of the [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester).
 
-![scripts/test.sh running screen shot](screen-shot.png)
+![Joomla Branches Software Architecture](images/joomla-branches-tester.png)
 
 The idea is to have all active Joomla development branches (currently 4.4-dev, 5.1-dev, 5.2-dev and 6.0-dev)
 available in parallel for testing. First for Joomla System Tests.
@@ -33,8 +33,6 @@ For the list of all Joomla Branches Tester scripts see [scripts/README.md](scrip
 127.0.0.1 host.docker.internal
 ```
 
-The installation takes about 2 GB disk space.
-
 Last tested with macOS 14 Sonoma, Windows 11 Pro WSL 2 and Ubuntu 24 Noble Numbat. For Ubuntu there is a script
 [ubuntu_setup.sh](scripts/ubuntu_setup.sh) to install Docker, open firewall port, set `host.docker.internal` etc.:
 ```
@@ -59,7 +57,7 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
 
 |Name|Port|Directory :eight_spoked_asterisk: |Comment|
 |----|----|----------------------------------|-------|
-|jbt_mysql| | | version 8.1 |
+|jbt_mysql| | | MySQL version 8.1 |
 |jbt_cypress| SMTP host.docker.internal:7025 | | SMTP server is only running during test execution |
 |jbt_mysqladmin|[7001](http://localhost:7001)| | user root / password root |
 |jbt_44|[7044](http://localhost:7044)| /branch_44 | Joomla branch 4.4-dev<br />PHP 8.1 |
@@ -108,7 +106,7 @@ scripts/test.sh 44 tests/System/integration/administrator/components/com_actionl
 
 The different Joomla versions exist in parallel, but the test runs sequentially.
 
-Only one PHP version (the one from the Joomla Docker image) and one database type (currently MySQL 8.1) is used.
+Only one PHP version (the one from the Joomla Docker image) and one database type and version (currently MySQL 8.1) is used.
 
 The Docker based Joomla System Tests are only intended for the headless operation of Cypress, the Cypress GUI is not available.
 
