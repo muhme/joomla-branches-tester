@@ -7,6 +7,10 @@
 # MIT License, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
+ME=`basename $0`
+TMP="/tmp/$ME.TMP.$$"
+trap 'rm -rf $TMP' 0
+
 source scripts/helper.sh
 
 # Zeroth check host.docker.internal entry
@@ -123,19 +127,19 @@ for version in "${VERSIONS[@]}"; do
   #   chmod: changing permissions of '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
   set +e
   # change root ownership to www-data
-  docker exec -it "jbt_${version}" chown -R www-data:www-data /var/www/html 2>/dev/null
+  docker exec -it "jbt_${version}" chown -R www-data:www-data /var/www/html >/dev/null 2>&1
   set -e
   # Joomla container needs to be restarted
   docker stop "jbt_${version}"
   docker start "jbt_${version}"
 
-  # 'Hack' until setting db_port is supported - overwrite with setting db_port in joomla-cypress and System Tests
-  if [ "${version}" == "44" ] ; then
-    grep -v cy.cancelTour scripts/Installation.cy.js > "branch_${version}/tests/System/integration/install/Installation.cy.js"
-  else
-    cp scripts/Installation.cy.js "branch_${version}/tests/System/integration/install/Installation.cy.js"
-  fi
+  # 'Hack' until PR with setting db_port is supported - overwrite with setting db_port in joomla-cypress and System Tests
+  append="/db_host: Cypress.env('db_host'),/a\      db_port: Cypress.env('db_port'), // muhme, 9 August 2024 'hack' as long as waiting for PR"
+  sed "${append}" "branch_${version}/tests/System/integration/install/Installation.cy.js" > $TMP
+  cp $TMP "branch_${version}/tests/System/integration/install/Installation.cy.js"
   cp scripts/Joomla.js "branch_${version}/node_modules/joomla-cypress/src/Joomla.js"
+
+  # 'Hack' until 6.0-dev is 
 
   # Using Install Joomla from System Tests
   docker exec -it jbt_cypress sh -c "cd /branch_${version} && cypress run --spec tests/System/integration/install/Installation.cy.js"
