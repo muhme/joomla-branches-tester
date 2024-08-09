@@ -6,21 +6,39 @@
 services:
 
   mysql:
-    container_name: jbt_mysql
+    container_name: jbt_my
     # Joomla 5 needs >= 8.0.13, actual 8.1.0
     # and hardwire as 8.1 as 8.4 needs mysql_native_password=ON
     restart: unless-stopped
     image: mysql:8.1
     ports:
-      - "7006:3306"
+      - "7011:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
 
-  mysqladmin:
-    container_name: jbt_admin
+  mariadb:
+    container_name: jbt_madb
+    restart: unless-stopped
+    image: mariadb:10.4
+    ports:
+      - "7012:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+
+  postgres:
+    container_name: jbt_pg
+    restart: unless-stopped
+    image: postgres:11
+    ports:
+      - "7013:5432"
+    environment:
+      POSTGRES_PASSWORD: root
+
+  myadmin:
+    container_name: jbt_mya
     image: phpmyadmin/phpmyadmin
     environment:
-      PMA_HOST: jbt_mysql
+      PMA_HOSTS: jbt_my:3306, jbt_pg:5432
       PMA_USER: root
       PMA_PASSWORD: root
     ports:
@@ -28,6 +46,20 @@ services:
     restart: unless-stopped
     depends_on:
       - mysql
+
+  pgadmin:
+    container_name: jbt_pga
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      # https://stackoverflow.com/questions/70883515/pgadmin-disable-login-dialog-automatic-login
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "7002:80"
+    restart: unless-stopped
+    depends_on:
+      - postgres
 
   joomla_44:
     container_name: jbt_44

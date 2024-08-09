@@ -11,12 +11,17 @@ source scripts/helper.sh
 
 # Zeroth check host.docker.internal entry
 HOSTS_FILE="/etc/hosts"
-EXPECTED_ENTRY="127.0.0.1[[:space:]]+host.docker.internal"
-if grep -Eq "${EXPECTED_ENTRY}" "$HOSTS_FILE"; then
-  log "Entry '${EXPECTED_ENTRY}' exists in file '${HOSTS_FILE}' - thx :)"
+if grep -Eq "127.0.0.1[[:space:]]+host.docker.internal" "$HOSTS_FILE"; then
+  log "Entry '127.0.0.1 host.docker.internal' exists in file '${HOSTS_FILE}' - thx :)"
 else
-  error "Entry '${EXPECTED_ENTRY}' is missing in file '${HOSTS_FILE}' - please add"
-  exit 1
+  error "Entry '127.0.0.1 host.docker.internal' is missing in file '${HOSTS_FILE}' - try to add"
+  sudo echo "127.0.0.1 host.docker.internal" >> "$HOSTS_FILE"
+  if grep -Eq "127.0.0.1[[:space:]]+host.docker.internal" "$HOSTS_FILE"; then
+    log "Entry '127.0.0.1 host.docker.internal' added in file '${HOSTS_FILE}'"
+  else
+    error "Entry '127.0.0.1 host.docker.internal' is missing in file '${HOSTS_FILE}' - please add"
+    exit 1
+  fi
 fi
 
 # First delete all docker containters
@@ -95,7 +100,7 @@ for version in "${VERSIONS[@]}"; do
   #   >     db_name: 'test_joomla_44'
   #   >     db_prefix: 'jos44_',
   #   >     db_host: 'host.docker.internal',
-  #   >     db_port: '7006',
+  #   >     db_port: '7011',
   #   >     baseUrl: 'http://host.docker.internal:7044',
   #   >     db_password: 'root',
   #   >     smtp_host: 'host.docker.internal',
@@ -106,7 +111,7 @@ for version in "${VERSIONS[@]}"; do
     -e \"s/db_name: .*/db_name: 'test_joomla_${version}',/\" \
     -e \"s/db_prefix: .*/db_prefix: 'jos${version}_',/\" \
     -e \"s/db_host: .*/db_host: 'host.docker.internal',/\" \
-    -e \"s/db_port: .*/db_port: '7006',/\" \
+    -e \"s/db_port: .*/db_port: '7011',/\" \
     -e \"s/baseUrl: .*/baseUrl: 'http:\/\/host.docker.internal:70${version}\/',/\" \
     -e \"s/db_password: .*/db_password: 'root',/\" \
     -e \"s/smtp_host: .*/smtp_host: 'host.docker.internal',/\" \
@@ -118,16 +123,26 @@ for version in "${VERSIONS[@]}"; do
   #   chmod: changing permissions of '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
   set +e
   # change root ownership to www-data
-  docker exec -it "jbt_${version}" chown -R www-data:www-data /var/www/html
+  docker exec -it "jbt_${version}" chown -R www-data:www-data /var/www/html 2>/dev/null
   set -e
   # Joomla container needs to be restarted
   docker stop "jbt_${version}"
   docker start "jbt_${version}"
+
+  # 'Hack' until setting db_port is supported - overwrite with setting db_port in joomla-cypress and System Tests
+  if [ "${version}" == "44" ] ; then
+    grep -v cy.cancelTour scripts/Installation.cy.js > "branch_${version}/tests/System/integration/install/Installation.cy.js"
+  else
+    cp scripts/Installation.cy.js "branch_${version}/tests/System/integration/install/Installation.cy.js"
+  fi
+  cp scripts/Joomla.js "branch_${version}/node_modules/joomla-cypress/src/Joomla.js"
+
+  # Using Install Joomla from System Tests
   docker exec -it jbt_cypress sh -c "cd /branch_${version} && cypress run --spec tests/System/integration/install/Installation.cy.js"
 
   # for the tests we need mysql user/password login
   log "jbt_${version} – Enable MySQL user root login with password"
-  docker exec -it jbt_mysql mysql -uroot -proot -e "ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'root';"
+  docker exec -it jbt_my mysql -uroot -proot -e "ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'root';"
 done
 
 log "Aditional having vim, ping and netstat in jbt_cypress container"

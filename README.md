@@ -24,6 +24,8 @@ The Joomla installation itself is executed by the Cypress spec `Installation.cy.
 
 For the list of all Joomla Branches Tester scripts see [scripts/README.md](scripts/README.md).
 
+Filesystem is available for example to inspect screenshots from failed tests.
+
 ## Installation
 
 ### Prerequisites
@@ -46,6 +48,10 @@ git clone https://github.com/muhme/joomla-system-tests
 cd joomla-system-tests
 scripts/create.sh
 ```
+
+#### Windows
+
+WSL2 sudo
 
 :point_right: The scripts use [ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code#Colors)
 to color their own log and error messages.
