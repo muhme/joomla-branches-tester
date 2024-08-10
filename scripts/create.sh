@@ -7,9 +7,6 @@
 # MIT License, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
-ME=`basename $0`
-TMP="/tmp/$ME.TMP.$$"
-trap 'rm -rf $TMP' 0
 
 source scripts/helper.sh
 
@@ -79,6 +76,12 @@ for version in "${VERSIONS[@]}"; do
   log "jbt_${version} – cloning ${branch} branch into directory branch_${version}"
   docker exec -it "jbt_${version}" bash -c "git clone -b ${branch} --depth 1 https://github.com/joomla/joomla-cms /var/www/html"
 
+  if [ "$version" = "51" ] || [ "$version" = "52" ] || [ "$version" = "60" ]; then
+    log "Install missing libraries in container jbt_${version}"
+    docker exec -it "jbt_${version}" bash -c "cd /var/www/html && \
+      apt-get install -y libzip4 libmagickwand-6.q16-6 libmemcached11"
+  fi
+
   log "jbt_${version} – Composer"
   docker exec -it "jbt_${version}" bash -c "cd /var/www/html && \
     php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\" && \
@@ -89,65 +92,33 @@ for version in "${VERSIONS[@]}"; do
   log "jbt_${version} – npm"
   docker exec -it "jbt_${version}" bash -c 'cd /var/www/html && npm ci'
 
-  # PR https://github.com/joomla/joomla-cms/pull/43676 – [4.4] Move the Cypress Tests to ESM
-  if [ -f "branch_${version}/cypress.config.dist.js" ]; then
-    extension="js"
-  elif [ -f "branch_${version}/cypress.config.dist.mjs" ]; then
-    extension="mjs"
-  else
-    error "No 'cypress.config.dist.*js' file found, please have a look" >&2
-    exit 1
-  fi
-
-  log "jbt_${version} – create cypress.config.${extension}"
-  # adopt e.g.:
-  #   >     db_name: 'test_joomla_44'
-  #   >     db_prefix: 'jos44_',
-  #   >     db_host: 'host.docker.internal',
-  #   >     db_port: '7011',
-  #   >     baseUrl: 'http://host.docker.internal:7044',
-  #   >     db_password: 'root',
-  #   >     smtp_host: 'host.docker.internal',
-  #   >     smtp_port: '7025',
-
-  #     -e \"s/baseUrl: .*/baseUrl: 'http:\/\/jbt_${version}\/',/\" \
-  docker exec -it "jbt_${version}" bash -c "cd /var/www/html && sed \
-    -e \"s/db_name: .*/db_name: 'test_joomla_${version}',/\" \
-    -e \"s/db_prefix: .*/db_prefix: 'jos${version}_',/\" \
-    -e \"s/db_host: .*/db_host: 'host.docker.internal',/\" \
-    -e \"s/db_port: .*/db_port: '7011',/\" \
-    -e \"s/baseUrl: .*/baseUrl: 'http:\/\/host.docker.internal:70${version}\/',/\" \
-    -e \"s/db_password: .*/db_password: 'root',/\" \
-    -e \"s/smtp_host: .*/smtp_host: 'host.docker.internal',/\" \
-    -e \"s/smtp_port: .*/smtp_port: '7025',/\" \
-    cypress.config.dist.${extension} > cypress.config.${extension}"
-
-  log "jbt_${version} – Cypress based Joomla installation"
+  log "jbt_${version} – Change root ownership to www-data"
   # temporarily disable -e for chown as on macOS seen following, but it doesn't matter as these files are 444
   #   chmod: changing permissions of '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
   set +e
   # change root ownership to www-data
   docker exec -it "jbt_${version}" chown -R www-data:www-data /var/www/html >/dev/null 2>&1
   set -e
+
   # Joomla container needs to be restarted
-  docker stop "jbt_${version}"
-  docker start "jbt_${version}"
+  log "jbt_${version} – Restart container"
 
-  # 'Hack' until PR with setting db_port is supported - overwrite with setting db_port in joomla-cypress and System Tests
-  append="/db_host: Cypress.env('db_host'),/a\      db_port: Cypress.env('db_port'), // muhme, 9 August 2024 'hack' as long as waiting for PR"
-  sed "${append}" "branch_${version}/tests/System/integration/install/Installation.cy.js" > $TMP
-  cp $TMP "branch_${version}/tests/System/integration/install/Installation.cy.js"
-  cp scripts/Joomla.js "branch_${version}/node_modules/joomla-cypress/src/Joomla.js"
+  # Configure using MariaDB and install Joomla
+  scripts/mariadb.sh "${version}"
 
-  # 'Hack' until 6.0-dev is 
-
-  # Using Install Joomla from System Tests
-  docker exec -it jbt_cypress sh -c "cd /branch_${version} && cypress run --spec tests/System/integration/install/Installation.cy.js"
-
-  # for the tests we need mysql user/password login
-  log "jbt_${version} – Enable MySQL user root login with password"
-  docker exec -it jbt_my mysql -uroot -proot -e "ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'root';"
 done
+
+# For the tests we need mysql user/password login
+log "jbt_${version} – Enable MySQL user root login with password"
+docker exec -it jbt_mysql mysql -uroot -proot -e "ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'root';"
+# And for MariaDB too
+log "jbt_${version} – Enable MariaDB user root login with password"
+docker exec -it jbt_madb mysql -uroot -proot -e  "ALTER USER 'root'@'%' IDENTIFIED BY 'root';"
+# And Postgres
+log "jbt_${version} – Create PostgreSQL user root with password root and SUPERUSER role"
+docker exec -it jbt_pg sh -c "\
+  psql -U postgres -c \"CREATE USER root WITH PASSWORD 'root';\" && \
+  psql -U postgres -c \"ALTER USER root WITH SUPERUSER;\""
 
 log "Aditional having vim, ping and netstat in jbt_cypress container"
 docker exec -it jbt_cypress sh -c "apt-get update && apt-get install -y git vim iputils-ping net-tools"

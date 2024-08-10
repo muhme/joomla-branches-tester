@@ -18,7 +18,7 @@ fi
 
 # Check if the given token looks like a GitHub personal access token
 if [[ $1 != ghp_* ]]; then
-  echo "Error: Argument with GitHub personal access token 'ghp_*' is missing."
+  error "Error: Argument with GitHub personal access token 'ghp_*' is missing."
   exit 1
 fi
 

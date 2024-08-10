@@ -13,7 +13,8 @@ This collection of scripts is the Joomla Branches Tester (see [../README.md](../
 | [scripts/ubuntu_setup.sh](ubuntu_setup.sh) | Helper script in an installation on standard Ubuntu Linux. | |
 | [scripts/helper.sh](helper.sh) | Some commonly used bash script functions and definitions. | |
 
-The scripts are used on the Mac command line and inside Docker container, but should also work on Linux and the Windows subsystem for Linux.
-
+:point_right: The scripts use [ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code#Colors)
+to color their own log and error messages.
+This can be disabled by setting environment variable [NOCOLOR=1](https://no-color.org/).
 
 ![scripts/test.sh running screen shot](../images/screen-shot.png)
