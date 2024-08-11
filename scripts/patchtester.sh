@@ -27,7 +27,7 @@ successful=0
 for version in "${versionsToInstall[@]}"
 do
   branch=$(branchName "${version}")
-  log "Install Joomla Patch Tester in ${branch} ${spec}"
+  log "Install Joomla Patch Tester in ${branch}"
   docker exec -it jbt_cypress sh -c "cd /branch_${version} && cypress run --env token=$1 --config specPattern=/scripts/patchtester.cy.js"
   if [ $? -eq 0 ] ; then
     ((successful++))
@@ -37,7 +37,7 @@ do
 done
 
 if [ ${failed} -eq 0 ] ; then
-  log "Completed ${versionsToInstall[@]} with ${successful} successful ${spec}"
+  log "Completed ${versionsToInstall[@]} with ${successful} successful"
 else
-  error "Completed ${versionsToInstall[@]} with ${failed} failed and ${successful} successful ${spec}"
+  error "Completed ${versionsToInstall[@]} with ${failed} failed and ${successful} successful"
 fi

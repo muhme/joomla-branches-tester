@@ -102,6 +102,7 @@ for version in "${VERSIONS[@]}"; do
 
   # Joomla container needs to be restarted
   log "jbt_${version} – Restart container"
+  docker restart "jbt_${version}"
 
   # Configure using MariaDB and install Joomla
   scripts/mariadb.sh "${version}"

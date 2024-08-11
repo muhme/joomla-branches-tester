@@ -55,7 +55,6 @@ for version in "${versions[@]}"; do
   #   >     smtp_host: 'host.docker.internal',
   #   >     smtp_port: '7025',
 
-
   docker exec -it "jbt_${version}" bash -c "cd /var/www/html && sed \
     -e \"s/db_type: .*/db_type: 'PostgreSQL (PDO)',/\" \
     -e \"s/db_name: .*/db_name: 'test_joomla_${version}',/\" \
