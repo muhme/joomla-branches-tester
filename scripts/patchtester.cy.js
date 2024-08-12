@@ -20,19 +20,6 @@ describe(`Install '${COMPONENT}' with`, () => {
     cy.installExtensionFromUrl(DOWNLOAD_URL);
   });
 
-  // Problems with patchtester seen after switching database, therefore uninstall and install again
-  // 42P01, 7, ERROR: relation "jos44_patchtester_pulls_labels" does not exist LINE 2: FROM "jos44_patchtester_pulls_labels"
-  it("uninstall component", () => {
-    cy.doAdministratorLogin();
-    cy.uninstallExtension(COMPONENT);
-  });
-
-  // Install extension 2nd time
-  it("install component again", () => {
-    cy.doAdministratorLogin();
-    cy.installExtensionFromUrl(DOWNLOAD_URL);
-  });
-
   // Set the GitHub Token
   it("set GitHub token", () => {
     const token = Cypress.env("token");

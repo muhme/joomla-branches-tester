@@ -79,10 +79,15 @@ for version in "${versions[@]}"; do
   cp $TMP "branch_${version}/tests/System/integration/install/Installation.cy.js"
   cp scripts/Joomla.js "branch_${version}/node_modules/joomla-cypress/src/Joomla.js"
 
+  # Since the database will be new, we clean up autoload classes cache file and
+  # all com_patchtester directories to prevent the next installation to be fail.
+  (cd branch_${version} ; rm -rf administrator/components/com_patchtester api/components/com_patchtester \
+                                 media/com_patchtester administrator/cache/autoload_psr4.php)
+
   # Using Install Joomla from System Tests
   log "jbt_${version} – Cypress based Joomla installation"
   docker exec -it jbt_cypress sh -c "cd /branch_${version} && cypress run --spec tests/System/integration/install/Installation.cy.js"
-  
+
   log "jbt_${version} – ${variant} based Joomla is installed"
   echo ""
 

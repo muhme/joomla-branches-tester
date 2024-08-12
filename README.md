@@ -172,6 +172,12 @@ scripts/database.sh pgsql
 
 :point_right: It can also be used to clean a Joomla installation.
 
+> :warning: **Caution:** In your Joomla installation, the database and the files may now have diverged.
+> This can be a problem if you have installed extensions.
+> For example for the Patch Tester the autoload classes file `autoload_psr4.php` and
+> the directories `administrator/components/com_patchtester`, `api/components/com_patchtester` and
+> `media/com_patchtester` needs to be deleted. And the script already takes care of that.
+
 ### Install Joomla Patch Tester
 
 For your comfort there is 
