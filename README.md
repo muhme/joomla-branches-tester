@@ -6,7 +6,8 @@ All four active Joomla branches run in parallel in a [Docker](https://www.docker
 Use one or all four branches for:
 * Automated [Joomla System Tests](https://github.com/joomla/joomla-cms/tree/4.4-dev/tests/System) with [Cypress](https://www.cypress.io/).
 * Automated installation of the [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester).
-* And you have the free choice to switch between the three supported databases MySQL, MariaDB and PostgreSQL.
+* Switch between the five combinations of database (MySQL, MariaDB or PostgreSQL) and
+  the database driver (MySQL improved or PHP Data Objects).
 
 ![Joomla Branches Software Architecture](images/joomla-branches-tester.svg)
 
@@ -141,6 +142,35 @@ see all Cypress log messages and to be able to repeat the test quickly. You have
 ```
 scripts/cypress.sh 51
 ```
+
+### Switch Database and Database Driver
+
+You can simply switch between one of the three supported databases (MariaDB, PostgreSQL or MySQL) and
+the database driver used (MySQL improved or PHP Data Objects).
+Firstly, the settings for the database server with `db_host` and the database driver with `db_type`
+are adjusted in the configuration file `Cypress.config.cy.mjs`.
+Secondly, a Joomla installation is performed with the Joomla System Tests.
+
+:warning: The overall database content is lost. For example, Joomla Patch Tester component needs to be installed again.
+
+Available variants are:
+* mariadbi – MariaDB with MySQLi (improved)
+* mariadb – MariaDB with MySQL PDO (PHP Data Objects)
+* pgsql - PostgreSQL PDO (PHP Data Objects)
+* mysqli – MySQL with MySQLi (improved)
+* mysql – MySQL with MySQL PDO (PHP Data Objects)
+
+Use MariaDB with driver MySQLi for Joomla 5.2-dev:
+```
+scripts/database.sh 52 mariadbi
+```
+
+Change all four Joomla instances to use PostgreSQL:
+```
+scripts/database.sh pgsql
+```
+
+:point_right: It can also be used to clean a Joomla installation.
 
 ### Install Joomla Patch Tester
 

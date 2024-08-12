@@ -1,8 +1,8 @@
 #!/bin/bash -e
 #
-# mysql.sh - Change Database to MySQL for one or all Joomla container.
-#   scripts/mysql.sh
-#   scripts/mysql.sh 51
+# database.sh - Change Database and database driver for one or all Joomla container.
+#   scripts/database.sh mysqli
+#   scripts/database.sh 51 pgsql
 #
 # MIT License, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
@@ -15,18 +15,24 @@ source scripts/helper.sh
 
 versions=("${VERSIONS[@]}")
 
-if [ $# -gt 1 ] ; then
-  error "Only one argument with version number is possible"
+if isValidVersion "$1"; then
+  versions=($1)
+  shift # argument is eaten
+fi
+
+if [ $# -lt 1 ] ; then
+  error "Desired selection of database and driver is missing, use one of ${DB_VARIANTS[@]}"
   exit 1
 fi
 
-if [ $# -eq 1 ] ; then
-  if isValidVersion "$1"; then
-    versions=($1)
-  else
-    error "Version number argument have to be from ${VERSIONS[@]}"
-    exit 1
-  fi
+if isValidVariant "$1"; then
+  variant=($1)
+  dbtype=$(dbTypeForVariant "$variant")
+  dbhost=$(dbHostForVariant "$variant")
+  shift # argument is eaten
+else
+  error "'$1' is not a valid selection for database and database driver, use one of ${DB_VARIANTS[@]}"
+  exit 1
 fi
 
 for version in "${versions[@]}"; do
@@ -41,21 +47,24 @@ for version in "${versions[@]}"; do
     exit 1
   fi
 
-  log "jbt_${version} – Create cypress.config.${extension} for MySQL"
+  log "jbt_${version} – Create cypress.config.${extension} for ${variant}"
+
   # adopt e.g.:
-  #   >     db_name: 'test_joomla_44'
-  #   >     db_prefix: 'jos44_',
-  #   >     db_host: 'jbt_mysql',
-  #   >     db_port: '',
-  #   >     baseUrl: 'http://host.docker.internal:7044',
-  #   >     db_password: 'root',
-  #   >     smtp_host: 'host.docker.internal',
-  #   >     smtp_port: '7025',
+  #   db_type: 'PostgreSQL (PDO)',
+  #   db_name: 'test_joomla_44'
+  #   db_prefix: 'jos44_',
+  #   db_host: 'jbt_pd',
+  #   db_port: '',
+  #   baseUrl: 'http://host.docker.internal:7044',
+  #   db_password: 'root',
+  #   smtp_host: 'host.docker.internal',
+  #   smtp_port: '7025',
 
   docker exec -it "jbt_${version}" bash -c "cd /var/www/html && sed \
+    -e \"s/db_type: .*/db_type: '${dbtype}',/\" \
     -e \"s/db_name: .*/db_name: 'test_joomla_${version}',/\" \
     -e \"s/db_prefix: .*/db_prefix: 'jos${version}_',/\" \
-    -e \"s/db_host: .*/db_host: 'jbt_mysql',/\" \
+    -e \"s/db_host: .*/db_host: '${dbhost}',/\" \
     -e \"s/db_port: .*/db_port: '',/\" \
     -e \"s/baseUrl: .*/baseUrl: 'http:\/\/host.docker.internal:70${version}\/',/\" \
     -e \"s/db_password: .*/db_password: 'root',/\" \
@@ -74,7 +83,7 @@ for version in "${versions[@]}"; do
   log "jbt_${version} – Cypress based Joomla installation"
   docker exec -it jbt_cypress sh -c "cd /branch_${version} && cypress run --spec tests/System/integration/install/Installation.cy.js"
   
-  log "jbt_${version} – MySQL based Joomla is installed"
+  log "jbt_${version} – ${variant} based Joomla is installed"
   echo ""
 
 done
