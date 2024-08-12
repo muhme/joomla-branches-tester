@@ -11,9 +11,9 @@ VERSIONS=(44 51 52 60)
 # Database and database driver variants as in configuration.php 'dbtype'
 DB_VARIANTS=("mysqli"    "mysql"       "mariadbi" "mariadb"     "pgsql"           )
 # Database driver mapping for the variants as in Web Installer 'database type'
-DB_TYPES=   ("MySQLi"    "MySQL (PDO)" "MySQLi"   "MySQL (PDO)" "PostgreSQL (PDO)")
+   DB_TYPES=("MySQLi"    "MySQL (PDO)" "MySQLi"   "MySQL (PDO)" "PostgreSQL (PDO)")
 # Database server mapping for the variants
-DB_HOSTS=   ("jbt_mysql" "jbt_mysql"   "jbt_madb" "jbt_madb"    "jbt_pg"          )
+   DB_HOSTS=("jbt_mysql" "jbt_mysql"   "jbt_madb" "jbt_madb"    "jbt_pg"          )
 
 # Get database type for variant
 #
