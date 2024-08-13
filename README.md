@@ -10,25 +10,35 @@ Alright, alright, apologies to those who enjoyed the whimsical writing style, bu
 ## Software Architecture
 All four active Joomla branches run in parallel in a [Docker](https://www.docker.com/) container environment.
 Use one or all four branches for:
-* Automated [Joomla System Tests](https://github.com/joomla/joomla-cms/tree/4.4-dev/tests/System) with [Cypress](https://www.cypress.io/).
+* Automated [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System) with [Cypress](https://www.cypress.io/).
 * Automated installation of the [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester).
 * Switch between the five combinations of database (MySQL, MariaDB or PostgreSQL) and
   the database driver (MySQL improved or PHP Data Objects).
 
 ![Joomla Branches Software Architecture](images/joomla-branches-tester.svg)
 
-The idea is to have all active Joomla development branches (currently 4.4-dev, 5.1-dev, 5.2-dev and 6.0-dev)
-available in parallel for testing. The installation takes place in 10 Docker containers and everything is scripted.
-You see the four orange Web Server containers with the different Joomla versions.
+The idea is to have all active Joomla development branches (currently 4.4-dev, 5.1-dev, 5.2-dev and 6.0-dev) are
+available for testing in parallel. The installation takes place in 10 Docker containers and everything is scripted.
+You see the four orange Web Server containers with the four different Joomla versions.
 They are based on the `branch_*` folders, which are also available on the Docker host.
+
 On the right you see three blue containers with the databases MySQL, MariaDB and PostgreSQL.
 To be able to check the databases, two further blue containers with phpMyAdmin and pgAdmin are installed.
 As green Docker container Cypress runs headless for testing.
 If you will check problems you can also run Cypress GUI on your host system.
 
-The `/scripts` folder contains all the bash-Scripts for the Joomla Branches Tester.
+The `/scripts` folder contains all the scripts and also configuration files.
 It is assumed that your current working directory is `joomla-branches-tester` all the time.
-For the complete list of all scripts see [scripts/README.md](scripts/README.md).
+
+:point_right: For the complete list of all scripts see [scripts/README.md](scripts/README.md).
+
+### Notes
+
+By using `host.docker.internal` it is possible to run everything with the same hostnames an
+URLs from container inside and Docker host machine outside.
+However, there is a performance issue with the database.
+Therefore, for the database connection `host.docker.internal` is only used when you run Cypress GUI from outside.
+There is no performance problem because you come from outside.
 
 ## Prerequisites
 
@@ -103,8 +113,8 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
 |jbt_madb| **7012**:3306 | | Database Server MariaDB version 10.4 |
 |jbt_pg| **7013**:5432 | | Database Server PostgrSQL version 12.20 |
 |jbt_cypress| SMTP **7025**:7025 | | Cypress Headless Test Environment<br />SMTP server is only running during test execution |
-|jbt_phpmya| **[7001](http://localhost:7001)** | | Web App to manage MariaDB and MySQL<br />auto-login configured<br />root / root |
-|jbt_pga| **[7002](http://localhost:7002)** | | Web App to manage PostgreSQL<br /auto-login configured<br />root / root, postgres / prostgres |
+|jbt_phpmya| **[7001](http://localhost:7001)** | | Web App to manage MariaDB and MySQL<br />auto-login configured, root / root |
+|jbt_pga| **[7002](http://localhost:7002)** | | Web App to manage PostgreSQL<br />auto-login configured, root / root, postgres / prostgres |
 
 :eight_spoked_asterisk: The directories are available on Docker host to:
 * Inspect and change the configuration files (`configuration.php` or `cypress.config.js`),
@@ -208,19 +218,20 @@ scripts/patchtester.sh 52 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
     ✓ fetch data (6254ms)
 ```
 
+### Syncing from GitHub Repository
+
+Script to fetch and merge all the latest changes from the Joomla GitHub repository into your local branches.
+And again, this can be done for all four branches without argument, or for one version such as 5.2-dev:
+```
+scripts/pull.sh 52
+```
+Finally, the Git status of the branch is displayed.
+
 ## Limitations
 
 The different Joomla versions exist in parallel, but the test runs sequentially.
 
 Only one PHP version (the one from the Joomla Docker image) and one database version is used.
-
-### Notes
-
-By using `host.docker.internal` inside the containers and outside on the Docker host,
-it is possible to run everything with the same hostnames and URLs from inside and outside.
-However, there is a performance issue with the database.
-Therefore, for the database connection `host.docker.internal` is only used when you run Cypress GUI from outside.
-There is no performance problem because you come from outside.
 
 ## License
 
