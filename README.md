@@ -13,16 +13,16 @@ Use one or all four branches for:
 
 The idea is to have all active Joomla development branches (currently 4.4-dev, 5.1-dev, 5.2-dev and 6.0-dev)
 available in parallel for testing. The installation takes place in 10 Docker containers and everything is scripted.
-You see the four orange Web Server containers with the different Joomla version.
+You see the four orange Web Server containers with the different Joomla versions.
 They are based on the `branch_*` folders, which are also available on the Docker host.
-On the right you see three blue containers with MySQL, MariaDB and PostgreSQL database.
+On the right you see three blue containers with the databases MySQL, MariaDB and PostgreSQL.
 To be able to check the databases, two further blue containers with phpMyAdmin and pgAdmin are installed.
 As green Docker container Cypress runs headless for testing.
 If you will check problems you can also run Cypress GUI on your host system.
 
 The `/scripts` folder contains all the bash-Scripts for the Joomla Branches Tester.
 It is assumed that your current working directory is `joomla-branches-tester` all the time.
-For the list of all Joomla Branches Tester scripts see [scripts/README.md](scripts/README.md).
+For the complete list of all scripts see [scripts/README.md](scripts/README.md).
 
 ## Prerequisites
 
@@ -97,8 +97,8 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
 |jbt_madb| **7012**:3306 | | MariaDB version 10.4 |
 |jbt_pg| **7013**:5432 | | PostgrSQL version 12.20 |
 |jbt_cypress| SMTP **7025**:7025 | | SMTP server is only running during test execution |
-|jbt_phpmya|[7001](http://localhost:7001)| | root / root |
-|jbt_pga|[7002](http://localhost:7002)| | admin@example.com / admin |
+|jbt_phpmya|[7001](http://localhost:7001)| | auto-login configured<br />root / root |
+|jbt_pga|[7002](http://localhost:7002)| | auto-login configured<br />root / root or postgres / prostgres |
 
 :eight_spoked_asterisk: The directories are available on Docker host to:
 * Inspect and change the configuration files (`configuration.php` or `cypress.config.js`),
@@ -176,12 +176,25 @@ scripts/database.sh pgsql
 > This can be a problem if you have installed extensions.
 > For example for the Patch Tester the autoload classes file `autoload_psr4.php` and
 > the directories `administrator/components/com_patchtester`, `api/components/com_patchtester` and
-> `media/com_patchtester` needs to be deleted. And the script already takes care of that.
+> `media/com_patchtester` needs to be deleted. This script takes already care for Joomla Patch Tester.
+>
+> :point_right: In case of doubt use `create.sh` to have a clean installation.
 
 ### Install Joomla Patch Tester
 
-For your comfort there is 
+For your comfort Joomla Patch Tester can be installed on one or all Joomla instances.
 
+```
+scripts/patchtester.sh 52 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
+```
+
+```
+  Running:  patchtester.cy.js                             (1 of 1)
+    Install 'Joomla! Patch Tester' with
+    ✓ install component (7747ms)
+    ✓ set GitHub token (2556ms)
+    ✓ fetch data (6254ms)
+```
 
 ## Limitations
 

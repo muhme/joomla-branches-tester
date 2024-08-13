@@ -104,8 +104,8 @@ for version in "${VERSIONS[@]}"; do
   log "jbt_${version} – Restart container"
   docker restart "jbt_${version}"
 
-  # Configure using MariaDB and install Joomla
-  scripts/mariadb.sh "${version}"
+  # Configure to use MariaDB with database driver MySQLi and install Joomla
+  scripts/database.sh "${version}" mariadbi
 
 done
 
@@ -115,7 +115,7 @@ docker exec -it jbt_mysql mysql -uroot -proot -e "ALTER USER 'root'@'%' IDENTIFI
 # And for MariaDB too
 log "jbt_${version} – Enable MariaDB user root login with password"
 docker exec -it jbt_madb mysql -uroot -proot -e  "ALTER USER 'root'@'%' IDENTIFIED BY 'root';"
-# And Postgres
+# And Postgres (which have already user postgres with SUPERUSER, but to simplify we will use same user root on postgres)
 log "jbt_${version} – Create PostgreSQL user root with password root and SUPERUSER role"
 docker exec -it jbt_pg sh -c "\
   psql -U postgres -c \"CREATE USER root WITH PASSWORD 'root';\" && \

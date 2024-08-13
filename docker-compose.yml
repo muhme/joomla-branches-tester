@@ -32,7 +32,8 @@ services:
     ports:
       - "7013:5432"
     environment:
-      POSTGRES_PASSWORD: root
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
 
   myadmin:
     container_name: jbt_mya
@@ -62,6 +63,12 @@ services:
     restart: unless-stopped
     depends_on:
       - postgres
+    volumes:
+      # Make a server entry for 'jbt_pg'
+      - ./scripts/servers.json:/pgadmin4/servers.json
+      - ./scripts/pgpass:/pgadmin4/pgpass
+      # pgpass file must me only owner read & writable
+    entrypoint: /bin/sh -c "chmod 600 /pgadmin4/pgpass; /entrypoint.sh"
 
   joomla_44:
     container_name: jbt_44

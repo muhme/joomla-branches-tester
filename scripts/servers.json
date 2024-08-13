@@ -1,0 +1,17 @@
+{
+    "Servers": {
+        "1": {
+            "Name": "jbt_pg",
+            "Group": "Servers",
+            "Host": "postgres",
+            "Port": 5432,
+            "MaintenanceDB": "postgres",
+            "Username": "postgres",
+            "Comment": "PostgreSQL server jbt_pg",
+            "ConnectionParameters": {
+                "passfile": "/pgadmin4/pgpass"
+            }
+        }
+    }
+}
+
