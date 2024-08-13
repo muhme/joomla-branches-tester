@@ -4,9 +4,10 @@
 
 <img align="right" src="images/magic_world.png">
 Imagine a little slice of a parallel universe where testing all four active Joomla branches becomes a fluffy, cosy, and almost magical experience. In this universe, you can effortlessly test with the Patch Tester, glide through the Cypress GUI, or even enjoy the smooth efficiency of Cypress Headless. Picture the warmth of being able to peer into any database table as if through a magical glass, or seamlessly switch between five different database variants with just a small wave of a magic wand. Wouldn't that create a truly fluffy and cosy environment to work in?
-
+<br /><br />
 Alright, alright, apologies to those who enjoyed the whimsical writing style, but now it's time to dive into the technical depths. Let's transition from the cozy, magical universe into the world of technical documentation, where we'll explore the numerous options, parameters, and configurations that power this experience ...
 
+## Software Architecture
 All four active Joomla branches run in parallel in a [Docker](https://www.docker.com/) container environment.
 Use one or all four branches for:
 * Automated [Joomla System Tests](https://github.com/joomla/joomla-cms/tree/4.4-dev/tests/System) with [Cypress](https://www.cypress.io/).
@@ -92,34 +93,36 @@ sudo scripts/create.sh
 
 The abbreviation `jbt` stands for Joomla Branches Tester:
 
-|Name|Host Port:Local Port|Directory :eight_spoked_asterisk: |Comment|
+|Name|Host Port:<br />Container Inside|Directory :eight_spoked_asterisk: |Comment|
 |----|----|----------------------------------|-------|
-|jbt_44|[7044](http://localhost:7044/administrator)| /branch_44 | Joomla branch 4.4-dev<br />PHP 8.1, ci-admin / joomla-17082005 |
-|jbt_51|[7051](http://localhost:7051/administrator)| /branch_51 | Joomla branch 5.1-dev<br />PHP 8.2, ci-admin / joomla-17082005 |
-|jbt_52|[7052](http://localhost:7052/administrator)| /branch_52 | Joomla branch 5.2-dev<br />PHP 8.2, ci-admin / joomla-17082005 |
-|jbt_60|[7060](http://localhost:7060/administrator)| /branch_60 | Joomla branch 6.0-dev<br />PHP 8.2, ci-admin / joomla-17082005 |
-|jbt_mysql| **7011**:3306 | | MySQL version 8.1 |
-|jbt_madb| **7012**:3306 | | MariaDB version 10.4 |
-|jbt_pg| **7013**:5432 | | PostgrSQL version 12.20 |
-|jbt_cypress| SMTP **7025**:7025 | | SMTP server is only running during test execution |
-|jbt_phpmya|[7001](http://localhost:7001)| | auto-login configured<br />root / root |
-|jbt_pga|[7002](http://localhost:7002)| | auto-login configured<br />root / root or postgres / prostgres |
+|jbt_44| **[7044](http://localhost:7044/administrator)** | /branch_44 | Web Server Joomla branch 4.4-dev<br />PHP 8.1, ci-admin / joomla-17082005 |
+|jbt_51| **[7051](http://localhost:7051/administrator)** | /branch_51 | Web Server Joomla branch 5.1-dev<br />PHP 8.2, ci-admin / joomla-17082005 |
+|jbt_52| **[7052](http://localhost:7052/administrator)** | /branch_52 | Web Server Joomla branch 5.2-dev<br />PHP 8.2, ci-admin / joomla-17082005 |
+|jbt_60| **[7060](http://localhost:7060/administrator)** | /branch_60 | Web Server Joomla branch 6.0-dev<br />PHP 8.2, ci-admin / joomla-17082005 |
+|jbt_mysql| **7011**:3306 | | Database Server MySQL version 8.1 |
+|jbt_madb| **7012**:3306 | | Database Server MariaDB version 10.4 |
+|jbt_pg| **7013**:5432 | | Database Server PostgrSQL version 12.20 |
+|jbt_cypress| SMTP **7025**:7025 | | Cypress Headless Test Environment<br />SMTP server is only running during test execution |
+|jbt_phpmya| **[7001](http://localhost:7001)** | | Web App to manage MariaDB and MySQL<br />auto-login configured<br />root / root |
+|jbt_pga| **[7002](http://localhost:7002)** | | Web App to manage PostgreSQL<br /auto-login configured<br />root / root, postgres / prostgres |
 
 :eight_spoked_asterisk: The directories are available on Docker host to:
 * Inspect and change the configuration files (`configuration.php` or `cypress.config.js`),
 * To edit the test specifications below `tests/System` or
-* To inspect screenshots from failed tests.
+* To inspect screenshots from failed tests or
+* To inspect and hack the Joomla sources from Docker host system.
 
 ## Usage
 
 ### Cypress Headless System Tests
 
-Test all (more than 100 – as defined in Cypress `specPattern`) specs in all four branches:
+Simple run all specs from the [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System)
+in all four branches:
 ```
 scripts/test.sh
 ```
 
-Test all specs only in the branch 5.1-dev:
+Run the Joomla System Tests in the branch 5.1-dev only:
 ```
 scripts/test.sh 51
 ```
@@ -134,7 +137,7 @@ Test all site specs with branch 4.4-dev using a pattern:
 scripts/test.sh 44 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
 ```
 
-To show `console.log` messages from Electron browser by setting environment variable: 
+To additional show `console.log` messages from Electron browser by setting environment variable: 
 ```
 export ELECTRON_ENABLE_LOGGING=1
 scripts/test.sh 44 tests/System/integration/administrator/components/com_actionlogs/Actionlogs.cy.js
@@ -143,7 +146,9 @@ scripts/test.sh 44 tests/System/integration/administrator/components/com_actionl
 ### Cypress GUI System Tests
 
 If a test specification fails, it is often helpful to watch the test in the browser and
-see all Cypress log messages and to be able to repeat the test quickly. You have to give the needed version to run:
+see all Cypress log messages and to be able to repeat the test quickly.
+You must specify the required Joomla version for whose instance the Cypress GUI
+is to be started (requires an installed Cypress):
 ```
 scripts/cypress.sh 51
 ```
@@ -187,7 +192,9 @@ scripts/database.sh pgsql
 
 ### Install Joomla Patch Tester
 
-For your comfort Joomla Patch Tester can be installed on one or all Joomla instances.
+For your convenience [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester)
+can be installed on one or all four Joomla instances. The script also sets GitHub Token and fetch the data.
+This can be done without version number for all four Joomla instances or e.g. for Joomla 5.2-dev:
 
 ```
 scripts/patchtester.sh 52 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
