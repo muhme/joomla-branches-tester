@@ -2,6 +2,11 @@
 
 # Docker based Joomla Branches Tester
 
+<img align="right" src="images/magic_world.png">
+Imagine a little slice of a parallel universe where testing all four active Joomla branches becomes a fluffy, cosy, and almost magical experience. In this universe, you can effortlessly test with the Patch Tester, glide through the Cypress GUI, or even enjoy the smooth efficiency of Cypress Headless. Picture the warmth of being able to peer into any database table as if through a magical glass, or seamlessly switch between five different database variants with just a small wave of a magic wand. Wouldn't that create a truly fluffy and cosy environment to work in?
+
+Alright, alright, apologies to those who enjoyed the whimsical writing style, but now it's time to dive into the technical depths. Let's transition from the cozy, magical universe into the world of technical documentation, where we'll explore the numerous options, parameters, and configurations that power this experience ...
+
 All four active Joomla branches run in parallel in a [Docker](https://www.docker.com/) container environment.
 Use one or all four branches for:
 * Automated [Joomla System Tests](https://github.com/joomla/joomla-cms/tree/4.4-dev/tests/System) with [Cypress](https://www.cypress.io/).
