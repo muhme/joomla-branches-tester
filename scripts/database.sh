@@ -80,8 +80,11 @@ for version in "${versionsToChange[@]}"; do
 
   # Since the database will be new, we clean up autoload classes cache file and
   # all com_patchtester directories to prevent the next installation to be fail.
-  (cd branch_${version} ; rm -rf administrator/components/com_patchtester api/components/com_patchtester \
-                                 media/com_patchtester administrator/cache/autoload_psr4.php)
+  # Again in Docker container as www-data user.
+  docker exec -it "jbt_${version}" bash -c "
+    cd /var/www/html
+    rm -rf administrator/components/com_patchtester api/components/com_patchtester
+    rm -rf media/com_patchtester administrator/cache/autoload_psr4.php"
 
   # Using Install Joomla from System Tests
   log "jbt_${version} – Cypress based Joomla installation"
