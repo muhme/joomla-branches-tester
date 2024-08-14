@@ -28,7 +28,7 @@ fi
 # Defaults to install for all branches, but a single one can be given
 versions=$(getVersions)
 IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
-versionsToInstall=($allVersions)
+versionsToInstall=(${allVersions[@]})
 
 if [ $# -ge 1 ] ; then
   if isValidVersion "$1" "$versions"; then
@@ -111,7 +111,7 @@ for version in "${versionsToInstall[@]}"; do
     mv composer.phar /usr/local/bin/composer && \
     composer install"
 
-  log "jbt_${version} – npm"
+  log "jbt_${version} – npm clean install"
   docker exec -it "jbt_${version}" bash -c 'cd /var/www/html && npm ci'
 
   log "jbt_${version} – Change root ownership to www-data"

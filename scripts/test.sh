@@ -37,7 +37,6 @@ failed=0
 successful=0
 for version in "${versionsToTest[@]}"
 do
-echo "VERSION $version"
   branch=$(branchName "${version}")
   log "Testing ${branch} ${spec}"
   docker exec -it jbt_cypress sh -c "cd /branch_${version} && ${eel1} cypress run ${spec}"

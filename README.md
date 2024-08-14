@@ -119,7 +119,7 @@ Last tested with
 * Windows 11 Pro WSL 2 and
 * Ubuntu 24 Noble Numbat.
 
-You can create the Docker containers and install Joomla with script [create.sh](scripts/create.sh):
+You can create the Docker containers and install Joomla with script `create.sh`:
 
 ```
 git clone https://github.com/muhme/joomla-branches-tester
@@ -130,7 +130,7 @@ scripts/create.sh
 The script can be parameterised with arguments, all of which are optional:
 1. The version number, e.g. `52`, defaults to all,
 2. The used database and database driver, e.g. `pgsql`, defaults to MariaDB with MySQLi driver and
-3. To forces a fresh build with `no-cache`, defaults to build from cache.
+3. To force a fresh build with `no-cache`, defaults to build from cache.
 
 :point_right: The script can run without `sudo`,
 but depending on the platform, it may ask you to enter your user password for individual sudo actions.
