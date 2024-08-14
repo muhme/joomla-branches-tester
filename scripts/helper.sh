@@ -157,3 +157,13 @@ error() {
     # -e enables backslash escapes
     echo -e "${JBT_GREEN_BG}${JBT_RED}${JBT_BOLD}*** $(date '+%y%m%d %H:%M:%S') *** $@${JBT_RESET}"
 }
+
+# As we have -e set the scripts exit immediately if any command fails.
+# Show a red messge with script name and line number.
+#
+errorHandler() {
+    error "An error occurred in script $(basename "$0") on line $1."
+    # Add any additional error handling logic here
+    exit 1
+}
+trap 'errorHandler $LINENO' ERR

@@ -7,10 +7,6 @@
 # MIT License, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
-ME=`basename $0`
-TMP="/tmp/$ME.TMP.$$"
-trap 'rm -rf $TMP' 0
-
 source scripts/helper.sh
 
 versions=$(getVersions)
@@ -48,7 +44,7 @@ for version in "${versionsToChange[@]}"; do
     exit 1
   fi
 
-  log "jbt_${version} – Create cypress.config.${extension} for variant ${variant} with dbytpe='${dbtype}' db_host='${dbhost}'"
+  log "jbt_${version} – Create cypress.config.${extension} for variant ${variant} (driver '${dbtype}' host '${dbhost}')"
 
   # adopt e.g.:
   #   db_type: 'PostgreSQL (PDO)',
@@ -75,10 +71,12 @@ for version in "${versionsToChange[@]}"; do
 
   # 'Hack' until PR with setting db_port is supported - overwrite with setting db_port in joomla-cypress and System Tests
   # (Only used later if we run Cypress GUI)
-  append="/db_host: Cypress.env('db_host'),/a\      db_port: Cypress.env('db_port'), // muhme, 9 August 2024 'hack' as long as waiting for PR"
-  sed "${append}" "branch_${version}/tests/System/integration/install/Installation.cy.js" > $TMP
-  cp $TMP "branch_${version}/tests/System/integration/install/Installation.cy.js"
-  cp scripts/Joomla.js "branch_${version}/node_modules/joomla-cypress/src/Joomla.js"
+  # Don't use sed inplace editing as not supported by macOS, do it in Docker container as owner is www-data
+  docker exec -it "jbt_${version}" bash -c "
+    cd /var/www/html/tests/System/integration/install
+    sed '/db_host: Cypress.env('\"'\"'db_host'\"'\"'),/a\\      db_port: Cypress.env('\"'\"'db_port'\"'\"'), // muhme, 9 August 2024 \"hack\" as long as waiting for PR' Installation.cy.js > Installation.cy.js.tmp
+    mv Installation.cy.js.tmp Installation.cy.js"
+  docker cp scripts/Joomla.js "jbt_${version}:/var/www/html/node_modules/joomla-cypress/src/Joomla.js"
 
   # Since the database will be new, we clean up autoload classes cache file and
   # all com_patchtester directories to prevent the next installation to be fail.
