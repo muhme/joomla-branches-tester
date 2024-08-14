@@ -119,7 +119,7 @@ function createDockerComposeFile() {
     cp docker-compose.base.yml docker-compose.yml
     for version in "${versions[@]}"; do
         # joomla:4 or joomla:5 image?
-        if [ "$$version" = "44" ]; then
+        if [ "$version" = "44" ]; then
             base="4"
         else
             base="5"
