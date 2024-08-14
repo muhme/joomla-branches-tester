@@ -127,8 +127,9 @@ cd joomla-branches-tester
 scripts/create.sh
 ```
 
+<img align="right" src="images/joomla-branches-tester.svg" width="512">
 The script can be parameterised with arguments, all of which are optional:
-1. The version number, e.g. `52`, defaults to all,
+1. The version number, e.g. `52` (your system architecture will look like the picture on the right), defaults to all,
 2. The used database and database driver, e.g. `pgsql`, defaults to MariaDB with MySQLi driver and
 3. To force a fresh build with `no-cache`, defaults to build from cache.
 
