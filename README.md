@@ -132,6 +132,9 @@ The script can be parameterised with arguments, all of which are optional:
 2. The used database and database driver, e.g. `pgsql`, defaults to MariaDB with MySQLi driver and
 3. To forces a fresh build with `no-cache`, defaults to build from cache.
 
+:point_right: The script can run without `sudo`,
+but depending on the platform, it may ask you to enter your user password for individual sudo actions.
+
 The initial script `create.sh` runs some time,
 especially the very first time when the Docker images still need to be downloaded.
 The `joomla-branches-tester` folder requires about of 2 GB of disc space.

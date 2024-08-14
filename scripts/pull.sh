@@ -35,9 +35,10 @@ do
   log "Running git pull on ${branch}"
   docker exec -it "jbt_${version}" sh -c "git config --global --add safe.directory /var/www/html && git pull"
   if [ $? -eq 0 ] ; then
-    ((successful++))
+    # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
+    successful=$((successful + 1))
   else
-    ((failed++))
+    failed=$((failed + 1))
   fi
   log "Showing git status on ${branch}"
   docker exec -it "jbt_${version}" sh -c "git status"

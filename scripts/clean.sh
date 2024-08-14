@@ -20,6 +20,7 @@ docker compose down
 for version in "${allVersions[@]}"; do
   if [ -d "branch_${version}" ]; then
     log "Removing directory branch_${version}"
-    rm -rf "branch_${version}"
+    # sudo is needed on Windows WSL Ubuntu
+    rm -rf "branch_${version}" >/dev/null 2>&1 || sudo rm -rf "branch_${version}"
   fi
 done

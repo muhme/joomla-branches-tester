@@ -31,9 +31,10 @@ do
   log "Install Joomla Patch Tester in ${branch}"
   docker exec -it jbt_cypress sh -c "cd /branch_${version} && cypress run --env token=$1 --config specPattern=/scripts/patchtester.cy.js"
   if [ $? -eq 0 ] ; then
-    ((successful++))
+    # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
+    successful=$((successful + 1))
   else
-    ((failed++))
+    failed=$((failed + 1))
   fi
 done
 
