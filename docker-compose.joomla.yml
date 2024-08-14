@@ -1,0 +1,22 @@
+# docker-compose.joomla.yml - Joomla Web Server entry, to be customized with the version number
+#                             e.g. 52 for XX and 5 for Y
+#
+# MIT License, Copyright (c) 2024 Heiko Lübbe
+# https://github.com/muhme/joomla-branches-tester
+
+  joomla_XX:
+    container_name: jbt_XX
+    image: joomla:Y
+    restart: unless-stopped
+    ports:
+      - 70XX:80
+    volumes:
+      - ./branch_XX:/var/www/html
+    environment:
+      JOOMLA_DB_HOST: mysql
+      JOOMLA_DB_PASSWORD: root
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - mysql
+      - postgres

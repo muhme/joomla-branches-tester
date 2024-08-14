@@ -9,26 +9,27 @@
 
 source scripts/helper.sh
 
-versionsToTest=("${VERSIONS[@]}")
-
 if [ $# -gt 1 ] ; then
   error "Only one argument with version number is possible"
   exit 1
 fi
 
+versions=$(getVersions)
+IFS=' ' versionsToPull=($(sort <<<"${versions}")); unset IFS # map to array
+
 if [ $# -eq 1 ] ; then
-  if isValidVersion "$1"; then
-    versionsToTest=($1)
+  if isValidVersion "$1" "$versions"; then
+    versionsToPull=($1)
     shift # 1st arg is eaten as the version number
   else
-    error "Version number argument have to be from ${VERSIONS[@]}"
+    error "Version number argument have to be from ${versions}"
     exit 1
   fi
 fi
 
 failed=0
 successful=0
-for version in "${versionsToTest[@]}"
+for version in "${versionsToPull[@]}"
 do
   branch=$(branchName "${version}")
   log "Running git pull on ${branch}"

@@ -1,4 +1,4 @@
-# docker-compose.yml
+# docker-compose.base.yml - Base with all Docker containers except the Joomla web servers.
 #
 # MIT License, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
@@ -69,70 +69,6 @@ services:
       - ./scripts/pgpass:/pgadmin4/pgpass
       # pgpass file must me only owner read & writable
     entrypoint: /bin/sh -c "chmod 600 /pgadmin4/pgpass; /entrypoint.sh"
-
-  joomla_44:
-    container_name: jbt_44
-    image: joomla:4
-    restart: unless-stopped
-    ports:
-      - 7044:80
-    volumes:
-      - ./branch_44:/var/www/html
-    environment:
-      JOOMLA_DB_HOST: mysql
-      JOOMLA_DB_PASSWORD: root
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    depends_on:
-      - mysql
-
-  joomla_51:
-    container_name: jbt_51
-    image: joomla:5
-    restart: unless-stopped
-    ports:
-      - 7051:80
-    volumes:
-      - ./branch_51:/var/www/html
-    environment:
-      JOOMLA_DB_HOST: mysql
-      JOOMLA_DB_PASSWORD: root
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    depends_on:
-      - mysql
-
-  joomla_52:
-    container_name: jbt_52
-    image: joomla:5
-    restart: unless-stopped
-    ports:
-      - 7052:80
-    volumes:
-      - ./branch_52:/var/www/html
-    environment:
-      JOOMLA_DB_HOST: mysql
-      JOOMLA_DB_PASSWORD: root
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    depends_on:
-      - mysql
-
-  joomla_60:
-    container_name: jbt_60
-    image: joomla:5
-    restart: unless-stopped
-    ports:
-      - 7060:80
-    volumes:
-      - ./branch_60:/var/www/html
-    environment:
-      JOOMLA_DB_HOST: mysql
-      JOOMLA_DB_PASSWORD: root
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    depends_on:
-      - mysql
 
   cypress:
     container_name: jbt_cypress

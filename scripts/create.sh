@@ -16,7 +16,7 @@ if grep -Eq "127.0.0.1[[:space:]]+host.docker.internal" "$HOSTS_FILE"; then
   log "Entry '127.0.0.1 host.docker.internal' exists in file '${HOSTS_FILE}' - thx :)"
 else
   error "Entry '127.0.0.1 host.docker.internal' is missing in file '${HOSTS_FILE}' - try to add"
-  sudo echo "127.0.0.1 host.docker.internal" >> "$HOSTS_FILE"
+  sudo sh -c "echo '127.0.0.1 host.docker.internal' >> $HOSTS_FILE"
   if grep -Eq "127.0.0.1[[:space:]]+host.docker.internal" "$HOSTS_FILE"; then
     log "Entry '127.0.0.1 host.docker.internal' added in file '${HOSTS_FILE}'"
   else
@@ -25,16 +25,47 @@ else
   fi
 fi
 
-# First delete all docker containters
-scripts/clean.sh
+# Defaults to install for all branches, but a single one can be given
+versions=$(getVersions)
+IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
+versionsToInstall=($allVersions)
+
+if [ $# -ge 1 ] ; then
+  if isValidVersion "$1" "$versions"; then
+    versionsToInstall=($1)
+    shift # 1st arg is eaten as the version number
+  fi
+fi
+
+# Defauls to use MariaDB with MySQLi database driver, but different one can be given
+database_variant="mariadbi"
+if [ $# -ge 1 ] && [ "$1" != "no-cache" ] ; then
+  if isValidVariant "$1"; then
+    database_variant=($1)
+    shift # argument is eaten as database variant
+  else
+    error "'$1' is not a valid selection for database and database driver, use one of ${DB_VARIANTS[@]}"
+    exit 1
+  fi
+fi
 
 # Clean up branch directories if necessary
-for version in "${VERSIONS[@]}"; do
+for version in "${allVersions[@]}"; do
   if [ -d "branch_${version}" ]; then
     log "Removing directory branch_${version}"
     rm -rf "branch_${version}"
   fi
 done
+
+# Delete all docker containters
+createDockerComposeFile "${allVersions[*]}" 
+scripts/clean.sh
+
+# Compare arrays as strings
+if [ "${versionsToInstall[*]}" != "${allVersions[*]}" ]; then
+  # Create docker compose with only one Joomla web server
+  createDockerComposeFile "${versionsToInstall[*]}" 
+fi
 
 if [ $# -eq 1 ] && [ "$1" = "no-cache" ]; then
   log "Docker compose build --no-cache"
@@ -44,7 +75,7 @@ fi
 log "Docker compose up"
 docker compose up -d
 
-for version in "${VERSIONS[@]}"; do
+for version in "${versionsToInstall[@]}"; do
   # If the copying has not yet been completed, then we have to wait, or we will get e.g.
   # rm: cannot remove '/var/www/html/libraries/vendor': Directory not empty.
   max_retries=120
@@ -105,7 +136,7 @@ for version in "${VERSIONS[@]}"; do
   docker restart "jbt_${version}"
 
   # Configure to use MariaDB with database driver MySQLi and install Joomla
-  scripts/database.sh "${version}" mariadbi
+  scripts/database.sh "${version}" "$database_variant"
 
 done
 

@@ -9,11 +9,12 @@
 
 source scripts/helper.sh
 
-versionsToInstall=("${VERSIONS[@]}")
+versions=$(getVersions)
+IFS=' ' versionsToInstall=($(sort <<<"${versions}")); unset IFS # map to array
 
-if isValidVersion "$1"; then
-   versionsToInstall=($1)
-   shift # 1st arg is eaten as the version number
+if isValidVersion "$1" "$versions"; then
+  versionsToInstall=($1)
+  shift # 1st arg is eaten as the version number
 fi
 
 # Check if the given token looks like a GitHub personal access token

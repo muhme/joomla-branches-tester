@@ -8,12 +8,12 @@ The following scripts are available and are also described in [../README.md](../
 
 | Script | Description | Additional Info |
 | --- | --- | --- |
-| [scripts/create.sh](create.sh) | (Re-)Build all docker containers. | The optional `no-cache` argument forces a fresh build. |
-| [scripts/test.sh](test.sh) | Running Cypress headless System Tests on one or all branches. | |
-| [scripts/cypress.sh](cypress.sh) | Running Cypress GUI on your local machine to run System Tests in browser. Cypress must be installed locally. | |
-| [scripts/database.sh](database.sh) | Changes database and database driver. | :warning: The overall database content is lost. |
-| [scripts/patchtester.sh](patchtester.sh) | Installs and configures Joomla patch tester component in one or all Joomla instances. | The GitHub token argument is mandatory. |
-| [scripts/pull.sh](pull.sh) | Running `git pull` and `git status` on one or all branches. | |
+| [scripts/create.sh](create.sh) | (Re-)Build all docker containers. | Optional arguments are version number, database variant and `no-cache`. |
+| [scripts/test.sh](test.sh) | Running Cypress headless System Tests on one or all branches. | The version number is an optional argument. |
+| [scripts/cypress.sh](cypress.sh) | Running Cypress GUI on your local machine to run System Tests in browser. Cypress must be installed locally. | Mandatory argument is the version number. |
+| [scripts/database.sh](database.sh) | Changes database and database driver. | :warning: The overall database content is lost.<br />Optional argument is the version number. Mandatory argument is the database variant. |
+| [scripts/patchtester.sh](patchtester.sh) | Installs and configures Joomla patch tester component in one or all Joomla instances. | The version number is an optional argument. The GitHub token argument is mandatory. |
+| [scripts/pull.sh](pull.sh) | Running `git pull` and `git status` on one or all branches. | The version number is an optional argument. |
 | [scripts/ubuntu_setup.sh](ubuntu_setup.sh) | Helper script in an installation on standard Ubuntu Linux. | |
 
 
@@ -33,3 +33,5 @@ This can be disabled by setting environment variable [NOCOLOR=1](https://no-colo
 | [scripts/Joomla.js](Joomla.js) | [joomla-cypress](https://github.com/joomla-projects/joomla-cypress) *hack* until setting `db_port` is supported |
 | [scripts/servers.json](servers.json) | PostgreSQL server configuration for pgAdmin. | |
 | [scripts/pgpass](pgpass) | Auto-logon password file for pgAdmin. | |
+| [scripts/docker-compose.base.yml](docker-compose.base.yml) | The basic part of the `docker-compose.yml` file. | |
+| [scripts/docker-compose.joomla.yml](docker-compose.joomla.yml) | Part of the `docker-compose.yml` file to be parameterised for one Joomla web server. | |

@@ -13,11 +13,12 @@ trap 'rm -rf $TMP' 0
 
 source scripts/helper.sh
 
-versions=("${VERSIONS[@]}")
+versions=$(getVersions)
+IFS=' ' versionsToChange=($(sort <<<"${versions}")); unset IFS # map to array
 
-if isValidVersion "$1"; then
-  versions=($1)
-  shift # argument is eaten
+if isValidVersion "$1" "$versions"; then
+  versionsToChange=($1)
+  shift # 1st arg is eaten as the version number
 fi
 
 if [ $# -lt 1 ] ; then
@@ -35,7 +36,7 @@ else
   exit 1
 fi
 
-for version in "${versions[@]}"; do
+for version in "${versionsToChange[@]}"; do
 
   # Handle .js or .mjs from PR https://github.com/joomla/joomla-cms/pull/43676 – [4.4] Move the Cypress Tests to ESM
   if [ -f "branch_${version}/cypress.config.dist.js" ]; then

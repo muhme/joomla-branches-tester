@@ -22,6 +22,9 @@ available for testing in parallel. The installation takes place in 10 Docker con
 You see the four orange Web Server containers with the four different Joomla versions.
 They are based on the `branch_*` folders, which are also available on the Docker host.
 
+:point_right: The version numbers used in this documentation are as of August 2024.
+As the active branches change regularly, the current numbers are read from the `joomla-cms` repository.
+
 On the right you see three blue containers with the databases MySQL, MariaDB and PostgreSQL.
 To be able to check the databases, two further blue containers with phpMyAdmin and pgAdmin are installed.
 As green Docker container Cypress runs headless for testing.
@@ -31,6 +34,8 @@ The `/scripts` folder contains all the scripts and also configuration files.
 It is assumed that your current working directory is `joomla-branches-tester` all the time.
 
 :point_right: For the complete list of all scripts see [scripts/README.md](scripts/README.md).
+
+The scripts contain *hacks* and a bit of magic for all the fluffiness, enjoy reading the comments.
 
 ### Notes
 
@@ -42,7 +47,7 @@ There is no performance problem because you come from outside.
 
 ## Prerequisites
 
-As a prerequisite, it is sufficient to be able to run git, Docker and a bash scripts.
+All you need is the ability to run Git, Docker and Bash scripts.
 Thanks to Docker, it is not necessary to install one of the databases, the database management tools, PHP, Node or Composer.
 Cypress needs only to be installed on your host system if you want to use Cypress GUI.
 
@@ -66,6 +71,43 @@ sudo scripts/ubuntu_setup.sh
 ```
 </details>
 
+<details>
+  <summary>Windows WSL2 Ubuntu Setup</summary>
+
+1. Install Windows WSL 2 if it has not already been done. Open PowerShell Window with administrator rights:
+   ```
+   wsl --install -d Ubuntu
+   ```
+   Restart your computer and in the terminal, type `wsl` to start the WSL environment.
+   The first time you do this, you will be asked to create a user and set a password.
+2. Install `git` inside WSL 2 Ubuntu:
+   ```
+   sudo apt-get update
+   sudo apt-get upgrade
+   sudo apt-get install git
+   ```
+3. Clone repository:
+   ```
+   git clone https://github.com/muhme/joomla-branches-tester
+   cd joomla-branches-tester
+   ```
+4. Continue the installion with the Ubuntu setup script:
+   ```
+   sudo scripts/ubuntu_setup.sh
+   ```
+   To run Docker as user it is needed to restart Ubuntu:
+   ```
+   sudo reboot
+   ```
+5. After open WSL 2 with Ubuntu again you are ready to create Joomla Branches Tester:
+   ```
+   cd joomla-branches-tester
+   sudo scripts/create.sh
+   ```
+
+TODO I guess Cypress GUI is not working - to be checked.
+</details>
+
 ## Installation
 
 For the four Web server containers, to simplify life, the standard Docker Joomla images (`joomla:4` or `joomla:5`)
@@ -85,9 +127,17 @@ cd joomla-branches-tester
 scripts/create.sh
 ```
 
+The script can be parameterised with arguments, all of which are optional:
+1. The version number, e.g. `52`, defaults to all,
+2. The used database and database driver, e.g. `pgsql`, defaults to MariaDB with MySQLi driver and
+3. To forces a fresh build with `no-cache`, defaults to build from cache.
+
 The initial script `create.sh` runs some time,
 especially the very first time when the Docker images still need to be downloaded.
-The `joomla-branches-tester` folder requires 2 GB of disc space.
+The `joomla-branches-tester` folder requires about of 2 GB of disc space.
+Docker needs additional about of 20 GB for images and volumes.
+If you are installing for the first time and downloading all necessary Docker images,
+you will need to download approximately 4 GB of data over the network.
 
 <details>
   <summary>Windows</summary>

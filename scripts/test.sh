@@ -12,11 +12,12 @@
 
 source scripts/helper.sh
 
-versionsToTest=("${VERSIONS[@]}")
+versions=$(getVersions)
+IFS=' ' versionsToTest=($(sort <<<"${versions}")); unset IFS # map to array
 
-if isValidVersion "$1"; then
-   versionsToTest=($1)
-   shift # 1st arg is eaten as the version number
+if isValidVersion "$1" "$versions"; then
+  versionsToTest=($1)
+  shift # 1st arg is eaten as the version number
 fi
 
 # Pass through the environment variable to show 'console.log()' messages
@@ -36,6 +37,7 @@ failed=0
 successful=0
 for version in "${versionsToTest[@]}"
 do
+echo "VERSION $version"
   branch=$(branchName "${version}")
   log "Testing ${branch} ${spec}"
   docker exec -it jbt_cypress sh -c "cd /branch_${version} && ${eel1} cypress run ${spec}"

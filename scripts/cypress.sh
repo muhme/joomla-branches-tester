@@ -8,15 +8,17 @@
 
 source scripts/helper.sh
 
+versions=$(getVersions)
+
 if [ $# -ne 1 ] ; then
-  error "Needs one argument with version number, e.g. 51"
+  error "Needs one argument with version number from $versions"
   exit 1
 fi
 
-if isValidVersion "$1"; then
+if isValidVersion "$1" "$versions"; then
   version="$1"
 else
-  error "Version number argument have to be from ${VERSIONS[@]}"
+  error "Version number argument have to be from $versions"
   exit 1
 fi
 
