@@ -6,11 +6,11 @@
 # https://github.com/muhme/joomla-branches-tester
 
 # Database and database driver variants as in configuration.php 'dbtype'
-DB_VARIANTS=("mysqli" "mysql" "mariadbi" "mariadb" "pgsql")
+JBT_DB_VARIANTS=("mysqli" "mysql" "mariadbi" "mariadb" "pgsql")
 # Database driver mapping for the variants as in Web Installer 'database type'
-DB_TYPES=("MySQLi" "MySQL (PDO)" "MySQLi" "MySQL (PDO)" "PostgreSQL (PDO)")
+JBT_DB_TYPES=("MySQLi" "MySQL (PDO)" "MySQLi" "MySQL (PDO)" "PostgreSQL (PDO)")
 # Database server mapping for the variants
-DB_HOSTS=("jbt_mysql" "jbt_mysql" "jbt_madb" "jbt_madb" "jbt_pg")
+JBT_DB_HOSTS=("jbt_mysql" "jbt_mysql" "jbt_madb" "jbt_madb" "jbt_pg")
 
 # Determine actual active Joomla branches, e.g. "44 51 52 60"
 #
@@ -72,9 +72,9 @@ function branchName() {
 #
 function dbTypeForVariant() {
     local variant=$1
-    for i in "${!DB_VARIANTS[@]}"; do
-        if [ "${DB_VARIANTS[$i]}" = "$variant" ]; then
-            echo "${DB_TYPES[$i]}"
+    for i in "${!JBT_DB_VARIANTS[@]}"; do
+        if [ "${JBT_DB_VARIANTS[$i]}" = "$variant" ]; then
+            echo "${JBT_DB_TYPES[$i]}"
             return
         fi
     done
@@ -85,9 +85,9 @@ function dbTypeForVariant() {
 #
 function dbHostForVariant() {
     local variant=$1
-    for i in "${!DB_VARIANTS[@]}"; do
-        if [ "${DB_VARIANTS[$i]}" = "$variant" ]; then
-            echo "${DB_HOSTS[$i]}"
+    for i in "${!JBT_DB_VARIANTS[@]}"; do
+        if [ "${JBT_DB_VARIANTS[$i]}" = "$variant" ]; then
+            echo "${JBT_DB_HOSTS[$i]}"
             return
         fi
     done
@@ -98,7 +98,7 @@ function dbHostForVariant() {
 #
 function isValidVariant() {
     local variant="$1"
-    for v in "${DB_VARIANTS[@]}"; do
+    for v in "${JBT_DB_VARIANTS[@]}"; do
         if [[ "$v" == "$variant" ]]; then
             return 0 # success
         fi

@@ -44,21 +44,12 @@ if [ $# -ge 1 ] && [ "$1" != "no-cache" ] ; then
     database_variant=($1)
     shift # argument is eaten as database variant
   else
-    error "'$1' is not a valid selection for database and database driver, use one of ${DB_VARIANTS[@]}"
+    error "'$1' is not a valid selection for database and database driver, use one of ${JBT_DB_VARIANTS[@]}"
     exit 1
   fi
 fi
 
-# Clean up branch directories if necessary
-for version in "${allVersions[@]}"; do
-  if [ -d "branch_${version}" ]; then
-    log "Removing directory branch_${version}"
-    rm -rf "branch_${version}"
-  fi
-done
-
-# Delete all docker containters
-createDockerComposeFile "${allVersions[*]}" 
+# Delete all docker containters and all branches_*
 scripts/clean.sh
 
 # Compare arrays as strings

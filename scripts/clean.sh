@@ -7,5 +7,19 @@
 
 source scripts/helper.sh
 
+versions=$(getVersions)
+IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
+
+# Delete all docker containters
+createDockerComposeFile "${allVersions[*]}" 
+
 log 'Stop and remove Joomla Branches Tester Docker containers and network'
 docker compose down
+
+# Clean up branch directories if existing
+for version in "${allVersions[@]}"; do
+  if [ -d "branch_${version}" ]; then
+    log "Removing directory branch_${version}"
+    rm -rf "branch_${version}"
+  fi
+done

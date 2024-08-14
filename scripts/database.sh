@@ -22,7 +22,7 @@ if isValidVersion "$1" "$versions"; then
 fi
 
 if [ $# -lt 1 ] ; then
-  error "Desired selection of database and driver is missing, use one of ${DB_VARIANTS[@]}"
+  error "Desired selection of database and driver is missing, use one of ${JBT_DB_VARIANTS[@]}"
   exit 1
 fi
 
@@ -32,7 +32,7 @@ if isValidVariant "$1"; then
   dbhost=$(dbHostForVariant "$variant")
   shift # argument is eaten
 else
-  error "'$1' is not a valid selection for database and database driver, use one of ${DB_VARIANTS[@]}"
+  error "'$1' is not a valid selection for database and database driver, use one of ${JBT_DB_VARIANTS[@]}"
   exit 1
 fi
 
@@ -48,7 +48,7 @@ for version in "${versionsToChange[@]}"; do
     exit 1
   fi
 
-  log "jbt_${version} – Create cypress.config.${extension} for ${variant}"
+  log "jbt_${version} – Create cypress.config.${extension} for variant ${variant} with dbytpe='${dbtype}' db_host='${dbhost}'"
 
   # adopt e.g.:
   #   db_type: 'PostgreSQL (PDO)',

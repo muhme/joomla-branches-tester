@@ -277,6 +277,13 @@ scripts/pull.sh 52
 ```
 Finally, the Git status of the branch is displayed.
 
+### Cleaning Up
+
+If you want to delete all Docker containers and all `branch_*` directories, you can do so:
+```
+scripts/clean.sh
+```
+
 ## Limitations
 
 The different Joomla versions exist in parallel, but the test runs sequentially.
