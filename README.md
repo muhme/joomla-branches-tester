@@ -35,7 +35,7 @@ It is assumed that your current working directory is `joomla-branches-tester` al
 
 :point_right: For the complete list of all scripts see [scripts/README.md](scripts/README.md).
 
-The scripts contain *hacks* and a bit of magic for all the fluffiness, enjoy reading the comments.
+The scripts contain *hacks* and a bit of magic for all the fluffiness, enjoy reading the comments in the scripts.
 
 ### Notes
 
@@ -253,7 +253,10 @@ scripts/database.sh pgsql
 > the directories `administrator/components/com_patchtester`, `api/components/com_patchtester` and
 > `media/com_patchtester` needs to be deleted. This script takes already care for Joomla Patch Tester.
 >
-> :point_right: In case of doubt use `create.sh` to have a clean installation.
+> :fairy: The good fairy waves her magic wand and says:
+> "When in doubt, it's wiser to use `create.sh` to ensure a clean installation.
+> With a sprinkle of stardust, you can specify the desired database variant,
+> and if you're only installing one Joomla version, it will be done in the blink of an eye."
 
 ### Install Joomla Patch Tester
 
