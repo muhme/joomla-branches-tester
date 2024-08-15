@@ -66,6 +66,27 @@ fi
 log "Docker compose up"
 docker compose up -d
 
+# Wait until MySQL database is up and running
+MAX_ATTEMPTS=20
+attempt=1
+until docker exec jbt_mysql mysqladmin ping -h"127.0.0.1" --silent || [ $attempt -eq $MAX_ATTEMPTS ]; do
+  log "Waiting for MySQL to be ready... Attempt $attempt/$MAX_ATTEMPTS"
+  attempt=$((attempt + 1))
+  sleep 1
+done
+
+# For the tests we need mysql user/password login
+log "jbt_${version} – Enable MySQL user root login with password"
+docker exec -it jbt_mysql mysql -uroot -proot -e "ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'root';"
+# And for MariaDB too
+log "jbt_${version} – Enable MariaDB user root login with password"
+docker exec -it jbt_madb mysql -uroot -proot -e  "ALTER USER 'root'@'%' IDENTIFIED BY 'root';"
+# And Postgres (which have already user postgres with SUPERUSER, but to simplify we will use same user root on postgres)
+log "jbt_${version} – Create PostgreSQL user root with password root and SUPERUSER role"
+docker exec -it jbt_pg sh -c "\
+  psql -U postgres -c \"CREATE USER root WITH PASSWORD 'root';\" && \
+  psql -U postgres -c \"ALTER USER root WITH SUPERUSER;\""
+
 for version in "${versionsToInstall[@]}"; do
   # If the copying has not yet been completed, then we have to wait, or we will get e.g.
   # rm: cannot remove '/var/www/html/libraries/vendor': Directory not empty.
@@ -115,12 +136,9 @@ for version in "${versionsToInstall[@]}"; do
   docker exec -it "jbt_${version}" bash -c 'cd /var/www/html && npm ci'
 
   log "jbt_${version} – Change root ownership to www-data"
-  # temporarily disable -e for chown as on macOS seen following, but it doesn't matter as these files are 444
-  #   chmod: changing permissions of '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
-  set +e
-  # change root ownership to www-data
-  docker exec -it "jbt_${version}" chown -R www-data:www-data /var/www/html >/dev/null 2>&1
-  set -e
+  # Following error seen on macOS, we ignore it as it does not matter, these files are 444
+  # chmod: changing permissions of '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
+  docker exec -it "jbt_${version}" bash -c 'chown -R www-data:www-data /var/www/html > /dev/null 2>&1 || true'
 
   # Joomla container needs to be restarted
   log "jbt_${version} – Restart container"
@@ -130,18 +148,6 @@ for version in "${versionsToInstall[@]}"; do
   scripts/database.sh "${version}" "$database_variant"
 
 done
-
-# For the tests we need mysql user/password login
-log "jbt_${version} – Enable MySQL user root login with password"
-docker exec -it jbt_mysql mysql -uroot -proot -e "ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'root';"
-# And for MariaDB too
-log "jbt_${version} – Enable MariaDB user root login with password"
-docker exec -it jbt_madb mysql -uroot -proot -e  "ALTER USER 'root'@'%' IDENTIFIED BY 'root';"
-# And Postgres (which have already user postgres with SUPERUSER, but to simplify we will use same user root on postgres)
-log "jbt_${version} – Create PostgreSQL user root with password root and SUPERUSER role"
-docker exec -it jbt_pg sh -c "\
-  psql -U postgres -c \"CREATE USER root WITH PASSWORD 'root';\" && \
-  psql -U postgres -c \"ALTER USER root WITH SUPERUSER;\""
 
 log "Aditional having vim, ping and netstat in jbt_cypress container"
 docker exec -it jbt_cypress sh -c "apt-get update && apt-get install -y git vim iputils-ping net-tools"

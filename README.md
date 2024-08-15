@@ -285,6 +285,23 @@ scripts/pull.sh 52
 ```
 Finally, the Git status of the branch is displayed.
 
+<img align="right" src="images/phpMyAdmin.png">
+### Gaze Into the Spellbook
+
+In the mystical world of Joomla, the database is the enchanted tome where all the secrets are stored.
+Sometimes, the wise must delve into this spellbook to uncover and weave new spells,
+adjusting rows and columns with precision.
+
+Fear not, for magical tools are at your disposal, each one a trusted companion.
+They are so finely attuned to your needs that they require no login, no password—just a single click,
+and the pages of the database open before you as if by magic:
+
+* [phpMyAdmin](http://localhost:7001) for MariaDB and MySQL databases
+* [pgAdmin](http://localhost:7002) for PostgreSQL database
+
+Simply approach these gateways, and the secrets of the database will reveal themselves effortlessly,
+ready for your exploration.
+
 ### Cleaning Up
 
 If you want to delete all Docker containers and all `branch_*` directories, you can do so:
