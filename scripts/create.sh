@@ -67,10 +67,10 @@ log "Docker compose up"
 docker compose up -d
 
 # Wait until MySQL database is up and running
-MAX_ATTEMPTS=20
+MAX_ATTEMPTS=60
 attempt=1
 until docker exec jbt_mysql mysqladmin ping -h"127.0.0.1" --silent || [ $attempt -eq $MAX_ATTEMPTS ]; do
-  log "Waiting for MySQL to be ready... Attempt $attempt/$MAX_ATTEMPTS"
+  log "Waiting for MySQL to be ready, attempt $attempt/$MAX_ATTEMPTS"
   attempt=$((attempt + 1))
   sleep 1
 done
@@ -125,7 +125,7 @@ for version in "${versionsToInstall[@]}"; do
       apt-get install -y libzip4 libmagickwand-6.q16-6 libmemcached11"
   fi
 
-  log "jbt_${version} – Composer"
+  log "jbt_${version} – Composer install"
   docker exec -it "jbt_${version}" bash -c "cd /var/www/html && \
     php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\" && \
     php composer-setup.php && \
