@@ -18,9 +18,11 @@ The following scripts are available and the use is described in [../README.md](.
 | [scripts/clean.sh](clean.sh) | Delete all `jbt_*`-Docker containers and the `joomla-branches-tester_default` Docker network and `branch_*` folders.. | Used by `create.sh` or for you to get rid of all the stuff. |
 
 :point_right: The scripts use [ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code#Colors)
-to color their own log and error messages. All messages begin with three asterisks.
-Log messages are highlighted in green. Error messages are displayed in red.
+to color their own log and error messages. 
+Log messages are highlighted in green and directed to the standard output (stdout) stream.
+Error messages are displayed in red and directed to the standard error output (stderr) stream.
 Colouring can be avoided by setting the environment variable [NOCOLOR=1](https://no-color.org/).
+All messages start with three asterisks, the date and the time. See the following example:
 
 ![scripts/test.sh running screen shot](../images/screen-shot.png)
 

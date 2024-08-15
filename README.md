@@ -142,7 +142,6 @@ you will need to download approximately 4 GB of data over the network.
 TODO I guess Cypress GUI is not working - to be checked.
 </details>
 
-
 ## Containers
 
 The abbreviation `jbt` stands for Joomla Branches Tester:
@@ -197,6 +196,10 @@ export ELECTRON_ENABLE_LOGGING=1
 scripts/test.sh 44 tests/System/integration/administrator/components/com_actionlogs/Actionlogs.cy.js
 ```
 
+:imp: When running all Joomla System Tests, the first step executed is the `Installation.cy.js`.
+  If there were any extensions previously installed,
+  this can lead to inconsistencies between the file system and the database.
+
 ### Cypress GUI System Tests
 
 If a test specification fails, it is often helpful to watch the test in the browser and
@@ -206,6 +209,10 @@ is to be started (requires an installed Cypress):
 ```
 scripts/cypress.sh 51
 ```
+
+:imp: When running all Joomla System Tests, the first step executed is the `Installation.cy.js`.
+  If there were any extensions previously installed,
+  this can lead to inconsistencies between the file system and the database.
 
 ### Switch Database and Database Driver
 
@@ -264,6 +271,13 @@ scripts/patchtester.sh 52 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
     ✓ set GitHub token (2556ms)
     ✓ fetch data (6254ms)
 ```
+
+:point_right: Remember, if you have changed the database version, you will need to reinstall Joomla Patch Tester.
+
+:point_right: The situation is similar with the execution of the System Tests including the Joomla step `Installation.cy.js`.
+  After the Joomla installation, the database is new and but the files from previous Patch Tester installation are still existing.
+  Therefore, reinstalling the patch tester fails.
+  In this case, use the `database.sh` script, as it can clean up the Patch Tester files before the next installation.
 
 ### Syncing from GitHub Repository
 
