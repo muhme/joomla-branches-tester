@@ -286,6 +286,7 @@ scripts/pull.sh 52
 Finally, the Git status of the branch is displayed.
 
 <img align="right" src="images/phpMyAdmin.png">
+
 ### Gaze Into the Spellbook
 
 In the mystical world of Joomla, the database is the enchanted tome where all the secrets are stored.
