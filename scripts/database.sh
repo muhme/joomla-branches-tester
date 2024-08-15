@@ -40,7 +40,7 @@ for version in "${versionsToChange[@]}"; do
   elif [ -f "branch_${version}/cypress.config.dist.mjs" ]; then
     extension="mjs"
   else
-    error "No 'cypress.config.dist.*js' file found, please have a look" >&2
+    error "No 'cypress.config.dist.*js' file found in branch_${version}, please have a look"
     exit 1
   fi
 

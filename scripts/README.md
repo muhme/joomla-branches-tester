@@ -4,7 +4,7 @@ The scripts and configuration files of the Joomla Branch Tester are stored in th
 
 ## Your Scripts
 
-The following scripts are available and are also described in [../README.md](../README.md).
+The following scripts are available and the use is described in [../README.md](../README.md).
 
 | Script | Description | Additional Info |
 | --- | --- | --- |
@@ -15,22 +15,23 @@ The following scripts are available and are also described in [../README.md](../
 | [scripts/patchtester.sh](patchtester.sh) | Installs and configures Joomla patch tester component in one or all Joomla instances. | The version number is an optional argument. The GitHub token argument is mandatory. |
 | [scripts/pull.sh](pull.sh) | Running `git pull` and `git status` on one or all branches. | The version number is an optional argument. |
 | [scripts/ubuntu_setup.sh](ubuntu_setup.sh) | Helper script in an installation on standard Ubuntu Linux. | |
-| [scripts/clean.sh](clean.sh) | Delete all `jbt_*`-Docker containers and the `joomla-branches-tester_default` Docker network. | Used by `create.sh` or for you to get rid of all the stuff. |
+| [scripts/clean.sh](clean.sh) | Delete all `jbt_*`-Docker containers and the `joomla-branches-tester_default` Docker network and `branch_*` folders.. | Used by `create.sh` or for you to get rid of all the stuff. |
 
 :point_right: The scripts use [ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code#Colors)
-to color their own log and error messages.
-This can be disabled by setting environment variable [NOCOLOR=1](https://no-color.org/).
+to color their own log and error messages. All messages begin with three asterisks.
+Log messages are highlighted in green. Error messages are displayed in red.
+Colouring can be avoided by setting the environment variable [NOCOLOR=1](https://no-color.org/).
 
 ![scripts/test.sh running screen shot](../images/screen-shot.png)
 
-## Machine Room Scripts and Configurations
+## Engine Room Scripts and Configurations
 
 | File | Description | Additional Info |
 | --- | --- | --- |
 | [scripts/patchtester.cy.js](patchtester.cy.js) | Cypress script to install and confgure Joomla Patch Tester component. | Used by `patchtester.sh`. |
 | [scripts/helper.sh](helper.sh) | Some commonly used bash script functions and definitions. | Used by all other bash-Scripts. |
-| [scripts/Joomla.js](Joomla.js) | [joomla-cypress](https://github.com/joomla-projects/joomla-cypress) *hack* until setting `db_port` is supported |
-| [scripts/servers.json](servers.json) | PostgreSQL server configuration for pgAdmin. | |
-| [scripts/pgpass](pgpass) | Auto-logon password file for pgAdmin. | |
-| [scripts/docker-compose.base.yml](docker-compose.base.yml) | The basic part of the `docker-compose.yml` file. | |
-| [scripts/docker-compose.joomla.yml](docker-compose.joomla.yml) | Part of the `docker-compose.yml` file to be parameterised for one Joomla web server. | |
+| [scripts/Joomla.js](Joomla.js) | [joomla-cypress](https://github.com/joomla-projects/joomla-cypress) *hack* until setting `db_port` is supported | Used by `database.sh`. |
+| [scripts/servers.json](servers.json) | PostgreSQL server configuration. | Used by `pgAdmin`. |
+| [scripts/pgpass](pgpass) | Auto-logon password file. | Used by `pgAdmin`. |
+| [scripts/docker-compose.base.yml](docker-compose.base.yml) | The basic part of the `docker-compose.yml` file. | Used by `create.sh`. |
+| [scripts/docker-compose.joomla.yml](docker-compose.joomla.yml) | Part of the `docker-compose.yml` file to be parameterised for one Joomla web server. | Used by `create.sh`. |

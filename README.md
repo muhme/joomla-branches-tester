@@ -35,11 +35,11 @@ It is assumed that your current working directory is `joomla-branches-tester` al
 
 :point_right: For the complete list of all scripts see [scripts/README.md](scripts/README.md).
 
-The scripts contain *hacks* and a bit of magic for all the fluffiness, enjoy reading the comments in the scripts.
+:fairy: The scripts contain *hacks* and a bit of magic for all the fluffiness, enjoy reading the comments in the scripts.
 
 ### Notes
 
-By using `host.docker.internal` it is possible to run everything with the same hostnames an
+By using `host.docker.internal` it is possible to run everything with the same hostnames and
 URLs from container inside and Docker host machine outside.
 However, there is a performance issue with the database.
 Therefore, for the database connection `host.docker.internal` is only used when you run Cypress GUI from outside.
@@ -59,17 +59,51 @@ Cypress needs only to be installed on your host system if you want to use Cypres
 <details>
   <summary>Ubuntu Setup Script</summary>
 
-:point_right: On Ubuntu with default enabled Uncomplicated Firewall (UFW) you need to allow SMTP port:
-```
-ufw allow 7025
-```
+For setting up and configuring an Ubuntu Linux environment with required Git, Docker, and firewall configuration,
+one of the gnomes has provided the [ubuntu_setup.sh](scripts/ubuntu_setup.sh) script.
+This script is designed to work on both a fresh Ubuntu desktop installation and Ubuntu on Windows WSL 2.
 
-:point_right: For Ubuntu Linux there is the script [ubuntu_setup.sh](scripts/ubuntu_setup.sh) available to install Docker, open the firewall port, set `host.docker.internal` entry etc.:
-
+Download the script to your current working directory and run with superuser privileges:
 ```
-sudo scripts/ubuntu_setup.sh
+sudo bash ./ubuntu_setup.sh
 ```
 </details>
+
+## Installation
+
+For the four Web server containers, to simplify life, the standard Docker Joomla images (`joomla:4` or `joomla:5`)
+are used as a starting point and then overinstalled with the source code from the corresponding Joomla development branch.
+The Joomla installation itself is executed by the Cypress spec `Installation.cy.js` from the Joomla System Tests.
+
+Last tested with
+* macOS 14 Sonoma,
+* Windows 11 Pro WSL 2 Ubuntu and
+* Ubuntu 24 Noble Numbat.
+
+You can create the Docker containers and install Joomla with script `create.sh`:
+
+```
+git clone https://github.com/muhme/joomla-branches-tester
+cd joomla-branches-tester
+scripts/create.sh
+```
+
+<img align="right" src="images/joomla-branches-tester-52.svg" width="400">
+The script can be parameterised with arguments, all of which are optional:
+
+1. Install for single version number, e.g. `52` (your system architecture will look like the picture on the right), defaults to all,
+2. The used database and database driver, e.g. `pgsql`, defaults to MariaDB with MySQLi driver and
+3. To force a fresh build with `no-cache`, defaults to build from cache.
+
+:point_right: The script can run without `sudo`,
+but depending on the platform, it may ask you to enter your user password for individual sudo actions.
+
+The initial script `create.sh` runs some time,
+especially the very first time when the Docker images still need to be downloaded.
+The `joomla-branches-tester` folder requires about of 2 GB of disc space.
+Docker needs additional about of 20 GB for images and volumes.
+If you are installing for the first time and downloading all necessary Docker images,
+you will need to download approximately 4 GB of data over the network.
 
 <details>
   <summary>Windows WSL2 Ubuntu Setup</summary>
@@ -99,60 +133,15 @@ sudo scripts/ubuntu_setup.sh
    ```
    sudo reboot
    ```
-5. After open WSL 2 with Ubuntu again you are ready to create Joomla Branches Tester:
+5. After open WSL 2 with Ubuntu again and you are ready to create Joomla Branches Tester:
    ```
    cd joomla-branches-tester
-   sudo scripts/create.sh
+   scripts/create.sh
    ```
 
 TODO I guess Cypress GUI is not working - to be checked.
 </details>
 
-## Installation
-
-For the four Web server containers, to simplify life, the standard Docker Joomla images (`joomla:4` or `joomla:5`)
-are used as a starting point and then overinstalled with the source code from the corresponding Joomla development branch.
-The Joomla installation itself is executed by the Cypress spec `Installation.cy.js` from the Joomla System Tests.
-
-Last tested with
-* macOS 14 Sonoma,
-* Windows 11 Pro WSL 2 and
-* Ubuntu 24 Noble Numbat.
-
-You can create the Docker containers and install Joomla with script `create.sh`:
-
-```
-git clone https://github.com/muhme/joomla-branches-tester
-cd joomla-branches-tester
-scripts/create.sh
-```
-
-<img align="right" src="images/joomla-branches-tester-52.svg" width="400">
-The script can be parameterised with arguments, all of which are optional:
-
-1. The version number, e.g. `52` (your system architecture will look like the picture on the right), defaults to all,
-2. The used database and database driver, e.g. `pgsql`, defaults to MariaDB with MySQLi driver and
-3. To force a fresh build with `no-cache`, defaults to build from cache.
-
-:point_right: The script can run without `sudo`,
-but depending on the platform, it may ask you to enter your user password for individual sudo actions.
-
-The initial script `create.sh` runs some time,
-especially the very first time when the Docker images still need to be downloaded.
-The `joomla-branches-tester` folder requires about of 2 GB of disc space.
-Docker needs additional about of 20 GB for images and volumes.
-If you are installing for the first time and downloading all necessary Docker images,
-you will need to download approximately 4 GB of data over the network.
-
-<details>
-  <summary>Windows</summary>
-
-Microsoft Windows needs WSL 2 installed and to run the script with `sudo`:
-```
-sudo scripts/create.sh
-```
-
-</details>
 
 ## Containers
 
@@ -297,15 +286,15 @@ Fear not, for magical tools are at your disposal, each one a trusted companion.
 They are so finely attuned to your needs that they require no login, no password—just a single click,
 and the pages of the database open before you as if by magic:
 
-* [phpMyAdmin](http://localhost:7001) for MariaDB and MySQL databases
-* [pgAdmin](http://localhost:7002) for PostgreSQL database
+* [phpMyAdmin](http://localhost:7001) for MariaDB and MySQL
+* [pgAdmin](http://localhost:7002) for PostgreSQL
 
 Simply approach these gateways, and the secrets of the database will reveal themselves effortlessly,
 ready for your exploration.
 
 ### Cleaning Up
 
-If you want to delete all Docker containers and all `branch_*` directories, you can do so:
+If you want to get rid of all these Docker containers and the 2 GB in the `branch_*` directories, you can do so:
 ```
 scripts/clean.sh
 ```

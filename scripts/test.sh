@@ -11,6 +11,8 @@
 # https://github.com/muhme/joomla-branches-tester
 
 source scripts/helper.sh
+# test script counts errors by own and should not stop
+trap - ERR
 
 versions=$(getVersions)
 IFS=' ' versionsToTest=($(sort <<<"${versions}")); unset IFS # map to array

@@ -144,18 +144,18 @@ if [ -n "$NO_COLOR" ]; then
     JBT_RESET=""
 fi
 
-# Give log message with date and time in bold and dark red on stdout
+# Give log message with date and time in bold and green background on stdout
 #
 log() {
     # -e enables backslash escapes
     echo -e "${JBT_GREEN_BG}${JBT_BOLD}*** $(date '+%y%m%d %H:%M:%S') *** $@${JBT_RESET}"
 }
 
-# Give log message with date and time in bold and dark red on stdout
+# Give error message with date and time in bold and dark red on stderr
 #
 error() {
     # -e enables backslash escapes
-    echo -e "${JBT_GREEN_BG}${JBT_RED}${JBT_BOLD}*** $(date '+%y%m%d %H:%M:%S') *** $@${JBT_RESET}"
+    echo -e "${JBT_RED}${JBT_BOLD}*** $(date '+%y%m%d %H:%M:%S') *** $@${JBT_RESET}" >&2
 }
 
 # As we have -e set the scripts exit immediately if any command fails.
@@ -163,7 +163,6 @@ error() {
 #
 errorHandler() {
     error "An error occurred in script $(basename "$0") on line $1."
-    # Add any additional error handling logic here
     exit 1
 }
 trap 'errorHandler $LINENO' ERR

@@ -2,7 +2,7 @@
 #
 # ubuntu_setup.sh - Install all prerequisites on Ubuntu
 # - tested with
-#   . Windows 11 Pro WSL 2
+#   . Windows 11 Pro WSL 2 Ubuntu
 #   . Ubuntu Desktop (GNOME), Version 1.524OS Ubuntu 22.04
 #     . https://marketplace.digitalocean.com/apps/ubuntu-desktop-gnome
 #     . 4 vCPU / 8 GB RAM / regular SSD
@@ -27,12 +27,15 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
-# prerequisites
+# Make the hosts entry
 echo "127.0.0.1 host.docker.internal" >> /etc/hosts
+
+# Enable SMTP port in Ubuntu Uncomplicated Firewall (UFW)
 ufw allow 7025
 
-# git and some basics
+# Some basics with git
 apt update
+apt upgrade
 apt install -y git vim iputils-ping net-tools telnet
 
 # Docker
