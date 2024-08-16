@@ -18,7 +18,12 @@ if isValidVersion "$1" "$versions"; then
 fi
 
 # Check if the given token looks like a GitHub personal access token
-if [[ $1 != ghp_* ]]; then
+if [[ $1 = ghp_* ]]; then
+  token="$1"
+elif [[ "${JBT_GITHUB_TOKEN}" = ghp_* ]]; then
+  token="${JBT_GITHUB_TOKEN}"
+  log "Use GitHub token from the environment variable JBT_GITHUB_TOKEN"
+else
   error "Error: Argument with GitHub personal access token 'ghp_*' is missing."
   exit 1
 fi
@@ -29,7 +34,7 @@ for version in "${versionsToInstall[@]}"
 do
   branch=$(branchName "${version}")
   log "Install Joomla Patch Tester in ${branch}"
-  docker exec -it jbt_cypress sh -c "cd /branch_${version} && cypress run --env token=$1 --config specPattern=/scripts/patchtester.cy.js"
+  docker exec -it jbt_cypress sh -c "cd /branch_${version} && cypress run --env token=${token} --config specPattern=/scripts/patchtester.cy.js"
   if [ $? -eq 0 ] ; then
     # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
     successful=$((successful + 1))

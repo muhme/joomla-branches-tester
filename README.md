@@ -51,7 +51,7 @@ All you need is the ability to run Git, Docker and Bash scripts.
 Thanks to Docker, it is not necessary to install one of the databases, the database management tools, PHP, Node or Composer.
 Cypress needs only to be installed on your host system if you want to use Cypress GUI.
 
-[Git](https://git-scm.com/), [Docker](https://www.docker.com/) an a bash scripting environment are required and must be installed. The following `/etc/hosts` entry must exist:
+[Git](https://git-scm.com/), [Docker](https://www.docker.com/) and a bash scripting environment are required and must be installed. The following `/etc/hosts` entry must exist:
 ```
 127.0.0.1 host.docker.internal
 ```
@@ -161,7 +161,7 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
 
 :eight_spoked_asterisk: The directories are available on Docker host to:
 * Inspect and change the configuration files (`configuration.php` or `cypress.config.js`),
-* To edit the test specifications below `tests/System` or
+* To edit the test specs below `tests/System` or
 * To inspect screenshots from failed tests or
 * To inspect and hack the Joomla sources from Docker host system.
 
@@ -169,13 +169,13 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
 
 ### Cypress Headless System Tests
 
-To simple run System Tests with all specs - except for the installation -
+To simple run the Joomla System Tests with all specs - except for the installation -
 from the [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System) in all four branches:
 ```
 scripts/test.sh
 ```
 
-Run the Joomla System Tests in the branch 5.1-dev only:
+Run the System Tests in the branch 5.1-dev only:
 ```
 scripts/test.sh 51
 ```
@@ -185,7 +185,7 @@ Test one spec with all four branches (of course, the spec must exist in all bran
 scripts/test.sh tests/System/integration/administrator/components/com_privacy/Consent.cy.js
 ```
 
-Test all site specs with branch 4.4-dev using a pattern:
+Test all `site` specs with branch 4.4-dev using a pattern:
 ```
 scripts/test.sh 44 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
 ```
@@ -202,7 +202,7 @@ scripts/test.sh 44 tests/System/integration/administrator/components/com_actionl
 
 ### Cypress GUI System Tests
 
-If a test specification fails, it is often helpful to watch the test in the browser and
+If a test spec fails, it is often helpful to watch the test in the browser and
 see all Cypress log messages and to be able to repeat the test quickly.
 You must specify the required Joomla version for whose instance the Cypress GUI
 is to be started (requires an installed Cypress):
@@ -241,21 +241,22 @@ scripts/database.sh pgsql
 
 :point_right: It can also be used to clean a Joomla installation.
 
-> :warning: **Caution:** In your Joomla installation, the database and the files may now have diverged.
-> This can be a problem if you have installed extensions.
-> For example for the Patch Tester the autoload classes file `autoload_psr4.php` and
-> the directories `administrator/components/com_patchtester`, `api/components/com_patchtester` and
-> `media/com_patchtester` needs to be deleted. This script takes already care for Joomla Patch Tester.
->
-> :fairy: The good fairy waves her magic wand and says:
-> "When in doubt, it's wiser to use `create.sh` to ensure a clean installation.
-> With a sprinkle of stardust, you can specify the desired database variant,
-> and if you're only installing one Joomla version, it will be done in the blink of an eye."
+:warning: **Caution:** In your Joomla installation, the database and the files may now have diverged.
+  This can be a problem if you have installed extensions.
+  As an example, the autoload classes file `autoload_psr4.php` and
+  the directories `administrator/components/com_patchtester`, `api/components/com_patchtester` and
+  `media/com_patchtester` must be deleted before the next installation of the Joomla Patch Tester.
+  This script takes care of this and you can reinstall Joomla Patch Tester without any problems.
+
+:fairy: The good fairy waves her magic wand and says:
+  "When in doubt, it's wiser to use `create.sh` to ensure a clean installation.
+  With a sprinkle of stardust, you can specify the desired database variant,
+  and if you're only installing one Joomla version, it will be done in the blink of an eye."
 
 ### Install Joomla Patch Tester
 
 For your convenience [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester)
-can be installed on one or all four Joomla instances. The script also sets GitHub Token and fetch the data.
+can be installed on one or all four Joomla instances. The script also sets GitHub token and fetch the data.
 This can be done without version number for all four Joomla instances or e.g. for Joomla 5.2-dev:
 
 ```
@@ -270,12 +271,9 @@ scripts/patchtester.sh 52 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
     ✓ fetch data (6254ms)
 ```
 
-:point_right: Remember, if you have changed the database version, you will need to reinstall Joomla Patch Tester.
+:point_right: The GitHub token can also be given by environment variable `JBT_GITHUB_TOKEN`.
 
-:point_right: The situation is similar with the execution of the System Tests including the Joomla step `Installation.cy.js`.
-  After the Joomla installation, the database is new and but the files from previous Patch Tester installation are still existing.
-  Therefore, reinstalling the patch tester fails.
-  In this case, use the `database.sh` script, as it can clean up the Patch Tester files before the next installation.
+:fairy: Remember, if you have changed the database version, you will need to reinstall Joomla Patch Tester.
 
 ### Syncing from GitHub Repository
 
