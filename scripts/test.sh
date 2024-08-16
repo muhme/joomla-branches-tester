@@ -11,7 +11,7 @@
 # https://github.com/muhme/joomla-branches-tester
 
 source scripts/helper.sh
-# test script counts errors by own and should not stop
+# test script counts errors by own and should not stop on command failures
 trap - ERR
 
 versions=$(getVersions)
@@ -28,17 +28,32 @@ if [ "$ELECTRON_ENABLE_LOGGING" == "1" ]; then
   eel1="ELECTRON_ENABLE_LOGGING=1"
 fi
 
-# Running all or having one test specification?
-if [ $# -eq 0 ] ; then
-  spec=""
-else
-  spec="--spec $1"
-fi
-
 failed=0
 successful=0
 for version in "${versionsToTest[@]}"
 do
+
+  # Running all or having one test specification?
+  if [ $# -eq 0 ] ; then
+    # Running all, but without installation step
+    # Handle .js or .mjs from PR https://github.com/joomla/joomla-cms/pull/43676 – [4.4] Move the Cypress Tests to ESM
+    cf="branch_${version}/cypress.config"
+    if [ -f "${cf}.js" ]; then
+      cf="${cf}.js"
+    elif [ -f "${cf}.mjs" ]; then
+      cf="${cf}.mjs"
+    else
+      error "No 'cypress.config.*js' file found in branch_${version}, please have a look"
+      exit 1
+    fi
+    # Create spec pattern list without installation spec
+    i="tests/System/integration/"
+    all=$(grep  "${i}" "${cf}" | grep -v "${i}install/" | tr -d "' " | awk '{printf "%s", $0}' | sed 's/,$//')
+    spec="--spec '${all}'"
+  else
+    spec="--spec '$1'"
+  fi
+
   branch=$(branchName "${version}")
   log "Testing ${branch} ${spec}"
   docker exec -it jbt_cypress sh -c "cd /branch_${version} && ${eel1} cypress run ${spec}"

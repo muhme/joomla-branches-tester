@@ -169,8 +169,8 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
 
 ### Cypress Headless System Tests
 
-Simple run all specs from the [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System)
-in all four branches:
+To simple run System Tests with all specs - except for the installation -
+from the [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System) in all four branches:
 ```
 scripts/test.sh
 ```
@@ -196,9 +196,9 @@ export ELECTRON_ENABLE_LOGGING=1
 scripts/test.sh 44 tests/System/integration/administrator/components/com_actionlogs/Actionlogs.cy.js
 ```
 
-:imp: When running all Joomla System Tests, the first step executed is the `Installation.cy.js`.
-  If there were any extensions previously installed,
-  this can lead to inconsistencies between the file system and the database.
+:fairy: To protect you, the first step `Installation.cy.js` of the Joomla System Tests
+  is excluded here when you run all tests. If you run this spec, this can lead to inconsistencies
+  between the file system and the database, as the Joomla database will be recreated.
 
 ### Cypress GUI System Tests
 
@@ -210,9 +210,7 @@ is to be started (requires an installed Cypress):
 scripts/cypress.sh 51
 ```
 
-:imp: When running all Joomla System Tests, the first step executed is the `Installation.cy.js`.
-  If there were any extensions previously installed,
-  this can lead to inconsistencies between the file system and the database.
+:imp: Yes, run `Installation.cy.js`, who cares about file system and database consistency? Go on, click on it.
 
 ### Switch Database and Database Driver
 
