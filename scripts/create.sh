@@ -129,6 +129,7 @@ for version in "${versionsToInstall[@]}"; do
   docker exec -it "jbt_${version}" bash -c "cd /var/www/html && \
     php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\" && \
     php composer-setup.php && \
+    rm composer-setup.php && \
     mv composer.phar /usr/local/bin/composer && \
     composer install"
 
