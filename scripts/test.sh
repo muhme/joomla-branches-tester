@@ -1,9 +1,10 @@
 #!/bin/bash
 #
-# test.sh - test cypress spec over on one or all branches, e.g.
+# test.sh - test cypress spec on one or all branches, e.g.
 #   scripts/test.sh
+#   scripts/test.sh firefox
 #   scripts/test.sh 44
-#   scripts/test.sh 51 tests/System/integration/site/components/com_contact/Categories.cy.js
+#   scripts/test.sh 51 edge tests/System/integration/site/components/com_contact/Categories.cy.js
 #   scripts/test.sh tests/System/integration/site/components/com_contact/Categories.cy.js
 #   ELECTRON_ENABLE_LOGGING=1 scripts/test.sh
 #
@@ -14,6 +15,7 @@ source scripts/helper.sh
 # test script counts errors by own and should not stop on command failures
 trap - ERR
 
+# Is the first argument a version number?
 versions=$(getVersions)
 IFS=' ' versionsToTest=($(sort <<<"${versions}")); unset IFS # map to array
 
@@ -21,6 +23,17 @@ if isValidVersion "$1" "$versions"; then
   versionsToTest=($1)
   shift # 1st arg is eaten as the version number
 fi
+
+# Is the next argument a browser?
+case "$1" in
+  chrome|edge|firefox|electron)
+    browser="--browser $1"
+    shift # arg is eaten as browser
+    ;;
+  *)
+    browser=""
+    ;;
+esac
 
 # Pass through the environment variable to show 'console.log()' messages
 eel1=""
@@ -33,9 +46,9 @@ successful=0
 for version in "${versionsToTest[@]}"
 do
 
-  # Running all or having one test specification?
+  # Is there one more argument with a test spec pattern?
   if [ $# -eq 0 ] ; then
-    # Running all, but without installation step
+    # Running everything, but without installation step
     # Handle .js or .mjs from PR https://github.com/joomla/joomla-cms/pull/43676 – [4.4] Move the Cypress Tests to ESM
     cf="branch_${version}/cypress.config"
     if [ -f "${cf}.js" ]; then
@@ -51,12 +64,13 @@ do
     all=$(grep  "${i}" "${cf}" | grep -v "${i}install/" | tr -d "' " | awk '{printf "%s", $0}' | sed 's/,$//')
     spec="--spec '${all}'"
   else
+    # Use the given test spec pattern
     spec="--spec '$1'"
   fi
 
   branch=$(branchName "${version}")
   log "Testing ${branch} ${spec}"
-  docker exec -it jbt_cypress sh -c "cd /branch_${version} && ${eel1} cypress run ${spec}"
+  docker exec -it jbt_cypress sh -c "cd /branch_${version} && ${eel1} cypress run ${browser} ${spec}"
   if [ $? -eq 0 ] ; then
     # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
     successful=$((successful + 1))

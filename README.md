@@ -144,6 +144,20 @@ you will need to download approximately 4 GB of data over the network.
 
 </details>
 
+<details>
+  <summary>macOS Setup</summary>
+
+TODO
+
+</details>
+
+<details>
+  <summary>Ubuntu Setup</summary>
+
+TODO
+
+</details>
+
 ## Containers
 
 The abbreviation `jbt` stands for Joomla Branches Tester:
@@ -177,17 +191,22 @@ from the [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/t
 scripts/test.sh
 ```
 
-Run the System Tests in the branch 5.1-dev only:
+Three optional arguments are possible, in the following order:
+1. Joomla version number, all versions are tested by default
+2. Browser, to be used with electron (default), firefox, chrome or edge
+3. Test spec pattern, all test specs (except the installation) are used by default
+
+As an example, run all the test specs (except the installation) from branch 5.1-dev with Mozilla Firefox:
 ```
-scripts/test.sh 51
+scripts/test.sh 51 firefox
 ```
 
-Test one spec with all four branches (of course, the spec must exist in all branches) :
+Run one test spec with Electron in all four branches (of course, the spec must exist in all branches):
 ```
 scripts/test.sh tests/System/integration/administrator/components/com_privacy/Consent.cy.js
 ```
 
-Test all `site` specs with branch 4.4-dev using a pattern:
+Test all `site` specs with Microsoft Edge in the branch 4.4-dev using a pattern:
 ```
 scripts/test.sh 44 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
 ```
@@ -321,9 +340,9 @@ scripts/clean.sh
 
 ## Limitations
 
-The different Joomla versions exist in parallel, but the test runs sequentially.
-
-Only one PHP version (the one from the Joomla Docker image) and one database version is used.
+* The different Joomla versions exist in parallel, but the test runs sequentially.
+* Only one PHP version (the one from the Joomla Docker image) and one database version is used.
+* The setup does not support HTTPS, secure connections issues are not testable.
 
 ## License
 
