@@ -28,7 +28,7 @@ As the active branches change regularly, the current numbers are read from the `
 On the right you see three blue containers with the databases MySQL, MariaDB and PostgreSQL.
 To be able to check the databases, two further blue containers with phpMyAdmin and pgAdmin are installed.
 As green Docker container Cypress runs headless for testing.
-If you will check problems you can also run Cypress GUI on your host system.
+If you need to inspect a failed test spec, you can run Cypress with the interactive GUI.
 
 The `/scripts` folder contains all the scripts and also configuration files.
 It is assumed that your current working directory is `joomla-branches-tester` all the time.
@@ -49,7 +49,6 @@ There is no performance problem because you come from outside.
 
 All you need is the ability to run Git, Docker and Bash scripts.
 Thanks to Docker, it is not necessary to install one of the databases, the database management tools, PHP, Node or Composer.
-Cypress needs only to be installed on your host system if you want to use Cypress GUI.
 
 [Git](https://git-scm.com/), [Docker](https://www.docker.com/) and a bash scripting environment are required and must be installed. The following `/etc/hosts` entry must exist:
 ```
@@ -61,7 +60,8 @@ Cypress needs only to be installed on your host system if you want to use Cypres
 
 For setting up and configuring an Ubuntu Linux environment with required Git, Docker, and firewall configuration,
 one of the gnomes has provided the [ubuntu_setup.sh](scripts/ubuntu_setup.sh) script.
-This script is designed to work on both a fresh Ubuntu desktop installation and Ubuntu on Windows WSL 2.
+This script is designed to work on both a fresh Ubuntu desktop installation and Ubuntu
+on Windows Subsystem for Linux (WSL).
 
 Download the script to your current working directory and run with superuser privileges:
 ```
@@ -139,7 +139,9 @@ you will need to download approximately 4 GB of data over the network.
    scripts/create.sh
    ```
 
-TODO I guess Cypress GUI is not working - to be checked.
+:point_right: To run the interactive Cypress GUI from the Docker container `jbt_cypress`,
+  Windows 11 (with includd Windows Subsystem for Linux GUI – WSLg) is required.
+
 </details>
 
 ## Containers
@@ -202,15 +204,23 @@ scripts/test.sh 44 tests/System/integration/administrator/components/com_actionl
 
 ### Cypress GUI System Tests
 
-If a test spec fails, it is often helpful to watch the test in the browser and
-see all Cypress log messages and to be able to repeat the test quickly.
-You must specify the required Joomla version for whose instance the Cypress GUI
-is to be started (requires an installed Cypress):
+If a test spec fails, the screenshot is helpful. More enlightening is it to execute the single failed test spec
+with the Cypress GUI in interactive mode. You can see all the Cypress log messages, use the time-traveling debugger and
+observe how the browser runs in parallel.
+
+Cypress GUI can be started from Docker container `jbt_cypress` with X11 forwarding
+(recommeded for Windows 11 WSL 2 and Ubuntu):
 ```
 scripts/cypress.sh 51
 ```
 
-:imp: Yes, run `Installation.cy.js`, who cares about file system and database consistency? Go on, click on it.
+Or from local installed Cypress (recommended for macOS) with additional argument `local`:
+```
+scripts/cypress.sh 51 local
+```
+
+:imp: Are you see the `Installation.cy.js` test spec? Here you finally have the chance to do it.
+  Who cares about file system and database consistency? Go on, click on it. Go on, go on ...
 
 ### Switch Database and Database Driver
 

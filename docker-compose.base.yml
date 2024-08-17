@@ -73,6 +73,8 @@ services:
   cypress:
     container_name: jbt_cypress
     image: cypress/included # actual (August 2024) versions are Cypress 13.7, Electon 114, Chrome 116, Edge 116 and Firefox 117
+    environment:
+      DISPLAY:  
     restart: unless-stopped
     entrypoint: ["sleep", "31536000"] # don't use cypress run, instead sleep one year
     ports:
@@ -83,5 +85,7 @@ services:
       - ./branch_52:/branch_52
       - ./branch_60:/branch_60
       - ./scripts:/scripts
+      - ~/.Xauthority:/root/.Xauthority:rw
+      - /tmp/.X11-unix:/tmp/.X11-unix
     extra_hosts:
       - "host.docker.internal:host-gateway"

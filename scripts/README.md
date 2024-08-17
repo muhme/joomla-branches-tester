@@ -10,7 +10,7 @@ The following scripts are available and the use is described in [../README.md](.
 | --- | --- | --- |
 | [scripts/create.sh](create.sh) | (Re-)Build all docker containers. | Optional arguments are version number, database variant and `no-cache`. |
 | [scripts/test.sh](test.sh) | Running Cypress headless System Tests on one or all branches. | The version number is an optional argument. |
-| [scripts/cypress.sh](cypress.sh) | Running Cypress GUI on your local machine to run System Tests in browser. Cypress must be installed locally. | Mandatory argument is the version number. |
+| [scripts/cypress.sh](cypress.sh) | Running interactive Cypress GUI. | Mandatory argument is the version number. Optional argument is `local` to use a locally installed Cypress. |
 | [scripts/database.sh](database.sh) | Changes database and database driver. | :warning: The overall database content is lost.<br />Optional argument is the version number. Mandatory argument is the database variant. |
 | [scripts/patchtester.sh](patchtester.sh) | Installs and configures Joomla patch tester component in one or all Joomla instances. | The version number is an optional argument. The GitHub token comes from `JBT_GITHUB_TOKEN` or as mandatory argument. |
 | [scripts/pull.sh](pull.sh) | Running `git pull` and `git status` on one or all branches. | The version number is an optional argument. |
