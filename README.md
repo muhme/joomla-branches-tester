@@ -91,7 +91,7 @@ scripts/create.sh
 <img align="right" src="images/joomla-branches-tester-52.svg" width="400">
 The script can be parameterised with arguments, all of which are optional:
 
-1. Install for single version number, e.g. `52` (your system architecture will look like the picture on the right), defaults to all,
+1. Install for single version number, e.g. only `52` (your system architecture will look like the picture on the right), defaults to all,
 2. The used database and database driver, e.g. `pgsql`, defaults to MariaDB with MySQLi driver and
 3. To force a fresh build with `no-cache`, defaults to build from cache.
 
@@ -193,7 +193,7 @@ scripts/test.sh
 
 Three optional arguments are possible, in the following order:
 1. Joomla version number, all versions are tested by default
-2. Browser, to be used with electron (default), firefox, chrome or edge
+2. Browser to be used, you can choose between electron (default), firefox, chrome or edge
 3. Test spec pattern, all test specs (except the installation) are used by default
 
 As an example, run all the test specs (except the installation) from branch 5.1-dev with Mozilla Firefox:
@@ -201,14 +201,14 @@ As an example, run all the test specs (except the installation) from branch 5.1-
 scripts/test.sh 51 firefox
 ```
 
-Run one test spec with Electron in all four branches (of course, the spec must exist in all branches):
+Run one test spec with default Electron in all four branches (of course, the spec must exist in all branches):
 ```
 scripts/test.sh tests/System/integration/administrator/components/com_privacy/Consent.cy.js
 ```
 
 Test all `site` specs with Microsoft Edge in the branch 4.4-dev using a pattern:
 ```
-scripts/test.sh 44 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
+scripts/test.sh 44 edge 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
 ```
 
 To additional show `console.log` messages from Electron browser by setting environment variable: 
@@ -218,7 +218,7 @@ scripts/test.sh 44 tests/System/integration/administrator/components/com_actionl
 ```
 
 :fairy: To protect you, the first step `Installation.cy.js` of the Joomla System Tests
-  is excluded here when you run all tests. If you run this spec, this can lead to inconsistencies
+  is excluded here when you run all test specs. If you run the installation, this can lead to inconsistencies
   between the file system and the database, as the Joomla database will be recreated.
 
 ### Cypress GUI System Tests
