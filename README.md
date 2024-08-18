@@ -18,7 +18,8 @@ Use one or all four branches for:
 ![Joomla Branches Software Architecture](images/joomla-branches-tester.svg)
 
 The idea is to have all active Joomla development branches (currently 4.4-dev, 5.1-dev, 5.2-dev and 6.0-dev) are
-available for testing in parallel. The installation takes place in 12 Docker containers and everything is scripted.
+available for testing in parallel.
+The installation takes place across a dozen Docker containers, and everything is scripted.
 You see the four orange Web Server containers with the four different Joomla versions.
 They are based on the `branch_*` folders, which are also available on the Docker host.
 
@@ -266,18 +267,20 @@ the use cases password reset and System Tests."
 
 1. The user requests a password reset with click on 'Forgot your Password?' in their web browser.
    This request is sent to the Joomla PHP code on the web server `jbt_51`.
-2. An email is sent via SMTP from the web server `jbt_51` to the email relay doubler `jbt_relay`.
-   In the Joomla `configuration.php` file is `smtpport = '7025'` configured.
+2. An email is sent via SMTP from the web server `jbt_51` to the email relay `jbt_relay`,
+   where it is duplicated. In the Joomla `configuration.php` file, the `smtpport` is configured as `7025`."
 3. The email relay `jbt_relay` duplicates the email and sends the first email via SMTP to the email catcher `jbt_mail`.
 4. The email relay `jbt_relay` tries to deliver the second email to `smtp-tester`.
-   But no system test is running, the email cannot be delivered and is thrown away.
-5. A system test is started with the bash script `test.sh` in the Cypress container `jbt_cypress`.
-   In the Cypress `cypres.config.mjs` file is `smtp_port: '7125'` configured.
+   But no System Tests is running, the email cannot be delivered and is thrown away.
+5. System Test is started with the bash script `test.sh` in the Cypress container `jbt_cypress`.
+   In the Cypress `cypres.config.mjs` file, the `smtp_por` is configured as `7125`.
    While the System Tests is running `smtp-tester` is listening on port 7125.
-6. One System Tests spec executes an action in Joomla that generates an email.
-7. Again the email is sent via SMTP from the web server `jbt_51` to the email relay doubler `jbt_relay`.
-8. Again the email relay `jbt_relay` duplicates the email and sends the first email via SMTP to the email catcher `jbt_mail`.
-9. This time the second email could be delivered to to `smtp-tester`. The Cypress test can check and validate the email.
+6. One of the System Tests specs executes an action in Joomla PHP code that generates an email.
+7. Again the email is sent via SMTP from the web server `jbt_51` to the email relay `jbt_relay`, where it is duplicated.
+8. Again the email relay `jbt_relay` duplicates the email and
+   sends the first email via SMTP to the email catcher `jbt_mail`.
+9. This time the second email could be delivered to the `smtp-tester`.
+   The Cypress test can check and validate the email.
 
 Therefore `cypres.config.mjs` uses a different SMTP port than `configuration.php`.
 
