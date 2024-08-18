@@ -162,7 +162,7 @@ error() {
 # Show a red messge with script name and line number.
 #
 errorHandler() {
-    error "An error occurred in script $(basename "$0") on line $1."
+    error "An error occurred, probably in script $(basename "$0") in line $1."
     exit 1
 }
 trap 'errorHandler $LINENO' ERR

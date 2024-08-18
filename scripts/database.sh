@@ -90,6 +90,13 @@ for version in "${versionsToChange[@]}"; do
   log "jbt_${version} – Cypress based Joomla installation"
   docker exec -it jbt_cypress sh -c "cd /branch_${version} && cypress run --spec tests/System/integration/install/Installation.cy.js"
 
+  # Cypress is using own SMTP port to read and reset mails by smtp-tester
+  log "jbt_${version} – Set Cypress SMTP port to 7125"
+  docker exec -it "jbt_${version}" bash -c "cd /var/www/html && sed \
+    -e \"s/smtp_port: .*/smtp_port: '7125',/\" \
+    cypress.config.${extension} > cypress.config.${extension}.tmp && \
+    mv cypress.config.${extension}.tmp cypress.config.${extension}"
+
   log "jbt_${version} – ${variant} based Joomla is installed"
   echo ""
 

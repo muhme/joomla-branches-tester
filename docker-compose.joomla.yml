@@ -20,3 +20,5 @@
     depends_on:
       - mysql
       - postgres
+      - relay
+      - mail
