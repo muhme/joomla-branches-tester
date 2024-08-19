@@ -1,7 +1,7 @@
 # docker-compose.joomla.yml - Joomla Web Server entry, to be customized with the version number
 #                             e.g. 52 for XX and 5 for Y
 #
-# MIT License, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
   joomla_XX:

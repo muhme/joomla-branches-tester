@@ -2,7 +2,7 @@
 #
 # Implementation without associative arrays to also work with macOS standard 3.2 bash.
 #
-# MIT License, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 # Database and database driver variants as in configuration.php 'dbtype'

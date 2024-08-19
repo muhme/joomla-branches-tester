@@ -2,7 +2,7 @@
 #
 # clean.sh - delete all jbt_* Docker containers and the network joomla-branches-tester_default.
 #
-# MIT License, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 source scripts/helper.sh

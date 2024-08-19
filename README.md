@@ -451,7 +451,7 @@ scripts/clean.sh
 
 ## License
 
-MIT License, Copyright (c) 2024 Heiko Lübbe, see [LICENSE](LICENSE)
+Distributed under the GNU General Public License version 2 or later, see [LICENSE](LICENSE)
 
 ## Contact
 

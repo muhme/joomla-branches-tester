@@ -7,7 +7,7 @@
 #     . https://marketplace.digitalocean.com/apps/ubuntu-desktop-gnome
 #     . 4 vCPU / 8 GB RAM / regular SSD
 #
-# MIT License, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 # if you wish to replace the default random created passwords:

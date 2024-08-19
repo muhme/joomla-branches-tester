@@ -1,7 +1,7 @@
 #
 # smtp_double_relay.py - SMTP relay to duplicate mails
 #
-# MIT License, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 import os

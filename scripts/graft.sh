@@ -4,7 +4,7 @@
 #   graft.sh 51 ~/Downloads/Joomla_5.0.0-alpha1-Alpha-Update_Package.tar.bz2
 #   graft.sh 51 pgsql ~/Downloads/Joomla_5.1.2-Stable-Full_Package.zip
 #
-# MIT License, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 TMP=/tmp/$(basename $0).$$

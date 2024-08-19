@@ -1,6 +1,6 @@
 # dockerfile-relay.yml - Create Docker image with SMTP double relay
 #
-# MIT License, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 FROM python:3.10-slim
