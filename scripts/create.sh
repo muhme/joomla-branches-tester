@@ -2,7 +2,7 @@
 #
 # create.sh - Delete all docker containers, build them new and install Joomla from the git branches.
 #   create.sh
-#   create.sh no-cache
+#   create.sh 51 pgsql no-cache
 #
 # MIT License, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
@@ -139,13 +139,13 @@ for version in "${versionsToInstall[@]}"; do
   log "jbt_${version} – Change root ownership to www-data"
   # Following error seen on macOS, we ignore it as it does not matter, these files are 444
   # chmod: changing permissions of '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
-  docker exec -it "jbt_${version}" bash -c 'chown -R www-data:www-data /var/www/html > /dev/null 2>&1 || true'
+  docker exec -it "jbt_${version}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true'
 
   # Joomla container needs to be restarted
   log "jbt_${version} – Restart container"
   docker restart "jbt_${version}"
 
-  # Configure to use MariaDB with database driver MySQLi and install Joomla
+  # Configure and install Joomla with desired database variant
   scripts/database.sh "${version}" "$database_variant"
 
 done

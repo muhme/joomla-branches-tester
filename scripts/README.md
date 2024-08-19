@@ -8,14 +8,15 @@ The following scripts are available and the use is described in [../README.md](.
 
 | Script | Description | Additional Info |
 | --- | --- | --- |
+| [scripts/clean.sh](clean.sh) | Delete all `jbt_*`-Docker containers and the `joomla-branches-tester_default` Docker network and `branch_*` folders.. | Used by `create.sh` or for you to get rid of all the stuff. |
 | [scripts/create.sh](create.sh) | (Re-)Build all docker containers. | Optional arguments are version number, database variant and `no-cache`. |
-| [scripts/test.sh](test.sh) | Running Cypress headless System Tests on one or all branches. | Optional arguments are version, browser and test spec pattern. |
 | [scripts/cypress.sh](cypress.sh) | Running interactive Cypress GUI. | Mandatory argument is the version number. Optional argument is `local` to use a locally installed Cypress. |
 | [scripts/database.sh](database.sh) | Changes database and database driver. | :warning: The overall database content is lost.<br />Optional argument is the version number. Mandatory argument is the database variant. |
+| [scripts/graft.sh](graft.sh) | Grafting a Joomla package onto a branch. | |
 | [scripts/patchtester.sh](patchtester.sh) | Installs and configures Joomla patch tester component in one or all Joomla instances. | The version number is an optional argument. The GitHub token comes from `JBT_GITHUB_TOKEN` or as mandatory argument. |
 | [scripts/pull.sh](pull.sh) | Running `git pull` and `git status` on one or all branches. | The version number is an optional argument. |
+| [scripts/test.sh](test.sh) | Running Cypress headless System Tests on one or all branches. | Optional arguments are version, browser and test spec pattern. |
 | [scripts/ubuntu_setup.sh](ubuntu_setup.sh) | Helper script in an installation on standard Ubuntu Linux. | |
-| [scripts/clean.sh](clean.sh) | Delete all `jbt_*`-Docker containers and the `joomla-branches-tester_default` Docker network and `branch_*` folders.. | Used by `create.sh` or for you to get rid of all the stuff. |
 
 :point_right: The scripts use [ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code#Colors)
 to color their own log and error messages. 
@@ -30,10 +31,12 @@ All messages start with three asterisks, the date and the time. See the followin
 
 | File | Description | Additional Info |
 | --- | --- | --- |
-| [scripts/patchtester.cy.js](patchtester.cy.js) | Cypress script to install and confgure Joomla Patch Tester component. | Used by `patchtester.sh`. |
+| [docker-compose.base.yml](docker-compose.base.yml) | The basic part of the `docker-compose.yml` file. | Used by `create.sh`. |
+| [docker-compose.joomla.yml](docker-compose.joomla.yml) | Part of the `docker-compose.yml` file to be parameterised for one Joomla web server. | Used by `create.sh`. |
+| [dockerfile-relay.yml](dockerfile-relay.yml) | Docker container definition for the SMTP relay doubler. | Used to create `jbt_relay`. |
 | [scripts/helper.sh](helper.sh) | Some commonly used bash script functions and definitions. | Used by all other bash-Scripts. |
 | [scripts/Joomla.js](Joomla.js) | [joomla-cypress](https://github.com/joomla-projects/joomla-cypress) *hack* until setting `db_port` is supported | Used by `database.sh`. |
-| [scripts/servers.json](servers.json) | PostgreSQL server configuration. | Used by `pgAdmin`. |
+| [scripts/patchtester.cy.js](patchtester.cy.js) | Cypress script to install and confgure Joomla Patch Tester component. | Used by `patchtester.sh`. |
 | [scripts/pgpass](pgpass) | Auto-logon password file. | Used by `pgAdmin`. |
-| [scripts/docker-compose.base.yml](docker-compose.base.yml) | The basic part of the `docker-compose.yml` file. | Used by `create.sh`. |
-| [scripts/docker-compose.joomla.yml](docker-compose.joomla.yml) | Part of the `docker-compose.yml` file to be parameterised for one Joomla web server. | Used by `create.sh`. |
+| [scripts/servers.json](servers.json) | PostgreSQL server configuration. | Used by `pgAdmin`. |
+| [scripts/smtp_double_relay.py](smtp_double_relay.py) | SMTP relay double source code. | Used by `jbt_relay`. |

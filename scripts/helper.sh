@@ -128,6 +128,31 @@ function createDockerComposeFile() {
     done
 }
 
+# Get Joomla major and minor version from file system
+# e.g. "51" for getJoomlaVersion "branch_51"  from file branch_51/libraries/src/Version.php
+#
+function getJoomlaVersion() {
+    local versions_file="$1/libraries/src/Version.php"
+
+    if [ ! -f "$versions_file" ]; then
+        error "There is no file \"${versions_file}\""
+        exit 1
+    fi
+
+    # from file content:
+    #     public const MAJOR_VERSION = 5;
+    #     public const MINOR_VERSION = 1;
+    version=$(grep -E 'const MAJOR_VERSION|const MINOR_VERSION' "$versions_file" | sed -e 's/.*= //' | tr -d ';\n')
+
+    # Two digits?
+    if [[ ! $version =~ ^[0-9]{2}$ ]]; then
+        error "Could not find Joomla major and minor number in file \"${versions_file}\""
+    fi
+
+    echo "$version"
+
+}
+
 # using ANSI escape sequences to find the log messages
 JBT_LIGHT_GREEN_BG="\033[102m"
 JBT_GREEN_BG="\033[42m"

@@ -8,12 +8,15 @@ Imagine a little slice of a parallel universe where testing all four active Joom
 Alright, alright, apologies to those who enjoyed the whimsical writing style, but now it's time to dive into the technical depths. Let's transition from the cozy, magical universe into the world of technical documentation, where we'll explore the numerous options, parameters, and configurations that power this experience ...
 
 ## Software Architecture
-All four active Joomla branches run in parallel in a [Docker](https://www.docker.com/) container environment.
+All four active Joomla development branches run in parallel in a [Docker](https://www.docker.com/) container environment.
 Use one or all four branches for:
-* Automated [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System) with [Cypress](https://www.cypress.io/).
+* Manual testing, including database inspections and email verifications.
+* Automated [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System)
+  with [Cypress](https://www.cypress.io/) GUI or headless.
 * Automated installation of the [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester).
-* Switch between the five combinations of database (MySQL, MariaDB or PostgreSQL) and
-  the database driver (MySQL improved or PHP Data Objects).
+* Switch between the three database options (MySQL, MariaDB, or PostgreSQL) and the two database drivers
+  (MySQLi or PHP Data Objects).
+* Grafting a Joomla package onto a branch.
 
 ![Joomla Branches Software Architecture](images/joomla-branches-tester.svg)
 
@@ -28,15 +31,22 @@ As the active branches change regularly, the current numbers are read from the `
 
 On the right you see three blue containers with the databases MySQL, MariaDB and PostgreSQL.
 To be able to check the databases, two further blue containers with phpMyAdmin and pgAdmin are installed.
-As green Docker container Cypress runs headless for testing.
+A green Docker container Cypress to run tests with GUI or headless.
 If you need to inspect a failed test spec, you can run Cypress with the interactive GUI.
+
+The two red mail containers duplicate all emails from manual Joomla tests or System Tests and
+make them readable via a web application.
 
 The `/scripts` folder contains all the scripts and also configuration files.
 It is assumed that your current working directory is `joomla-branches-tester` all the time.
 
+On the Docker Host system (left side), your red web browser is running.
+On macOS and Ubuntu, the native Cypress GUI is shown in green.
+
 :point_right: For the complete list of all scripts see [scripts/README.md](scripts/README.md).
 
-:fairy: The scripts contain *hacks* and a bit of magic for all the fluffiness, enjoy reading the comments in the scripts.
+:fairy: The scripts have a sprinkle of *hacks* and just a touch of magic to keep things fluffy.
+        For those with a taste for the finer details, the comments are a gourmet treat.
 
 <details>
   <summary>There are 12 Docker containers that provide the functionality.</summary>
@@ -52,9 +62,11 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
 |jbt_mysql| **7011**:3306 | | Database Server MySQL version 8.1 |
 |jbt_madb| **7012**:3306 | | Database Server MariaDB version 10.4 |
 |jbt_pg| **7013**:5432 | | Database Server PostgrSQL version 12.20 |
-|jbt_cypress| SMTP **7025**:7025 | | Cypress Headless Test Environment<br />SMTP server is only running during test execution |
+|jbt_cypress| SMTP **7125**:7125 | | Cypress Headless Test Environment<br />SMTP server is only running during test execution |
 |jbt_phpmya| **[7001](http://localhost:7001)** | | Web App to manage MariaDB and MySQL<br />auto-login configured, root / root |
 |jbt_pga| **[7002](http://localhost:7002)** | | Web App to manage PostgreSQL<br />auto-login configured, root / root, postgres / prostgres |
+|jbt_mail| **[7003](http://localhost:7003)** | | Web interface to verify emails. |
+|jbt_relay| SMTP **7025**:7025 | | SMTP relay doubler |
 
 :eight_spoked_asterisk: The directories are available on Docker host to:
 * Inspect and change the configuration files (`configuration.php` or `cypress.config.js`),
@@ -100,7 +112,7 @@ sudo bash ./ubuntu_setup.sh
 
 For the four Web server containers, to simplify life, the standard Docker Joomla images (`joomla:4` or `joomla:5`)
 are used as a starting point and then overinstalled with the source code from the corresponding Joomla development branch.
-The Joomla installation itself is executed by the Cypress spec `Installation.cy.js` from the Joomla System Tests.
+The Joomla Web-Installer is executed by the Cypress spec `Installation.cy.js` from the Joomla System Tests.
 
 Last tested with
 * macOS 14 Sonoma,
@@ -118,8 +130,9 @@ scripts/create.sh
 <img align="right" src="images/joomla-branches-tester-52.svg" width="400">
 The script can be parameterised with arguments, all of which are optional:
 
-1. Install for single version number, e.g. only `52` (your system architecture will look like the picture on the right), defaults to all,
-2. The used database and database driver, e.g. `pgsql`, defaults to MariaDB with MySQLi driver and
+1. Install for a single version number, e.g. `52` only
+   (your system architecture will look like the picture on the right), default setting is for all branches,
+2. The used database and database driver, e.g. `pgsql`, defaults to use MariaDB with MySQLi driver and
 3. To force a fresh build with `no-cache`, defaults to build from cache.
 
 :point_right: The script can run without `sudo`,
@@ -186,6 +199,21 @@ TODO
 </details>
 
 ## Usage
+
+### Manual Testing
+
+From your Docker Host system you can test the Joomla Frontend e.g. for Joomla release 5.2
+with [http://localhost:7052](http://localhost:7052) and the backend
+[http://localhost:7052/administrator](http://localhost:7052/administrator).
+User *ci-admin* and password *joomla-17082005* (Whose birthday is it anyway?) are from Joomla System Tests.
+
+In parallel you can inspect MariaDB and MySQL database with [phpMyAdmin](https://www.phpmyadmin.net/) on
+[http://localhost:7001](http://localhost:7001) or PostgreSQL database with [pgAdmin](https://www.pgadmin.org/) on
+[http://localhost:7002](http://localhost:7002). And verify all emails from Joomla and the System Tests with
+[MailDev](https://github.com/maildev/maildev/blob/master/docs/docker.md) on
+[http://localhost:7003](http://localhost:7003).
+
+If you need to inspect files, they are available in the directory `branch_52` for this Joomla release 5.2 sample.
 
 ### Cypress Headless System Tests
 
@@ -348,6 +376,23 @@ scripts/database.sh pgsql
   "When in doubt, it's wiser to use `create.sh` to ensure a clean installation.
   With a sprinkle of stardust, you can specify the desired database variant,
   and if you're only installing one Joomla version, it will be done in the blink of an eye."
+
+### Grafting a Joomla Package
+
+Not interested in testing the latest development branch but still need to test a Joomla package? No problem!
+Just like in plant grafting, where a scion is joined to a rootstock,
+you can graft a Joomla package onto the development branch for testing.
+Simply choose the same major and minor version numbers from the development branch,
+and graft the package for a seamless experience.:
+
+```
+scripts/graft.sh 52 ~/Downloads/Joomla_5.2.0-alpha4-dev-Development-Full_Package.zip
+```
+
+After grafting, you can do everything  except `pull.sh` you can do everything, like switching database variant,
+install Joomla Patch Tester or run System Tests.
+
+:point_right: Grafting can be done multiple times, just as you can repeat this process for different packages.
 
 ### Syncing from GitHub Repository
 
