@@ -65,7 +65,7 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
 |jbt_cypress| SMTP **7125**:7125 | | Cypress Headless Test Environment<br />SMTP server is only running during test execution |
 |jbt_phpmya| **[7001](http://localhost:7001)** | | Web App to manage MariaDB and MySQL<br />auto-login configured, root / root |
 |jbt_pga| **[7002](http://localhost:7002)** | | Web App to manage PostgreSQL<br />auto-login configured, root / root, postgres / prostgres |
-|jbt_mail| **[7003](http://localhost:7003)** | | Web interface to verify emails. |
+|jbt_mail| **[7003](http://localhost:7003)** <br /> SMTP **7225**:1025 | | Web interface to verify emails. |
 |jbt_relay| SMTP **7025**:7025 | | SMTP relay doubler |
 
 :eight_spoked_asterisk: The directories are available on Docker host to:
@@ -119,7 +119,7 @@ Last tested with
 * Windows 11 Pro WSL 2 Ubuntu and
 * Ubuntu 24 Noble Numbat.
 
-You can create the Docker containers and install Joomla with script `create.sh`:
+You can create all the Docker containers and install all four Joomla instances using the `create.sh` script:
 
 ```
 git clone https://github.com/muhme/joomla-branches-tester
@@ -154,28 +154,41 @@ you will need to download approximately 4 GB of data over the network.
    ```
    Restart your computer and in the terminal, type `wsl` to start the WSL environment.
    The first time you do this, you will be asked to create a user and set a password.
+
+   :point_right: If `wsl` is not open, you may need again `wsl --install Ubuntu` after Windows restart.
 2. Install `git` inside WSL 2 Ubuntu:
    ```
    sudo apt-get update
-   sudo apt-get upgrade
-   sudo apt-get install git
+   sudo apt-get -y upgrade
+   sudo apt-get -y install git
    ```
-3. Clone repository:
+3. Clone Joomla Branches Tester repository e.g. in your home directory:
    ```
+   cd
    git clone https://github.com/muhme/joomla-branches-tester
-   cd joomla-branches-tester
    ```
-4. Continue the installion with the Ubuntu setup script:
+4. Continue the installation with the Ubuntu setup script:
    ```
+   cd ~/joomla-branches-tester
    sudo scripts/ubuntu_setup.sh
    ```
    To run Docker as user it is needed to restart Ubuntu:
    ```
    sudo reboot
    ```
-5. After open WSL 2 with Ubuntu again and you are ready to create Joomla Branches Tester:
+5. Open WSL again and verify Docker is running and you have access without sudo:
    ```
-   cd joomla-branches-tester
+   docker ps
+   ```
+   Should show no containers:
+   ```
+   CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+   ```
+   :point_right: It may take a moment for the Docker service to run.
+   This can also be checked with `sudo service docker status` command.
+5. Now you are ready to create Joomla Branches Tester:
+   ```
+   cd ~/joomla-branches-tester
    scripts/create.sh
    ```
 
@@ -333,6 +346,7 @@ scripts/patchtester.sh 52 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
 ```
 
 :point_right: The GitHub token can also be given by environment variable `JBT_GITHUB_TOKEN`.
+              And of course the sample token does not work.
 
 :fairy: Remember, if you have changed the database version, you will need to reinstall Joomla Patch Tester.
 
@@ -346,7 +360,7 @@ Secondly, a Joomla installation is performed with the Joomla System Tests.
 
 :warning: The overall database content is lost. For example, Joomla Patch Tester component needs to be installed again.
 
-Available variants are:
+Five variants are available:
 * mariadbi – MariaDB with MySQLi (improved)
 * mariadb – MariaDB with MySQL PDO (PHP Data Objects)
 * pgsql - PostgreSQL PDO (PHP Data Objects)
@@ -389,15 +403,16 @@ and graft the package for a seamless experience.:
 scripts/graft.sh 52 ~/Downloads/Joomla_5.2.0-alpha4-dev-Development-Full_Package.zip
 ```
 
-After grafting, you can do everything  except `pull.sh` you can do everything, like switching database variant,
-install Joomla Patch Tester or run System Tests.
+After grafting, you can do everything except running pull.sh, such as switching the database variant,
+installing Joomla Patch Tester, or running Joomla System Tests.
 
 :point_right: Grafting can be done multiple times, just as you can repeat this process for different packages.
 
 ### Syncing from GitHub Repository
 
-Script to fetch and merge all the latest changes from the Joomla GitHub repository into your local branches.
-And again, this can be done for all four branches without argument, or for one version such as 5.2-dev:
+To avoid recreating everything the next day, you can simply fetch and merge the latest changes from the
+Joomla GitHub repository into your local branches. This can be done for all four branches without any arguments,
+or for a specific version, such as 5.2-dev.
 ```
 scripts/pull.sh 52
 ```
@@ -405,7 +420,7 @@ Finally, the Git status of the branch is displayed.
 
 <img align="right" src="images/phpMyAdmin.png">
 
-### Gaze Into the Spellbook
+### :fairy: Gaze Into the Spellbook
 
 In the mystical world of Joomla, the database is the enchanted tome where all the secrets are stored.
 Sometimes, the wise must delve into this spellbook to uncover and weave new spells,

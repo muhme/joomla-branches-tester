@@ -15,6 +15,8 @@ services:
       - "7011:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   mariadb:
     container_name: jbt_madb
@@ -24,6 +26,8 @@ services:
       - "7012:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   postgres:
     container_name: jbt_pg
@@ -34,6 +38,8 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   myadmin:
     container_name: jbt_mya
@@ -48,6 +54,8 @@ services:
     depends_on:
       - mysql
       - postgres
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   pgadmin:
     container_name: jbt_pga
@@ -69,6 +77,8 @@ services:
       - ./scripts/pgpass:/pgadmin4/pgpass
       # pgpass file must me only owner read & writable
     entrypoint: /bin/sh -c "chmod 600 /pgadmin4/pgpass; /entrypoint.sh"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   cypress:
     container_name: jbt_cypress
@@ -107,6 +117,8 @@ services:
       - cypress
     ports:
       - "7025:7025"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   mail:
     container_name: jbt_mail
@@ -114,3 +126,5 @@ services:
     ports:
       - "7003:1080"
       - "7225:1025"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
