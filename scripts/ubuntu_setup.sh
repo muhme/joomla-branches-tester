@@ -36,7 +36,7 @@ ufw allow 7025
 # Some basics with git
 apt update
 apt upgrade -y
-apt install -y git vim iputils-ping net-tools telnet
+apt install -y git vim iputils-ping net-tools telnet unzip
 
 # Docker
 apt install -y apt-transport-https ca-certificates curl software-properties-common

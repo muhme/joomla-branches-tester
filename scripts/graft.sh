@@ -7,6 +7,9 @@
 # MIT License, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
+TMP=/tmp/$(basename $0).$$
+trap 'rm -rf $TMP' 0
+
 source scripts/helper.sh
 
 versions=$(getVersions)
@@ -54,25 +57,31 @@ if [ ! -d "branch_${version}/node_modules" ]; then
   exit 1
 fi
 
+# On Windows WSL with Ubuntu, some files and directories may have root or www-data as their owner.
+# As a result, retry any file system operation with sudo if the first attempt fails.
+# And suppress stderr on the first attempt to avoid unnecessary error messages.
+
 log "Create new directory branch_${version} with cypress.config.dist.mjs, tests/System and node_modules"
-mv "branch_${version}" "branch_${version}-TMP"
-mkdir -p "branch_${version}/tests"
-( cd "branch_${version}-TMP" && \
-  mv cypress.config.dist.mjs node_modules "../branch_${version}" && \
-  mv tests/System "../branch_${version}/tests" )
-rm -rf "branch_${version}-TMP"
+mv "branch_${version}" "branch_${version}-TMP" 2>/dev/null|| sudo mv "branch_${version}" "branch_${version}-TMP"
+mkdir -p "branch_${version}/tests" 2>/dev/null || sudo mkdir -p "branch_${version}/tests"
+( cd "branch_${version}-TMP"; \
+  mv cypress.config.dist.mjs node_modules "../branch_${version}" 2>/dev/null || \
+     sudo mv cypress.config.dist.mjs node_modules "../branch_${version}"; \
+  mv tests/System "../branch_${version}/tests" 2>/dev/null || \
+     sudo mv tests/System "../branch_${version}/tests" )
+rm -rf "branch_${version}-TMP" 2>/dev/null || sudo rm -rf "branch_${version}-TMP"
 
 log "Extrating package file ${package}"
 cd "branch_${version}"
 case "$package" in
   *.zip)
-    unzip "$package" -d .
+    unzip "$package" -d . 2>/dev/null || sudo unzip "$package" -d .
     ;;
   *.tar.zst)
-    tar --use-compress-program=unzstd -xvf "$package" -C .
+    tar --use-compress-program=unzstd -xvf "$package" -C . 2>/dev/null || sudo tar --use-compress-program=unzstd -xvf "$package" -C . 
     ;;
   *.tar.gz)
-    tar -xvf "$package" -C .
+    tar -xvf "$package" -C . 2>/dev/null || sudo tar -xvf "$package" -C .
     ;;
   *)
     error "Unsupported file type, use .zip, .tar.gz or .tar.zst"
@@ -99,8 +108,9 @@ docker exec -it "jbt_${version}" bash -c 'chown -R www-data:www-data /var/www/ht
 version_file="branch_${version}/libraries/src/Version.php"
 if grep -q "public const DEV_STATUS = 'Stable';" "$version_file"; then
     log "Stable version detected, DEV_STATUS Development temporarily set"
-    cp "$version_file" "${version_file}.orig"
-    sed "s/public const DEV_STATUS = 'Stable';/public const DEV_STATUS = 'Development';/" "$version_file.orig" > "${version_file}"
+    cp "$version_file" "${version_file}.orig" 2>/dev/null || sudo cp "$version_file" "${version_file}.orig"
+    sed "s/public const DEV_STATUS = 'Stable';/public const DEV_STATUS = 'Development';/" "$version_file.orig" > ${TMP}
+    cp ${TMP} "${version_file}" 2>/dev/null || sudo cp ${TMP} "${version_file}"
 fi
 
 # Configure and install Joomla with desired database variant
@@ -108,8 +118,10 @@ scripts/database.sh "${version}" "$database_variant"
 
 if [ -f "${version_file}.orig" ]; then
   log "Change DEV_STATUS back to Stable"
-  mv "$version_file.orig" "${version_file}"
+  # The -f force option is needed to prevent interactive prompt for overwriting files.
+  mv -f "${version_file}.orig" "${version_file}" 2>/dev/null || sudo mv "${version_file}.orig" "${version_file}"
 fi
 
-log "Grafting the package `basename $package` with Joomla `getJoomlaVersion branch_${version}` \
-     onto branch_${version} is completed."
+package_file=$(basename $package)
+joomla_version=$(getJoomlaVersion branch_${version})
+log "Grafting the package ${package_file} with Joomla ${joomla_version} onto branch_${version} is completed."
