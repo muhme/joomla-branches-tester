@@ -64,7 +64,7 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
 |jbt_mysql| **7011**:3306 | | Database Server MySQL version 8.1 |
 |jbt_madb| **7012**:3306 | | Database Server MariaDB version 10.4 |
 |jbt_pg| **7013**:5432 | | Database Server PostgrSQL version 12.20 |
-|jbt_cypress| SMTP **7125**:7125 | | Cypress Headless Test Environment<br />SMTP server is only running during test execution |
+|jbt_cypress| SMTP :7125 | | Cypress Headless Test Environment<br />SMTP server is only running during test execution |
 |jbt_phpmya| **[7001](http://localhost:7001)** | | Web App to manage MariaDB and MySQL<br />auto-login configured, root / root |
 |jbt_pga| **[7002](http://localhost:7002)** | | Web App to manage PostgreSQL<br />auto-login configured, root / root, postgres / prostgres |
 |jbt_mail| **[7003](http://localhost:7003)** <br /> SMTP **7225**:1025 | | Web interface to verify emails. |
@@ -76,20 +76,22 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
 * To inspect screenshots from failed tests or
 * To inspect and hack the Joomla sources from Docker host system.
 
-:point_right: Using `host.docker.internal` allows you to maintain consistent hostnames and URLs between containers and
-  the Docker host machine. However, there are two exceptions to note:
+:point_right: Using `host.docker.internal` allows to maintain consistent hostnames and URLs between containers and
+              the Docker host machine. However, there are two exceptions to note:
 
 1. **Database Performance**: For database connections, the Docker container name and the default
     database port are used to avoid performance issues.
-    When running Cypress GUI on the Docker host, `localhost` and the mapped database port are used instead,
+    
+    And when running Cypress GUI on the Docker host, `localhost` and the mapped database port are used instead,
     as Docker container hostnames aren't accessible outside Docker,
     and no performance issues have been observed in this configuration.
-2. **SMTP Tester Port**: The `smtp-tester` port (7125) is not mapped to prevent it from listening
-    on that port. This configuration ensures that the Cypress GUI running on the Docker host can
+2. **SMTP Tester Port**: The `smtp-tester` port (7125) is not mapped to prevent listening
+    on that port. This ensures that the, on the Docker host running, local Cypress GUI can
     listen on port 7125 during System Tests.
 
 As a result, there is a separate Cypress configuration file, `cypress.config.local.mjs`,
-for managing these settings.
+for running local Cypress GUI.
+
 ---
 
 </details>
@@ -381,7 +383,7 @@ the use cases password reset and System Tests."
 4. The email relay `jbt_relay` tries to deliver the second email to `smtp-tester`.
    But no System Tests is running, the email cannot be delivered and is thrown away.
 5. System Test is started with the bash script `test.sh` in the Cypress container `jbt_cypress`.
-   In the Cypress `cypres.config.mjs` file, the `smtp_por` is configured as `7125`.
+   In the Cypress `cypres.config.mjs` file, the `smtp_port` is configured as `7125`.
    While the System Tests is running `smtp-tester` is listening on port 7125.
 6. One of the System Tests specs executes an action in Joomla PHP code that generates an email.
 7. Again the email is sent via SMTP from the web server `jbt_51` to the email relay `jbt_relay`, where it is duplicated.
