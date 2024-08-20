@@ -24,7 +24,8 @@ function getVersions() {
     local json_data=$(curl -s "$URL")
 
     # Extract the names of the branches, only with grep and sed, so as not to install any dependencies, e.g. jq
-    local branches=$(echo "$json_data" | grep -o '"name":"[0-9]\+\.[0-9]\+-dev"' | sed 's/"name":"\([0-9]\+\)\.\([0-9]\+\)-dev"/\1\2/')
+    # Use sed with -E flag to enable extended regular expressions, which is also working with macOS sed
+    local branches=$(echo "$json_data" | grep -o '"name":"[0-9]\+\.[0-9]\+-dev"' | sed -E 's/"name":"([0-9]+)\.([0-9]+)-dev"/\1\2/')
 
     # Create as array
     local formatted_branches=()
