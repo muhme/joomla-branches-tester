@@ -102,7 +102,6 @@ services:
 
   relay:
     container_name: jbt_relay
-    image: smtp-double-relay
     build:
       context: .
       dockerfile: dockerfile-relay.yml
