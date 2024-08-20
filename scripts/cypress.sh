@@ -11,7 +11,7 @@ source scripts/helper.sh
 
 versions=$(getVersions)
 
-if [ $# -lt 1 ] ; then
+if [ $# -lt 1 ]; then
   error "Needs one argument with version number from $versions"
   exit 1
 fi
@@ -20,6 +20,11 @@ if isValidVersion "$1" "$versions"; then
   version="$1"
 else
   error "Version number argument have to be from $versions"
+  exit 1
+fi
+
+if [ $# -eq 2 ] && [ "$2" != "local" ]; then
+  error "Only 'local' is possible as the second argument"
   exit 1
 fi
 
