@@ -76,17 +76,23 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
 * To inspect screenshots from failed tests or
 * To inspect and hack the Joomla sources from Docker host system.
 
+:point_right: Using `host.docker.internal` allows you to maintain consistent hostnames and URLs between containers and
+  the Docker host machine. However, there are two exceptions to note:
+
+1. **Database Performance**: For database connections, the Docker container name and the default
+    database port are used to avoid performance issues.
+    When running Cypress GUI on the Docker host, `localhost` and the mapped database port are used instead,
+    as Docker container hostnames aren't accessible outside Docker,
+    and no performance issues have been observed in this configuration.
+2. **SMTP Tester Port**: The `smtp-tester` port (7125) is not mapped to prevent it from listening
+    on that port. This configuration ensures that the Cypress GUI running on the Docker host can
+    listen on port 7125 during System Tests.
+
+As a result, there is a separate Cypress configuration file, `cypress.config.local.mjs`,
+for managing these settings.
 ---
 
 </details>
-
-### Notes
-
-By using `host.docker.internal` it is possible to run everything with the same hostnames and
-URLs from container inside and Docker host machine outside.
-However, there is a performance issue with the database.
-Therefore, for the database connection `host.docker.internal` is only used when you run Cypress GUI from outside.
-There is no performance problem because you come from outside.
 
 ## Prerequisites
 

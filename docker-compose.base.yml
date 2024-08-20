@@ -87,8 +87,9 @@ services:
       DISPLAY:  
     restart: unless-stopped
     entrypoint: ["sleep", "31536000"] # don't use cypress run, instead sleep one year
-    ports:
-      - 7125:7125 # smtp-tester port (only available during the test run)
+# Port 7125 is intentionally not mapped - using Cypress GUI local will LISTEN on Docker host and this interferes
+#   ports:
+#     - 7125:7125 # smtp-tester port (only available during the test run)
     volumes:
       - ./branch_44:/branch_44
       - ./branch_51:/branch_51

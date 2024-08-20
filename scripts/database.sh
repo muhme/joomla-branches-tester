@@ -26,6 +26,7 @@ if isValidVariant "$1"; then
   variant=($1)
   dbtype=$(dbTypeForVariant "$variant")
   dbhost=$(dbHostForVariant "$variant")
+  dbport=$(dbPortForVariant "$variant")
   shift # argument is eaten
 else
   error "'$1' is not a valid selection for database and database driver, use one of ${JBT_DB_VARIANTS[@]}"
@@ -46,7 +47,8 @@ for version in "${versionsToChange[@]}"; do
   #   db_password: 'root',
   #   smtp_host: 'host.docker.internal',
   #   smtp_port: '7025',
-
+  #
+  # Using database host and default port Docker-inside as performance issues are seen in using host.docker.internal
   docker exec -it "jbt_${version}" bash -c "cd /var/www/html && sed \
     -e \"s/db_type: .*/db_type: '${dbtype}',/\" \
     -e \"s/db_name: .*/db_name: 'test_joomla_${version}',/\" \
@@ -58,6 +60,17 @@ for version in "${versionsToChange[@]}"; do
     -e \"s/smtp_host: .*/smtp_host: 'host.docker.internal',/\" \
     -e \"s/smtp_port: .*/smtp_port: '7025',/\" \
     cypress.config.dist.mjs > cypress.config.mjs"
+
+  # Create second Cypress config file for running local
+  # Using localhost from outside Docker and the mapped database port
+  log "jbt_${version} – Create additional cypress.config.local.mjs with using localhost and database port ${dbport}"
+  docker exec -it "jbt_${version}" bash -c "cd /var/www/html && sed \
+    -e \"s/db_host: .*/db_host: 'localhost',/\" \
+    -e \"s/db_port: .*/db_port: '$dbport',/\" \
+    -e \"s/baseUrl: .*/baseUrl: 'http:\/\/localhost:70${version}\/',/\" \
+    -e \"s/smtp_host: .*/smtp_host: 'localhost',/\" \
+    -e \"s/smtp_port: .*/smtp_port: '7125',/\" \
+    cypress.config.mjs > cypress.config.local.mjs"
 
   # 'Hack' until PR with setting db_port is supported - overwrite with setting db_port in joomla-cypress and System Tests
   # (Only used later if we run Cypress GUI)

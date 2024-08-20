@@ -35,7 +35,7 @@ if [ "$2" = "local" ]; then
   log "Install Cypress, if needed"
   npm install cypress
   log "Open local installed Cypress GUI for ${version}"
-  npx cypress open --env smtp_port=7325 --e2e --project .
+  npx cypress open --e2e --project . --config-file cypress.config.local.mjs
   # By the way, the same way it is possible to run Cypress headless from Docker host
 else
   log "Open jbt_cypress container Cypress GUI for ${version}"

@@ -10,7 +10,9 @@ JBT_DB_VARIANTS=("mysqli" "mysql" "mariadbi" "mariadb" "pgsql")
 # Database driver mapping for the variants as in Web Installer 'database type'
 JBT_DB_TYPES=("MySQLi" "MySQL (PDO)" "MySQLi" "MySQL (PDO)" "PostgreSQL (PDO)")
 # Database server mapping for the variants
-JBT_DB_HOSTS=("jbt_mysql" "jbt_mysql" "jbt_madb" "jbt_madb" "jbt_pg")
+JBT_DB_HOSTS=("jbt_mysql" "jbt_mysql" "jbt_madb" "jbt_madb" "jbt_pg"          )
+# Database port mapping for the variants
+JBT_DB_PORTS=("7011"      "7011"      "7012"     "7012"     "7013"            )
 
 # Determine actual active Joomla branches, e.g. "44 51 52 60"
 #
@@ -89,6 +91,19 @@ function dbHostForVariant() {
     for i in "${!JBT_DB_VARIANTS[@]}"; do
         if [ "${JBT_DB_VARIANTS[$i]}" = "$variant" ]; then
             echo "${JBT_DB_HOSTS[$i]}"
+            return
+        fi
+    done
+    error "No database host found for variant'$1'"
+}
+
+# Get database host for variant
+#
+function dbPortForVariant() {
+    local variant=$1
+    for i in "${!JBT_DB_VARIANTS[@]}"; do
+        if [ "${JBT_DB_VARIANTS[$i]}" = "$variant" ]; then
+            echo "${JBT_DB_PORTS[$i]}"
             return
         fi
     done
