@@ -34,17 +34,7 @@ fi
 
 for version in "${versionsToChange[@]}"; do
 
-  # Handle .js or .mjs from PR https://github.com/joomla/joomla-cms/pull/43676 – [4.4] Move the Cypress Tests to ESM
-  if [ -f "branch_${version}/cypress.config.dist.js" ]; then
-    extension="js"
-  elif [ -f "branch_${version}/cypress.config.dist.mjs" ]; then
-    extension="mjs"
-  else
-    error "No 'cypress.config.dist.*js' file found in branch_${version}, please have a look"
-    exit 1
-  fi
-
-  log "jbt_${version} – Create cypress.config.${extension} for variant ${variant} (driver '${dbtype}' host '${dbhost}')"
+  log "jbt_${version} – Create cypress.config.mjs for variant ${variant} (driver '${dbtype}' host '${dbhost}')"
 
   # adopt e.g.:
   #   db_type: 'PostgreSQL (PDO)',
@@ -67,7 +57,7 @@ for version in "${versionsToChange[@]}"; do
     -e \"s/db_password: .*/db_password: 'root',/\" \
     -e \"s/smtp_host: .*/smtp_host: 'host.docker.internal',/\" \
     -e \"s/smtp_port: .*/smtp_port: '7025',/\" \
-    cypress.config.dist.${extension} > cypress.config.${extension}"
+    cypress.config.dist.mjs > cypress.config.mjs"
 
   # 'Hack' until PR with setting db_port is supported - overwrite with setting db_port in joomla-cypress and System Tests
   # (Only used later if we run Cypress GUI)
@@ -94,8 +84,8 @@ for version in "${versionsToChange[@]}"; do
   log "jbt_${version} – Set Cypress SMTP port to 7125"
   docker exec -it "jbt_${version}" bash -c "cd /var/www/html && sed \
     -e \"s/smtp_port: .*/smtp_port: '7125',/\" \
-    cypress.config.${extension} > cypress.config.${extension}.tmp && \
-    mv cypress.config.${extension}.tmp cypress.config.${extension}"
+    cypress.config.mjs > cypress.config.mjs.tmp && \
+    mv cypress.config.mjs.tmp cypress.config.mjs"
 
   log "jbt_${version} – ${variant} based Joomla is installed"
   echo ""
