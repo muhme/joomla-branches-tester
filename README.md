@@ -89,8 +89,8 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
     on that port. This ensures that the, on the Docker host running, local Cypress GUI can
     listen on port 7125 during System Tests.
 
-As a result, there is a separate Cypress configuration file, `cypress.config.local.mjs`,
-for running local Cypress GUI.
+Therefore, there is a separate Cypress configuration file `cypress.config.local.mjs`
+for the local execution of Cypress GUI on the Docker host.
 
 ---
 
