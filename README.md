@@ -51,6 +51,8 @@ On macOS and Ubuntu, the native Cypress GUI is shown in green.
 <details>
   <summary>There are 12 Docker containers that provide the functionality.</summary>
 
+---
+
 The abbreviation `jbt` stands for Joomla Branches Tester:
 
 |Name|Host Port:<br />Container Inside|Directory :eight_spoked_asterisk: |Comment|
@@ -73,6 +75,8 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
 * To edit the test specs below `tests/System` or
 * To inspect screenshots from failed tests or
 * To inspect and hack the Joomla sources from Docker host system.
+
+---
 
 </details>
 
@@ -97,6 +101,8 @@ Thanks to Docker, it is not necessary to install one of the databases, the datab
 <details>
   <summary>Ubuntu Setup Script</summary>
 
+---
+
 For setting up and configuring an Ubuntu Linux environment with required Git, Docker, and firewall configuration,
 one of the gnomes has provided the [ubuntu_setup.sh](scripts/ubuntu_setup.sh) script.
 This script is designed to work on both a fresh Ubuntu desktop installation and Ubuntu
@@ -106,6 +112,9 @@ Download the script to your current working directory and run with superuser pri
 ```
 sudo bash ./ubuntu_setup.sh
 ```
+
+---
+
 </details>
 
 ## Installation
@@ -147,6 +156,8 @@ you will need to download approximately 4 GB of data over the network.
 
 <details>
   <summary>Windows WSL2 Ubuntu Setup</summary>
+
+---
 
 1. Install Windows WSL 2 if it has not already been done. Open PowerShell Window with administrator rights:
    ```
@@ -195,10 +206,14 @@ you will need to download approximately 4 GB of data over the network.
 :point_right: To run the interactive Cypress GUI from the Docker container `jbt_cypress`,
   Windows 11 (with included Windows Subsystem for Linux GUI – WSLg) is required.
 
+---
+
 </details>
 
 <details>
   <summary>macOS Setup</summary>
+
+---
 
 To install the required Docker and Git, one possible approach is to follow these four steps:
 
@@ -239,12 +254,19 @@ for each branch the first time you open it:
 ```
 scripts/cypress.sh 52 local
 ```
+
+---
+
 </details>
 
 <details>
   <summary>Ubuntu Setup</summary>
 
+---
+
 TODO
+
+---
 
 </details>
 
@@ -338,6 +360,8 @@ like the password reset email the SMTP Relay Doubler `jbt_relay`
 <details>
   <summary>:imp: "Postal dispatch nonsense picture? Don't open it, you'll get a headache!</summary>
 
+---
+
 :fairy: "Shut up and listen. The email traffic is explained using the Joomla branch 5.1-dev with
 the use cases password reset and System Tests."
 
@@ -361,6 +385,8 @@ the use cases password reset and System Tests."
    The Cypress test can check and validate the email.
 
 Therefore `cypres.config.mjs` uses a different SMTP port than `configuration.php`.
+
+---
 
 </details>
 
