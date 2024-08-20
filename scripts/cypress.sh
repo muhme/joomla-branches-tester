@@ -25,8 +25,11 @@ fi
 
 # Use of SMTP port 7325 for the smtp-tester, as port 7125 is occupied by the mapping for the Cypress container.
 if [ "$2" = "local" ]; then
-  log "Open local installed Cypress GUI for ${version}"
   cd "branch_${version}"
+  # Install the Cypress version used in this branch, if needed
+  log "Install Cypress, if needed"
+  npm install cypress
+  log "Open local installed Cypress GUI for ${version}"
   npx cypress open --env smtp_port=7325 --e2e --project .
   # By the way, the same way it is possible to run Cypress headless from Docker host
 else

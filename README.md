@@ -193,7 +193,7 @@ you will need to download approximately 4 GB of data over the network.
    ```
 
 :point_right: To run the interactive Cypress GUI from the Docker container `jbt_cypress`,
-  Windows 11 (with includd Windows Subsystem for Linux GUI – WSLg) is required.
+  Windows 11 (with included Windows Subsystem for Linux GUI – WSLg) is required.
 
 </details>
 
@@ -224,6 +224,20 @@ the Joomla Branches Tester:
 git clone https://github.com/muhme/joomla-branches-tester
 cd joomla-branches-tester
 scripts/create.sh
+```
+
+If you like to run Cypress GUI locally you have to install Node.js. Actual use LTS version 20 and follow the instructions to extend `PATH`:
+
+```
+brew install node@20
+echo 'export PATH="/opt/homebrew/opt/node@20/bin:$PATH"' >> ~/.zshrc
+```
+
+You can now run System Tests using the Cypress GUI locally.
+The script will automatically install the appropriate version specified
+for each branch the first time you open it:
+```
+scripts/cypress.sh 52 local
 ```
 </details>
 
