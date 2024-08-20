@@ -200,8 +200,31 @@ you will need to download approximately 4 GB of data over the network.
 <details>
   <summary>macOS Setup</summary>
 
-TODO
+To install the required Docker and Git, one possible approach is to follow these four steps:
 
+1. [Install Docker Desktop on Mac](https://docs.docker.com/desktop/install/mac-install/) for either Apple silicon or Intel chip, and then run it.
+2. Verify Docker is running:
+   ```
+   docker ps
+   ```
+   Should show no containers:
+   ```
+   CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+   ```
+3. Install [Homebrew](https://brew.sh/) and follow the instructions to
+   add `/opt/homebrew/bin` to your `PATH`.
+4. Install git
+```
+brew install git
+```
+
+Once Docker and Git are installed, open a terminal window, clone the repository, and create
+the Joomla Branches Tester:
+```
+git clone https://github.com/muhme/joomla-branches-tester
+cd joomla-branches-tester
+scripts/create.sh
+```
 </details>
 
 <details>
