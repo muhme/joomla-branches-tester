@@ -11,8 +11,8 @@ Alright, alright, apologies to those who enjoyed the whimsical writing style, bu
 All four active Joomla development branches run in parallel in a [Docker](https://www.docker.com/) container environment.
 Use one or all four branches for:
 * Manual testing, including database inspections and email verifications.
-* Automated [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System)
-  with [Cypress](https://www.cypress.io/) GUI or headless.
+* [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System)
+  with [Cypress](https://www.cypress.io/) GUI (interactive mode) or headless (automated mode).
 * Automated installation of the [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester).
 * Switch between the three database options (MySQL, MariaDB, or PostgreSQL) and the two database drivers
   (MySQLi or PHP Data Objects).
@@ -523,6 +523,8 @@ scripts/clean.sh
 ## License
 
 Distributed under the GNU General Public License version 2 or later, see [LICENSE](LICENSE)
+
+If it is used, I would like to pass it on to the Joomla! project.
 
 ## Contact
 
