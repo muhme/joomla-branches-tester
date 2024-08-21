@@ -131,10 +131,11 @@ For the four Web server containers, to simplify life, the standard Docker Joomla
 are used as a starting point and then overinstalled with the source code from the corresponding Joomla development branch.
 The Joomla Web-Installer is executed by the Cypress spec `Installation.cy.js` from the Joomla System Tests.
 
-Last tested with
-* macOS 14 Sonoma,
+Last tested in August 2024 with:
+* Intel chip macOS 14 Sonoma,
+* Apple silicon macOS 14 Sonoma,
 * Windows 11 Pro WSL 2 Ubuntu and
-* Ubuntu 24 Noble Numbat.
+* Ubuntu 24 Noble Numbat (absolute minimum with GUI is a VPS with 2 shared vCPUs and 4 GB RAM).
 
 You can create all the Docker containers and install all four Joomla instances using the `create.sh` script:
 
@@ -161,6 +162,9 @@ The `joomla-branches-tester` folder requires about of 2 GB of disc space.
 Docker needs additional about of 20 GB for images and volumes.
 If you are installing for the first time and downloading all necessary Docker images,
 you will need to download approximately 4 GB of data over the network.
+
+:point_right: In case of trouble try to look into the scripts, run the scripts with `bash -x` and
+              [open an issue](../../issues).
 
 <details>
   <summary>Windows WSL2 Ubuntu Setup</summary>
@@ -268,11 +272,45 @@ scripts/cypress.sh 52 local
 </details>
 
 <details>
-  <summary>Ubuntu Setup</summary>
+  <summary>Ubuntu 22.04.3 LTS (Jammy Jellyfish) Setup</summary>
 
 ---
 
-TODO
+Installing with a user that is able to run `sudo`.
+
+1. Install `git` if you not have already:
+   ```
+   sudo apt-get update
+   sudo apt-get -y upgrade
+   sudo apt-get -y install git
+   ```
+2. Clone Joomla Branches Tester repository e.g. in your home directory:
+   ```
+   cd
+   git clone https://github.com/muhme/joomla-branches-tester
+   ```
+3. Continue the installation with the Ubuntu setup script:
+   ```
+   cd ~/joomla-branches-tester
+   sudo scripts/ubuntu_setup.sh
+   ```
+4. To run Docker as user it is needed to restart Ubuntu:
+   ```
+   sudo reboot
+   ```
+5. Verify Docker is running:
+   ```
+   docker ps
+   ```
+   Should show no containers:
+   ```
+   CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+   ```
+6. Now you are ready to create Joomla Branches Tester:
+   ```
+   cd ~/joomla-branches-tester
+   scripts/create.sh
+   ```
 
 ---
 

@@ -5,14 +5,14 @@
 #   . Windows 11 Pro WSL 2 Ubuntu
 #   . Ubuntu Desktop (GNOME), Version 1.524OS Ubuntu 22.04
 #     . https://marketplace.digitalocean.com/apps/ubuntu-desktop-gnome
-#     . 4 vCPU / 8 GB RAM / regular SSD
+#     . 2 vCPU / 4 GB RAM / regular SSD
+#     . via ssh
+#       . passwd user
+#       . usermod -aG sudo user
+#     . use RDP for GUI
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
-
-# if you wish to replace the default random created passwords:
-#   root# x11vnc -storepasswd yourPassword /home/user/.vnc/passwd
-#   root# passwd user
 
 # Run as a non-root user:
 #   git clone https://github.com/muhme/joomla-branches-tester
@@ -21,31 +21,37 @@
 #   scripts/create.sh
 #   scripts/test.sh
 
+source scripts/helper.sh
+
 # Running as sudo?
 if [ "$(id -u)" -ne 0 ]; then
-    echo "*** This script must be run as root. Exiting."
+    error "This script must be run as root."
     exit 1
 fi
 
 # Make the hosts entry
+log "Make hosts entry host.docker.internal"
 echo "127.0.0.1 host.docker.internal" >> /etc/hosts
 
 # Enable SMTP port in Ubuntu Uncomplicated Firewall (UFW)
-ufw allow 7025
+log "Allow 7000:7999/tcp in Ubuntu Uncomplicated Firewall (UFW)"
+sudo ufw allow 7000:7999/tcp
 
 # Some basics with git
+log "Install git and some base packages"
 apt update
 apt upgrade -y
 apt install -y git vim iputils-ping net-tools telnet unzip
 
 # Docker
+log "Install Docker"
 apt install -y apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg > /etc/apt/trusted.gpg.d/docker.asc
 add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 apt update
 apt install -y docker-ce
 
-echo "*** Adding '$USER' to the docker group"
+log "Adding '$USER' to the docker group"
 usermod -aG docker $USER
 
-echo "*** Make the necessary `sudo reboot`, after that try `docker ps`"
+log "Finished, make the necessary `sudo reboot`, after that try `docker ps`"
