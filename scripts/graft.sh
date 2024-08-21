@@ -43,7 +43,18 @@ if [ $# -ne 1 ]; then
   error "Missing Joomla package argument, e.g. Joomla_5.1.2-Stable-Full_Package.zip"
   exit 1
 fi
-package="$1"
+# Convert relative path to absolute path if necessary, as we need to do change the directory. 
+if [[ "$1" != /* ]]; then
+    # It's a relative path
+    package="$(pwd)/$FILE_PATH"
+else
+  package="$1"
+fi
+if [ ! -f "$package" ]; then
+    error "Given '${package}' isn't a file"
+    exit 1
+fi
+
 if [ ! -f "branch_${version}/cypress.config.dist.mjs" ]; then
   error "Missing file branch_${version}/cypress.config.dist.mjs, use create.sh first"
   exit 1
@@ -80,11 +91,11 @@ case "$package" in
   *.tar.zst)
     tar --use-compress-program=unzstd -xvf "$package" -C . 2>/dev/null || sudo tar --use-compress-program=unzstd -xvf "$package" -C . 
     ;;
-  *.tar.gz)
+  *.tar.gz|*.tar.bz2)
     tar -xvf "$package" -C . 2>/dev/null || sudo tar -xvf "$package" -C .
     ;;
   *)
-    error "Unsupported file type, use .zip, .tar.gz or .tar.zst"
+    error "Unsupported file type, use .zip, .tar.gz, .tar.bz2 or .tar.zst"
     exit 1
     ;;
 esac
