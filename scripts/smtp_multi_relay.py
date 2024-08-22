@@ -1,5 +1,10 @@
 #
-# smtp_double_relay.py - SMTP relay to duplicate mails
+# smtp_multi_relay.py - SMTP relay to duplicate mails up-to 10 times
+#
+# Intended to run in Docker container with env vars:
+#   LISTEN_PORT (defaults to 25)
+#   TARGET_HOST_0 ... TARGET_HOST_9
+#   TARGET_PORT_0 ... TARGET_PORT_9 (defaults to 25)
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
@@ -14,6 +19,7 @@ from aiosmtpd.smtp import Envelope
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
 
 class ForwardingHandler:
     def __init__(self, targets):
@@ -32,21 +38,17 @@ class ForwardingHandler:
         with smtplib.SMTP(target['host'], target['port']) as smtp:
             smtp.sendmail(envelope.mail_from, envelope.rcpt_tos, envelope.content)
 
+
 if __name__ == '__main__':
     # Read target hosts and ports from environment variables
     targets = []
-    
-    target_host1 = os.getenv('TARGET_HOST1')
-    target_port1 = int(os.getenv('TARGET_PORT1', 25))
-    
-    target_host2 = os.getenv('TARGET_HOST2')
-    target_port2 = int(os.getenv('TARGET_PORT2', 25))
 
-    if target_host1:
-        targets.append({'host': target_host1, 'port': target_port1})
+    for i in range(10):
+        target_host = os.getenv(f'TARGET_HOST_{i}')
+        target_port = int(os.getenv(f'TARGET_PORT_{i}', 25))
 
-    if target_host2:
-        targets.append({'host': target_host2, 'port': target_port2})
+        if target_host:
+            targets.append({'host': target_host, 'port': target_port})
 
     # Ensure at least one target is defined
     if not targets:

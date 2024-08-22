@@ -1,4 +1,4 @@
-# dockerfile-relay.yml - Create Docker image with SMTP double relay
+# dockerfile-relay.yml - Create Docker image with SMTP multiplicator relay
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
@@ -7,8 +7,8 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-COPY scripts/smtp_double_relay.py /app/smtp_double_relay.py
+COPY scripts/smtp_multi_relay.py /app/smtp_multi_relay.py
 
 RUN pip install aiosmtpd aiomail
 
-CMD ["python", "smtp_double_relay.py"]
+CMD ["python", "smtp_multi_relay.py"]

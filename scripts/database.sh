@@ -69,7 +69,7 @@ for version in "${versionsToChange[@]}"; do
     -e \"s/db_port: .*/db_port: '$dbport',/\" \
     -e \"s/baseUrl: .*/baseUrl: 'http:\/\/localhost:70${version}\/',/\" \
     -e \"s/smtp_host: .*/smtp_host: 'localhost',/\" \
-    -e \"s/smtp_port: .*/smtp_port: '7125',/\" \
+    -e \"s/smtp_port: .*/smtp_port: '7325',/\" \
     cypress.config.mjs > cypress.config.local.mjs"
 
   # 'Hack' until PR with setting db_port is supported - overwrite with setting db_port in joomla-cypress and System Tests

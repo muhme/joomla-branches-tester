@@ -77,7 +77,7 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
 * To inspect and hack the Joomla sources from Docker host system.
 
 :point_right: Using `host.docker.internal` allows to maintain consistent hostnames and URLs between containers and
-              the Docker host machine. However, there are two exceptions to note:
+              the Docker host machine. However, there is one exceptions to note:
 
 1. **Database Performance**: For database connections, the Docker container name and the default
     database port are used to avoid performance issues.
@@ -85,9 +85,6 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
     And when running Cypress GUI on the Docker host, `localhost` and the mapped database port are used instead,
     as Docker container hostnames aren't accessible outside Docker,
     and no performance issues have been observed in this configuration.
-2. **SMTP Tester Port**: The `smtp-tester` port (7125) is not mapped to prevent listening
-    on that port. This ensures that the, on the Docker host running, local Cypress GUI can
-    listen on port 7125 during System Tests.
 
 Therefore, there is a separate Cypress configuration file `cypress.config.local.mjs`
 for the local execution of Cypress GUI on the Docker host.
@@ -415,22 +412,28 @@ the use cases password reset and System Tests."
 
 1. The user requests a password reset with click on 'Forgot your Password?' in their web browser.
    This request is sent to the Joomla PHP code on the web server `jbt_51`.
-2. An email is sent via SMTP from the web server `jbt_51` to the email relay `jbt_relay`,
-   where it is duplicated. In the Joomla `configuration.php` file, the `smtpport` is configured as `7025`."
-3. The email relay `jbt_relay` duplicates the email and sends the first email via SMTP to the email catcher `jbt_mail`.
+2. An email is sent via SMTP from the web server `jbt_51` to the email relay `jbt_relay`.
+   In the Joomla `configuration.php` file, the `smtpport` is configured as `7025`."
+3. The email relay `jbt_relay` triplicates the email and sends the first email via SMTP to the email catcher `jbt_mail`.
 4. The email relay `jbt_relay` tries to deliver the second email to `smtp-tester`.
    But no System Tests is running, the email cannot be delivered and is thrown away.
-5. System Test is started with the bash script `test.sh` in the Cypress container `jbt_cypress`.
-   In the Cypress `cypres.config.mjs` file, the `smtp_port` is configured as `7125`.
+5. The email relay `jbt_relay` tries to deliver the third email to locally running Cypress GUI with `smtp-tester`.
+   But no Cypress GUI is running, the email cannot be delivered and is thrown away.
+6. System Test is started with the bash script `test.sh` in the Cypress container `jbt_cypress`.
+   In the Cypress `cypress.config.mjs` file, the `smtp_port` is configured as `7125`.
    While the System Tests is running `smtp-tester` is listening on port 7125.
-6. One of the System Tests specs executes an action in Joomla PHP code that generates an email.
-7. Again the email is sent via SMTP from the web server `jbt_51` to the email relay `jbt_relay`, where it is duplicated.
-8. Again the email relay `jbt_relay` duplicates the email and
-   sends the first email via SMTP to the email catcher `jbt_mail`.
-9. This time the second email could be delivered to the `smtp-tester`.
+7. One of the System Tests specs executes an action in Joomla PHP code that generates an email.
+8. Again the email is sent via SMTP from the web server `jbt_51` to the email relay `jbt_relay`, where it is duplicated.
+9. Again the email relay `jbt_relay` triplicates the email and
+   sends the one email via SMTP to the `jbt_cypress` container with `smtp-tester` running in .
    The Cypress test can check and validate the email.
+10. Again the email relay `jbt_relay` sents one copy via SMTP to the email catcher `jbt_mail`.
+11. Again the email relay `jbt_relay` tries to deliver the third email to locally running Cypress GUI with
+    `smtp-tester`. But no Cypress GUI is running, the email cannot be delivered and is thrown away.
 
-Therefore `cypres.config.mjs` uses a different SMTP port than `configuration.php`.
+Therefore, the `cypress.config.mjs` file uses a different SMTP port (7125) than the `configuration.php` file (7025).
+Additionally, the `cypress.config.local.mjs` file is used with yet another SMTP port (7325)
+for running the Cypress GUI locally.
 
 ---
 
@@ -551,6 +554,35 @@ If you want to get rid of all these Docker containers and the 2 GB in the `branc
 ```
 scripts/clean.sh
 ```
+
+## Trouble-Shooting
+
+1. To fully grasp the process, it's helpful to both see the diagrams and read the explanations provided.
+   For instance, if you create the Joomla Branches Tester only for branch 5.1-dev,
+   you won’t be able to run tests on branch 5.2-dev.
+   In this situation, it’s necessary to create a Joomla Branches Tester for all branches,
+   ensuring you can work across all branches.
+2. Check the Docker container logs to monitor activity.
+   For example, the `jbt_relay` container logs will display information about receiving and delivering emails.
+   ```
+   docker logs jbt_relay
+   ```
+   ```
+   2024-08-22 10:09:34,082 - INFO - SMTP relay running on port 7025 and forwarding emails...
+   2024-08-22 10:21:45,082 - INFO - ('192.168.65.1', 31625) >> b'MAIL FROM:<admin@example.com>'
+   2024-08-22 10:21:45,083 - INFO - ('192.168.65.1', 31625) >> b'RCPT TO:<test@example.com>'
+   2024-08-22 10:21:45,219 - INFO - Email forwarded to host.docker.internal:7125
+   2024-08-22 10:21:45,345 - INFO - Email forwarded to host.docker.internal:7225
+   2024-08-22 10:21:45,346 - ERROR - Failed to forward email to host.docker.internal:7325: [Errno 111] Connection refused
+   ```
+   An email is received by `jbt_relay:7025` and delivered to the Cypress headless `smtp-tester` listening on
+   `jbt_cypress:7125`, delivered to the mail catcher listeing on `jbt_mail:7225`, and could not be delivered to local
+   the locally running Cypress GUI `smtp-tester` listening on `localhost:7325` (equivalent host names are used for clarity).
+3. Run a script with the command `bash -x` before to enable detailed debugging output that shows each command
+   executed along with its arguments.
+   ```
+   bash -x scripts/pull.sh
+   ```
 
 ## Limitations
 
