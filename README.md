@@ -557,7 +557,6 @@ scripts/clean.sh
 * The different Joomla versions exist in parallel, but the test runs sequentially.
 * Only one PHP version (the one from the Joomla Docker image) and one database version is used.
 * The setup does not support HTTPS, secure connections issues are not testable.
-* The used port number range is hard-wired with 7,000, if you have already something LISTEN in that range it is a problem.
 * The predefined port range starts from 7000. If another service is already using this range, it may cause a conflict.
 
 ## License
