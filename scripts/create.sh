@@ -119,7 +119,7 @@ for version in "${versionsToInstall[@]}"; do
   log "jbt_${version} – cloning ${branch} branch into directory branch_${version}"
   docker exec -it "jbt_${version}" bash -c "git clone -b ${branch} --depth 1 https://github.com/joomla/joomla-cms /var/www/html"
 
-  if [ "$version" = "51" ] || [ "$version" = "52" ] || [ "$version" = "60" ]; then
+  if [ "$version" -ge 51 ]; then
     log "Install missing libraries in container jbt_${version}"
     docker exec -it "jbt_${version}" bash -c "cd /var/www/html && \
       apt-get install -y libzip4 libmagickwand-6.q16-6 libmemcached11"

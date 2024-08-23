@@ -70,7 +70,7 @@ do
 
   branch=$(branchName "${version}")
   log "Testing ${branch} ${spec}"
-  docker exec -it jbt_cypress sh -c "cd /branch_${version} && ${eel1} cypress run ${browser} ${spec}"
+  docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && ${eel1} cypress run ${browser} ${spec}"
   if [ $? -eq 0 ] ; then
     # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
     successful=$((successful + 1))

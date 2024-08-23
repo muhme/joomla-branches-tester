@@ -79,7 +79,7 @@ for version in "${versionsToChange[@]}"; do
     cd /var/www/html/tests/System/integration/install
     sed '/db_host: Cypress.env('\"'\"'db_host'\"'\"'),/a\\      db_port: Cypress.env('\"'\"'db_port'\"'\"'), // muhme, 9 August 2024 \"hack\" as long as waiting for PR' Installation.cy.js > Installation.cy.js.tmp
     mv Installation.cy.js.tmp Installation.cy.js"
-  docker cp scripts/Joomla.js "jbt_${version}:/var/www/html/node_modules/joomla-cypress/src/Joomla.js"
+  docker cp scripts/joomla.js "jbt_${version}:/var/www/html/node_modules/joomla-cypress/src/joomla.js"
 
   # Since the database will be new, we clean up autoload classes cache file and
   # all com_patchtester directories to prevent the next installation to be fail.
@@ -91,7 +91,7 @@ for version in "${versionsToChange[@]}"; do
 
   # Using Install Joomla from System Tests
   log "jbt_${version} – Cypress based Joomla installation"
-  docker exec -it jbt_cypress sh -c "cd /branch_${version} && cypress run --spec tests/System/integration/install/Installation.cy.js"
+  docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && cypress run --spec tests/System/integration/install/Installation.cy.js"
 
   # Cypress is using own SMTP port to read and reset mails by smtp-tester
   log "jbt_${version} – Set Cypress SMTP port to 7125"

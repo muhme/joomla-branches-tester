@@ -3,13 +3,13 @@
 # Docker based Joomla Branches Tester
 
 <img align="right" src="images/magic_world.png">
-Imagine a little slice of a parallel universe where testing all four active Joomla branches becomes a fluffy, cosy, and almost magical experience. In this universe, you can effortlessly test with the Patch Tester, glide through the Cypress GUI, or even enjoy the smooth efficiency of Cypress Headless. Picture the warmth of being able to peer into any database table as if through a magical glass, or seamlessly switch between five different database variants with just a small wave of a magic wand. Wouldn't that create a truly fluffy and cosy environment to work in?
+Imagine a little slice of a parallel universe where testing all active Joomla branches becomes a fluffy, cosy, and almost magical experience. In this universe, you can effortlessly test with the Patch Tester, glide through the Cypress GUI, or even enjoy the smooth efficiency of Cypress Headless. Picture the warmth of being able to peer into any database table as if through a magical glass, or seamlessly switch between five different database variants with just a small wave of a magic wand. Wouldn't that create a truly fluffy and cosy environment to work in?
 <br /><br />
 Alright, alright, apologies to those who enjoyed the whimsical writing style, but now it's time to dive into the technical depths. Let's transition from the cozy, magical universe into the world of technical documentation, where we'll explore the numerous options, parameters, and configurations that power this experience ...
 
 ## Software Architecture
-All four active Joomla development branches run in parallel in a [Docker](https://www.docker.com/) container environment.
-Use one or all four branches for:
+All active Joomla development branches run in parallel in a [Docker](https://www.docker.com/) container environment.
+Use one or all branches for:
 * Manual testing, including database inspections and email verifications.
 * [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System)
   with [Cypress](https://www.cypress.io/) GUI (interactive mode) or headless (automated mode).
@@ -20,14 +20,17 @@ Use one or all four branches for:
 
 ![Joomla Branches Software Architecture](images/joomla-branches-tester.svg)
 
-The idea is to have all active Joomla development branches (currently 4.4-dev, 5.1-dev, 5.2-dev and 6.0-dev) are
-available for testing in parallel.
+The idea is to have all active Joomla development branches
+(in this picture 4.4-dev, 5.1-dev, 5.2-dev and 6.0-dev) are available for testing in parallel.
 The installation takes place across a dozen Docker containers, and everything is scripted.
 You see the four orange Web Server containers with the four different Joomla versions.
 They are based on the `branch_*` folders, which are also available on the Docker host.
 
-:point_right: The version numbers used in this documentation are as of August 2024.
-As the active branches change regularly, the current numbers are read from the `joomla-cms` repository.
+:point_right: The version numbers referenced are current as of early August 2024.
+              Since active branches are subject to frequent changes,
+              the latest version numbers can always be retrieved directly from the `joomla-cms` repository.
+              As of late August 2024, a fifth active branch, `5.3-dev`, has been introduced.
+              Consequently, five web servers are now configured to accommodate this change.
 
 On the right you see three blue containers with the databases MySQL, MariaDB and PostgreSQL.
 To be able to check the databases, two further blue containers with phpMyAdmin and pgAdmin are installed.
@@ -60,6 +63,7 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
 |jbt_44| **[7044](http://localhost:7044/administrator)** | /branch_44 | Web Server Joomla branch 4.4-dev<br />PHP 8.1, ci-admin / joomla-17082005 |
 |jbt_51| **[7051](http://localhost:7051/administrator)** | /branch_51 | Web Server Joomla branch 5.1-dev<br />PHP 8.2, ci-admin / joomla-17082005 |
 |jbt_52| **[7052](http://localhost:7052/administrator)** | /branch_52 | Web Server Joomla branch 5.2-dev<br />PHP 8.2, ci-admin / joomla-17082005 |
+|jbt_53| **[7053](http://localhost:7053/administrator)** | /branch_53 | Web Server Joomla branch 5.3-dev<br />PHP 8.2, ci-admin / joomla-17082005 |
 |jbt_60| **[7060](http://localhost:7060/administrator)** | /branch_60 | Web Server Joomla branch 6.0-dev<br />PHP 8.2, ci-admin / joomla-17082005 |
 |jbt_mysql| **7011**:3306 | | Database Server MySQL version 8.1 |
 |jbt_madb| **7012**:3306 | | Database Server MariaDB version 10.4 |
@@ -68,7 +72,7 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
 |jbt_phpmya| **[7001](http://localhost:7001)** | | Web App to manage MariaDB and MySQL<br />auto-login configured, root / root |
 |jbt_pga| **[7002](http://localhost:7002)** | | Web App to manage PostgreSQL<br />auto-login configured, root / root, postgres / prostgres |
 |jbt_mail| **[7003](http://localhost:7003)** <br /> SMTP **7225**:1025 | | Web interface to verify emails. |
-|jbt_relay| SMTP **7025**:7025 | | SMTP relay doubler |
+|jbt_relay| SMTP **7025**:7025 | | SMTP relay triplicator |
 
 :eight_spoked_asterisk: The directories are available on Docker host to:
 * Inspect and change the configuration files (`configuration.php` or `cypress.config.js`),
@@ -124,7 +128,7 @@ sudo bash ./ubuntu_setup.sh
 
 ## Installation
 
-For the four Web server containers, to simplify life, the standard Docker Joomla images (`joomla:4` or `joomla:5`)
+For the web server containers, to simplify life, the standard Docker Joomla images (`joomla:4` or `joomla:5`)
 are used as a starting point and then overinstalled with the source code from the corresponding Joomla development branch.
 The Joomla Web-Installer is executed by the Cypress spec `Installation.cy.js` from the Joomla System Tests.
 
@@ -134,7 +138,7 @@ Last tested in August 2024 with:
 * Windows 11 Pro WSL 2 Ubuntu and
 * Ubuntu 24 Noble Numbat (absolute minimum with GUI is a VPS with 2 shared vCPUs and 4 GB RAM).
 
-You can create all the Docker containers and install all four Joomla instances using the `create.sh` script:
+You can create all the Docker containers and install all e.g. five Joomla instances using the `create.sh` script:
 
 ```
 git clone https://github.com/muhme/joomla-branches-tester
@@ -261,7 +265,7 @@ You can now run System Tests using the Cypress GUI locally.
 The script will automatically install the appropriate version specified
 for each branch the first time you open it:
 ```
-scripts/cypress.sh 52 local
+scripts/cypress.sh 53 local
 ```
 
 ---
@@ -333,7 +337,7 @@ If you need to inspect files, they are available in the directory `branch_52` fo
 ### Cypress Headless System Tests
 
 To simple run the Joomla System Tests with all specs - except for the installation -
-from the [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System) in all four branches:
+from the [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System) in all branches:
 ```
 scripts/test.sh
 ```
@@ -348,7 +352,7 @@ As an example, run all the test specs (except the installation) from branch 5.1-
 scripts/test.sh 51 firefox
 ```
 
-Run one test spec with default Electron in all four branches (of course, the spec must exist in all branches):
+Run one test spec with default Electron in all branches (of course, the spec must exist in all branches):
 ```
 scripts/test.sh tests/System/integration/administrator/components/com_privacy/Consent.cy.js
 ```
@@ -393,10 +397,10 @@ scripts/cypress.sh 51 local
 To verify the emails sent from Joomla the [MailDev](https://hub.docker.com/r/maildev/maildev) container gives you
 a web interface on [http://localhost:7003]/(http://localhost:7003).
 As the Cypress System Tests is using own SMTP server `smtp-tester` to receive, check and delete emails,
-there is the need to duplicate emails. This is done by the SMTP Relay Doubler `jbt_relay`.
+there is the need to triple emails. This is done by the SMTP relay triplicator `jbt_relay`.
 
 To see these emails and also emails from manual testing Joomla,
-like the password reset email the SMTP Relay Doubler `jbt_relay`
+like the password reset email the SMTP relay triplicator`jbt_relay`
 
 :fairy: Oh, dear Gnome, now I can really read all the emails from the system tests, thank you.
 
@@ -442,11 +446,11 @@ for running the Cypress GUI locally.
 ### Install Joomla Patch Tester
 
 For your convenience [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester)
-can be installed on one or all four Joomla instances. The script also sets GitHub token and fetch the data.
-This can be done without version number for all four Joomla instances or e.g. for Joomla 5.2-dev:
+can be installed on one or all Joomla instances. The script also sets GitHub token and fetch the data.
+This can be done without version number for all Joomla instances or e.g. for Joomla 5.3-dev:
 
 ```
-scripts/patchtester.sh 52 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
+scripts/patchtester.sh 53 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
 ```
 
 ```
@@ -479,12 +483,12 @@ Five variants are available:
 * mysqli – MySQL with MySQLi (improved)
 * mysql – MySQL with MySQL PDO (PHP Data Objects)
 
-Use MariaDB with driver MySQLi for Joomla 5.2-dev:
+Use MariaDB with driver MySQLi for Joomla 5.1-dev:
 ```
-scripts/database.sh 52 mariadbi
+scripts/database.sh 51 mariadbi
 ```
 
-Change all four Joomla instances to use PostgreSQL:
+Change all Joomla instances to use PostgreSQL:
 ```
 scripts/database.sh pgsql
 ```
@@ -523,10 +527,10 @@ installing Joomla Patch Tester, or running Joomla System Tests.
 ### Syncing from GitHub Repository
 
 To avoid recreating everything the next day, you can simply fetch and merge the latest changes from the
-Joomla GitHub repository into your local branches. This can be done for all four branches without any arguments,
-or for a specific version, such as 5.2-dev.
+Joomla GitHub repository into your local branches. This can be done for branches without any arguments,
+or for a specific version, such as 6.0-dev.
 ```
-scripts/pull.sh 52
+scripts/pull.sh 60
 ```
 Finally, the Git status of the branch is displayed.
 
@@ -583,6 +587,8 @@ scripts/clean.sh
    ```
    bash -x scripts/pull.sh
    ```
+4. If you encounter problems after running `scripts/create.sh` multiple times,
+   try using the `no-cache` option to force a fresh build of the containers.
 
 ## Limitations
 

@@ -46,5 +46,5 @@ if [ "$2" = "local" ]; then
   # By the way, the same way it is possible to run Cypress headless from Docker host
 else
   log "Open jbt_cypress container Cypress GUI for ${version}"
-  docker exec -it jbt_cypress bash -c "cd \"/branch_${version}\" && cypress open --env smtp_port=7325 --e2e --project ."
+  docker exec -it jbt_cypress bash -c "cd \"/jbt/branch_${version}\" && cypress open --env smtp_port=7325 --e2e --project ."
 fi

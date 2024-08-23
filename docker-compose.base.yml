@@ -90,11 +90,7 @@ services:
     ports:
       - 7125:7125 # smtp-tester port (only available during the test run)
     volumes:
-      - ./branch_44:/branch_44
-      - ./branch_51:/branch_51
-      - ./branch_52:/branch_52
-      - ./branch_60:/branch_60
-      - ./scripts:/scripts
+      - .:/jbt
       - ~/.Xauthority:/root/.Xauthority:rw
       - /tmp/.X11-unix:/tmp/.X11-unix
     extra_hosts:

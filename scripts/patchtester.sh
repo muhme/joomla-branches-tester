@@ -34,7 +34,7 @@ for version in "${versionsToInstall[@]}"
 do
   branch=$(branchName "${version}")
   log "Install Joomla Patch Tester in ${branch}"
-  docker exec -it jbt_cypress sh -c "cd /branch_${version} && cypress run --env token=${token} --config specPattern=/scripts/patchtester.cy.js"
+  docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && cypress run --env token=${token} --config specPattern=/jbt/scripts/patchtester.cy.js"
   if [ $? -eq 0 ] ; then
     # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
     successful=$((successful + 1))
