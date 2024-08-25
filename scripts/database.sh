@@ -125,7 +125,9 @@ EOF
         # Print the original line
         echo "$line"
       fi
-    done < "${PATCHED}" > "${TMP}" && cp "${TMP}" "${PATCHED}"
+    done < "${PATCHED}" > "${TMP}"
+    # if copying the file has failed, start a second attempt with sudo
+    cp "${TMP}" "${PATCHED}" || sudo cp "${TMP}" "${PATCHED}"
   else
     log "jbt_${version} – Patch for https://github.com/joomla-projects/joomla-cypress/pull/33 is already applied"
   fi
