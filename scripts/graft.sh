@@ -142,8 +142,9 @@ if grep -q "public const DEV_STATUS = 'Stable';" "branch_${version}/libraries/sr
       fi
       # Always print the original line
       echo "$line"
-    done < "${PATCHED}" > "${TMP}" && cp "${TMP}" "${PATCHED}"
-
+    done < "${PATCHED}" > "${TMP}"
+    # if copying the file has failed, start a second attempt with sudo
+    cp "${TMP}" "${PATCHED}" || sudo cp "${TMP}" "${PATCHED}"
   fi
 fi
 
