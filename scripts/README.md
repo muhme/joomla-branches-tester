@@ -35,7 +35,6 @@ All messages start with three asterisks, the date and the time. See the followin
 | [docker-compose.joomla.yml](docker-compose.joomla.yml) | Part of the `docker-compose.yml` file to be parameterised for one Joomla web server. | Used by `create.sh`. |
 | [dockerfile-relay.yml](dockerfile-relay.yml) | Docker container definition for the SMTP relay doubler. | Used to create `jbt_relay`. |
 | [scripts/helper.sh](helper.sh) | Some commonly used bash script functions and definitions. | Used by all other bash-Scripts. |
-| [scripts/Joomla.js](Joomla.js) | [joomla-cypress](https://github.com/joomla-projects/joomla-cypress) *hack* until setting `db_port` is supported | Used by `database.sh`. |
 | [scripts/patchtester.cy.js](patchtester.cy.js) | Cypress script to install and confgure Joomla Patch Tester component. | Used by `patchtester.sh`. |
 | [scripts/pgpass](pgpass) | Auto-logon password file. | Used by `pgAdmin`. |
 | [scripts/servers.json](servers.json) | PostgreSQL server configuration. | Used by `pgAdmin`. |

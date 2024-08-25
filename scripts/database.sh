@@ -7,6 +7,9 @@
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
+TMP=/tmp/$(basename $0).$$
+trap 'rm -rf $TMP' 0
+
 source scripts/helper.sh
 
 versions=$(getVersions)
@@ -72,17 +75,60 @@ for version in "${versionsToChange[@]}"; do
     -e \"s/smtp_port: .*/smtp_port: '7325',/\" \
     cypress.config.mjs > cypress.config.local.mjs"
 
-  # - 'Hack' until PR https://github.com/joomla/joomla-cms/pull/43968 with set db_port is merged in all! active branches.
+  # Joomla System Tests 'Hack' until PR https://github.com/joomla/joomla-cms/pull/43968
+  # '[cypress] Add db_port in Installation.cy.js' is merged in all! active Joomla branches.
   # - Only used in Cypress GUI in spec Installation.cy.js
   # - Don't use sed inplace editing as not supported by macOS, do it in Docker container as owner is www-data
-  if ! grep -q "db_port" "branch_${version}/tests/System/integration/install/tests/Installation.cy.js"; then
+
+  if grep -q "db_port" "branch_${version}/tests/System/integration/install/Installation.cy.js"; then
+    log "jbt_${version} – Patch for https://github.com/joomla/joomla-cms/pull/43968 is already applied"
+  else
+    log "jbt_${version} – Applying patch for https://github.com/joomla/joomla-cms/pull/43968 Add db_port in Installation.cy.js"
     docker exec -it "jbt_${version}" bash -c "
       cd /var/www/html/tests/System/integration/install
       sed '/db_host: Cypress.env('\"'\"'db_host'\"'\"'),/a\\      db_port: Cypress.env('\"'\"'db_port'\"'\"'), // muhme, 9 August 2024 \"hack\" waiting for PR https://github.com/joomla/joomla-cms/pull/43968' Installation.cy.js > Installation.cy.js.tmp
       mv Installation.cy.js.tmp Installation.cy.js"
   fi
-  #  - overwrite with setting db_port in joomla-cypress and System Tests
-  docker cp scripts/joomla.js "jbt_${version}:/var/www/html/node_modules/joomla-cypress/src/joomla.js"
+
+  # joomla-cypress 'Hack' until PR https://github.com/joomla-projects/joomla-cypress/pull/33
+  # 'Install Joomla with non-standard db_port' is merged, new joomla-cypress release is build and used in all active Joomla branches
+
+  # Line to be replaced
+  SEARCH_LINE="cy.get('#jform_db_host').clear().type(config.db_host)"
+
+  # Replacement
+  PATCH=$(cat <<'EOF'
+// muhme, 9 August 2024 'hack' as long as waiting for PR https://github.com/joomla-projects/joomla-cypress/pull/33 is merged, and new joomla-cypress release is build and used in all active Joomla branches
+let connection = config.db_host
+if (config.db_port && config.db_port.trim() !== '') {
+  connection += `:${config.db_port.trim()}`;
+}
+cy.get('#jform_db_host').clear().type(connection)
+EOF
+)
+
+  # Check if the patch is already there
+  PATCHED="branch_${version}/node_modules/joomla-cypress/src/joomla.js"
+  if grep -q "${SEARCH_LINE}" "${PATCHED}"; then
+    log "jbt_${version} – Applying patch for https://github.com/joomla-projects/joomla-cypress/pull/33 Install Joomla with non-standard db_port"
+    while IFS= read -r line; do
+      if [[ "$line" == *"$SEARCH_LINE"* ]]; then
+        # Insert the patch
+        echo "// muhme, 9 August 2024 'hack' as long as waiting for PR https://github.com/joomla-projects/joomla-cypress/pull/33"
+        echo "// is merged, and new joomla-cypress release is build and used in all active Joomla branches"
+        echo "let connection = config.db_host;"
+        echo 'if (config.db_port && config.db_port.trim() !== "") {'
+        echo '  connection += ":${config.db_port.trim()}";'
+        echo "}"
+        echo 'cy.get("#jform_db_host").clear().type(connection);'
+      else
+        # Print the original line
+        echo "$line"
+      fi
+    done < "${PATCHED}" > "${TMP}" && cp "${TMP}" "${PATCHED}"
+  else
+    log "jbt_${version} – Patch for https://github.com/joomla-projects/joomla-cypress/pull/33 is already applied"
+  fi
 
   # Since the database will be new, we clean up autoload classes cache file and
   # all com_patchtester directories to prevent the next installation to be fail.
