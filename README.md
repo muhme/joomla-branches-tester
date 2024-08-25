@@ -164,8 +164,7 @@ Docker needs additional about of 20 GB for images and volumes.
 If you are installing for the first time and downloading all necessary Docker images,
 you will need to download approximately 4 GB of data over the network.
 
-:point_right: In case of trouble try to look into the scripts, run the scripts with `bash -x` and
-              [open an issue](../../issues).
+:point_right: In case of trouble, see [Trouble-Shooting](#trouble-shooting).
 
 <details>
   <summary>Windows WSL2 Ubuntu Setup</summary>
@@ -580,15 +579,16 @@ scripts/clean.sh
    2024-08-22 10:21:45,346 - ERROR - Failed to forward email to host.docker.internal:7325: [Errno 111] Connection refused
    ```
    An email is received by `jbt_relay:7025` and delivered to the Cypress headless `smtp-tester` listening on
-   `jbt_cypress:7125`, delivered to the mail catcher listeing on `jbt_mail:7225`, and could not be delivered to local
+   `jbt_cypress:7125`, delivered to the mail catcher listening on `jbt_mail:7225`, and could not be delivered to local
    the locally running Cypress GUI `smtp-tester` listening on `localhost:7325` (equivalent host names are used for clarity).
-3. Run a script with the command `bash -x` before to enable detailed debugging output that shows each command
-   executed along with its arguments.
+3. Run a script with the option `-x` to enable detailed debugging output that shows each command
+   executed along with its arguments, for example:
    ```
    bash -x scripts/pull.sh
    ```
 4. If you encounter problems after running `scripts/create.sh` multiple times,
    try using the `no-cache` option to force a fresh build of the containers.
+5. Open an [issue](../../issues).
 
 ## Limitations
 
