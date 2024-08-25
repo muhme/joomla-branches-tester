@@ -64,8 +64,12 @@ do
     all=$(grep  "${i}" "${cf}" | grep -v "${i}install/" | tr -d "' " | awk '{printf "%s", $0}' | sed 's/,$//')
     spec="--spec '${all}'"
   else
-    # Use the given test spec pattern
-    spec="--spec '$1'"
+    # Use the given test spec pattern and check if we can (no pattern) and must (missing path) insert path
+    if [[ "$1" != *","* && "$1" != tests/System/integration/* ]]; then
+      spec="--spec 'tests/System/integration/$1'"
+    else
+      spec="--spec '$1'"
+    fi
   fi
 
   branch=$(branchName "${version}")

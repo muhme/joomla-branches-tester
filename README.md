@@ -353,8 +353,11 @@ scripts/test.sh 51 firefox
 
 Run one test spec with default Electron in all branches (of course, the spec must exist in all branches):
 ```
-scripts/test.sh tests/System/integration/administrator/components/com_privacy/Consent.cy.js
+scripts/test.sh administrator/components/com_privacy/Consent.cy.js
 ```
+
+:point_right: When specifying a single test spec file,
+              you can omit the `tests/System/integration/` path at the beginning.
 
 Test all `site` specs with Microsoft Edge in the branch 4.4-dev using a pattern:
 ```
@@ -364,7 +367,7 @@ scripts/test.sh 44 edge 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
 To additional show `console.log` messages from Electron browser by setting environment variable: 
 ```
 export ELECTRON_ENABLE_LOGGING=1
-scripts/test.sh 44 tests/System/integration/administrator/components/com_actionlogs/Actionlogs.cy.js
+scripts/test.sh 44 administrator/components/com_actionlogs/Actionlogs.cy.js
 ```
 
 :fairy: To protect you, the first step `Installation.cy.js` of the Joomla System Tests
