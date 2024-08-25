@@ -116,22 +116,39 @@ docker exec -it "jbt_${version}" bash -c 'chown -R www-data:www-data /var/www/ht
 #   public const DEV_STATUS = 'Development';
 #   public const DEV_STATUS = 'Stable';
 
-version_file="branch_${version}/libraries/src/Version.php"
-if grep -q "public const DEV_STATUS = 'Stable';" "$version_file"; then
-    log "Stable version detected, DEV_STATUS Development temporarily set"
-    cp "$version_file" "${version_file}.orig" 2>/dev/null || sudo cp "$version_file" "${version_file}.orig"
-    sed "s/public const DEV_STATUS = 'Stable';/public const DEV_STATUS = 'Development';/" "$version_file.orig" > ${TMP}
-    cp ${TMP} "${version_file}" 2>/dev/null || sudo cp ${TMP} "${version_file}"
+if grep -q "public const DEV_STATUS = 'Stable';" "branch_${version}/libraries/src/Version.php"; then
+  log "Stable Joomla version detected"
+  # Check if the patch is already there
+  PATCHED="branch_${version}/node_modules/joomla-cypress/src/joomla.js"
+  if grep -q "button.complete-installation" "${PATCHED}"; then
+    log "jbt_${version} – Patch https://github.com/joomla-projects/joomla-cypress/pull/35 is already applied"
+  else
+    log "jbt_${version} – Applying patch for https://github.com/joomla-projects/joomla-cypress/pull/35 installJoomla for stable releases"
+    while IFS= read -r line; do
+      if [[ "$line" == *"--Install Joomla--"* ]]; then
+        # Insert the patch
+        echo "// muhme, 25 August 2024 'hack' as long as waiting for PR https://github.com/joomla-projects/joomla-cypress/pull/35"
+        echo "// is merged, and new joomla-cypress release is build and used in all active Joomla branches"
+        echo ""
+        echo "// In case of Stable release the Joomla Web Installer needs one more click to complete the installation"
+        echo "cy.get('button.complete-installation')"
+        echo '    .then($button => {'
+        echo "    // Check if the button exists"
+        echo '  if ($button.length > 0) {'
+        echo "    // If the button exists, click it"
+        echo '    cy.wrap($button).first().click()'
+        echo "  }"
+        echo "})"
+      fi
+      # Always print the original line
+      echo "$line"
+    done < "${PATCHED}" > "${TMP}" && cp "${TMP}" "${PATCHED}"
+
+  fi
 fi
 
 # Configure and install Joomla with desired database variant
 scripts/database.sh "${version}" "$database_variant"
-
-if [ -f "${version_file}.orig" ]; then
-  log "Change DEV_STATUS back to Stable"
-  # The -f force option is needed to prevent interactive prompt for overwriting files.
-  mv -f "${version_file}.orig" "${version_file}" 2>/dev/null || sudo mv "${version_file}.orig" "${version_file}"
-fi
 
 package_file=$(basename $package)
 joomla_version=$(getJoomlaVersion branch_${version})
