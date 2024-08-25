@@ -396,18 +396,17 @@ scripts/cypress.sh 51 local
 
 ### Check Email
 
-To verify the emails sent from Joomla the [MailDev](https://hub.docker.com/r/maildev/maildev) container gives you
-a web interface on [http://localhost:7003]/(http://localhost:7003).
-As the Cypress System Tests is using own SMTP server `smtp-tester` to receive, check and delete emails,
-there is the need to triple emails. This is done by the SMTP relay triplicator `jbt_relay`.
+To check the emails sent by Joomla,
+the [MailDev](https://hub.docker.com/r/maildev/maildev) container offers you
+provides you with a web interface at [http://localhost:7003]/(http://localhost:7003).
+The Cypress System Tests is using an own SMTP server `smtp-tester` to receive, check and delete emails.
+Since we run Cypress locally or in a container, it is necessary to triple emails.
+This is done by the SMTP relay triplicator `jbt_relay`.
 
-To see these emails and also emails from manual testing Joomla,
-like the password reset email the SMTP relay triplicator`jbt_relay`
-
-:fairy: Oh, dear Gnome, now I can really read all the emails from the system tests, thank you.
+:fairy: Oh, dear Gnome, now I can really read all the emails from the System Tests, thank you.
 
 <details>
-  <summary>:imp: "Postal dispatch nonsense picture? Don't open it, you'll get a headache!</summary>
+  <summary>:imp: "Postal dispatch nonsense picture? Don't open it, you'll get a triple headache!</summary>
 
 ---
 
