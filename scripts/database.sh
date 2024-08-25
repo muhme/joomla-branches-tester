@@ -62,23 +62,26 @@ for version in "${versionsToChange[@]}"; do
     cypress.config.dist.mjs > cypress.config.mjs"
 
   # Create second Cypress config file for running local
-  # Using localhost from outside Docker and the mapped database port
+  # Using host.docker.internal to have it reachable from outside for Cypress and inside web server container
   log "jbt_${version} – Create additional cypress.config.local.mjs with using localhost and database port ${dbport}"
   docker exec -it "jbt_${version}" bash -c "cd /var/www/html && sed \
-    -e \"s/db_host: .*/db_host: 'localhost',/\" \
+    -e \"s/db_host: .*/db_host: 'host.docker.internal',/\" \
     -e \"s/db_port: .*/db_port: '$dbport',/\" \
     -e \"s/baseUrl: .*/baseUrl: 'http:\/\/localhost:70${version}\/',/\" \
     -e \"s/smtp_host: .*/smtp_host: 'localhost',/\" \
     -e \"s/smtp_port: .*/smtp_port: '7325',/\" \
     cypress.config.mjs > cypress.config.local.mjs"
 
-  # 'Hack' until PR with setting db_port is supported - overwrite with setting db_port in joomla-cypress and System Tests
-  # (Only used later if we run Cypress GUI)
-  # Don't use sed inplace editing as not supported by macOS, do it in Docker container as owner is www-data
-  docker exec -it "jbt_${version}" bash -c "
-    cd /var/www/html/tests/System/integration/install
-    sed '/db_host: Cypress.env('\"'\"'db_host'\"'\"'),/a\\      db_port: Cypress.env('\"'\"'db_port'\"'\"'), // muhme, 9 August 2024 \"hack\" as long as waiting for PR' Installation.cy.js > Installation.cy.js.tmp
-    mv Installation.cy.js.tmp Installation.cy.js"
+  # - 'Hack' until PR https://github.com/joomla/joomla-cms/pull/43968 with set db_port is merged in all! active branches.
+  # - Only used in Cypress GUI in spec Installation.cy.js
+  # - Don't use sed inplace editing as not supported by macOS, do it in Docker container as owner is www-data
+  if ! grep -q "db_port" "branch_${version}/tests/System/integration/install/tests/Installation.cy.js"; then
+    docker exec -it "jbt_${version}" bash -c "
+      cd /var/www/html/tests/System/integration/install
+      sed '/db_host: Cypress.env('\"'\"'db_host'\"'\"'),/a\\      db_port: Cypress.env('\"'\"'db_port'\"'\"'), // muhme, 9 August 2024 \"hack\" waiting for PR https://github.com/joomla/joomla-cms/pull/43968' Installation.cy.js > Installation.cy.js.tmp
+      mv Installation.cy.js.tmp Installation.cy.js"
+  fi
+  #  - overwrite with setting db_port in joomla-cypress and System Tests
   docker cp scripts/joomla.js "jbt_${version}:/var/www/html/node_modules/joomla-cypress/src/joomla.js"
 
   # Since the database will be new, we clean up autoload classes cache file and
