@@ -56,7 +56,7 @@ do
     elif [ -f "${cf}.mjs" ]; then
       cf="${cf}.mjs"
     else
-      error "No 'cypress.config.*js' file found in branch_${version}, please have a look"
+      error "No 'cypress.config.*js' file found in branch_${version}. Please use 'scripts/create.sh' first."
       exit 1
     fi
     # Create spec pattern list without installation spec
@@ -72,8 +72,7 @@ do
     fi
   fi
 
-  branch=$(branchName "${version}")
-  log "Testing ${branch} ${spec}"
+  log "Testing version ${version} with ${spec}."
   docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && ${eel1} cypress run ${browser} ${spec}"
   if [ $? -eq 0 ] ; then
     # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
@@ -84,7 +83,7 @@ do
 done
 
 if [ ${failed} -eq 0 ] ; then
-  log "Completed ${versionsToTest[@]} with ${successful} successful ${spec}"
+  log "Completed version ${versionsToTest[@]} with ${successful} successful ${spec}."
 else
-  error "Completed ${versionsToTest[@]} with ${failed} failed and ${successful} successful ${spec}"
+  error "Completed version ${versionsToTest[@]} with ${failed} failed and ${successful} successful ${spec}."
 fi

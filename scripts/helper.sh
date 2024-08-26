@@ -5,6 +5,9 @@
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
+# Record the start time in seconds since 1.1.1970
+start_time=$(date +%s)
+
 # Database and database driver variants as in configuration.php 'dbtype'
 JBT_DB_VARIANTS=("mysqli" "mysql" "mariadbi" "mariadb" "pgsql")
 # Database driver mapping for the variants as in Web Installer 'database type'
@@ -81,7 +84,7 @@ function dbTypeForVariant() {
             return
         fi
     done
-    error "No database type found for variant'$1'"
+    error "No database type found for variant '$1'"
 }
 
 # Get database host for variant
@@ -94,7 +97,7 @@ function dbHostForVariant() {
             return
         fi
     done
-    error "No database host found for variant'$1'"
+    error "No database host found for variant '$1'"
 }
 
 # Get database host for variant
@@ -107,7 +110,7 @@ function dbPortForVariant() {
             return
         fi
     done
-    error "No database host found for variant'$1'"
+    error "No database port found for variant '$1'"
 }
 
 # Check if the given argument is a valid database variant
@@ -126,7 +129,7 @@ function isValidVariant() {
 # argument is e.g. "52" or "44 51 52 60"
 #
 function createDockerComposeFile() {
-    log "Create 'docker-compose.yml' file for $1"
+    log "Create 'docker-compose.yml' file for $1."
 
     local versions=()
     IFS=' ' versions=($(sort <<<"$1"))
@@ -185,6 +188,31 @@ if [ -n "$NO_COLOR" ]; then
     JBT_RESET=""
 fi
 
+# Return running time e.g. as "17 seconds" or as "3:18"
+runningTime() {
+    # Record the actual time in seconds since 1.1.1970
+    actual_time=$(date +%s)
+
+    # Calculate the elapsed time in minutes and seconds
+    elapsed_time=$((actual_time - start_time))
+    minutes=$((elapsed_time / 60))
+    seconds=$((elapsed_time % 60))
+
+    # Having seconds also formatted with a leading zero
+    formatted_seconds=$(printf "%02d" $seconds)
+
+    # Human readable outbut
+    if [ $minutes -gt 0 ]; then
+        echo "${minutes}:${formatted_seconds}"
+    else
+        if [ $seconds -eq 1 ]; then
+            echo "1 second"
+        else 
+            echo "${seconds} seconds"
+        fi
+    fi
+}
+
 # Give log message with date and time in bold and green background on stdout
 #
 log() {
@@ -203,7 +231,20 @@ error() {
 # Show a red messge with script name and line number.
 #
 errorHandler() {
-    error "An error occurred, probably in script $(basename "$0") in line $1."
+    error "An error occurred, probably in script '$(basename "$0")' in line $1."
+    error "Script '$(basename "$0")' failed after $(runningTime)."
+    trap - EXIT
     exit 1
 }
 trap 'errorHandler $LINENO' ERR
+
+# This is the end.
+#
+theEnd() {
+    log "Script '$(basename "$0")' finished in $(runningTime)."
+}
+trap theEnd EXIT
+
+# No, every end is a new beginning :)
+#
+log "Script '$(basename "$0")' started."

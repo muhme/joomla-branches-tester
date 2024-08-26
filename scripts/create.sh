@@ -13,14 +13,12 @@ source scripts/helper.sh
 # Zeroth check host.docker.internal entry
 HOSTS_FILE="/etc/hosts"
 if grep -Eq "127.0.0.1[[:space:]]+host.docker.internal" "$HOSTS_FILE"; then
-  log "Entry '127.0.0.1 host.docker.internal' exists in file '${HOSTS_FILE}' - thx :)"
+  log "Entry '127.0.0.1 host.docker.internal' already exists in the file '${HOSTS_FILE}'"
 else
-  error "Entry '127.0.0.1 host.docker.internal' is missing in file '${HOSTS_FILE}' - try to add"
+  log "Adding entry '127.0.0.1 host.docker.internal' to the file '${HOSTS_FILE}'."
   sudo sh -c "echo '127.0.0.1 host.docker.internal' >> $HOSTS_FILE"
-  if grep -Eq "127.0.0.1[[:space:]]+host.docker.internal" "$HOSTS_FILE"; then
-    log "Entry '127.0.0.1 host.docker.internal' added in file '${HOSTS_FILE}'"
-  else
-    error "Entry '127.0.0.1 host.docker.internal' is missing in file '${HOSTS_FILE}' - please add"
+  if ! grep -Eq "127.0.0.1[[:space:]]+host.docker.internal" "$HOSTS_FILE"; then
+    error "Please add entry '127.0.0.1 host.docker.internal' to the file '${HOSTS_FILE}'."
     exit 1
   fi
 fi
@@ -44,7 +42,7 @@ if [ $# -ge 1 ] && [ "$1" != "no-cache" ] ; then
     database_variant=($1)
     shift # argument is eaten as database variant
   else
-    error "'$1' is not a valid selection for database and database driver, use one of ${JBT_DB_VARIANTS[@]}"
+    error "'$1' is not a valid selection for database and database driver. Please use one of ${JBT_DB_VARIANTS[@]}."
     exit 1
   fi
 fi
@@ -59,30 +57,30 @@ if [ "${versionsToInstall[*]}" != "${allVersions[*]}" ]; then
 fi
 
 if [ $# -eq 1 ] && [ "$1" = "no-cache" ]; then
-  log "Docker compose build --no-cache"
+  log "Running 'docker compose build --no-cache'."
   docker compose build --no-cache
 fi
 
-log "Docker compose up"
+log "Running 'docker compose up'."
 docker compose up -d
 
 # Wait until MySQL database is up and running
 MAX_ATTEMPTS=60
 attempt=1
 until docker exec jbt_mysql mysqladmin ping -h"127.0.0.1" --silent || [ $attempt -eq $MAX_ATTEMPTS ]; do
-  log "Waiting for MySQL to be ready, attempt $attempt/$MAX_ATTEMPTS"
+  log "Waiting for MySQL to be ready, attempt $attempt of $MAX_ATTEMPTS."
   attempt=$((attempt + 1))
   sleep 1
 done
 
 # For the tests we need mysql user/password login
-log "jbt_${version} – Enable MySQL user root login with password"
+log "jbt_${version} – Enable MySQL user root login with password."
 docker exec -it jbt_mysql mysql -uroot -proot -e "ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'root';"
 # And for MariaDB too
-log "jbt_${version} – Enable MariaDB user root login with password"
+log "jbt_${version} – Enable MariaDB user root login with password."
 docker exec -it jbt_madb mysql -uroot -proot -e  "ALTER USER 'root'@'%' IDENTIFIED BY 'root';"
 # And Postgres (which have already user postgres with SUPERUSER, but to simplify we will use same user root on postgres)
-log "jbt_${version} – Create PostgreSQL user root with password root and SUPERUSER role"
+log "jbt_${version} – Create PostgreSQL user root with password root and SUPERUSER role."
 docker exec -it jbt_pg sh -c "\
   psql -U postgres -c \"CREATE USER root WITH PASSWORD 'root';\" && \
   psql -U postgres -c \"ALTER USER root WITH SUPERUSER;\""
@@ -93,22 +91,22 @@ for version in "${versionsToInstall[@]}"; do
   max_retries=120
   for ((i = 1; i < $max_retries; i++)); do
     docker logs "jbt_${version}" 2>&1 | grep 'This server is now configured to run Joomla!' && break || {
-      log "Waiting for original Joomla installation, attempt ${i}/${max_retries}"
+      log "Waiting for original Joomla installation, attempt ${i} of ${max_retries}."
       sleep 1
     }
   done
   if [ $i -ge $max_retries ]; then
-    error "Failed after $max_retries attempts, giving up"
+    error "Failed after $max_retries attempts. Giving up."
     exit 1
   fi
-  log "jbt_${version} – Deleting orignal Joomla installation"
+  log "jbt_${version} – Deleting orignal Joomla installation."
   docker exec -it "jbt_${version}" bash -c 'rm -rf /var/www/html/* && rm -rf /var/www/html/.??*'
 
   # Move away the disabled PHP error logging.
-  log "jbt_${version} – Show PHP warnings"
+  log "jbt_${version} – Configure to display PHP warnings."
   docker exec -it "jbt_${version}" bash -c 'mv /usr/local/etc/php/conf.d/error-logging.ini /usr/local/etc/php/conf.d/error-logging.ini.DISABLED'
 
-  log "jbt_${version} – Installing packages"
+  log "jbt_${version} – Installing additional packages."
   docker exec -it "jbt_${version}" bash -c 'apt-get update -qq && \
     apt-get upgrade -y && \
     curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
@@ -116,16 +114,16 @@ for version in "${versionsToInstall[@]}"; do
   # Aditional having vim, ping, netstat
 
   branch=$(branchName "${version}")
-  log "jbt_${version} – cloning ${branch} branch into directory branch_${version}"
+  log "jbt_${version} – Cloning the ${branch} branch into the 'branch_${version}' directory."
   docker exec -it "jbt_${version}" bash -c "git clone -b ${branch} --depth 1 https://github.com/joomla/joomla-cms /var/www/html"
 
   if [ "$version" -ge 51 ]; then
-    log "Install missing libraries in container jbt_${version}"
+    log "jbt_${version} – Installing missing libraries."
     docker exec -it "jbt_${version}" bash -c "cd /var/www/html && \
       apt-get install -y libzip4 libmagickwand-6.q16-6 libmemcached11"
   fi
 
-  log "jbt_${version} – Composer install"
+  log "jbt_${version} – Running composer install."
   docker exec -it "jbt_${version}" bash -c "cd /var/www/html && \
     php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\" && \
     php composer-setup.php && \
@@ -133,16 +131,16 @@ for version in "${versionsToInstall[@]}"; do
     mv composer.phar /usr/local/bin/composer && \
     composer install"
 
-  log "jbt_${version} – npm clean install"
+  log "jbt_${version} – Running npm clean install."
   docker exec -it "jbt_${version}" bash -c 'cd /var/www/html && npm ci'
 
-  log "jbt_${version} – Change root ownership to www-data"
+  log "jbt_${version} – Changing ownership to www-data for all files and directories."
   # Following error seen on macOS, we ignore it as it does not matter, these files are 444
   # chmod: changing permissions of '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
   docker exec -it "jbt_${version}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true'
 
   # Joomla container needs to be restarted
-  log "jbt_${version} – Restart container"
+  log "jbt_${version} – Restarting container."
   docker restart "jbt_${version}"
 
   # Configure and install Joomla with desired database variant
@@ -150,7 +148,5 @@ for version in "${versionsToInstall[@]}"; do
 
 done
 
-log "Aditional having vim, ping and netstat in jbt_cypress container"
+log "Installing vim, ping, and netstat in the 'jbt_cypress' container."
 docker exec -it jbt_cypress sh -c "apt-get update && apt-get install -y git vim iputils-ping net-tools"
-
-log "Work is done, you can now use scripts/tests.sh for System Tests or scripts/patchtester.sh to install Joomla Test Patcher"

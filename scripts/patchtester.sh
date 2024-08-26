@@ -24,7 +24,7 @@ elif [[ "${JBT_GITHUB_TOKEN}" = ghp_* ]]; then
   token="${JBT_GITHUB_TOKEN}"
   log "Use GitHub token from the environment variable JBT_GITHUB_TOKEN"
 else
-  error "Error: Argument with GitHub personal access token 'ghp_*' is missing."
+  error "Please give argument with GitHub personal access token 'ghp_*'."
   exit 1
 fi
 
@@ -33,7 +33,11 @@ successful=0
 for version in "${versionsToInstall[@]}"
 do
   branch=$(branchName "${version}")
-  log "Install Joomla Patch Tester in ${branch}"
+  if [ ! -d "branch_${version}" ]; then
+    log "jbt_${version} – There is no directory 'branch_${version}', jumped over."
+    continue
+  fi
+  log "jbt_${version} – Installing Joomla Patch Tester."
   docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && cypress run --env token=${token} --config specPattern=/jbt/scripts/patchtester.cy.js"
   if [ $? -eq 0 ] ; then
     # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
@@ -44,7 +48,7 @@ do
 done
 
 if [ ${failed} -eq 0 ] ; then
-  log "Completed ${versionsToInstall[@]} with ${successful} successful"
+  log "Completed ${versionsToInstall[@]} with ${successful} successful."
 else
-  error "Completed ${versionsToInstall[@]} with ${failed} failed and ${successful} successful"
+  error "Completed ${versionsToInstall[@]} with ${failed} failed and ${successful} successful."
 fi

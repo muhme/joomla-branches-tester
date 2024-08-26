@@ -12,19 +12,19 @@ source scripts/helper.sh
 versions=$(getVersions)
 
 if [ $# -lt 1 ]; then
-  error "Needs one argument with version number from $versions"
+  error "Please give one argument with version number from ${versions}."
   exit 1
 fi
 
 if isValidVersion "$1" "$versions"; then
   version="$1"
 else
-  error "Version number argument have to be from $versions"
+  error "Please use a version number from ${versions}."
   exit 1
 fi
 
 if [ $# -eq 2 ] && [ "$2" != "local" ]; then
-  error "Only 'local' is possible as the second argument"
+  error "Please use 'local' as second argument."
   exit 1
 fi
 
@@ -33,18 +33,18 @@ if [ "$2" = "local" ]; then
   cd "branch_${version}"
   # Install smtp-tester, if needed (after )
   if [ ! -d node_modules/smtp-tester ]; then
-     log "Install smtp-tester"
+     log "Installing smtp-tester."
      npm install smtp-tester --save-dev
   fi
   # Install the Cypress version used in this branch, if needed
-  log "Install Cypress, if needed"
+  log "Installing Cypress if needed."
   npm install cypress --save-dev
   # it was needed on Ubuntu to run again with npx
   npx cypress install 
-  log "Open local installed Cypress GUI for ${version}"
+  log "Open locally installed Cypress GUI for version ${version}."
   npx cypress open --e2e --project . --config-file cypress.config.local.mjs
   # By the way, the same way it is possible to run Cypress headless from Docker host
 else
-  log "Open jbt_cypress container Cypress GUI for ${version}"
+  log "Open jbt_cypress container Cypress GUI for version ${version}."
   docker exec -it jbt_cypress bash -c "cd \"/jbt/branch_${version}\" && cypress open --env smtp_port=7325 --e2e --project ."
 fi

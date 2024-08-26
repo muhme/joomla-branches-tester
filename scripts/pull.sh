@@ -13,7 +13,7 @@ trap 'rm -rf $TMP' 0
 source scripts/helper.sh
 
 if [ $# -gt 1 ] ; then
-  error "Only one argument with version number is possible"
+  error "Please use no or one argument with a version number."
   exit 1
 fi
 
@@ -25,7 +25,7 @@ if [ $# -eq 1 ] ; then
     versionsToPull=($1)
     shift # 1st arg is eaten as the version number
   else
-    error "Version number argument have to be from ${versions}"
+    error "Please use a version from: ${versions}."
     exit 1
   fi
 fi
@@ -35,31 +35,31 @@ for version in "${versionsToPull[@]}"
 do
   branch=$(branchName "${version}")
   if [ ! -d "branch_${version}" ]; then
-    log "jbt_${version} – There is no directory 'branch_${version}', jumped over"
+    log "jbt_${version} – There is no directory 'branch_${version}', jumped over."
     continue
   fi
-  log "jbt_${version} – Running Git fetch origin for ${branch}"
+  log "jbt_${version} – Running Git fetch origin for ${branch}."
   # Prevent dubious ownership in repository
   docker exec -it "jbt_${version}" sh -c "git config --global --add safe.directory /var/www/html"
   if docker exec -it "jbt_${version}" sh -c 'git fetch origin && [ "$(git rev-parse HEAD)" = "$(git rev-parse origin/$(git rev-parse --abbrev-ref HEAD))" ]' ; then
-    log "jbt_${version} – Local Git clone for branch ${branch} is up to date"
+    log "jbt_${version} – Local Git clone for branch ${branch} is up to date."
   else
-    log "jbt_${version} – Running git pull"
+    log "jbt_${version} – Running git pull."
     cp "branch_${version}/package-lock.json" "${TMP}"
     docker exec -it "jbt_${version}" sh -c "git pull"
-    log "jbt_${version} – Running composer install, just in case"
+    log "jbt_${version} – Running composer install, just in case."
     docker exec -it "jbt_${version}" sh -c "composer install"
     if diff -q "branch_${version}/package-lock.json" "$TMP" >/dev/null; then
-      log "jbt_${version} – No changes in package-lock.json, skipping npm ci"
+      log "jbt_${version} – No changes in file 'package-lock.json', skipping npm ci."
     else
-      log "jbt_${version} – Changes detected in package-lock.json, running npm ci"
+      log "jbt_${version} – Changes detected in file 'package-lock.json', running npm ci."
       docker exec -it "jbt_${version}" sh -c "npm ci"
     fi
     # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
     pulled=$((pulled + 1))
   fi
-  log "jbt_${version} – Showing Git status for branch ${branch}"
+  log "jbt_${version} – Showing Git status for branch ${branch}."
   docker exec -it "jbt_${version}" sh -c "git status"
 done
 
-log "Completed ${versionsToPull[@]} with ${pulled} pull's"
+log "Completed ${versionsToPull[@]} with ${pulled} pull's."

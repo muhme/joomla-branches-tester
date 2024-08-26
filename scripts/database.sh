@@ -21,7 +21,7 @@ if isValidVersion "$1" "$versions"; then
 fi
 
 if [ $# -lt 1 ] ; then
-  error "Desired selection of database and driver is missing, use one of ${JBT_DB_VARIANTS[@]}"
+  error "Desired database and driver selection is missing. Please use one of: ${JBT_DB_VARIANTS[@]}."
   exit 1
 fi
 
@@ -32,13 +32,13 @@ if isValidVariant "$1"; then
   dbport=$(dbPortForVariant "$variant")
   shift # argument is eaten
 else
-  error "'$1' is not a valid selection for database and database driver, use one of ${JBT_DB_VARIANTS[@]}"
+  error "'$1' is not a valid selection for the database and driver. Please use one of: ${JBT_DB_VARIANTS[@]}."
   exit 1
 fi
 
 for version in "${versionsToChange[@]}"; do
 
-  log "jbt_${version} – Create cypress.config.mjs for variant ${variant} (driver '${dbtype}' host '${dbhost}')"
+  log "jbt_${version} – Create 'cypress.config.mjs' file for variant ${variant} (driver '${dbtype}' host '${dbhost}')."
 
   # adopt e.g.:
   #   db_type: 'PostgreSQL (PDO)',
@@ -66,7 +66,7 @@ for version in "${versionsToChange[@]}"; do
 
   # Create second Cypress config file for running local
   # Using host.docker.internal to have it reachable from outside for Cypress and inside web server container
-  log "jbt_${version} – Create additional cypress.config.local.mjs with using localhost and database port ${dbport}"
+  log "jbt_${version} – Create additional 'cypress.config.local.mjs' file with using localhost and database port ${dbport}."
   docker exec -it "jbt_${version}" bash -c "cd /var/www/html && sed \
     -e \"s/db_host: .*/db_host: 'host.docker.internal',/\" \
     -e \"s/db_port: .*/db_port: '$dbport',/\" \
@@ -81,9 +81,9 @@ for version in "${versionsToChange[@]}"; do
   # - Don't use sed inplace editing as not supported by macOS, do it in Docker container as owner is www-data
 
   if grep -q "db_port" "branch_${version}/tests/System/integration/install/Installation.cy.js"; then
-    log "jbt_${version} – Patch for https://github.com/joomla/joomla-cms/pull/43968 is already applied"
+    log "jbt_${version} – Patch https://github.com/joomla/joomla-cms/pull/43968 has already been applied."
   else
-    log "jbt_${version} – Applying patch for https://github.com/joomla/joomla-cms/pull/43968 Add db_port in Installation.cy.js"
+    log "jbt_${version} – Applying changes as in https://github.com/joomla/joomla-cms/pull/43968."
     docker exec -it "jbt_${version}" bash -c "
       cd /var/www/html/tests/System/integration/install
       sed '/db_host: Cypress.env('\"'\"'db_host'\"'\"'),/a\\      db_port: Cypress.env('\"'\"'db_port'\"'\"'), // muhme, 9 August 2024 \"hack\" waiting for PR https://github.com/joomla/joomla-cms/pull/43968' Installation.cy.js > Installation.cy.js.tmp
@@ -110,7 +110,7 @@ EOF
   # Check if the patch is already there
   PATCHED="branch_${version}/node_modules/joomla-cypress/src/joomla.js"
   if grep -q "${SEARCH_LINE}" "${PATCHED}"; then
-    log "jbt_${version} – Applying patch for https://github.com/joomla-projects/joomla-cypress/pull/33 Install Joomla with non-standard db_port"
+    log "jbt_${version} – Applying changes as in https://github.com/joomla-projects/joomla-cypress/pull/33."
     while IFS= read -r line; do
       if [[ "$line" == *"$SEARCH_LINE"* ]]; then
         # Insert the patch
@@ -129,7 +129,7 @@ EOF
     # if copying the file has failed, start a second attempt with sudo
     cp "${TMP}" "${PATCHED}" || sudo cp "${TMP}" "${PATCHED}"
   else
-    log "jbt_${version} – Patch for https://github.com/joomla-projects/joomla-cypress/pull/33 is already applied"
+    log "jbt_${version} – Patch https://github.com/joomla-projects/joomla-cypress/pull/33 has already been applied."
   fi
 
   # Since the database will be new, we clean up autoload classes cache file and
@@ -141,17 +141,16 @@ EOF
     rm -rf media/com_patchtester administrator/cache/autoload_psr4.php"
 
   # Using Install Joomla from System Tests
-  log "jbt_${version} – Cypress based Joomla installation"
+  log "jbt_${version} – Cypress-based Joomla installation."
   docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && cypress run --spec tests/System/integration/install/Installation.cy.js"
 
   # Cypress is using own SMTP port to read and reset mails by smtp-tester
-  log "jbt_${version} – Set Cypress SMTP port to 7125"
+  log "jbt_${version} – Set the SMTP port used by Cypress to 7125."
   docker exec -it "jbt_${version}" bash -c "cd /var/www/html && sed \
     -e \"s/smtp_port: .*/smtp_port: '7125',/\" \
     cypress.config.mjs > cypress.config.mjs.tmp && \
     mv cypress.config.mjs.tmp cypress.config.mjs"
 
-  log "jbt_${version} – ${variant} based Joomla is installed"
-  echo ""
+  log "jbt_${version} – Joomla based on the $(branchName ${variant}) Git branch is installed."
 
 done
