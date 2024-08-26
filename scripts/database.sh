@@ -151,6 +151,11 @@ EOF
     cypress.config.mjs > cypress.config.mjs.tmp && \
     mv cypress.config.mjs.tmp cypress.config.mjs"
 
+  log "jbt_${version} – Changing ownership to www-data for all files and directories."
+  # Following error seen on macOS, we ignore it as it does not matter, these files are 444
+  # chmod: changing permissions of '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
+  docker exec -it "jbt_${version}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true'
+
   log "jbt_${version} – Joomla based on the $(branchName ${variant}) Git branch is installed."
 
 done
