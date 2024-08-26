@@ -7,6 +7,9 @@
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
+TMP=/tmp/$(basename $0).$$
+trap 'rm -rf $TMP' 0
+
 source scripts/helper.sh
 
 if [ $# -gt 1 ] ; then
@@ -27,25 +30,36 @@ if [ $# -eq 1 ] ; then
   fi
 fi
 
-failed=0
-successful=0
+pulled=0
 for version in "${versionsToPull[@]}"
 do
   branch=$(branchName "${version}")
-  log "Running git pull on ${branch}"
-  docker exec -it "jbt_${version}" sh -c "git config --global --add safe.directory /var/www/html && git pull"
-  if [ $? -eq 0 ] ; then
-    # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
-    successful=$((successful + 1))
-  else
-    failed=$((failed + 1))
+  if [ ! -d "branch_${version}" ]; then
+    log "jbt_${version} – There is no directory 'branch_${version}', jumped over"
+    continue
   fi
-  log "Showing git status on ${branch}"
+  log "jbt_${version} – Running Git fetch origin for ${branch}"
+  # Prevent dubious ownership in repository
+  docker exec -it "jbt_${version}" sh -c "git config --global --add safe.directory /var/www/html"
+  if docker exec -it "jbt_${version}" sh -c 'git fetch origin && [ "$(git rev-parse HEAD)" = "$(git rev-parse origin/$(git rev-parse --abbrev-ref HEAD))" ]' ; then
+    log "jbt_${version} – Local Git clone for branch ${branch} is up to date"
+  else
+    log "jbt_${version} – Running git pull"
+    cp "branch_${version}/package-lock.json" "${TMP}"
+    docker exec -it "jbt_${version}" sh -c "git pull"
+    log "jbt_${version} – Running composer install, just in case"
+    docker exec -it "jbt_${version}" sh -c "composer install"
+    if diff -q "branch_${version}/package-lock.json" "$TMP" >/dev/null; then
+      log "jbt_${version} – No changes in package-lock.json, skipping npm ci"
+    else
+      log "jbt_${version} – Changes detected in package-lock.json, running npm ci"
+      docker exec -it "jbt_${version}" sh -c "npm ci"
+    fi
+    # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
+    pulled=$((pulled + 1))
+  fi
+  log "jbt_${version} – Showing Git status for branch ${branch}"
   docker exec -it "jbt_${version}" sh -c "git status"
 done
 
-if [ ${failed} -eq 0 ] ; then
-  log "Completed ${versionsToTest[@]} with ${successful} successful ${spec}"
-else
-  error "Completed ${versionsToTest[@]} with ${failed} failed and ${successful} successful ${spec}"
-fi
+log "Completed ${versionsToPull[@]} with ${pulled} pull's"
