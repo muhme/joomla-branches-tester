@@ -1,8 +1,9 @@
 #!/bin/bash -e
 #
-# graft.sh - Place Joomla package onto development branch
-#   graft.sh 51 ~/Downloads/Joomla_5.0.0-alpha1-Alpha-Update_Package.tar.bz2
-#   graft.sh 51 pgsql ~/Downloads/Joomla_5.1.2-Stable-Full_Package.zip
+# graft.sh - Place Joomla package onto development branch.
+#            Just like in plant grafting, where a scion is joined to a rootstock.
+#   scripts/graft.sh 52 ~/Downloads/Joomla_5.2.0-alpha4-dev-Development-Full_Package.zip
+#   scripts/graft.sh 51 pgsql ~/Downloads/Joomla_5.1.2-Stable-Full_Package.zip
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
@@ -21,18 +22,18 @@ fi
 
 if isValidVersion "$1" "$versions"; then
   version="$1"
-  shift # version number is eaten
+  shift # Version number is eaten.
 else
   error "Please use as version number one of: ${versions}."
   exit 1
 fi
 
-# Defauls to use MariaDB with MySQLi database driver, but different one can be given
+# Defauls to use MariaDB with MySQLi database driver, but different one can be given.
 database_variant="mariadbi"
 if [ $# -eq 2 ]; then
   if isValidVariant "$1"; then
     database_variant=($1)
-    shift # argument is eaten as database variant
+    shift # Argument is eaten as database variant.
   else
     error "'$1' is not a valid selection for database and driver. Please use one of ${JBT_DB_VARIANTS[@]}."
     exit 1
@@ -43,9 +44,10 @@ if [ $# -ne 1 ]; then
   error "Missing Joomla package argument. Please give local file e.g. Joomla_5.1.2-Stable-Full_Package.zip."
   exit 1
 fi
-# Convert relative path to absolute path if necessary, as we need to do change the directory. 
+
+# Convert relative path to absolute path if necessary, as we need to change the working directory. 
 if [[ "$1" != /* ]]; then
-    # It's a relative path
+    # It's a relative path.
     package="$(pwd)/$FILE_PATH"
 else
   package="$1"
@@ -101,24 +103,23 @@ case "$package" in
 esac
 cd ..
 
-# Joomla container needs to be restarted to have the new folder
+# Joomla container needs to be restarted to access the new folder.
 log "Restarting Docker containers."
 docker restart "jbt_${version}"
 docker restart "jbt_cypress"
 
 log "Changing ownership to www-data for all files and directories."
-# Following error seen on macOS, we ignore it as it does not matter, these files are 444
+# Following error seen on macOS, we ignore it as it does not matter, these files are all 444.
 # chmod: changing permissions of '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
 docker exec -it "jbt_${version}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true'
 
 # For stable releases the Joomla Web Installer stops with different 'We detected development mode' Congratulations!
-# screen and you have to click in either 'Open Site' or 'Open Administrator' or all URLS ends in Web Installer.
+# screen and you have to click in either 'Open Site' or 'Open Administrator' or all URLs end in Web Installer.
 #   public const DEV_STATUS = 'Development';
 #   public const DEV_STATUS = 'Stable';
-
 if grep -q "public const DEV_STATUS = 'Stable';" "branch_${version}/libraries/src/Version.php"; then
   log "Stable Joomla version detected."
-  # Check if the patch is already there
+  # Is the patch already there?
   PATCHED="branch_${version}/node_modules/joomla-cypress/src/joomla.js"
   if grep -q "button.complete-installation" "${PATCHED}"; then
     log "jbt_${version} – Patch https://github.com/joomla-projects/joomla-cypress/pull/35 has already been applied."
@@ -140,15 +141,15 @@ if grep -q "public const DEV_STATUS = 'Stable';" "branch_${version}/libraries/sr
         echo "  }"
         echo "})"
       fi
-      # Always print the original line
+      # Always print the original line.
       echo "$line"
     done < "${PATCHED}" > "${TMP}"
-    # if copying the file has failed, start a second attempt with sudo
+    # If copying the file has failed, start a second attempt with sudo.
     cp "${TMP}" "${PATCHED}" || sudo cp "${TMP}" "${PATCHED}"
   fi
 fi
 
-# Configure and install Joomla with desired database variant
+# Configure and install Joomla with desired database variant.
 scripts/database.sh "${version}" "$database_variant"
 
 package_file=$(basename $package)
