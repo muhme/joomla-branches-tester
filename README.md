@@ -8,7 +8,7 @@ Imagine a little slice of a parallel universe where testing all five active Joom
 Alright, alright, apologies to those who enjoyed the whimsical writing style, but now it's time to dive into the technical depths. Let's transition from the cozy, magical universe into the world of technical documentation, where we'll explore the numerous options, parameters, and configurations that power this experience ...
 
 ## Software Architecture
-All active Joomla development branches run in parallel in a [Docker](https://www.docker.com/) container environment.
+All active Joomla development branches with the different Joomla versions run in parallel in a [Docker](https://www.docker.com/) container environment.
 Use one or all branches for:
 * Manual testing, including database inspections and email verifications.
 * [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System)
@@ -30,20 +30,20 @@ They are based on the `branch_*` folders, which are also available on the Docker
 
 :point_right: The version numbers referenced are current as of early August 2024.
               Since active branches are subject to frequent changes,
-              the latest version numbers can always be retrieved directly from the `joomla-cms` repository.
+              the latest version numbers are always be retrieved directly from the `joomla-cms` repository.
               As of late August 2024, a fifth active branch, `5.3-dev`, has been introduced.
               Consequently, five web servers are now configured to accommodate this change.
 
 On the right you see three blue containers with the databases MySQL, MariaDB and PostgreSQL.
 To be able to check the databases, two further blue containers with phpMyAdmin and pgAdmin are installed.
-A green Docker container Cypress to run tests with GUI or headless.
+The green Docker container runs Cypress based Joomla System Tests with GUI or headless.
 If you need to inspect a failed test spec, you can run Cypress with the interactive GUI.
 
-The two red mail containers duplicate all emails from manual Joomla tests or System Tests and
+The two red mail containers triplicate all emails from manual Joomla tests or System Tests and
 make them readable via a web application.
 
 The `/scripts` folder contains all the scripts and also configuration files.
-It is assumed that your current working directory is `joomla-branches-tester` all the time.
+Your current working directory must always be `joomla-branches-tester`.
 
 On the Docker Host system (left side), your red web browser is running.
 On macOS and Ubuntu, the native Cypress GUI is shown in green.
@@ -62,14 +62,14 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
 
 |Name|Host Port:<br />Container Inside|Directory :eight_spoked_asterisk: |Comment|
 |----|----|----------------------------------|-------|
-|jbt_44| **[7044](http://localhost:7044/administrator)** | /branch_44 | Web Server Joomla branch 4.4-dev<br />PHP 8.1, ci-admin / joomla-17082005 |
-|jbt_51| **[7051](http://localhost:7051/administrator)** | /branch_51 | Web Server Joomla branch 5.1-dev<br />PHP 8.2, ci-admin / joomla-17082005 |
-|jbt_52| **[7052](http://localhost:7052/administrator)** | /branch_52 | Web Server Joomla branch 5.2-dev<br />PHP 8.2, ci-admin / joomla-17082005 |
-|jbt_53| **[7053](http://localhost:7053/administrator)** | /branch_53 | Web Server Joomla branch 5.3-dev<br />PHP 8.2, ci-admin / joomla-17082005 |
-|jbt_60| **[7060](http://localhost:7060/administrator)** | /branch_60 | Web Server Joomla branch 6.0-dev<br />PHP 8.2, ci-admin / joomla-17082005 |
+|jbt_44| **[7044](http://localhost:7044/administrator)** | /branch_44 | Web Server Joomla branch 4.4-dev<br />user ci-admin / joomla-17082005 |
+|jbt_51| **[7051](http://localhost:7051/administrator)** | /branch_51 | Web Server Joomla branch 5.1-dev<br />user ci-admin / joomla-17082005 |
+|jbt_52| **[7052](http://localhost:7052/administrator)** | /branch_52 | Web Server Joomla branch 5.2-dev<br />user ci-admin / joomla-17082005 |
+|jbt_53| **[7053](http://localhost:7053/administrator)** | /branch_53 | Web Server Joomla branch 5.3-dev<br />user ci-admin / joomla-17082005 |
+|jbt_60| **[7060](http://localhost:7060/administrator)** | /branch_60 | Web Server Joomla branch 6.0-dev<br />user ci-admin / joomla-17082005 |
 |jbt_mysql| **7011**:3306 | | Database Server MySQL version 8.1 |
 |jbt_madb| **7012**:3306 | | Database Server MariaDB version 10.4 |
-|jbt_pg| **7013**:5432 | | Database Server PostgrSQL version 12.20 |
+|jbt_pg| **7013**:5432 | | Database Server PostgreSQL version 12.20 |
 |jbt_cypress| SMTP :7125 | | Cypress Headless Test Environment<br />SMTP server is only running during test execution |
 |jbt_phpmya| **[7001](http://localhost:7001)** | | Web App to manage MariaDB and MySQL<br />auto-login configured, root / root |
 |jbt_pga| **[7002](http://localhost:7002)** | | Web App to manage PostgreSQL<br />auto-login configured, root / root, postgres / prostgres |
@@ -82,18 +82,17 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
 * To inspect screenshots from failed tests or
 * To inspect and hack the Joomla sources from Docker host system.
 
-:point_right: Using `host.docker.internal` allows to maintain consistent hostnames and URLs between containers and
-              the Docker host machine. However, there is one exceptions to note:
+:point_right: Using `host.docker.internal` ensures consistent hostnames and URLs between containers and the Docker host machine.
+              However, there are exceptions to note:
 
 1. **Database Performance**: For database connections, the Docker container name and the default
     database port are used to avoid performance issues.
     
-    And when running Cypress GUI on the Docker host, `localhost` and the mapped database port are used instead,
+2. **Running Cypress GUI on the Docker host**: `localhost` and the mapped database port are used instead,
     as Docker container hostnames aren't accessible outside Docker,
-    and no performance issues have been observed in this configuration.
-
-Therefore, there is a separate Cypress configuration file `cypress.config.local.mjs`
-for the local execution of Cypress GUI on the Docker host.
+    and no performance issues have been observed in this configuration.<br /><br />
+    Therefore, there is a separate Cypress configuration file `cypress.config.local.mjs`
+    for the local execution of Cypress GUI on the Docker host.
 
 ---
 
@@ -104,7 +103,7 @@ for the local execution of Cypress GUI on the Docker host.
 All you need is the ability to run Git, Docker and Bash scripts.
 Thanks to Docker, it is not necessary to install one of the databases, the database management tools, PHP, Node or Composer.
 
-[Git](https://git-scm.com/), [Docker](https://www.docker.com/) and a bash scripting environment are required and must be installed. The following `/etc/hosts` entry must exist:
+[Git](https://git-scm.com/), [Docker](https://www.docker.com/) and a bash scripting environment are required and must be installed. The following `/etc/hosts` entry will be created:
 ```
 127.0.0.1 host.docker.internal
 ```
@@ -138,7 +137,7 @@ Last tested in August 2024 with:
 * Intel chip macOS 14 Sonoma,
 * Apple silicon macOS 14 Sonoma,
 * Windows 11 Pro WSL 2 Ubuntu and
-* Ubuntu 24 Noble Numbat (absolute minimum with GUI is a VPS with 2 shared vCPUs and 4 GB RAM).
+* Ubuntu 24 Noble Numbat (the absolute minimum, if you also wish to use the Cypress GUI, is a VPS with 2 shared vCPUs and 4 GB RAM).
 
 You can create all Docker containers and install the current (August 2024)
 five Joomla instances using the `create.sh` script:
@@ -166,7 +165,7 @@ you will need to download approximately 4 GB of data over the network.
    (your system architecture will look like the picture on the right), default setting is for all branches.
    You can also give multiple Joomla versions like `53 60`.
 2. The used database and database driver, e.g. `pgsql`, defaults to use MariaDB with MySQLi driver.
-3. The used PHP version. You can choose between `php8.1`, `php8.2`, and `php8.3`. See more details in [Switch PHP Version](#switch-php-version).
+3. The used PHP version. You can choose between `php8.1`, `php8.2`, and `php8.3`. Defaults to `php8.1`. See more details in [Switch PHP Version](#switch-php-version).
 4. To force a fresh build with `no-cache`, defaults to build from cache.
 </details>
 
@@ -346,12 +345,11 @@ from the [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/t
 ```
 scripts/test.sh
 ```
+Optional arguments are:
 
-Three optional arguments are possible, in the following order:
-1. Joomla version number(s), all versions are tested by default
-2. Browser to be used, you can choose between electron (default),
-   firefox, chrome or edge (web browser installation must exist)
-3. Test spec pattern, all test specs (except the installation) are used by default
+* **Joomla version number(s)**: All versions are tested by default.
+* **Browser to be used**: Choose between electron (default), firefox, chrome, or edge (the web browser must be installed).
+* **Test spec pattern**: All test specs (except the installation) are used by default.
 
 As an example, run all the test specs (except the installation) from branch 5.1-dev with Mozilla Firefox:
 ```
@@ -405,8 +403,8 @@ scripts/cypress.sh 51 local
 
 To check the emails sent by Joomla,
 the [MailDev](https://hub.docker.com/r/maildev/maildev) container offers you
-provides you with a web interface at [http://localhost:7003]/(http://localhost:7003).
-The Cypress System Tests is using an own SMTP server `smtp-tester` to receive, check and delete emails.
+provides you with a web interface at [http://localhost:7003](http://localhost:7003).
+The Cypress based Joomla System Tests is using an own SMTP server `smtp-tester` to receive, check and delete emails.
 Since we run Cypress locally or in a container, it is necessary to triple emails.
 This is done by the SMTP relay triplicator `jbt_relay`.
 
@@ -422,10 +420,10 @@ the use cases password reset and System Tests."
 
 ![Joomla Branches Tester – Email Traffic](images/email.svg)
 
-1. The user requests a password reset with click on 'Forgot your Password?' in their web browser.
-   This request is sent to the Joomla PHP code on the web server `jbt_51`.
+1. A user (not in the Super User group) requests a password reset by clicking 'Forgot your Password?' in their web browser.
+   This request is sent to the Joomla PHP code on the web server jbt_51.
 2. An email is sent via SMTP from the web server `jbt_51` to the email relay `jbt_relay`.
-   In the Joomla `configuration.php` file, the `smtpport` is configured as `7025`."
+   In the Joomla `configuration.php` file, the `smtpport` is configured as `7025`.
 3. The email relay `jbt_relay` triplicates the email and sends the first email via SMTP to the email catcher `jbt_mail`.
 4. The email relay `jbt_relay` tries to deliver the second email to `smtp-tester`.
    But no System Tests is running, the email cannot be delivered and is thrown away.
@@ -435,7 +433,7 @@ the use cases password reset and System Tests."
    In the Cypress `cypress.config.mjs` file, the `smtp_port` is configured as `7125`.
    While the System Tests is running `smtp-tester` is listening on port 7125.
 7. One of the System Tests specs executes an action in Joomla PHP code that generates an email.
-8. Again the email is sent via SMTP from the web server `jbt_51` to the email relay `jbt_relay`, where it is duplicated.
+8. Again the email is sent via SMTP from the web server `jbt_51` to the email relay `jbt_relay`.
 9. Again the email relay `jbt_relay` triplicates the email and
    sends the one email via SMTP to the `jbt_cypress` container with `smtp-tester` running in .
    The Cypress test can check and validate the email.
@@ -454,8 +452,8 @@ for running the Cypress GUI locally.
 ### Install Joomla Patch Tester
 
 For your convenience [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester)
-can be installed on the Joomla instances. The script also sets GitHub token and fetch the data.
-This can be done without version number for all Joomla instances or e.g. for th one Joomla 5.3-dev:
+can be installed on the Joomla instances. The script also sets the GitHub token and fetch the data.
+This can be done without version number for all Joomla instances or for e.g. Joomla 5.3-dev:
 
 ```
 scripts/patchtester.sh 53 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
@@ -472,7 +470,7 @@ scripts/patchtester.sh 53 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
 :point_right: The GitHub token can also be given by environment variable `JBT_GITHUB_TOKEN`.
               And of course the sample token does not work.
 
-:fairy: Remember, if you have changed the database version, you will need to reinstall Joomla Patch Tester.
+:fairy: Remember, if you have changed the database version or the PHP version, you need to reinstall Joomla Patch Tester.
 
 ### Switch Database and Database Driver
 
@@ -524,15 +522,15 @@ and the [Docker Hub page](https://registry.hub.docker.com/_/joomla/)). Thank you
 You can switch between the available Images for PHP 8.1, PHP 8.2, and PHP 8.3
 across all branches:
 ```
-scripts/php.sh php83
+scripts/php.sh php8.3
 ```
 Or specify the desired branches:
 ```
-scripts/php.sh 44 51 php81
+scripts/php.sh 44 51 php8.1
 ```
 As we are based on the Docker images there are limitations (as of August 2024):
-* There is no Docker image for Joomla 4.4 with PHP 8.3, there is a fall back to PHP 5.2 used
-* There are no Docker images for Joomla 5.3 and Joomla 6.0. The Joomla 5.2 image is being used instead.
+* There is no Docker image for Joomla 4.4 with PHP 8.3, there is a fall back to PHP 5.2 used.
+* There are no Docker images for Joomla 5.3 and Joomla 6.0. The Joomla 5.2 images are being used instead.
   This should not cause any issues, as the source code for 5.3 and 6.0 is pulled from the respective
   GitHub branches.
 
@@ -548,10 +546,8 @@ and graft the package for a seamless experience.:
 scripts/graft.sh 52 ~/Downloads/Joomla_5.2.0-alpha4-dev-Development-Full_Package.zip
 ```
 
-After grafting, you can do everything except running pull.sh, such as switching the database variant,
-installing Joomla Patch Tester, or running Joomla System Tests.
-
-:point_right: Grafting can be done multiple times, just as you can repeat this process for different packages.
+After grafting, you can do everything except running `scripts/pull.sh`, such as switching the database variant,
+switching PHP version, installing Joomla Patch Tester, or running Joomla System Tests. Grafting can be done multiple times. :smile:
 
 ### Syncing from GitHub Repository
 
@@ -580,8 +576,8 @@ Fear not, for magical tools are at your disposal, each one a trusted companion.
 They are so finely attuned to your needs that they require no login, no password — just a single click,
 and the pages of the database open before you as if by magic:
 
-* [phpMyAdmin](http://localhost:7001) for MariaDB and MySQL
-* [pgAdmin](http://localhost:7002) for PostgreSQL
+* [http://localhost:7001](http://localhost:7001) phpMyAdmin – for MariaDB and MySQL
+* [http://localhost:7002](http://localhost:7002) pgAdmin – for PostgreSQL
 
 Simply approach these gateways, and the secrets of the database will reveal themselves effortlessly,
 ready for your exploration.
@@ -613,7 +609,7 @@ scripts/clean.sh
    2024-08-22 10:21:45,345 - INFO - Email forwarded to host.docker.internal:7225
    2024-08-22 10:21:45,346 - ERROR - Failed to forward email to host.docker.internal:7325: [Errno 111] Connection refused
    ```
-   An email is received by `jbt_relay:7025` and delivered to the Cypress headless `smtp-tester` listening on
+   An email is received by `jbt_relay:7025` and delivered to the Cypress container `smtp-tester` listening on
    `jbt_cypress:7125`, delivered to the mail catcher listening on `jbt_mail:7225`, and could not be delivered to local
    the locally running Cypress GUI `smtp-tester` listening on `localhost:7325` (equivalent host names are used for clarity).
 3. Run a script with the option `-x` to enable detailed debugging output that shows each command
@@ -628,7 +624,7 @@ scripts/clean.sh
 ## Limitations
 
 * The different Joomla versions exist in parallel, but the test runs sequentially.
-* Only one PHP version (the one from the Joomla Docker image) and one database version is used.
+* Database server versions cannot be changed.
 * The setup does not support HTTPS, secure connections issues are not testable.
 * The predefined port range starts from 7000. If another service is already using this range, it may cause a conflict.
 
