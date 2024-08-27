@@ -16,13 +16,15 @@ Use one or all branches for:
 * Automated installation of the [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester).
 * Switch between the three database options (MySQL, MariaDB, or PostgreSQL) and the two database drivers
   (MySQLi or PHP Data Objects).
+* Switch between the PHP versions (8.1, 8.2, or 8.3) as supported by the official Docker images.
 * Grafting a Joomla package onto a branch.
 
 ![Joomla Branches Software Architecture](images/joomla-branches-tester.svg)
 
 The idea is to have all active Joomla development branches
 (in this picture 4.4-dev, 5.1-dev, 5.2-dev and 6.0-dev) are available for testing in parallel.
-The installation takes place across a dozen Docker containers, and everything is scripted.
+The installation is carried out with a good dozen Docker containers,
+and everything is scripted.
 You see the four orange Web Server containers with the four different Joomla versions.
 They are based on the `branch_*` folders, which are also available on the Docker host.
 
@@ -52,7 +54,7 @@ On macOS and Ubuntu, the native Cypress GUI is shown in green.
         For those with a taste for the finer details, the comments are a gourmet treat.
 
 <details>
-  <summary>There are 12 Docker containers that provide the functionality.</summary>
+  <summary>There are a good dozen Docker containers that provide the functionality.</summary>
 
 ---
 
@@ -138,22 +140,14 @@ Last tested in August 2024 with:
 * Windows 11 Pro WSL 2 Ubuntu and
 * Ubuntu 24 Noble Numbat (absolute minimum with GUI is a VPS with 2 shared vCPUs and 4 GB RAM).
 
-You can create all the Docker containers and install all e.g. five Joomla instances using the `create.sh` script:
+You can create all Docker containers and install the current (August 2024)
+five Joomla instances using the `create.sh` script:
 
 ```
 git clone https://github.com/muhme/joomla-branches-tester
 cd joomla-branches-tester
 scripts/create.sh
 ```
-
-<img align="right" src="images/joomla-branches-tester-52.svg" width="400">
-The script can be parameterised with arguments, all of which are optional:
-
-1. Install for a single version number, e.g. `52` only
-   (your system architecture will look like the picture on the right), default setting is for all branches,
-2. The used database and database driver, e.g. `pgsql`, defaults to use MariaDB with MySQLi driver and
-3. To force a fresh build with `no-cache`, defaults to build from cache.
-
 :point_right: The script can run without `sudo`,
 but depending on the platform, it may ask you to enter your user password for individual sudo actions.
 
@@ -163,6 +157,18 @@ The `joomla-branches-tester` folder requires about of 2 GB of disc space.
 Docker needs additional about of 20 GB for images and volumes.
 If you are installing for the first time and downloading all necessary Docker images,
 you will need to download approximately 4 GB of data over the network.
+
+<details>
+  <summary>The script can be parameterised with optional arguments.</summary>
+<img align="right" src="images/joomla-branches-tester-52.svg" width="400">
+
+1. Install for a single version number, e.g. `52` only
+   (your system architecture will look like the picture on the right), default setting is for all branches.
+   You can also give multiple Joomla versions like `53 60`.
+2. The used database and database driver, e.g. `pgsql`, defaults to use MariaDB with MySQLi driver.
+3. The used PHP version. You can choose between `php8.1`, `php8.2`, and `php8.3`. See more details in [Switch PHP Version](#switch-php-version).
+4. To force a fresh build with `no-cache`, defaults to build from cache.
+</details>
 
 :point_right: In case of trouble, see [Trouble-Shooting](#trouble-shooting).
 
@@ -342,8 +348,9 @@ scripts/test.sh
 ```
 
 Three optional arguments are possible, in the following order:
-1. Joomla version number, all versions are tested by default
-2. Browser to be used, you can choose between electron (default), firefox, chrome or edge
+1. Joomla version number(s), all versions are tested by default
+2. Browser to be used, you can choose between electron (default),
+   firefox, chrome or edge (web browser installation must exist)
 3. Test spec pattern, all test specs (except the installation) are used by default
 
 As an example, run all the test specs (except the installation) from branch 5.1-dev with Mozilla Firefox:
@@ -359,9 +366,9 @@ scripts/test.sh administrator/components/com_privacy/Consent.cy.js
 :point_right: When specifying a single test spec file,
               you can omit the `tests/System/integration/` path at the beginning.
 
-Test all `site` specs with Microsoft Edge in the branch 4.4-dev using a pattern:
+Test all `site` specs with Microsoft Edge in the branches Joomla 5.1, 5.2 and 5.3 using a pattern:
 ```
-scripts/test.sh 44 edge 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
+scripts/test.sh 51 52 53 edge 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
 ```
 
 To additional show `console.log` messages from Electron browser by setting environment variable: 
@@ -447,8 +454,8 @@ for running the Cypress GUI locally.
 ### Install Joomla Patch Tester
 
 For your convenience [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester)
-can be installed on one or all Joomla instances. The script also sets GitHub token and fetch the data.
-This can be done without version number for all Joomla instances or e.g. for Joomla 5.3-dev:
+can be installed on the Joomla instances. The script also sets GitHub token and fetch the data.
+This can be done without version number for all Joomla instances or e.g. for th one Joomla 5.3-dev:
 
 ```
 scripts/patchtester.sh 53 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
@@ -484,9 +491,9 @@ Five variants are available:
 * mysqli – MySQL with MySQLi (improved)
 * mysql – MySQL with MySQL PDO (PHP Data Objects)
 
-Use MariaDB with driver MySQLi for Joomla 5.1-dev:
+Use MariaDB with driver MySQLi for Joomla 5.1 and Joomla 5.2:
 ```
-scripts/database.sh 51 mariadbi
+scripts/database.sh 51 52 mariadbi
 ```
 
 Change all Joomla instances to use PostgreSQL:
@@ -508,6 +515,27 @@ scripts/database.sh pgsql
   With a sprinkle of stardust, you can specify the desired database variant,
   and if you're only installing one Joomla version, it will be done in the blink of an eye."
 
+### Switch PHP Version
+
+The Joomla Docker images are from the official images for Joomla
+(see [docker-joomla](https://github.com/joomla-docker/docker-joomla)
+and the [Docker Hub page](https://registry.hub.docker.com/_/joomla/)). Thank you! :pray:
+
+You can switch between the available Images for PHP 8.1, PHP 8.2, and PHP 8.3
+across all branches:
+```
+scripts/php.sh php83
+```
+Or specify the desired branches:
+```
+scripts/php.sh 44 51 php81
+```
+As we are based on the Docker images there are limitations (as of August 2024):
+* There is no Docker image for Joomla 4.4 with PHP 8.3, there is a fall back to PHP 5.2 used
+* There are no Docker images for Joomla 5.3 and Joomla 6.0. The Joomla 5.2 image is being used instead.
+  This should not cause any issues, as the source code for 5.3 and 6.0 is pulled from the respective
+  GitHub branches.
+
 ### Grafting a Joomla Package
 
 Not interested in testing the latest development branch but still need to test a Joomla package? No problem!
@@ -528,12 +556,17 @@ installing Joomla Patch Tester, or running Joomla System Tests.
 ### Syncing from GitHub Repository
 
 To avoid recreating everything the next day, you can simply fetch and merge the latest changes from the
-Joomla GitHub repository into your local branches. This can be done for branches without any arguments,
-or for a specific version, such as 6.0-dev.
+Joomla GitHub repository into your local branches. This can be done for all branches without any arguments,
+or for specific versions:
 ```
-scripts/pull.sh 60
+scripts/pull.sh 53 60
 ```
-Finally, the Git status of the branch is displayed.
+
+If changes are pulled then:
+* Just in case the command `composer install` ist executed.
+* If `package-lock.json` file has changed the command `npm ci` is executed.
+
+Finally, the Git status is displayed.
 
 <img align="right" src="images/phpMyAdmin.png">
 

@@ -1,12 +1,12 @@
 #!/bin/bash -e
 #
-# create.sh - Delete all docker containers, build them new and install Joomla from the git branches.
+# create.sh - Create Docker containers based on Joomla Git branches.
 #   create.sh
 #   create.sh 51 pgsql no-cache
+#   create.sh 52 53 php8.1
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
-
 
 source scripts/helper.sh
 
@@ -23,38 +23,47 @@ else
   fi
 fi
 
-# Defaults to install for all branches, but a single one can be given
 versions=$(getVersions)
 IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
-versionsToInstall=(${allVersions[@]})
 
-if [ $# -ge 1 ] ; then
-  if isValidVersion "$1" "$versions"; then
-    versionsToInstall=($1)
-    shift # 1st arg is eaten as the version number
-  fi
-fi
-
-# Defauls to use MariaDB with MySQLi database driver, but different one can be given
+# Defauls to use MariaDB with MySQLi database driver, to use cache and PHP 8.1.
 database_variant="mariadbi"
-if [ $# -ge 1 ] && [ "$1" != "no-cache" ] ; then
-  if isValidVariant "$1"; then
-    database_variant=($1)
-    shift # argument is eaten as database variant
+no_cache=false
+php_version="php8.1"
+versionsToInstall=()
+while [ $# -ge 1 ]; do
+  if isValidVersion "$1" "$versions"; then
+    versionsToInstall+=("$1")
+    shift # Argument is eaten as one version number.
+  elif isValidVariant "$1"; then
+    database_variant="$1"
+    shift # Argument is eaten as database variant.
+  elif [ "$1" = "no-cache" ]; then
+    no_cache=true
+    shift # Argument is eaten as no cache option.
+  elif isValidPHP "$1"; then
+    php_version="$1"
+    shift # Argument is eaten as PHP version.
   else
-    error "'$1' is not a valid selection for database and database driver. Please use one of ${JBT_DB_VARIANTS[@]}."
+    log "Optional version can be one or more of the following: ${allVersions[@]} (default is all)."
+    log "Optional database variant can be one of: ${JBT_DB_VARIANTS[@]} (default is mariadbi)."
+    log "Optional no-cache can be set (default is to use cache)."
+    log "Optional PHP version can be one of: ${JBT_PHP_VERSIONS[@]} (default is php8.1)."
+    error "Argument '$1' is not valid."
     exit 1
   fi
+done
+
+# If no version was given, use all.
+if [ ${#versionsToInstall[@]} -eq 0 ]; then
+  versionsToInstall=(${allVersions[@]})
 fi
 
-# Delete all docker containters and all branches_*
+# Delete all docker containters and branches_* directories.
 scripts/clean.sh
 
-# Compare arrays as strings
-if [ "${versionsToInstall[*]}" != "${allVersions[*]}" ]; then
-  # Create docker compose with only one Joomla web server
-  createDockerComposeFile "${versionsToInstall[*]}" 
-fi
+# Create Docker Compose setup with Joomla web servers for all versions to be installed.
+createDockerComposeFile "${versionsToInstall[*]}" "$php_version"
 
 if [ $# -eq 1 ] && [ "$1" = "no-cache" ]; then
   log "Running 'docker compose build --no-cache'."
@@ -133,15 +142,6 @@ for version in "${versionsToInstall[@]}"; do
 
   log "jbt_${version} – Running npm clean install."
   docker exec -it "jbt_${version}" bash -c 'cd /var/www/html && npm ci'
-
-  log "jbt_${version} – Changing ownership to www-data for all files and directories."
-  # Following error seen on macOS, we ignore it as it does not matter, these files are 444
-  # chmod: changing permissions of '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
-  docker exec -it "jbt_${version}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true'
-
-  # Joomla container needs to be restarted
-  log "jbt_${version} – Restarting container."
-  docker restart "jbt_${version}"
 
   # Configure and install Joomla with desired database variant
   scripts/database.sh "${version}" "$database_variant"

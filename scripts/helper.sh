@@ -16,6 +16,8 @@ JBT_DB_TYPES=("MySQLi" "MySQL (PDO)" "MySQLi" "MySQL (PDO)" "PostgreSQL (PDO)")
 JBT_DB_HOSTS=("jbt_mysql" "jbt_mysql" "jbt_madb" "jbt_madb" "jbt_pg"          )
 # Database port mapping for the variants
 JBT_DB_PORTS=("7011"      "7011"      "7012"     "7012"     "7013"            )
+# PHP versions to chooce from
+JBT_PHP_VERSIONS=("php8.1" "php8.2" "php8.3")
 
 # Determine actual active Joomla branches, e.g. "44 51 52 60"
 #
@@ -46,7 +48,7 @@ function getVersions() {
     echo "${sorted_branches[*]}"
 }
 
-# Check if the given argument is a valid Joomla version
+# Check if the given argument is one valid Joomla version
 # e.g. isValidVersion "44" "44 51 52 60"
 #
 function isValidVersion() {
@@ -56,6 +58,19 @@ function isValidVersion() {
 
     for v in "${versions[@]}"; do
         if [[ "$v" == "$version" ]]; then
+            return 0 # success
+        fi
+    done
+    return 1 # nope
+}
+
+# Check if the given argument is a valid PHP version
+# e.g. isValidVersion "php8.1"
+#
+function isValidPHP() {
+    local php_version="$1"
+    for p in "${JBT_PHP_VERSIONS[@]}"; do
+        if [[ "$p" == "$php_version" ]]; then
             return 0 # success
         fi
     done
@@ -125,26 +140,54 @@ function isValidVariant() {
     return 1 # nope
 }
 
-# Create docker-compose.ymk with one or all four Joomla web servers
-# argument is e.g. "52" or "44 51 52 60"
+# Create docker-compose.yml with one or all five Joomla web servers
+# 1st argument is e.g. "52" or "44 51 52 53 60"
+# 2nd argument e.g. "php8.1"
 #
 function createDockerComposeFile() {
-    log "Create 'docker-compose.yml' file for $1."
+    log "Create 'docker-compose.yml' file for version(s) $1 and $2."
 
+    local php_version="$2"
     local versions=()
-    IFS=' ' versions=($(sort <<<"$1"))
-    unset IFS # map to array
+    IFS=' ' versions=($(sort <<<"$1")); unset IFS # map to array
 
     cp docker-compose.base.yml docker-compose.yml
+    local version
     for version in "${versions[@]}"; do
-        # joomla:4 or joomla:5 image?
-        if [ "$version" = "44" ]; then
-            base="4"
-        else
-            base="5"
-        fi
-        sed -e "s/XX/${version}/" -e "s/Y/$base/" docker-compose.joomla.yml >>docker-compose.yml
+        local din=$(dockerImageName "$version" "$php_version")
+        sed -e "s/XX/${version}/" -e "s/Y/${din}/" docker-compose.joomla.yml >> docker-compose.yml
     done
+}
+
+# Returns existing Docker image name for given Joomla and PHP version.
+#   e.g. dockerImage "44" "php8.1" -> "4.4-php8.1-apache"
+#   exceptions:
+#   - There is no "4.4-php8.3-apache", fallback "4.4-php8.2-apache"
+#   - There are no Joomla 5.3 and 6.0 images fallback to Joomla 5.2
+#
+function dockerImageName() {
+    local version="$1"
+    local php_version="$2"
+
+    # joomla:4 or joomla:5 image?
+    if [ "$version" = "44" ]; then
+        local php_to_use="$php_version"
+        if [ "$php_version" = "php8.3" ]; then
+            # There is no PHP 8.3 for Joomla 4.4, simple use PHP 8.2.
+            php_to_use="php8.2"
+         fi
+        base="4.4-${php_to_use}"
+    else
+        # Currently (August 2024) there are no Joomla 5.3 and Joomla 6.0 Docker images,
+        # simple use 5.2 as base.
+        local version_to_use="$version"
+        if [ "$version" -gt "52" ]; then
+            version_to_use="52"
+        fi
+        # e.g. "5.2-php8.1-apache"
+        base="${version_to_use:0:1}.${version_to_use:1}-${php_version}"
+    fi
+    echo "joomla:${base}-apache"
 }
 
 # Get Joomla major and minor version from file system

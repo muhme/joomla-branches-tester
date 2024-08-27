@@ -1,8 +1,9 @@
 #!/bin/bash
 #
-# pull.sh - Running git pull and git status on one or all branches, e.g.
+# pull.sh - Running git pull and more on all, one or multiple branches, e.g.
 #   scripts/pull.sh
-#   scripts/pull.sh 52
+#   scripts/pull.sh 51
+#   scripts/pull.sh 52 53
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
@@ -12,22 +13,24 @@ trap 'rm -rf $TMP' 0
 
 source scripts/helper.sh
 
-if [ $# -gt 1 ] ; then
-  error "Please use no or one argument with a version number."
-  exit 1
-fi
-
 versions=$(getVersions)
-IFS=' ' versionsToPull=($(sort <<<"${versions}")); unset IFS # map to array
+IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
 
-if [ $# -eq 1 ] ; then
+versionsToPull=()
+while [ $# -ge 1 ]; do
   if isValidVersion "$1" "$versions"; then
-    versionsToPull=($1)
-    shift # 1st arg is eaten as the version number
+    versionsToPull+=("$1")
+    shift # Argument is eaten as one version number.
   else
-    error "Please use a version from: ${versions}."
+    log "Optional version can be one or more of the following: ${allVersions[@]} (default is all)."
+    error "Argument '$1' is not valid."
     exit 1
   fi
+done
+
+# If no version was given, use all.
+if [ ${#versionsToPull[@]} -eq 0 ]; then
+  versionsToPull=(${allVersions[@]})
 fi
 
 pulled=0

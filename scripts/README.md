@@ -9,13 +9,14 @@ The following scripts are available and the use is described in [../README.md](.
 | Script | Description | Additional Info |
 | --- | --- | --- |
 | [scripts/clean.sh](clean.sh) | Delete all `jbt_*`-Docker containers and the `joomla-branches-tester_default` Docker network and `branch_*` folders.. | Used by `create.sh` or for you to get rid of all the stuff. |
-| [scripts/create.sh](create.sh) | (Re-)Build all docker containers. | Optional arguments are version number, database variant and `no-cache`. |
-| [scripts/cypress.sh](cypress.sh) | Running interactive Cypress GUI. | Mandatory argument is the version number. Optional argument is `local` to use a locally installed Cypress. |
-| [scripts/database.sh](database.sh) | Changes database and database driver. | :warning: The overall database content is lost.<br />Optional argument is the version number. Mandatory argument is the database variant. |
-| [scripts/graft.sh](graft.sh) | Grafting a Joomla package onto a branch. | :warning: The overall database content is lost.<br />Optional argument is the database variant. Mandatory argument is the Joomla package.|
-| [scripts/patchtester.sh](patchtester.sh) | Installs and configures Joomla patch tester component in one or all Joomla instances. | The version number is an optional argument. The GitHub token comes from environment variable `JBT_GITHUB_TOKEN` or as mandatory argument. |
-| [scripts/pull.sh](pull.sh) | Running `git pull` and `git status` on one or all branches. | The version number is an optional argument. |
-| [scripts/test.sh](test.sh) | Running Cypress headless System Tests on one or all branches. | Optional arguments are version, browser and test spec pattern. |
+| [scripts/create.sh](create.sh) | (Re-)Build all docker containers. | Optional arguments are version number(s), database variant, PHP version and `no-cache`. |
+| [scripts/cypress.sh](cypress.sh) | Running interactive Cypress GUI. | Mandatory argument is the Joomla version number. Optional argument is `local` to use a locally installed Cypress. |
+| [scripts/database.sh](database.sh) | Changes database and database driver. | :warning: The overall database content is lost.<br />Mandatory argument is the database variant. Optional argument(s): Joomla version number(s). |
+| [scripts/graft.sh](graft.sh) | Grafting a Joomla package onto a branch. | :warning: The overall database content is lost.<br />Mandatory argument is the Joomla package. Optional argument is the database variant.|
+| [scripts/patchtester.sh](patchtester.sh) | Installs and configures Joomla patch tester component in one or all Joomla instances. | The GitHub token comes from environment variable `JBT_GITHUB_TOKEN` or as mandatory argument. Optional argument(s): Joomla version number(s). |
+| [scripts/php.sh](php.sh) | Change used PHP version. | Mandatory is the PHP version, e.g. `php8.3`. Optional argument(s): Joomla version number(s). |
+| [scripts/pull.sh](pull.sh) | Running `git pull` and more. | Optional argument(s): Joomla version number(s). |
+| [scripts/test.sh](test.sh) | Running Cypress headless System Tests on one or all branches. | Optional argument(s): Joomla version number(s), browser and test spec pattern. |
 | [scripts/ubuntu_setup.sh](ubuntu_setup.sh) | Helper script in an installation on standard Ubuntu Linux. | |
 
 :point_right: The scripts use [ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code#Colors)

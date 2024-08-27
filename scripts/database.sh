@@ -1,8 +1,9 @@
 #!/bin/bash -e
 #
-# database.sh - Change Database and database driver for one or all Joomla container.
+# database.sh - Change the database and database driver for all, one or multiple Joomla containers.
 #   scripts/database.sh mysqli
-#   scripts/database.sh 51 pgsql
+#   scripts/database.sh 44 mariadb
+#   scripts/database.sh 53 60 pgsql
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
@@ -12,33 +13,41 @@ trap 'rm -rf $TMP' 0
 
 source scripts/helper.sh
 
+versionsToChange=()
 versions=$(getVersions)
-IFS=' ' versionsToChange=($(sort <<<"${versions}")); unset IFS # map to array
+IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
 
-if isValidVersion "$1" "$versions"; then
-  versionsToChange=($1)
-  shift # 1st arg is eaten as the version number
-fi
+while [ $# -ge 1 ]; do
+  if isValidVersion "$1" "$versions"; then
+    versionsToChange+=("$1")
+    shift # Argument is eaten as version number.
+  elif isValidVariant "$1"; then
+    dbvariant="$1"
+    dbtype=$(dbTypeForVariant "$dbvariant")
+    dbhost=$(dbHostForVariant "$dbvariant")
+    dbport=$(dbPortForVariant "$dbvariant")
+    shift # Argument is eaten as database variant.
+  else
+    log "Mandatory database variant can be one of: ${JBT_DB_VARIANTS[@]}."
+    log "Optional version can be one or more of the following: ${versions} (default is all, e.g. '52 53')."
+    error "Argument '$1' is not valid."
+    exit 1
+  fi
+done
 
-if [ $# -lt 1 ] ; then
-  error "Desired database and driver selection is missing. Please use one of: ${JBT_DB_VARIANTS[@]}."
+if [ -z "$dbvariant" ] ; then
+  error "Mandatory database variant is missing. Please use one of: ${JBT_DB_VARIANTS[@]}."
   exit 1
 fi
 
-if isValidVariant "$1"; then
-  variant=($1)
-  dbtype=$(dbTypeForVariant "$variant")
-  dbhost=$(dbHostForVariant "$variant")
-  dbport=$(dbPortForVariant "$variant")
-  shift # argument is eaten
-else
-  error "'$1' is not a valid selection for the database and driver. Please use one of: ${JBT_DB_VARIANTS[@]}."
-  exit 1
+# If no version was given, use all.
+if [ ${#versionsToChange[@]} -eq 0 ]; then
+  versionsToChange=(${allVersions[@]})
 fi
 
 for version in "${versionsToChange[@]}"; do
 
-  log "jbt_${version} – Create 'cypress.config.mjs' file for variant ${variant} (driver '${dbtype}' host '${dbhost}')."
+  log "jbt_${version} – Create 'cypress.config.mjs' file for variant ${dbvariant} (driver '${dbtype}' host '${dbhost}')."
 
   # adopt e.g.:
   #   db_type: 'PostgreSQL (PDO)',
@@ -156,6 +165,6 @@ EOF
   # chmod: changing permissions of '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
   docker exec -it "jbt_${version}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true'
 
-  log "jbt_${version} – Joomla based on the $(branchName ${variant}) Git branch is installed."
+  log "jbt_${version} – Joomla based on the $(branchName ${dbvariant}) database variant is installed."
 
 done

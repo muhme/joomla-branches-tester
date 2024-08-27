@@ -4,9 +4,9 @@
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
-  joomla_XX:
+  jbt_XX:
     container_name: jbt_XX
-    image: joomla:Y
+    image: Y # jbt_XX PHP version
     restart: unless-stopped
     ports:
       - 70XX:80
