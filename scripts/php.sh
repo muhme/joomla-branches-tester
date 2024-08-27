@@ -82,6 +82,13 @@ do
     mv composer.phar /usr/local/bin/composer && \
     composer install"
 
+  # New image from Docker Hub needs to install at least git for next pull.sh
+  log "jbt_${version} – Installing additional packages."
+  docker exec -it "jbt_${version}" bash -c 'apt-get update -qq && \
+    apt-get upgrade -y && \
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    apt-get install -y git vim nodejs iputils-ping net-tools'
+
   changed=$((changed + 1))
 
   log "jbt_${version} – Changed to use $din."
