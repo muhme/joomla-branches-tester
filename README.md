@@ -546,8 +546,19 @@ and graft the package for a seamless experience.:
 scripts/graft.sh 52 ~/Downloads/Joomla_5.2.0-alpha4-dev-Development-Full_Package.zip
 ```
 
+Mandatory arguments are the Joomla branch version and the package file. Optional argument is the database variant:
+```
+scripts/graft.sh 51 pgsql ~/Downloads/Joomla_5.1.3-Stable-Full_Package.zip
+```
+
 After grafting, you can do everything except running `scripts/pull.sh`, such as switching the database variant,
-switching PHP version, installing Joomla Patch Tester, or running Joomla System Tests. Grafting can be done multiple times. :smile:
+switching PHP version, installing Joomla Patch Tester, or running Joomla System Tests. And grafting can be done multiple times. :smile:
+
+What distinguishes a grafted Joomla from a standard package-installed Joomla?
+A grafted Joomla contains one additional file and two directories from the development branch:
+* File: `cypress.config.dist.mjs`
+* Directory: `node_modules`
+* Directory: `tests/System`
 
 ### Syncing from GitHub Repository
 
