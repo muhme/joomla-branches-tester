@@ -47,6 +47,11 @@ fi
 
 for version in "${versionsToChange[@]}"; do
 
+  if [ ! -d "branch_${version}" ]; then
+    log "jbt_${version} – There is no directory 'branch_${version}', jumped over."
+    continue
+  fi
+
   log "jbt_${version} – Create 'cypress.config.mjs' file for variant ${dbvariant} (driver '${dbtype}' host '${dbhost}')."
 
   # adopt e.g.:

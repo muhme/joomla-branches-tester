@@ -45,6 +45,12 @@ fi
 changed=0
 for version in "${versionsToInstall[@]}"
 do
+
+  if [ ! -d "branch_${version}" ]; then
+    log "jbt_${version} – There is no directory 'branch_${version}', jumped over."
+    continue
+  fi
+
   log "jbt_${version} – Stopping Docker container."
   docker compose stop "jbt_${version}"
 

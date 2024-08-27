@@ -46,6 +46,11 @@ successful=0
 for version in "${versionsToTest[@]}"
 do
 
+  if [ ! -d "branch_${version}" ]; then
+    log "jbt_${version} – There is no directory 'branch_${version}', jumped over."
+    continue
+  fi
+
   # Is there one more argument with a test spec pattern?
   if [ $# -eq 0 ] ; then
     # Running everything, but without installation step
