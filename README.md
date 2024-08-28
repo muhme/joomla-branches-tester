@@ -166,7 +166,10 @@ you will need to download approximately 4 GB of data over the network.
    You can also give multiple Joomla versions like `53 60`.
 2. The used database and database driver, e.g. `pgsql`, defaults to use MariaDB with MySQLi driver.
 3. The used PHP version. You can choose between `php8.1`, `php8.2`, and `php8.3`. Defaults to `php8.1`. See more details in [Switch PHP Version](#switch-php-version).
-4. To force a fresh build with `no-cache`, defaults to build from cache.
+4. Instead using `joomla-cms` repository, you can specify a different Git repository and branch.
+   For example, using `https://github.com/Elfangor93/joomla-cms:mod_community_info`.
+   In this case, exactly one version must be provided, which should match the cloned repository.
+5. To force a fresh build with `no-cache`, defaults to build from cache.
 </details>
 
 :point_right: In case of trouble, see [Trouble-Shooting](#trouble-shooting).

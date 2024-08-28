@@ -4,6 +4,7 @@
 #   create.sh
 #   create.sh 51 pgsql no-cache
 #   create.sh 52 53 php8.1
+#   create.sh 52 https://github.com/Elfangor93/joomla-cms:mod_community_info
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
@@ -44,15 +45,26 @@ while [ $# -ge 1 ]; do
   elif isValidPHP "$1"; then
     php_version="$1"
     shift # Argument is eaten as PHP version.
+  elif [[ "$1" == *:* ]]; then
+    # Split into repository and branch.
+    git_repository="${1%:*}" # remove everything after the last ':'
+    git_branch="${1##*:}" # everythin after the last ':'
+    shift # Argument is eaten as repository:branch.
   else
     log "Optional version can be one or more of the following: ${allVersions[@]} (default is all)."
     log "Optional database variant can be one of: ${JBT_DB_VARIANTS[@]} (default is mariadbi)."
     log "Optional no-cache can be set (default is to use cache)."
     log "Optional PHP version can be one of: ${JBT_PHP_VERSIONS[@]} (default is php8.1)."
+    log "Optional repository:branch, e.g. https://github.com/Elfangor93/joomla-cms:mod_community_info."
     error "Argument '$1' is not valid."
     exit 1
   fi
 done
+
+if [ ! -z "${git_repository}" ] && [ ${#versionsToInstall[@]} -ne 1 ]; then
+  error "If you use repository:branch, please specify one version as one of the following: ${allVersions[@]}."
+  exit 1
+fi
 
 # If no version was given, use all.
 if [ ${#versionsToInstall[@]} -eq 0 ]; then
@@ -123,8 +135,12 @@ for version in "${versionsToInstall[@]}"; do
   # Aditional having vim, ping, netstat
 
   branch=$(branchName "${version}")
-  log "jbt_${version} – Cloning the ${branch} branch into the 'branch_${version}' directory."
-  docker exec -it "jbt_${version}" bash -c "git clone -b ${branch} --depth 1 https://github.com/joomla/joomla-cms /var/www/html"
+  if [ -z "${git_repository}" ]; then
+    git_repository="https://github.com/joomla/joomla-cms"
+    git_branch="${branch}"
+  fi
+  log "jbt_${version} – Cloning ${git_repository}:${git_branch} into the 'branch_${version}' directory."
+  docker exec -it "jbt_${version}" bash -c "git clone -b ${git_branch} --depth 1 ${git_repository} /var/www/html"
 
   if [ "$version" -ge 51 ]; then
     log "jbt_${version} – Installing missing libraries."
