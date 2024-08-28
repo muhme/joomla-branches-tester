@@ -607,7 +607,13 @@ scripts/clean.sh
    you won’t be able to run tests on branch 5.2-dev.
    In this situation, it’s necessary to create a Joomla Branches Tester for all branches,
    ensuring you can work across all branches.
-2. Check the Docker container logs to monitor activity.
+2. One of the major advantages of using Docker and scripting is that you can easily throw everything away and start fresh.
+   It takes only two and a half minutes on an entry-level 2024 MacBook Air to delete everything and
+   create nine new containers with Joomla 5.2-dev using PHP 8.3 and PostgreSQL:
+   ```
+   scripts/create.sh pgsql php8.3 52
+   ```
+3. Check the Docker container logs to monitor activity.
    For example, the `jbt_relay` container logs will display information about receiving and delivering emails.
    ```
    docker logs jbt_relay
@@ -623,14 +629,14 @@ scripts/clean.sh
    An email is received by `jbt_relay:7025` and delivered to the Cypress container `smtp-tester` listening on
    `jbt_cypress:7125`, delivered to the mail catcher listening on `jbt_mail:7225`, and could not be delivered to local
    the locally running Cypress GUI `smtp-tester` listening on `localhost:7325` (equivalent host names are used for clarity).
-3. Run a script with the option `-x` to enable detailed debugging output that shows each command
+4. Run a script with the option `-x` to enable detailed debugging output that shows each command
    executed along with its arguments, for example:
    ```
    bash -x scripts/pull.sh
    ```
-4. If you encounter problems after running `scripts/create.sh` multiple times,
+5. If you encounter problems after running `scripts/create.sh` multiple times,
    try using the `no-cache` option to force a fresh build of the containers.
-5. Open an [issue](../../issues).
+6. Open an [issue](../../issues).
 
 ## Limitations
 
