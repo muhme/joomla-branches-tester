@@ -555,10 +555,9 @@ After grafting, you can do everything except running `scripts/pull.sh`, such as 
 switching PHP version, installing Joomla Patch Tester, or running Joomla System Tests. And grafting can be done multiple times. :smile:
 
 What distinguishes a grafted Joomla from a standard package-installed Joomla?
-A grafted Joomla contains one additional file and two directories from the development branch:
-* File: `cypress.config.dist.mjs`
-* Directory: `node_modules`
-* Directory: `tests/System`
+A grafted Joomla contains three additional files and two directories from the development branch:
+* Files: `cypress.config.dist.mjs`, `package.json` and `package-lock.json`
+* Directories: `node_modules` and `tests/System`
 
 ### Syncing from GitHub Repository
 

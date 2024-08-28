@@ -24,18 +24,13 @@ else
 fi
 
 if [ $# -eq 2 ] && [ "$2" != "local" ]; then
-  error "Please use 'local' as second argument."
+  error "If you use a second argument, please use 'local' only."
   exit 1
 fi
 
 # Use of SMTP port 7325 for the smtp-tester, as port 7125 is occupied by the mapping for the Cypress container.
 if [ "$2" = "local" ]; then
   cd "branch_${version}"
-  # Install smtp-tester, if needed (after )
-  if [ ! -d node_modules/smtp-tester ]; then
-     log "Installing smtp-tester."
-     npm install smtp-tester --save-dev
-  fi
   # Install the Cypress version used in this branch, if needed
   log "Installing Cypress if needed."
   npm install cypress --save-dev

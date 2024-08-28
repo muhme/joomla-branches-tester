@@ -74,11 +74,11 @@ fi
 # As a result, retry any file system operation with sudo if the first attempt fails.
 # And suppress stderr on the first attempt to avoid unnecessary error messages.
 
-log "Creating new directory 'branch_${version}' with copied 'cypress.config.dist.mjs', 'tests/System', and 'node_modules'."
+log "Creating new directory 'branch_${version}' and copy three files and two directories."
 mv "branch_${version}" "branch_${version}-TMP" 2>/dev/null|| sudo mv "branch_${version}" "branch_${version}-TMP"
 mkdir -p "branch_${version}/tests" 2>/dev/null || sudo mkdir -p "branch_${version}/tests"
 ( cd "branch_${version}-TMP"; \
-  mv cypress.config.dist.mjs node_modules "../branch_${version}" 2>/dev/null || \
+  mv cypress.config.dist.mjs package.json package-lock.json node_modules "../branch_${version}" 2>/dev/null || \
      sudo mv cypress.config.dist.mjs node_modules "../branch_${version}"; \
   mv tests/System "../branch_${version}/tests" 2>/dev/null || \
      sudo mv tests/System "../branch_${version}/tests" )
@@ -131,7 +131,7 @@ if grep -q "public const DEV_STATUS = 'Stable';" "branch_${version}/libraries/sr
         echo "// muhme, 25 August 2024 'hack' as long as waiting for PR https://github.com/joomla-projects/joomla-cypress/pull/35"
         echo "// is merged, and new joomla-cypress release is build and used in all active Joomla branches"
         echo ""
-        echo "// In case of Stable release the Joomla Web Installer needs one more click to complete the installation"
+        echo "// In case of Joomla Stable release the Joomla Web Installer needs one more click to complete the installation"
         echo "cy.get('button.complete-installation')"
         echo '    .then($button => {'
         echo "    // Check if the button exists"
