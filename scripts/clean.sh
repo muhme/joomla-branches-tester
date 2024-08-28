@@ -13,8 +13,8 @@ IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
 # Delete all docker containters (PHP version does not play a role for deletion)
 createDockerComposeFile "${allVersions[*]}" "php8.2"
 
-log 'Stopping and removing JBT Docker containers and associated Docker networks.'
-docker compose down
+log 'Stopping and removing JBT Docker containers, associated Docker networks and volumes.'
+docker compose down -v
 
 # Clean up branch directories if existing
 for version in "${allVersions[@]}"; do
