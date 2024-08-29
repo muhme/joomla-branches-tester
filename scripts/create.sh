@@ -159,6 +159,16 @@ for version in "${versionsToInstall[@]}"; do
   log "jbt_${version} – Running npm clean install."
   docker exec -it "jbt_${version}" bash -c 'cd /var/www/html && npm ci'
 
+  # Needed on Windows WSL2 Ubuntu to be able to run Joomla Web Installer
+  log "jbt_${version} – Changing ownership to www-data for all files and directories."
+  # Following error seen on macOS, we ignore it as it does not matter, these files are 444
+  # chmod: changing permissions of '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
+  docker exec -it "jbt_${version}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true'
+
+  # Joomla container needs to be restarted
+  log "jbt_${version} – Restarting container."
+  docker restart "jbt_${version}"
+
   # Configure and install Joomla with desired database variant
   scripts/database.sh "${version}" "$database_variant"
 
