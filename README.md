@@ -220,7 +220,30 @@ you will need to download approximately 4 GB of data over the network.
    ```
    :point_right: It may take a moment for the Docker service to run.
    This can also be checked with `sudo service docker status` command.
-5. Now you are ready to create Joomla Branches Tester:
+6. Create a hosts entry on Windows to map `host.docker.internal` to `127.0.0.1`, follow these steps:
+   * Open Notepad as Administrator
+     * Press the Start button, type `Notepad`.
+     * Right-click on Notepad and select Run as administrator.
+   * Open the Hosts File:
+     * In Notepad, click File -> Open.
+     * Navigate to the hosts file location: `C:\Windows\System32\drivers\etc\`.
+     * In the Open dialog, make sure to select All Files `(*.*)` in the file type dropdown
+       at the bottom right (since the hosts file doesn't have a .txt extension).
+       Select the hosts file and click Open.
+   * Add the Host Entry:
+     * At the end of the file, add a new line with the following entry:
+       ```
+       127.0.0.1 host.docker.internal
+       ```
+    * Save the Hosts File:
+      * Click File -> Save to save your changes.
+    * Test the New Hosts Entry:
+      * Open Command Prompt and ping the host.docker.internal to ensure it resolves to 127.0.0.1:
+        ```bash
+        ping host.docker.internal
+        ```
+        It should return responses from 127.0.0.1.
+7. Now you are ready to create Joomla Branches Tester:
    ```
    cd ~/joomla-branches-tester
    scripts/create.sh
