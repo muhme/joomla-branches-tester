@@ -9,8 +9,8 @@ Alright, alright, apologies to those who enjoyed the whimsical writing style, bu
 
 ## Software Architecture
 All used Joomla development branches with the different Joomla versions run in parallel in a [Docker](https://www.docker.com/) container environment.
-*Used* refers to default, active and stale GitHub branches.
-Use one or all branches for:
+*Used* Joomla development branches refers to GitHub [joomla-cms](https://github.com/joomla/joomla-cms) with default, active and stale branches.
+Use one, multiple, or all branches for:
 * Manual testing, including database inspections and email verifications.
 * [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System)
   with [Cypress](https://www.cypress.io/) GUI (interactive mode) or headless (automated mode).
@@ -18,6 +18,7 @@ Use one or all branches for:
 * Switch between the three database options (MySQL, MariaDB, or PostgreSQL) and the two database drivers
   (MySQLi or PHP Data Objects).
 * Switch between the PHP versions (8.1, 8.2, or 8.3) as supported by the official Docker images.
+* Install Joomla from a cloned 'joomla-cms' Git repository.
 * Grafting a Joomla package onto a branch.
 
 ![Joomla Branches Software Architecture](images/joomla-branches-tester.svg)
