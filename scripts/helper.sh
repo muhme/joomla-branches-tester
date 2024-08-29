@@ -19,22 +19,23 @@ JBT_DB_PORTS=("7011"      "7011"      "7012"     "7012"     "7013"            )
 # PHP versions to chooce from
 JBT_PHP_VERSIONS=("php8.1" "php8.2" "php8.3")
 
-# Determine actual active Joomla branches, e.g. "44 51 52 60"
+# Determine actual active Joomla branches, e.g. "44 52 53 60"
 #
+# We using default, active and stale branches.
 # With ugly screen-scraping, because no git command found and GitHub API with token looks too oversized.
 #
 function getVersions() {
-    # GitHub branch page of the repository joomla-cms
-    local URL="https://github.com/joomla/joomla-cms/branches"
 
-    # Get the JSON data mit curl
-    local json_data=$(curl -s "$URL")
+    # Get the JSON data from both the main branches and stale branches URLs
+    local json_data=$(curl -s "https://github.com/joomla/joomla-cms/branches")
+    local stale_json_data=$(curl -s "https://github.com/joomla/joomla-cms/branches/stale")
 
     # Extract the names of the branches, only with grep and sed, so as not to install any dependencies, e.g. jq
-    # Use sed with -E flag to enable extended regular expressions, which is also working with macOS sed
-    local branches=$(echo "$json_data" | grep -o '"name":"[0-9]\+\.[0-9]\+-dev"' | sed -E 's/"name":"([0-9]+)\.([0-9]+)-dev"/\1\2/')
+    # Use sed with -E flag to enable extended regular expressions, which is also working with macOS sed.
+    local branches=$(echo "$json_data" "$stale_json_data"  | grep -o '"name":"[0-9]\+\.[0-9]\+-dev"' | \
+                     sed -E 's/"name":"([0-9]+)\.([0-9]+)-dev"/\1\2/')
 
-    # Create as array
+    # Create as array and add branches from both sources
     local formatted_branches=()
     for branch in ${branches}; do
         formatted_branches+=("${branch}")

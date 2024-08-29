@@ -1,11 +1,11 @@
 #!/bin/bash
 #
-# test.sh - test cypress spec on one or all branches, e.g.
+# test.sh - test cypress spec on one, multiple or all branches, e.g.
 #   scripts/test.sh
 #   scripts/test.sh firefox
 #   scripts/test.sh 44
-#   scripts/test.sh 51 edge tests/System/integration/site/components/com_contact/Categories.cy.js
-#   scripts/test.sh tests/System/integration/site/components/com_contact/Categories.cy.js
+#   scripts/test.sh 52 53 edge site/components/com_contact/Categories.cy.js
+#   scripts/test.sh 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
 #   ELECTRON_ENABLE_LOGGING=1 scripts/test.sh
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
@@ -15,25 +15,28 @@ source scripts/helper.sh
 # test script counts errors by own and should not stop on command failures
 trap - ERR
 
-# Is the first argument a version number?
 versions=$(getVersions)
-IFS=' ' versionsToTest=($(sort <<<"${versions}")); unset IFS # map to array
+IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
 
-if isValidVersion "$1" "$versions"; then
-  versionsToTest=($1)
-  shift # 1st arg is eaten as the version number
-fi
-
-# Is the next argument a browser?
-case "$1" in
-  chrome|edge|firefox|electron)
+browser=""
+versionsToTest=()
+while [ $# -ge 1 ]; do
+  if isValidVersion "$1" "$versions"; then
+    versionsToTest+=("$1")
+    shift # Argument is eaten as the Joomla version number.
+  elif [[ "$1" =~ ^(chrome|edge|firefox|electron)$ ]]; then
     browser="--browser $1"
-    shift # arg is eaten as browser
-    ;;
-  *)
-    browser=""
-    ;;
-esac
+    shift # Argument is eaten as browser to use.
+  else
+    spec="$1"
+    shift # Argument is eaten as test specification.
+  fi
+done
+
+# If no version was given, use all.
+if [ ${#versionsToTest[@]} -eq 0 ]; then
+  versionsToTest=(${allVersions[@]})
+fi
 
 # Pass through the environment variable to show 'console.log()' messages
 eel1=""
@@ -52,7 +55,7 @@ do
   fi
 
   # Is there one more argument with a test spec pattern?
-  if [ $# -eq 0 ] ; then
+  if [ -z "$spec" ] ; then
     # Running everything, but without installation step
     # Handle .js or .mjs from PR https://github.com/joomla/joomla-cms/pull/43676 – [4.4] Move the Cypress Tests to ESM
     cf="branch_${version}/cypress.config"
@@ -70,10 +73,10 @@ do
     spec="--spec '${all}'"
   else
     # Use the given test spec pattern and check if we can (no pattern) and must (missing path) insert path
-    if [[ "$1" != *","* && "$1" != tests/System/integration/* ]]; then
-      spec="--spec 'tests/System/integration/$1'"
+    if [[ "$spec" != *","* && "$spec" != tests/System/integration/* ]]; then
+      spec="--spec 'tests/System/integration/$spec'"
     else
-      spec="--spec '$1'"
+      spec="--spec '$spec'"
     fi
   fi
 

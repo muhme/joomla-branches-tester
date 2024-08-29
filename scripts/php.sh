@@ -26,7 +26,7 @@ while [ $# -ge 1 ]; do
     shift # Argument is eaten as PHP version.
   else
     log "Mandatory PHP version is one of: ${JBT_PHP_VERSIONS[@]}."
-    log "Optional version can be one of: ${allVersions[@]} (default is all)."
+    log "Optional Joomla version can be one of: ${allVersions[@]} (default is all)."
     error "Argument '$1' is not valid."
     exit 1
   fi

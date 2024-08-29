@@ -29,7 +29,7 @@ while [ $# -ge 1 ]; do
     shift # Argument is eaten as database variant.
   else
     log "Mandatory database variant can be one of: ${JBT_DB_VARIANTS[@]}."
-    log "Optional version can be one or more of the following: ${versions} (default is all, e.g. '52 53')."
+    log "Optional Joomla version can be one or more of the following: ${versions} (default is all, e.g. '52 53')."
     error "Argument '$1' is not valid."
     exit 1
   fi

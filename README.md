@@ -3,12 +3,13 @@
 # Docker based Joomla Branches Tester
 
 <img align="right" src="images/magic_world.png">
-Imagine a little slice of a parallel universe where testing all five active Joomla branches becomes a fluffy, cosy, and almost magical experience. In this universe, you can effortlessly test with the Patch Tester, glide through the Cypress GUI, or even enjoy the smooth efficiency of Cypress Headless. Picture the warmth of being able to peer into any database table as if through a magical glass, or seamlessly switch between five different database variants with just a small wave of a magic wand. Wouldn't that create a truly fluffy and cosy environment to work in?
+Imagine a little slice of a parallel universe where testing all used Joomla branches becomes a fluffy, cosy, and almost magical experience. In this universe, you can effortlessly test with the Patch Tester, glide through the Cypress GUI, or even enjoy the smooth efficiency of Cypress Headless. Picture the warmth of being able to peer into any database table as if through a magical glass, or seamlessly switch between five different database variants with just a small wave of a magic wand. Wouldn't that create a truly fluffy and cosy environment to work in?
 <br /><br />
 Alright, alright, apologies to those who enjoyed the whimsical writing style, but now it's time to dive into the technical depths. Let's transition from the cozy, magical universe into the world of technical documentation, where we'll explore the numerous options, parameters, and configurations that power this experience ...
 
 ## Software Architecture
-All active Joomla development branches with the different Joomla versions run in parallel in a [Docker](https://www.docker.com/) container environment.
+All used Joomla development branches with the different Joomla versions run in parallel in a [Docker](https://www.docker.com/) container environment.
+*Used* refers to default, active and stale GitHub branches.
 Use one or all branches for:
 * Manual testing, including database inspections and email verifications.
 * [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System)
@@ -21,7 +22,7 @@ Use one or all branches for:
 
 ![Joomla Branches Software Architecture](images/joomla-branches-tester.svg)
 
-The idea is to have all active Joomla development branches
+The idea is to have all used Joomla development branches
 (in this picture 4.4-dev, 5.1-dev, 5.2-dev and 6.0-dev) are available for testing in parallel.
 The installation is carried out with a good dozen Docker containers,
 and everything is scripted.
@@ -29,10 +30,9 @@ You see the four orange Web Server containers with the four different Joomla ver
 They are based on the `branch_*` folders, which are also available on the Docker host.
 
 :point_right: The version numbers referenced are current as of early August 2024.
-              Since active branches are subject to frequent changes,
+              Since used branches are subject to frequent changes,
               the latest version numbers are always be retrieved directly from the `joomla-cms` repository.
-              As of late August 2024, a fifth active branch, `5.3-dev`, has been introduced.
-              Consequently, five web servers are now configured to accommodate this change.
+              As of late August 2024, `5.1-dev` has been removed, and `5.3-dev` has been introduced.
 
 On the right you see three blue containers with the databases MySQL, MariaDB and PostgreSQL.
 To be able to check the databases, two further blue containers with phpMyAdmin and pgAdmin are installed.
@@ -62,18 +62,18 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
 
 |Name|Host Port:<br />Container Inside|Directory :eight_spoked_asterisk: |Comment|
 |----|----|----------------------------------|-------|
-|jbt_44| **[7044](http://localhost:7044/administrator)** | /branch_44 | Web Server Joomla branch 4.4-dev<br />user ci-admin / joomla-17082005 |
-|jbt_51| **[7051](http://localhost:7051/administrator)** | /branch_51 | Web Server Joomla branch 5.1-dev<br />user ci-admin / joomla-17082005 |
-|jbt_52| **[7052](http://localhost:7052/administrator)** | /branch_52 | Web Server Joomla branch 5.2-dev<br />user ci-admin / joomla-17082005 |
-|jbt_53| **[7053](http://localhost:7053/administrator)** | /branch_53 | Web Server Joomla branch 5.3-dev<br />user ci-admin / joomla-17082005 |
-|jbt_60| **[7060](http://localhost:7060/administrator)** | /branch_60 | Web Server Joomla branch 6.0-dev<br />user ci-admin / joomla-17082005 |
+|jbt_44| **[7044](http://host.docker.internal:7044/administrator)** | /branch_44 | Web Server Joomla branch 4.4-dev<br />user ci-admin / joomla-17082005 |
+|jbt_51| **[7051](http://host.docker.internal:7051/administrator)** | /branch_51 | Web Server Joomla branch 5.1-dev<br />user ci-admin / joomla-17082005 |
+|jbt_52| **[7052](http://host.docker.internal:7052/administrator)** | /branch_52 | Web Server Joomla branch 5.2-dev<br />user ci-admin / joomla-17082005 |
+|jbt_53| **[7053](http://host.docker.internal:7053/administrator)** | /branch_53 | Web Server Joomla branch 5.3-dev<br />user ci-admin / joomla-17082005 |
+|jbt_60| **[7060](http://host.docker.internal:7060/administrator)** | /branch_60 | Web Server Joomla branch 6.0-dev<br />user ci-admin / joomla-17082005 |
 |jbt_mysql| **7011**:3306 | | Database Server MySQL version 8.1 |
 |jbt_madb| **7012**:3306 | | Database Server MariaDB version 10.4 |
 |jbt_pg| **7013**:5432 | | Database Server PostgreSQL version 12.20 |
 |jbt_cypress| SMTP :7125 | | Cypress Headless Test Environment<br />SMTP server is only running during test execution |
-|jbt_phpmya| **[7001](http://localhost:7001)** | | Web App to manage MariaDB and MySQL<br />auto-login configured, root / root |
-|jbt_pga| **[7002](http://localhost:7002)** | | Web App to manage PostgreSQL<br />auto-login configured, root / root, postgres / prostgres |
-|jbt_mail| **[7003](http://localhost:7003)** <br /> SMTP **7225**:1025 | | Web interface to verify emails. |
+|jbt_phpmya| **[7001](http://host.docker.internal:7001)** | | Web App to manage MariaDB and MySQL<br />auto-login configured, root / root |
+|jbt_pga| **[7002](http://host.docker.internal:7002)** | | Web App to manage PostgreSQL<br />auto-login configured, root / root, postgres / prostgres |
+|jbt_mail| **[7003](http://host.docker.internal:7003)** <br /> SMTP **7225**:1025 | | Web interface to verify emails. |
 |jbt_relay| SMTP **7025**:7025 | | SMTP relay triplicator |
 
 :eight_spoked_asterisk: The directories are available on Docker host to:
@@ -165,10 +165,12 @@ you will need to download approximately 4 GB of data over the network.
    (your system architecture will look like the picture on the right), default setting is for all branches.
    You can also give multiple Joomla versions like `53 60`.
 2. The used database and database driver, e.g. `pgsql`, defaults to use MariaDB with MySQLi driver.
-3. The used PHP version. You can choose between `php8.1`, `php8.2`, and `php8.3`. Defaults to `php8.1`. See more details in [Switch PHP Version](#switch-php-version).
+3. The used PHP version. You can choose between `php8.1`, `php8.2`, and `php8.3`. Defaults to `php8.1`.
+   See more details in [Switch PHP Version](#switch-php-version).
 4. Instead using `joomla-cms` repository, you can specify a different Git repository and branch.
    For example, using `https://github.com/Elfangor93/joomla-cms:mod_community_info`.
-   In this case, exactly one version must be provided, which should match the cloned repository.
+   In this case, exactly one version must be provided,
+   and it should match the version of the given `joomla-cms` cloned repository.
 5. To force a fresh build with `no-cache`, defaults to build from cache.
 </details>
 
@@ -329,15 +331,15 @@ Installing with a user that is able to run `sudo`.
 ### Manual Testing
 
 From your Docker Host system you can test the Joomla Frontend e.g. for Joomla release 5.2
-with [http://localhost:7052](http://localhost:7052) and the backend
-[http://localhost:7052/administrator](http://localhost:7052/administrator).
+with [http://host.docker.internal:7052](http://host.docker.internal:7052) and the backend
+[http://host.docker.internal:7052/administrator](http://host.docker.internal:7052/administrator).
 User *ci-admin* and password *joomla-17082005* (Whose birthday is it anyway?) are from Joomla System Tests.
 
 In parallel you can inspect MariaDB and MySQL database with [phpMyAdmin](https://www.phpmyadmin.net/) on
-[http://localhost:7001](http://localhost:7001) or PostgreSQL database with [pgAdmin](https://www.pgadmin.org/) on
-[http://localhost:7002](http://localhost:7002). And verify all emails from Joomla and the System Tests with
+[http://host.docker.internal:7001](http://host.docker.internal:7001) or PostgreSQL database with [pgAdmin](https://www.pgadmin.org/) on
+[http://host.docker.internal:7002](http://host.docker.internal:7002). And verify all emails from Joomla and the System Tests with
 [MailDev](https://github.com/maildev/maildev/blob/master/docs/docker.md) on
-[http://localhost:7003](http://localhost:7003).
+[http://host.docker.internal:7003](http://host.docker.internal:7003).
 
 If you need to inspect files, they are available in the directory `branch_52` for this Joomla release 5.2 sample.
 
@@ -406,7 +408,7 @@ scripts/cypress.sh 51 local
 
 To check the emails sent by Joomla,
 the [MailDev](https://hub.docker.com/r/maildev/maildev) container offers you
-provides you with a web interface at [http://localhost:7003](http://localhost:7003).
+provides you with a web interface at [http://host.docker.internal:7003](http://host.docker.internal:7003).
 The Cypress based Joomla System Tests is using an own SMTP server `smtp-tester` to receive, check and delete emails.
 Since we run Cypress locally or in a container, it is necessary to triple emails.
 This is done by the SMTP relay triplicator `jbt_relay`.
@@ -549,7 +551,9 @@ and graft the package for a seamless experience.:
 scripts/graft.sh 52 ~/Downloads/Joomla_5.2.0-alpha4-dev-Development-Full_Package.zip
 ```
 
-Mandatory arguments are the Joomla branch version and the package file. Optional argument is the database variant:
+Mandatory arguments are the Joomla branch version and the local package file.
+Supported file formats are .zip, .tar, .tar.zst, .tar.gz, and .tar.bz2.
+An optional argument is the database variant, such as PostgreSQL in the following example:
 ```
 scripts/graft.sh 51 pgsql ~/Downloads/Joomla_5.1.3-Stable-Full_Package.zip
 ```
@@ -589,8 +593,8 @@ Fear not, for magical tools are at your disposal, each one a trusted companion.
 They are so finely attuned to your needs that they require no login, no password — just a single click,
 and the pages of the database open before you as if by magic:
 
-* [http://localhost:7001](http://localhost:7001) phpMyAdmin – for MariaDB and MySQL
-* [http://localhost:7002](http://localhost:7002) pgAdmin – for PostgreSQL
+* [http://host.docker.internal:7001](http://host.docker.internal:7001) phpMyAdmin – for MariaDB and MySQL
+* [http://host.docker.internal:7002](http://host.docker.internal:7002) pgAdmin – for PostgreSQL
 
 Simply approach these gateways, and the secrets of the database will reveal themselves effortlessly,
 ready for your exploration.

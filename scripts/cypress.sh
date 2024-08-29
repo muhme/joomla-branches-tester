@@ -11,25 +11,29 @@ source scripts/helper.sh
 
 versions=$(getVersions)
 
-if [ $# -lt 1 ]; then
-  error "Please give one argument with version number from ${versions}."
-  exit 1
-fi
+local=false
+while [ $# -ge 1 ]; do
+  if isValidVersion "$1" "$versions"; then
+    version="$1"
+    shift # Argument is eaten as the version number.
+  elif [ $1 = "local" ]; then
+    local=true
+    shift # Argument is eaten to run Cypress directly on the Docker host.
+  else
+    log "The mandatory Joomla version argument must be one of the following: ${allVersions[@]}."
+    log "The optional 'local' argument runs Cypress directly on the Docker host (default is to run from the Docker container)."
+    error "Argument '$1' is not valid."
+    exit 1
+  fi
+done
 
-if isValidVersion "$1" "$versions"; then
-  version="$1"
-else
-  error "Please use a version number from ${versions}."
-  exit 1
-fi
-
-if [ $# -eq 2 ] && [ "$2" != "local" ]; then
-  error "If you use a second argument, please use 'local' only."
+if [ -z "${version}" ]; then
+  error "Please provide a Joomla version number from the following: ${versions}."
   exit 1
 fi
 
 # Use of SMTP port 7325 for the smtp-tester, as port 7125 is occupied by the mapping for the Cypress container.
-if [ "$2" = "local" ]; then
+if $local; then
   cd "branch_${version}"
   # Install the Cypress version used in this branch, if needed
   log "Installing Cypress if needed."

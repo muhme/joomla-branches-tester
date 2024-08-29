@@ -3,7 +3,7 @@
 # graft.sh - Place Joomla package onto development branch.
 #            Just like in plant grafting, where a scion is joined to a rootstock.
 #   scripts/graft.sh 52 ~/Downloads/Joomla_5.2.0-alpha4-dev-Development-Full_Package.zip
-#   scripts/graft.sh 51 pgsql ~/Downloads/Joomla_5.1.2-Stable-Full_Package.zip
+#   scripts/graft.sh /tmp/Joomla_5.1.2-Stable-Full_Package.zip 51 pgsql
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
@@ -15,42 +15,40 @@ source scripts/helper.sh
 
 versions=$(getVersions)
 
-if [ $# -lt 1 ]; then
-  error "Needs version number argument. Please use one of: ${versions}."
-  exit 1
-fi
-
-if isValidVersion "$1" "$versions"; then
-  version="$1"
-  shift # Version number is eaten.
-else
-  error "Please use as version number one of: ${versions}."
-  exit 1
-fi
-
-# Defauls to use MariaDB with MySQLi database driver, but different one can be given.
 database_variant="mariadbi"
-if [ $# -eq 2 ]; then
-  if isValidVariant "$1"; then
-    database_variant=($1)
+while [ $# -ge 1 ]; do
+  if isValidVersion "$1" "$versions"; then
+    version="$1"
+    shift # Argument is eaten as the version number.
+  elif isValidVariant "$1"; then
+    database_variant="$1"
     shift # Argument is eaten as database variant.
+  elif [[ "$1" =~ \.(zip|tar|tar\.zst|tar\.gz|tar\.bz2)$ ]]; then
+    package="$1"
+    shift # Argument is eaten as package file.
   else
-    error "'$1' is not a valid selection for database and driver. Please use one of ${JBT_DB_VARIANTS[@]}."
+    log "The mandatory Joomla version argument must be one of the following: ${versions}."
+    log "The Joomla package file argument (e.g. 'Joomla_5.1.2-Stable-Full_Package.zip') is mandatory."
+    log "Optional database variant can be one of: ${JBT_DB_VARIANTS[@]} (default is mariadbi)."
+    error "Argument '$1' is not valid."
     exit 1
   fi
+done
+
+if [ -z "${version}" ]; then
+  error "Please provide a Joomla version number from the following: ${versions}."
+  exit 1
 fi
 
-if [ $# -ne 1 ]; then
-  error "Missing Joomla package argument. Please give local file e.g. Joomla_5.1.2-Stable-Full_Package.zip."
+if [ -z "${package}" ]; then
+  error "Please provide a Joomla package argument, e.g. local file 'Joomla_5.1.2-Stable-Full_Package.zip'."
   exit 1
 fi
 
 # Convert relative path to absolute path if necessary, as we need to change the working directory. 
-if [[ "$1" != /* ]]; then
+if [[ "$package" != /* ]]; then
     # It's a relative path.
-    package="$(pwd)/$FILE_PATH"
-else
-  package="$1"
+    package="$(pwd)/$package"
 fi
 if [ ! -f "$package" ]; then
     error "Given '${package}' package is not a file. Please check."

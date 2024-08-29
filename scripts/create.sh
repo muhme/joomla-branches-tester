@@ -51,7 +51,7 @@ while [ $# -ge 1 ]; do
     git_branch="${1##*:}" # everythin after the last ':'
     shift # Argument is eaten as repository:branch.
   else
-    log "Optional version can be one or more of the following: ${allVersions[@]} (default is all)."
+    log "Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all)."
     log "Optional database variant can be one of: ${JBT_DB_VARIANTS[@]} (default is mariadbi)."
     log "Optional no-cache can be set (default is to use cache)."
     log "Optional PHP version can be one of: ${JBT_PHP_VERSIONS[@]} (default is php8.1)."
