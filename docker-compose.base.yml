@@ -109,6 +109,7 @@ services:
       TARGET_PORT_2: 7225
       TARGET_HOST_3: host.docker.internal
       TARGET_PORT_3: 7325
+    restart: unless-stopped
     depends_on:
       - mail
       - cypress
@@ -120,6 +121,7 @@ services:
   mail:
     container_name: jbt_mail
     image: maildev/maildev
+    restart: unless-stopped
     ports:
       - "7003:1080"
       - "7225:1025"
