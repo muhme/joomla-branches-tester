@@ -28,7 +28,7 @@ while [ $# -ge 1 ]; do
     browser="--browser $1"
     shift # Argument is eaten as browser to use.
   else
-    spec="$1"
+    spec_argument="$1"
     shift # Argument is eaten as test specification.
   fi
 done
@@ -55,7 +55,7 @@ do
   fi
 
   # Is there one more argument with a test spec pattern?
-  if [ -z "$spec" ] ; then
+  if [ -z "$spec_argument" ] ; then
     # Running everything, but without installation step
     # Handle .js or .mjs from PR https://github.com/joomla/joomla-cms/pull/43676 – [4.4] Move the Cypress Tests to ESM
     cf="branch_${version}/cypress.config"
@@ -73,10 +73,10 @@ do
     spec="--spec '${all}'"
   else
     # Use the given test spec pattern and check if we can (no pattern) and must (missing path) insert path
-    if [[ "$spec" != *","* && "$spec" != tests/System/integration/* ]]; then
-      spec="--spec 'tests/System/integration/$spec'"
+    if [[ "$spec_argument" != *","* && "$spec_argument" != tests/System/integration/* ]]; then
+      spec="--spec 'tests/System/integration/$spec_argument'"
     else
-      spec="--spec '$spec'"
+      spec="--spec '$spec_argument'"
     fi
   fi
 
