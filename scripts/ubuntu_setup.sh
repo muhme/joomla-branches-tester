@@ -21,38 +21,44 @@
 #   scripts/create.sh
 #   scripts/test.sh
 
-source scripts/helper.sh
-
 # Running as sudo?
 if [ "$(id -u)" -ne 0 ]; then
-    error "Please run this script as root user with sudo."
+    echo "*** Error: Please run this script as root user with sudo."
     exit 1
 fi
 
 # Make the hosts entry
 HOSTS_FILE="/etc/hosts"
-log "Adding entry '127.0.0.1 host.docker.internal' to the file '${HOSTS_FILE}'."
-echo "127.0.0.1 host.docker.internal" >> "${HOSTS_FILE}"
+if grep -q host.docker.internal "${HOSTS_FILE}"; then
+  echo "*** Entry 'host.docker.internal' exists already in '${HOSTS_FILE}' file."
+else
+  echo "*** Adding entry '127.0.0.1 host.docker.internal' to the file '${HOSTS_FILE}'."
+  echo "127.0.0.1 host.docker.internal" >> "${HOSTS_FILE}"
+fi
 
 # Enable SMTP port in Ubuntu Uncomplicated Firewall (UFW)
-log "Allow port range 7000:7999/tcp in Ubuntu Uncomplicated Firewall (UFW)."
-sudo ufw allow 7000:7999/tcp
+echo "*** Allow port range 7000:7999/tcp in Ubuntu Uncomplicated Firewall (UFW)."
+# This is possible even UFW is disabled or the rules exist already
+ufw allow 7000:7999/tcp
 
 # Some basics with git
-log "Installing git and some base packages."
-apt update
-apt upgrade -y
-apt install -y git vim iputils-ping net-tools telnet unzip
+echo "*** Installing git and some base packages."
+# This can run multiple times
+apt-get update
+apt-get upgrade -y
+apt-get install -y git vim iputils-ping net-tools telnet unzip
 
 # Docker
-log "Installing Docker."
-apt install -y apt-transport-https ca-certificates curl software-properties-common
+echo "*** Installing Docker."
+# This can run multiple times
+apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg > /etc/apt/trusted.gpg.d/docker.asc
 add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-apt update
-apt install -y docker-ce
+apt-get update
+apt-get install -y docker-ce
 
-log "Adding '$USER' user to the docker group."
+echo "*** Adding '$USER' user to the docker group."
+# This can run multiple times
 usermod -aG docker $USER
 
-log "Finished. Please run `sudo reboot`, and after that, try `docker ps`."
+echo "*** Finished. Please run 'sudo reboot', and after that, try 'docker ps'."
