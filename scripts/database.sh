@@ -154,6 +154,10 @@ EOF
     rm -rf administrator/components/com_patchtester api/components/com_patchtester
     rm -rf media/com_patchtester administrator/cache/autoload_psr4.php"
 
+  # Seen on Ubuntu, 13.10.0 was installed, but 12.13.2 needed for the branch
+  log "jbt_${version} – Install Cypress with needed version (if needed)."
+  docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && npx cypress install"
+
   # Using Install Joomla from System Tests
   log "jbt_${version} – Cypress-based Joomla installation."
   docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && cypress run --spec tests/System/integration/install/Installation.cy.js"
