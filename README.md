@@ -377,7 +377,7 @@ scripts/test.sh
 Optional arguments are:
 
 * **Joomla version number(s)**: All versions are tested by default.
-* **Browser to be used**: Choose between electron (default), firefox, chrome, or edge (the web browser must be installed).
+* **Browser to be used**: Choose between electron (default), firefox, chrome, or edge.
 * **Test spec pattern**: All test specs (except the installation) are used by default.
 
 As an example, run all the test specs (except the installation) from branch 5.1-dev with Mozilla Firefox:
@@ -428,7 +428,7 @@ scripts/cypress.sh 51 local
 The script will automatically install the appropriate Cypress version locally
 for each branch if it doesn't already exist.
 Using the Cypress container has the advantage of having Chrome, Edge, Electron, and Chromium pre-installed.
-If you run Cypress locally, only the browsers installed on your system will be available.
+If you run Cypress locally, only the browsers installed on your Docker host system will be available.
 
 :imp: Are you see the `Installation.cy.js` test spec? Here you finally have the chance to do it.
   Who cares about file system and database consistency? Go on, click on it. Go on, go on ...
