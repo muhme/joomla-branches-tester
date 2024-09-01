@@ -415,18 +415,20 @@ with the Cypress GUI in interactive mode. You can see all the Cypress log messag
 observe how the browser runs in parallel.
 
 Cypress GUI can be started from Docker container `jbt_cypress` with X11 forwarding
-(recommeded for Windows 11 WSL 2):
+(recommeded for Windows 11 WSL 2 Ubuntu):
 ```
 scripts/cypress.sh 51
 ```
 
-Or from local installed Cypress (recommended for macOS and Ubuntu) with additional argument `local`:
+Or from local installed Cypress (recommended for macOS and native Ubuntu) with additional argument `local`:
 ```
 scripts/cypress.sh 51 local
 ```
 
 The script will automatically install the appropriate Cypress version locally
 for each branch if it doesn't already exist.
+Using the Cypress container has the advantage of having Chrome, Edge, Electron, and Chromium pre-installed.
+If you run Cypress locally, only the browsers installed on your system will be available.
 
 :imp: Are you see the `Installation.cy.js` test spec? Here you finally have the chance to do it.
   Who cares about file system and database consistency? Go on, click on it. Go on, go on ...
