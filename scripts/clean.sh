@@ -24,3 +24,12 @@ for version in "${allVersions[@]}"; do
     rm -rf "branch_${version}" >/dev/null 2>&1 || sudo rm -rf "branch_${version}"
   fi
 done
+
+# Checking Cypress global binary cache for macOS and Linux
+for dir in  "${HOME}/Library/Caches/Cypress" "${HOME}/.cache/Cypress"; do
+  if [ -d "${dir}" ]; then
+    log "Found Cypress global binary cache in the '${dir}' directory with the following sizes in MB:"
+    du -ms ${dir}/*
+    log "You may delete this Cypress binary system cache if it's not shared with other projects, or remove outdated versions."
+  fi
+done
