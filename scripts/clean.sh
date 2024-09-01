@@ -29,7 +29,7 @@ done
 for dir in  "${HOME}/Library/Caches/Cypress" "${HOME}/.cache/Cypress"; do
   if [ -d "${dir}" ]; then
     log "Found Cypress global binary cache in the '${dir}' directory with the following sizes in MB:"
-    du -ms ${dir}/*
+    du -ms ${dir}/* || true
     log "You may delete this Cypress binary system cache if it's not shared with other projects, or remove outdated versions."
   fi
 done

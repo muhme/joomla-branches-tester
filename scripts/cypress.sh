@@ -37,9 +37,12 @@ if $local; then
   cd "branch_${version}"
   # Install the Cypress version used in this branch, if needed
   log "Installing Cypress if needed."
-  npm install cypress --save-dev
-  # it was needed on Ubuntu to run again with npx
-  npx cypress install 
+
+  # If it fails, try again with sudo, but specify the user's cache directory.
+  npm install cypress 2>/dev/null || sudo CYPRESS_CACHE_FOLDER=~/.cache/Cypress npm install cypress
+  # Install Cypress binary.
+  npx cypress install 2>/dev/null || sudo CYPRESS_CACHE_FOLDER=~/.cache/Cypress npx cypress install
+
   log "Open locally installed Cypress GUI for version ${version}."
   npx cypress open --e2e --project . --config-file cypress.config.local.mjs
   # By the way, the same way it is possible to run Cypress headless from Docker host

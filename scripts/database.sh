@@ -141,7 +141,7 @@ EOF
       fi
     done < "${PATCHED}" > "${TMP}"
     # if copying the file has failed, start a second attempt with sudo
-    cp "${TMP}" "${PATCHED}" || sudo cp "${TMP}" "${PATCHED}"
+    cp "${TMP}" "${PATCHED}" 2>/dev/null || sudo cp "${TMP}" "${PATCHED}"
   else
     log "jbt_${version} – Patch https://github.com/joomla-projects/joomla-cypress/pull/33 has already been applied."
   fi
@@ -155,12 +155,12 @@ EOF
     rm -rf media/com_patchtester administrator/cache/autoload_psr4.php"
 
   # Seen on Ubuntu, 13.10.0 was installed, but 12.13.2 needed for the branch
-  log "jbt_${version} – Install Cypress with needed version (if needed)."
+  log "jbt_${version} – Install Cypress (if needed)."
   docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && npx cypress install"
 
   # Using Install Joomla from System Tests
   log "jbt_${version} – Cypress-based Joomla installation."
-  docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && cypress run --spec tests/System/integration/install/Installation.cy.js"
+  docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && unset DISPLAY && cypress run --spec tests/System/integration/install/Installation.cy.js"
 
   # Cypress is using own SMTP port to read and reset mails by smtp-tester
   log "jbt_${version} – Set the SMTP port used by Cypress to 7125."
