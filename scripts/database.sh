@@ -128,13 +128,7 @@ EOF
     while IFS= read -r line; do
       if [[ "$line" == *"$SEARCH_LINE"* ]]; then
         # Insert the patch
-        echo "// muhme, 9 August 2024 'hack' as long as waiting for PR https://github.com/joomla-projects/joomla-cypress/pull/33"
-        echo "// is merged, and new joomla-cypress release is build and used in all active Joomla branches"
-        echo "let connection = config.db_host;"
-        echo 'if (config.db_port && config.db_port.trim() !== "") {'
-        echo '  connection += ":${config.db_port.trim()}";'
-        echo "}"
-        echo 'cy.get("#jform_db_host").clear().type(connection);'
+        echo "$PATCH"
       else
         # Print the original line
         echo "$line"
