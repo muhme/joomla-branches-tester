@@ -131,7 +131,7 @@ for version in "${versionsToInstall[@]}"; do
   docker exec -it "jbt_${version}" bash -c 'apt-get update -qq && \
     apt-get upgrade -y && \
     curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
-    apt-get install -y git unzip vim nodejs iputils-ping net-tools'
+    apt-get install -y git unzip vim nodejs iputils-ping iproute2 telnet net-tools'
   # Aditional having vim, ping, netstat
 
   branch=$(branchName "${version}")
@@ -174,5 +174,5 @@ for version in "${versionsToInstall[@]}"; do
 
 done
 
-log "Installing vim, ping, and netstat in the 'jbt_cypress' container."
-docker exec -it jbt_cypress sh -c "apt-get update && apt-get install -y git vim iputils-ping net-tools"
+log "Installing vim, ping, ip, telnet and netstat in the 'jbt_cypress' container."
+docker exec -it jbt_cypress sh -c "apt-get update && apt-get install -y git vim iputils-ping iproute2 telnet net-tools"
