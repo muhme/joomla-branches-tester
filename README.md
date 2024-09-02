@@ -25,7 +25,7 @@ Use one, multiple, or all branches for:
 
 The idea is to have all used Joomla development branches
 (in this picture 4.4-dev, 5.1-dev, 5.2-dev and 6.0-dev) are available for testing in parallel.
-The installation is carried out with a good dozen Docker containers,
+The installation is carried out with a dozen Docker containers,
 and everything is scripted.
 You see the four orange Web Server containers with the four different Joomla versions.
 They are based on the `branch_*` folders, which are also available on the Docker host.
@@ -55,7 +55,7 @@ On macOS and Ubuntu, the native Cypress GUI is shown in green.
         For those with a taste for the finer details, the comments are a gourmet treat.
 
 <details>
-  <summary>There are a good dozen Docker containers that provide the functionality.</summary>
+  <summary>There are a dozen Docker containers that provide the functionality.</summary>
 
 ---
 
@@ -627,6 +627,41 @@ and the pages of the database open before you as if by magic:
 
 Simply approach these gateways, and the secrets of the database will reveal themselves effortlessly,
 ready for your exploration.
+
+### Info
+
+You can retrieve some interesting Joomla Branches Tester status information:
+```
+scripts/info.sh
+```
+The following example shows an installation with only the `5.3-dev` branch,
+which uses 568 megabytes in the `/branch_53` directory.
+Interestingly, not only the `5.3-dev` branch is used; the Joomla Framework Database branch is also included:
+```
+Docker version 27.1.1 is running with 9 containers and 21 images
+Standard Containers:
+  jbt_mya     is running, ports: 80/tcp -> 0.0.0.0:7001
+  jbt_pga     is running, ports: 80/tcp -> 0.0.0.0:7002
+  jbt_mysql   is running, ports: 3306/tcp -> 0.0.0.0:7011
+  jbt_madb    is running, ports: 3306/tcp -> 0.0.0.0:7012
+  jbt_pg      is running, ports: 5432/tcp -> 0.0.0.0:7013
+  jbt_relay   is running, ports: 7025/tcp -> 0.0.0.0:7025
+  jbt_mail    is running, ports: 1025/tcp -> 0.0.0.0:7225; 1080/tcp -> 0.0.0.0:7003
+  jbt_cypress is running, ports: 7125/tcp -> 0.0.0.0:7125
+Branches:
+  Branch 4.4-dev:
+    /branch_44 is NOT existing
+  Branch 5.1-dev:
+    /branch_51 is NOT existing
+  Branch 5.2-dev:
+    /branch_52 is NOT existing
+  Branch 5.3-dev: jbt_53 is running, ports: 80/tcp -> 0.0.0.0:7053
+    /branch_53: 568MB
+      Repo branch_53/libraries/vendor/joomla/database: https://github.com/joomla-framework/database.git,  Branch: 3.x-dev-portnumber,  Status: 0 changes
+      Repo branch_53: https://github.com/joomla/joomla-cms,  Branch: 5.3-dev,  Status: 6 changes
+  Branch 6.0-dev:
+    /branch_60 is NOT existing
+```
 
 ### Cleaning Up
 
