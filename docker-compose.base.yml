@@ -3,6 +3,24 @@
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
+# IPv4 (default):
+# - subnet 192.168.150.0/24
+# - enable_ipv6: false
+# IPv6 (create.sh IPv6):
+# - subnet 2003:c2:6727:cb00::/64
+# - enable_ipv6: true
+# (perhaps both as dual stack network?)
+#
+networks:
+  jbt_network:
+    name: jbt_network
+    driver: bridge
+    enable_ipv6: false
+    ipam:
+      driver: default
+      config:
+        - subnet: "192.168.150.0/24"
+
 services:
 
   mysql:
@@ -17,6 +35,8 @@ services:
       MYSQL_ROOT_PASSWORD: root
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - jbt_network
 
   mariadb:
     container_name: jbt_madb
@@ -28,6 +48,8 @@ services:
       MYSQL_ROOT_PASSWORD: root
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - jbt_network
 
   postgres:
     container_name: jbt_pg
@@ -40,6 +62,8 @@ services:
       - POSTGRES_PASSWORD=postgres
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - jbt_network
 
   myadmin:
     container_name: jbt_mya
@@ -56,6 +80,8 @@ services:
       - postgres
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - jbt_network
 
   pgadmin:
     container_name: jbt_pga
@@ -79,6 +105,8 @@ services:
     entrypoint: /bin/sh -c "chmod 600 /pgadmin4/pgpass; /entrypoint.sh"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - jbt_network
 
   cypress:
     container_name: jbt_cypress
@@ -95,6 +123,8 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - jbt_network
 
   relay:
     container_name: jbt_relay
@@ -117,6 +147,8 @@ services:
       - "7025:7025"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - jbt_network
 
   mail:
     container_name: jbt_mail
@@ -127,3 +159,5 @@ services:
       - "7225:1025"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - jbt_network

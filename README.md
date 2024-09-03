@@ -172,7 +172,10 @@ you will need to download approximately 4 GB of data over the network.
    For example, using `https://github.com/Elfangor93/joomla-cms:mod_community_info`.
    In this case, exactly one version must be provided,
    and it should match the version of the given `joomla-cms` cloned repository.
-5. To force a fresh build with `no-cache`, defaults to build from cache.
+5. The Docker `jbt_network`, used by all containers, defaults to IPv4.
+   To use IPv6, run the script with the `IPv6` option.
+   This will configure the Docker network to use IPv6.
+6. To force a fresh build with `no-cache`, defaults to build from cache.
 </details>
 
 :point_right: In case of trouble, see [Trouble-Shooting](#trouble-shooting).
@@ -387,7 +390,7 @@ scripts/test.sh 51 firefox
 
 Run one test spec with default Electron in all branches (of course, the spec must exist in all branches):
 ```
-scripts/test.sh administrator/components/com_privacy/Consent.cy.js
+scripts/test.sh administrator/components/com_users/Users.cy.js
 ```
 
 :point_right: When specifying a single test spec file,

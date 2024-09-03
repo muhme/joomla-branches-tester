@@ -29,6 +29,7 @@ IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
 
 # Defauls to use MariaDB with MySQLi database driver, to use cache and PHP 8.1.
 database_variant="mariadbi"
+network="IPv4"
 no_cache=false
 php_version="php8.1"
 versionsToInstall=()
@@ -39,6 +40,9 @@ while [ $# -ge 1 ]; do
   elif isValidVariant "$1"; then
     database_variant="$1"
     shift # Argument is eaten as database variant.
+  elif [ "$1" = "IPv6" ]; then
+    network="IPv6"
+    shift # Argument is eaten as IPv6 option.
   elif [ "$1" = "no-cache" ]; then
     no_cache=true
     shift # Argument is eaten as no cache option.
@@ -51,8 +55,9 @@ while [ $# -ge 1 ]; do
     arg_branch="${1##*:}" # everythin after the last ':'
     shift # Argument is eaten as repository:branch.
   else
-    log "Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all)."
+    log "Optional Joomla version can be one or more of the following: ${allVersions[@]} (without version, all are installed)."
     log "Optional database variant can be one of: ${JBT_DB_VARIANTS[@]} (default is mariadbi)."
+    log "Optional IPv6 can be set (default is to use IPv4)."
     log "Optional no-cache can be set (default is to use cache)."
     log "Optional PHP version can be one of: ${JBT_PHP_VERSIONS[@]} (default is php8.1)."
     log "Optional repository:branch, e.g. https://github.com/Elfangor93/joomla-cms:mod_community_info."
@@ -75,7 +80,7 @@ fi
 scripts/clean.sh
 
 # Create Docker Compose setup with Joomla web servers for all versions to be installed.
-createDockerComposeFile "${versionsToInstall[*]}" "$php_version"
+createDockerComposeFile "${versionsToInstall[*]}" "${php_version}" "${network}"
 
 if [ $# -eq 1 ] && [ "$1" = "no-cache" ]; then
   log "Running 'docker compose build --no-cache'."

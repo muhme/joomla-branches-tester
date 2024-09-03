@@ -146,15 +146,23 @@ function isValidVariant() {
 # Create docker-compose.yml with one or all five Joomla web servers
 # 1st argument is e.g. "52" or "44 51 52 53 60"
 # 2nd argument e.g. "php8.1"
+# 3rd argument is "IPv4" or "IPv6"
 #
 function createDockerComposeFile() {
-    log "Create 'docker-compose.yml' file for version(s) $1 and $2."
+    log "Create 'docker-compose.yml' file for version(s) $1, based on $2 and $3."
 
     local php_version="$2"
+    local network="$3"
     local versions=()
     IFS=' ' versions=($(sort <<<"$1")); unset IFS # map to array
 
-    cp docker-compose.base.yml docker-compose.yml
+    if [ "${network}" = "IPv4" ]; then
+      cp docker-compose.base.yml docker-compose.yml
+    else
+      sed -e 's/enable_ipv6: false/enable_ipv6: true/' \
+          -e 's/subnet: "192.168.150.0\/24"/subnet: "2003:c2:6727:cb00::\/64"/' \
+          docker-compose.base.yml > docker-compose.yml
+    fi
     local version
     for version in "${versions[@]}"; do
         local din=$(dockerImageName "$version" "$php_version")

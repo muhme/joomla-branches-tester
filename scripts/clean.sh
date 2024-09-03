@@ -10,8 +10,8 @@ source scripts/helper.sh
 versions=$(getVersions)
 IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
 
-# Delete all docker containters (PHP version does not play a role for deletion)
-createDockerComposeFile "${allVersions[*]}" "php8.2"
+# Delete all docker containters. The PHP version and network do not affect the deletion process.
+createDockerComposeFile "${allVersions[*]}" "php8.2" "IPv4"
 
 log 'Stopping and removing JBT Docker containers, associated Docker networks and volumes.'
 docker compose down -v
