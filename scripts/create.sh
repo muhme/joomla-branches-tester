@@ -47,8 +47,8 @@ while [ $# -ge 1 ]; do
     shift # Argument is eaten as PHP version.
   elif [[ "$1" == *:* ]]; then
     # Split into repository and branch.
-    git_repository="${1%:*}" # remove everything after the last ':'
-    git_branch="${1##*:}" # everythin after the last ':'
+    arg_repository="${1%:*}" # remove everything after the last ':'
+    arg_branch="${1##*:}" # everythin after the last ':'
     shift # Argument is eaten as repository:branch.
   else
     log "Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all)."
@@ -132,12 +132,15 @@ for version in "${versionsToInstall[@]}"; do
     apt-get upgrade -y && \
     curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt-get install -y git unzip vim nodejs iputils-ping iproute2 telnet net-tools'
-  # Aditional having vim, ping, netstat
+    # Aditional having vim, ping, netstat
 
   branch=$(branchName "${version}")
-  if [ -z "${git_repository}" ]; then
+  if [ -z "${arg_repository}" ]; then
     git_repository="https://github.com/joomla/joomla-cms"
     git_branch="${branch}"
+  else
+    git_repository="$arg_repository"
+    git_branch="${arg_branch}"
   fi
   log "jbt_${version} – Cloning ${git_repository}:${git_branch} into the 'branch_${version}' directory."
   docker exec -it "jbt_${version}" bash -c "git clone -b ${git_branch} --depth 1 ${git_repository} /var/www/html"
@@ -179,7 +182,7 @@ done
 log "Installing vim, ping, ip, telnet and netstat in the 'jbt_cypress' container."
 docker exec -it jbt_cypress sh -c "apt-get update && apt-get install -y git vim iputils-ping iproute2 telnet net-tools"
 
-log "Add bash in Alpine containers"
+log "Add bash for Alpine containers"
 for container in "jbt_pga" "jbt_mail"; do
   docker exec -u root ${container} apk add bash || true # Who cares?
 done
