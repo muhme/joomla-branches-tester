@@ -634,33 +634,41 @@ You can retrieve some interesting Joomla Branches Tester status information:
 ```
 scripts/info.sh
 ```
-The following example shows an installation with only the `5.3-dev` branch,
-which uses 568 megabytes in the `/branch_53` directory.
-Interestingly, not only the `5.3-dev` branch is used; the Joomla Framework Database branch is also included:
+The following example illustrates an installation with three branches:
+* `4.4-dev`: A development clone based on version 4.4.9.
+* `5.1-dev`: Grafted with the Joomla 5.1.2 Stable package.
+* `5.2-dev`: A development clone of version 5.2.0 with additional patches applied.
 ```
-Docker version 27.1.1 is running with 9 containers and 21 images
+Docker version 24.0.6 is running with 11 containers and 21 images
 Standard Containers:
-  jbt_mya     is running, ports: 80/tcp -> 0.0.0.0:7001
   jbt_pga     is running, ports: 80/tcp -> 0.0.0.0:7002
+  jbt_mya     is running, ports: 80/tcp -> 0.0.0.0:7001
   jbt_mysql   is running, ports: 3306/tcp -> 0.0.0.0:7011
   jbt_madb    is running, ports: 3306/tcp -> 0.0.0.0:7012
   jbt_pg      is running, ports: 5432/tcp -> 0.0.0.0:7013
   jbt_relay   is running, ports: 7025/tcp -> 0.0.0.0:7025
   jbt_mail    is running, ports: 1025/tcp -> 0.0.0.0:7225; 1080/tcp -> 0.0.0.0:7003
   jbt_cypress is running, ports: 7125/tcp -> 0.0.0.0:7125
-Branches:
-  Branch 4.4-dev:
-    /branch_44 is NOT existing
-  Branch 5.1-dev:
-    /branch_51 is NOT existing
-  Branch 5.2-dev:
-    /branch_52 is NOT existing
-  Branch 5.3-dev: jbt_53 is running, ports: 80/tcp -> 0.0.0.0:7053
-    /branch_53: 568MB
-      Repo branch_53/libraries/vendor/joomla/database: https://github.com/joomla-framework/database.git,  Branch: 3.x-dev-portnumber,  Status: 0 changes
-      Repo branch_53: https://github.com/joomla/joomla-cms,  Branch: 5.3-dev,  Status: 6 changes
-  Branch 6.0-dev:
-    /branch_60 is NOT existing
+Branch 4.4-dev:
+  jbt_44 is running, ports: 80/tcp -> 0.0.0.0:7044
+  Version: Joomla! 4.4.9 Development
+  /branch_44: 448MB
+  Repository branch_44: https://github.com/joomla/joomla-cms,  Branch: 4.4-dev,  Status: 0 changes
+Branch 5.1-dev:
+  jbt_51 is running, ports: 80/tcp -> 0.0.0.0:7051
+  Version: Joomla! 5.1.2 Stable
+  /branch_51: 395MB
+Branch 5.2-dev:
+  jbt_52 is running, ports: 80/tcp -> 0.0.0.0:7052
+  Version: Joomla! 5.2.0 Development
+  /branch_52: 497MB
+  Repository branch_52: https://github.com/joomla/joomla-cms,  Branch: 5.2-dev,  Status: 2 changes
+Branch 5.3-dev:
+  jbt_53 is NOT running
+  /branch_53 is NOT existing
+Branch 6.0-dev:
+  jbt_60 is NOT running
+  /branch_60 is NOT existing
 ```
 
 ### Cleaning Up

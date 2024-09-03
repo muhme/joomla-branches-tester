@@ -30,29 +30,43 @@ else
   log "Docker is NOT running?"
 fi
 
-echo "Branches:"
 for version in "${allVersions[@]}"; do
   branch_name=$(branchName "${version}")
-  echo -n "  Branch ${branch_name}: "
+  echo "Branch ${branch_name}:"
   if ${docker_running}; then
     if [ "$(docker ps -q -f name=jbt_${version})" ]; then
       ports=$(docker port jbt_${version} | awk '{printf "%s; ", $0} END {print ""}' | sed 's/; $/\n/')
-      echo -n "jbt_${version} is running, ports: $ports"
+      echo "  jbt_${version} is running, ports: $ports"
+    else
+      echo "  jbt_${version} is NOT running"
     fi
-    echo
   fi
   if [ -d "branch_${version}" ]; then
-    echo "    /branch_${version}: $(du -ms branch_${version} | awk '{print $1}')MB"
+      version_file="branch_${version}/libraries/src/Version.php"
+    if [ -f "${version_file}" ]; then
+      product=$(grep "public const PRODUCT" "${version_file}" | awk -F"'" '{print $2}')
+      major_version=$(grep "public const MAJOR_VERSION" "${version_file}" | awk -F" " '{print $NF}' | tr -d ';')
+      minor_version=$(grep "public const MINOR_VERSION" "${version_file}" | awk -F" " '{print $NF}' | tr -d ';')
+      patch_version=$(grep "public const PATCH_VERSION" "${version_file}" | awk -F" " '{print $NF}' | tr -d ';')
+      extra_version=$(grep "public const EXTRA_VERSION" "${version_file}" | awk -F"'" '{print $NF}' | tr -d ';')
+      dev_status=$(grep "public const DEV_STATUS" "${version_file}" | awk -F"'" '{print $2}')
+      echo -n "  Version: $product $major_version.$minor_version.$patch_version"
+      if [ ! -z "${extra_version}"]; then
+        echo "-$extra_version"
+      fi
+      echo " ${dev_status}"
+    fi
+    echo "  /branch_${version}: $(du -ms branch_${version} | awk '{print $1}')MB"
     for git_dir in $(find "branch_${version}" -name ".git"); do
       repo_dir=$(dirname "$git_dir")
       (
         cd "$repo_dir"
-        echo "      Repo ${repo_dir}: $(git config --get remote.origin.url), " \
+        echo "  Repository ${repo_dir}: $(git config --get remote.origin.url), " \
              "Branch: $(git branch --show-current), " \
              "Status: $(git status -s | grep -v -e 'tests/System/integration/install/Installation.cy.js' -e 'cypress.config.local.mjs' | wc -l | tr -d ' ') changes"
       )
     done
   else
-    echo "    /branch_${version} is NOT existing"
+    echo "  /branch_${version} is NOT existing"
   fi
 done
