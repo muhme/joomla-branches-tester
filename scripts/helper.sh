@@ -18,6 +18,8 @@ JBT_DB_HOSTS=("jbt_mysql" "jbt_mysql" "jbt_madb" "jbt_madb" "jbt_pg"          )
 JBT_DB_PORTS=("7011"      "7011"      "7012"     "7012"     "7013"            )
 # PHP versions to chooce from
 JBT_PHP_VERSIONS=("php8.1" "php8.2" "php8.3")
+# Base Docker containers, matching with docker-compose.base.xml
+JBT_BASE_CONTAINERS=("jbt_pga" "jbt_mya" "jbt_mysql" "jbt_madb" "jbt_pg" "jbt_relay" "jbt_mail" "jbt_cypress")
 
 # Determine actual active Joomla branches, e.g. "44 52 53 60"
 #

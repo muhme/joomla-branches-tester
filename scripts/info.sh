@@ -17,7 +17,7 @@ if docker info >/dev/null 2>&1; then
   echo "Docker version $(docker version --format '{{.Server.Version}}') is running with" \
     "$(docker ps -q | wc -l | tr -d ' ') containers and $(docker images -q | wc -l | tr -d ' ') images"
   echo "Standard Containers:"
-  for container in jbt_mya jbt_pga jbt_mysql jbt_madb jbt_pg jbt_relay jbt_mail jbt_cypress; do
+  for container in "${JBT_BASE_CONTAINERS[@]}"; do
     if [ "$(docker ps -q -f name=${container})" ]; then
       padded_container=$(printf "%-11s" "$container")
       ports=$(docker port ${container} | awk '{printf "%s; ", $0} END {print ""}' | sed 's/; $/\n/')

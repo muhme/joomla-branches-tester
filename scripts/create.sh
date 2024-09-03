@@ -172,7 +172,19 @@ for version in "${versionsToInstall[@]}"; do
   # Configure and install Joomla with desired database variant
   scripts/database.sh "${version}" "$database_variant"
 
+  log "jbt_${version} – Set container prompt"
+  docker exec "jbt_${version}" bash -c "echo PS1=\'jbt_${version} \# \' >> ~/.bashrc" || true # Who cares?
 done
 
 log "Installing vim, ping, ip, telnet and netstat in the 'jbt_cypress' container."
 docker exec -it jbt_cypress sh -c "apt-get update && apt-get install -y git vim iputils-ping iproute2 telnet net-tools"
+
+log "Add bash in Alpine containers"
+for container in "jbt_pga" "jbt_mail"; do
+  docker exec -u root ${container} apk add bash || true # Who cares?
+done
+log "Set container prompts for base containers"
+for container in "${JBT_BASE_CONTAINERS[@]}"; do
+  docker exec -u root "${container}" sh -c  \
+    "echo PS1=\'${container} \# \' >> ~/.bashrc" || true # Who cares?
+done
