@@ -149,8 +149,6 @@ function isValidVariant() {
 # 3rd argument is "IPv4" or "IPv6"
 #
 function createDockerComposeFile() {
-    log "Create 'docker-compose.yml' file for version(s) $1, based on $2 and $3."
-
     local php_version="$2"
     local network="$3"
     local versions=()

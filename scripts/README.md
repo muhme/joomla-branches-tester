@@ -19,6 +19,7 @@ The following scripts are available and the use is described in [../README.md](.
 | [scripts/pull.sh](pull.sh) | Running `git pull` and more. | Optional argument(s): Joomla version number(s). |
 | [scripts/test.sh](test.sh) | Running Cypress headless System Tests on one or all branches. | Optional argument(s): Joomla version number(s), browser and test spec pattern. |
 | [scripts/ubuntu_setup.sh](ubuntu_setup.sh) | Helper script in an installation on Ubuntu Linux (native or in Windows WSL 2). | |
+| [scripts/xdebug.sh](xdebug.sh) | Switching PHP in web container to installation with or without Xdebug. | Mandatory argument is `on` or `off`. Optional arguments are the version number(s). |
 
 :point_right: The scripts use [ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code#Colors)
 to color their own log and error messages. 

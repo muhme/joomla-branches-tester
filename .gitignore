@@ -6,3 +6,6 @@ docker-compose.yml
 
 # macOS custom Finder attributes
 .DS_Store
+
+# Visual Studio Code
+.vscode

@@ -11,7 +11,8 @@ versions=$(getVersions)
 IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
 
 # Delete all docker containters. The PHP version and network do not affect the deletion process.
-createDockerComposeFile "${allVersions[*]}" "php8.2" "IPv4"
+log "Create 'docker-compose.yml' file with all branch versions to remove Joomla Branches Tester overall."
+createDockerComposeFile "${versions}" "php8.2" "IPv4"
 
 log 'Stopping and removing JBT Docker containers, associated Docker networks and volumes.'
 docker compose down -v

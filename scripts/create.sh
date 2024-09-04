@@ -80,6 +80,7 @@ fi
 scripts/clean.sh
 
 # Create Docker Compose setup with Joomla web servers for all versions to be installed.
+log "Create 'docker-compose.yml' file for version(s) ${versionsToInstall[*]}, based on ${php_version} and ${network}."
 createDockerComposeFile "${versionsToInstall[*]}" "${php_version}" "${network}"
 
 if [ $# -eq 1 ] && [ "$1" = "no-cache" ]; then
@@ -125,12 +126,37 @@ for version in "${versionsToInstall[@]}"; do
     error "Failed after $max_retries attempts. Giving up."
     exit 1
   fi
-  log "jbt_${version} – Deleting orignal Joomla installation."
+  log "jbt_${version} – Deleting original Joomla installation."
   docker exec -it "jbt_${version}" bash -c 'rm -rf /var/www/html/* && rm -rf /var/www/html/.??*'
 
   # Move away the disabled PHP error logging.
   log "jbt_${version} – Configure to display PHP warnings."
   docker exec -it "jbt_${version}" bash -c 'mv /usr/local/etc/php/conf.d/error-logging.ini /usr/local/etc/php/conf.d/error-logging.ini.DISABLED'
+
+  # Create two PHP environments: one with Xdebug and one without.
+  # Manage them by cloning /usr/local, and use symbolic links to toggle between the two installations.
+  log "jbt_${version} – Configure php.ini for development and parallel install with Xdebug."
+  docker exec -it "jbt_${version}" bash -c ' \
+    cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini &&
+    cp -r /usr/local /usr/local-without-xdebug &&
+    pecl install xdebug && \
+    docker-php-ext-enable xdebug'
+  xdebug_path=$(docker exec -it "jbt_${version}" bash -c 'find /usr/local/lib/php/extensions/ -name "xdebug.so" | head -n 1')
+  docker exec -it "jbt_${version}" bash -c "
+cat <<EOF > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+zend_extension=${xdebug_path}
+xdebug.mode=debug
+xdebug.start_with_request=yes
+xdebug.client_host=host.docker.internal
+xdebug.client_port=79${version}
+xdebug.log=/var/log/xdebug.log
+xdebug.discover_client_host=true
+EOF
+"
+  docker exec -it "jbt_${version}" bash -c ' \
+    mv /usr/local /usr/local-with-xdebug && \
+    ln -s /usr/local-without-xdebug /usr/local'
+  # Apache is not restarted because /var/www/html is then in use, and would cause the following git clone to fail.
 
   log "jbt_${version} – Installing additional packages."
   docker exec -it "jbt_${version}" bash -c 'apt-get update -qq && \
@@ -162,6 +188,7 @@ for version in "${versionsToInstall[@]}"; do
     php composer-setup.php && \
     rm composer-setup.php && \
     mv composer.phar /usr/local/bin/composer && \
+    cp -p /usr/local/bin/composer /usr/local-with-xdebug/bin/composer && \
     composer install"
 
   log "jbt_${version} – Running npm clean install."
@@ -183,6 +210,32 @@ for version in "${versionsToInstall[@]}"; do
   log "jbt_${version} – Set container prompt"
   docker exec "jbt_${version}" bash -c "echo PS1=\'jbt_${version} \# \' >> ~/.bashrc" || true # Who cares?
 done
+
+log "Creating File '.vscode/launch.json' for versions ${versionsToInstall[*]}"
+launch_json=".vscode/launch.json"
+mkdir -p $(dirname "${launch_json}")
+cat > "${launch_json}" <<EOF
+{
+    "version": "0.2.0",
+    "configurations": [
+EOF
+for version in "${versionsToInstall[@]}"; do
+  cat >> "${launch_json}" <<EOF
+      {
+          "name": "Listen jbt_${version}",
+          "type": "php",
+          "request": "launch",
+          "port": 79${version},
+          "pathMappings": {
+              "/var/www/html": "\${workspaceFolder}/branch_${version}"
+          }
+      },
+EOF
+done
+cat >> "${launch_json}" <<EOF
+    ]
+}
+EOF
 
 log "Installing vim, ping, ip, telnet and netstat in the 'jbt_cypress' container."
 docker exec -it jbt_cypress sh -c "apt-get update && apt-get install -y git vim iputils-ping iproute2 telnet net-tools"

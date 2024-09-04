@@ -674,6 +674,26 @@ Branch 6.0-dev:
   /branch_60 is NOT existing
 ```
 
+### Xdebug
+
+Joomla web server containers are ready with a second PHP installation for switching to
+[Xdebug](https://github.com/xdebug/xdebug).
+You can switch to the PHP version with Xdebug for example:
+```
+scripts/xdebug.sh 53 on
+```
+
+A `.vscode/launch.json` file is also prepared.
+In [Visual Studio Code](https://code.visualstudio.com/),
+select 'Start Debugging' and choose the corresponding entry `Listen jbt_53`.
+
+Finally, it may be reset again to improve performance:
+```
+scripts/xdebug.sh off
+```
+
+Used ports are 79xx, for the given example 7953.
+
 ### Cleaning Up
 
 If you want to get rid of all these Docker containers and the 2 GB in the `branch_*` directories, you can do so:
