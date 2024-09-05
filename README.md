@@ -708,9 +708,10 @@ scripts/clean.sh
    you won’t be able to run tests on branch 5.2-dev.
    In this situation, it’s necessary to create a Joomla Branches Tester for all branches,
    ensuring you can work across all branches.
-2. One of the major advantages of using Docker and scripting is that you can easily throw everything away and start fresh.
-   It takes only two and a half minutes on an entry-level 2024 MacBook Air to delete everything and
-   create nine new containers with Joomla 5.2-dev using PHP 8.3 and PostgreSQL:
+2. One advantage of Docker and scripting: you can easily start fresh.
+   As Roy from The IT Crowd says, "Have you tried turning it off and on again?"
+   It takes just 2.5 minutes on a 2024 entry-level MacBook Air to delete everything and
+   create 9 new containers with Joomla 5.2-dev, PHP 8.3, and PostgreSQL.
    ```
    scripts/create.sh pgsql php8.3 52
    ```
