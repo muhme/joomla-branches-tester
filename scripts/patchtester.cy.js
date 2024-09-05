@@ -7,24 +7,23 @@
  * https://github.com/muhme/joomla-branches-tester
  */
 
-// It would be nice if you had a latest link.
-const DOWNLOAD_URL =
-  "https://github.com/joomla-extensions/patchtester/releases/download/4.3.1/com_patchtester_4.3.1.tar.bz2";
-const COMPONENT = 'Joomla! Patch Tester';
-
-describe(`Install '${COMPONENT}' with`, () => {
+describe("Install 'Joomla! Patch Tester' with", () => {
 
   // Install extension
   it("install component", () => {
+    const patchtester_url = Cypress.env("patchtester_url");
+    if (!patchtester_url) {
+      assert.fail("Patch Tester download URL is missing as environment variable 'patchtester_url'.");
+    }
     cy.doAdministratorLogin();
-    cy.installExtensionFromUrl(DOWNLOAD_URL);
+    cy.installExtensionFromUrl(patchtester_url);
   });
 
   // Set the GitHub Token
   it("set GitHub token", () => {
     const token = Cypress.env("token");
     if (!token) {
-      assert.fail("GitHub token is missing as environment variable TOKEN");
+      assert.fail("GitHub token is missing as environment variable 'token'.");
     }
     cy.doAdministratorLogin();
     cy.visit("administrator/index.php?option=com_patchtester&view=pulls");

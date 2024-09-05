@@ -45,6 +45,17 @@ if [ -z "${token}" ]; then
   fi
 fi
 
+# Create latest Patch Tester URL from latest release link redirect.
+REPO="joomla-extensions/patchtester"
+# Fetch the redirect URL for the latest release
+LATEST_TAG_URL=$(curl -s -I https://github.com/${REPO}/releases/latest | grep -i Location | awk '{print $2}' | tr -d '\r')
+# e.g. 4.3.3 from https://github.com/joomla-extensions/patchtester/releases/tag/4.3.3
+LATEST_TAG=$(basename "${LATEST_TAG_URL}")
+log "The latest patch tester release puzzled out as ${LATEST_TAG}."
+# e.g. https://github.com/joomla-extensions/patchtester/releases/download/4.3.3/com_patchtester_4.3.3.tar.bz2
+PATCHTESTER_URL="https://github.com/${REPO}/releases/download/${LATEST_TAG}/com_patchtester_${LATEST_TAG}.tar.bz2"
+log "Using URL '${PATCHTESTER_URL}'."
+
 failed=0
 successful=0
 for version in "${versionsToInstall[@]}"
@@ -55,7 +66,11 @@ do
     continue
   fi
   log "jbt_${version} – Installing Joomla Patch Tester."
-  docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && unset DISPLAY && cypress run --env token=${token} --config specPattern=/jbt/scripts/patchtester.cy.js"
+  docker exec -it jbt_cypress sh -c " \
+    cd /jbt/branch_${version} && \
+    unset DISPLAY && \
+    cypress run --env patchtester_url=${PATCHTESTER_URL},token=${token} \
+                --config specPattern=/jbt/scripts/patchtester.cy.js"
   if [ $? -eq 0 ] ; then
     # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
     successful=$((successful + 1))
