@@ -20,7 +20,7 @@ while [ $# -ge 1 ]; do
     local=true
     shift # Argument is eaten to run Cypress directly on the Docker host.
   else
-    log "The mandatory Joomla version argument must be one of the following: ${allVersions[@]}."
+    log "The mandatory Joomla version argument must be one of the following: ${versions}."
     log "The optional 'local' argument runs Cypress directly on the Docker host (default is to run from the Docker container)."
     error "Argument '$1' is not valid."
     exit 1
