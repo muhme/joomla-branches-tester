@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# test.sh - test cypress spec on one, multiple or all branches, e.g.
+# test.sh - Runs Cypress specs on one, multiple, or all branches, e.g.
 #   scripts/test.sh
-#   scripts/test.sh firefox
+#   scripts/test.sh novnc firefox
 #   scripts/test.sh 44
 #   scripts/test.sh 52 53 edge site/components/com_contact/Categories.cy.js
 #   scripts/test.sh 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
@@ -18,15 +18,27 @@ trap - ERR
 versions=$(getVersions)
 IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
 
+novnc=false
 browser=""
 versionsToTest=()
 while [ $# -ge 1 ]; do
   if isValidVersion "$1" "$versions"; then
     versionsToTest+=("$1")
     shift # Argument is eaten as the Joomla version number.
+  elif [ "$1" = "novnc" ]; then
+    novnc=true
+    shift # Argument is eaten as using NoVNC.
   elif [[ "$1" =~ ^(chrome|edge|firefox|electron)$ ]]; then
     browser="--browser $1"
     shift # Argument is eaten as browser to use.
+  elif [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
+    # In principle, all arguments are valid, as they may form a test pattern. But we realise that help is needed.
+    log "Script test.sh runs Cypress specs on one, multiple, or all branches."
+    log "Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all)."
+    log "Optional novnc argument sets DISPLAY=jbt_novnc:0 (default is headless)."
+    log "Optional chrome, edge, or firefox can be specified as the browser (default is electron)."
+    log "Have a nice day!"
+    exit 0
   else
     spec_argument="$1"
     shift # Argument is eaten as test specification.
@@ -80,8 +92,13 @@ do
     fi
   fi
 
-  log "Testing version ${version} with ${spec}."
-  docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && unset DISPLAY && ${eel1} cypress run ${browser} ${spec}"
+  if [[ "$novnc" == true ]]; then
+    log "Testing version ${version} with NoVNC and ${spec}."
+    docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && export DISPLAY=jbt_novnc:0 && ${eel1} cypress run --headed ${browser} ${spec}"
+  else
+    log "Testing version ${version} headless with ${spec}."
+    docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && unset DISPLAY && ${eel1} cypress run ${browser} ${spec}"
+  fi
   if [ $? -eq 0 ] ; then
     # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
     successful=$((successful + 1))

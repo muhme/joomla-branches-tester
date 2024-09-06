@@ -1,6 +1,4 @@
-# helper.sh - bash script helper functions
-#
-# Implementation without associative arrays to also work with macOS standard 3.2 bash.
+# helper.sh - General-purpose helper functions for various tasks across all bash scripts.
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
@@ -8,22 +6,31 @@
 # Record the start time in seconds since 1.1.1970
 start_time=$(date +%s)
 
-# Database and database driver variants as in configuration.php 'dbtype'
-JBT_DB_VARIANTS=("mysqli" "mysql" "mariadbi" "mariadb" "pgsql")
-# Database driver mapping for the variants as in Web Installer 'database type'
-JBT_DB_TYPES=("MySQLi" "MySQL (PDO)" "MySQLi" "MySQL (PDO)" "PostgreSQL (PDO)")
-# Database server mapping for the variants
-JBT_DB_HOSTS=("jbt_mysql" "jbt_mysql" "jbt_madb" "jbt_madb" "jbt_pg"          )
-# Database port mapping for the variants
-JBT_DB_PORTS=("7011"      "7011"      "7012"     "7012"     "7013"            )
-# PHP versions to chooce from
-JBT_PHP_VERSIONS=("php8.1" "php8.2" "php8.3")
-# Base Docker containers, matching with docker-compose.base.xml
-JBT_BASE_CONTAINERS=("jbt_pga" "jbt_mya" "jbt_mysql" "jbt_madb" "jbt_pg" "jbt_relay" "jbt_mail" "jbt_cypress")
-
-# Determine actual active Joomla branches, e.g. "44 52 53 60"
+# The following four arrays are positionally mapped, avoiding associative arrays
+# to ensure compatibility with macOS default Bash 3.2.
 #
-# We using default, active and stale branches.
+# Database and driver variants available for 'dbtype' in 'configuration.php'.
+JBT_DB_VARIANTS=("mysqli"      "mysql"         "mariadbi"   "mariadb"       "pgsql"           )
+# Database driver mapping for the variants as in Web Installer 'database type'.
+   JBT_DB_TYPES=("MySQLi"      "MySQL (PDO)"   "MySQLi"     "MySQL (PDO)"   "PostgreSQL (PDO)")
+# Database server mapping for the variants.
+   JBT_DB_HOSTS=("jbt_mysql"   "jbt_mysql"     "jbt_madb"   "jbt_madb"      "jbt_pg"          )
+# Database port mapping for the variants.
+   JBT_DB_PORTS=("7011"        "7011"          "7012"       "7012"          "7013"            )
+
+# PHP versions to choose from, as Docker images with those versions are available.
+JBT_PHP_VERSIONS=("php8.1" "php8.2" "php8.3")
+
+# Base Docker containers, eg ("jbt_pga" "jbt_mya" "jbt_mysql" "jbt_madb" "jbt_pg" "jbt_relay" "jbt_mail" "jbt_cypress" "jbt_novnc")
+JBT_BASE_CONTAINERS=()
+while read -r line; do
+  JBT_BASE_CONTAINERS+=("$line")
+done < <(grep 'container_name:' docker-compose.base.yml | awk '{print $2}')
+
+# Determine the currently used Joomla branches.
+# e.g. getVersions -> "44 52 53 60"
+#
+# We are using default, active and stale branches.
 # With ugly screen-scraping, because no git command found and GitHub API with token looks too oversized.
 #
 function getVersions() {
@@ -51,8 +58,8 @@ function getVersions() {
     echo "${sorted_branches[*]}"
 }
 
-# Check if the given argument is one valid Joomla version
-# e.g. isValidVersion "44" "44 51 52 60"
+# Check if the given argument is a valid Joomla version.
+# e.g. isValidVersion "44" "44 51 52 60" -> 0
 #
 function isValidVersion() {
     local version="$1"
@@ -67,8 +74,8 @@ function isValidVersion() {
     return 1 # nope
 }
 
-# Check if the given argument is a valid PHP version
-# e.g. isValidVersion "php8.1"
+# Check if the given argument is a valid PHP version.
+# e.g. isValidVersion "php7.2" -> 1
 #
 function isValidPHP() {
     local php_version="$1"
@@ -80,8 +87,8 @@ function isValidPHP() {
     return 1 # nope
 }
 
-# Returns git branch name for version number
-# e.g. returns '5.1-dev' for '51'
+# Returns the Git branch name corresponding to the version number.
+# e.g. branchName "51" -> '5.1-dev'
 #
 function branchName() {
     if [[ -z "$1" ]]; then
@@ -92,7 +99,8 @@ function branchName() {
     fi
 }
 
-# Get database type for variant
+# Returns the database type for a given database variant.
+# e.g. dbTypeForVariant "mysql" -> "MySQL (PDO)"
 #
 function dbTypeForVariant() {
     local variant=$1
@@ -105,7 +113,8 @@ function dbTypeForVariant() {
     error "No database type found for variant '$1'"
 }
 
-# Get database host for variant
+# Returns the database host for a given database variant.
+# e.g. dbHostForVariant "mysql" -> "jbt_mysql"
 #
 function dbHostForVariant() {
     local variant=$1
@@ -118,7 +127,8 @@ function dbHostForVariant() {
     error "No database host found for variant '$1'"
 }
 
-# Get database host for variant
+# Returns the host.docker.internal mapped database port for a given database variant.
+# e.g. dbPortForVariant "mysql" -> "7011"
 #
 function dbPortForVariant() {
     local variant=$1
@@ -131,7 +141,8 @@ function dbPortForVariant() {
     error "No database port found for variant '$1'"
 }
 
-# Check if the given argument is a valid database variant
+# Check if the given argument is a valid database variant.
+# e.g. isValidVariant "Ingres" -> 1
 #
 function isValidVariant() {
     local variant="$1"
@@ -143,7 +154,7 @@ function isValidVariant() {
     return 1 # nope
 }
 
-# Create docker-compose.yml with one or all five Joomla web servers
+# Create 'docker-compose.yml' file with one or multiple web servers.
 # 1st argument is e.g. "52" or "44 51 52 53 60"
 # 2nd argument e.g. "php8.1"
 # 3rd argument is "IPv4" or "IPv6"
@@ -169,7 +180,7 @@ function createDockerComposeFile() {
 }
 
 # Returns existing Docker image name for given Joomla and PHP version.
-#   e.g. dockerImage "44" "php8.1" -> "4.4-php8.1-apache"
+#   e.g. dockerImageName "44" "php8.1" -> "4.4-php8.1-apache"
 #   exceptions:
 #   - There is no "4.4-php8.3-apache", fallback "4.4-php8.2-apache"
 #   - There are no Joomla 5.3 and 6.0 images fallback to Joomla 5.2
@@ -199,8 +210,8 @@ function dockerImageName() {
     echo "joomla:${base}-apache"
 }
 
-# Get Joomla major and minor version from file system
-# e.g. "51" for getJoomlaVersion "branch_51"  from file branch_51/libraries/src/Version.php
+# Retrieve the installed Joomla major and minor version from the `libraries/src/Version.php` file in the specified branch directory.
+# e.g. getJoomlaVersion "branch_51" -> "51"
 #
 function getJoomlaVersion() {
     local versions_file="$1/libraries/src/Version.php"
@@ -221,18 +232,19 @@ function getJoomlaVersion() {
     fi
 
     echo "$version"
-
 }
 
-# using ANSI escape sequences to find the log messages
+# Use ANSI escape sequences to colorize JBT log messages to differentiate them from others.
+#
 JBT_LIGHT_GREEN_BG="\033[102m"
 JBT_GREEN_BG="\033[42m"
 JBT_RED="\033[0;31m"
 JBT_BOLD="\033[1m"
 JBT_RESET="\033[0m"
 
-if [ -n "$NO_COLOR" ]; then
-    # NO_COLOR is set and it is non empty
+# Is the 'NO_COLOR' environment variable set and non-empty?
+if [ -n "${NO_COLOR}" ]; then
+    # Do not use color for log messages.
     JBT_LIGHT_GREEN_BG=""
     JBT_GREEN_BG=""
     JBT_RED=""
@@ -240,7 +252,8 @@ if [ -n "$NO_COLOR" ]; then
     JBT_RESET=""
 fi
 
-# Return running time e.g. as "17 seconds" or as "3:18"
+# Return script running time e.g. as "17 seconds" or as "3:18".
+#
 runningTime() {
     # Record the actual time in seconds since 1.1.1970
     actual_time=$(date +%s)
@@ -265,22 +278,22 @@ runningTime() {
     fi
 }
 
-# Give log message with date and time in bold and green background on stdout
+# Log message with date and time in bold and green background on stdout.
 #
 log() {
     # -e enables backslash escapes
     echo -e "${JBT_GREEN_BG}${JBT_BOLD}*** $(date '+%y%m%d %H:%M:%S') *** $@${JBT_RESET}"
 }
 
-# Give error message with date and time in bold and dark red on stderr
+# Error message with date and time in bold and dark red on stderr.
 #
 error() {
     # -e enables backslash escapes
     echo -e "${JBT_RED}${JBT_BOLD}*** $(date '+%y%m%d %H:%M:%S') *** $@${JBT_RESET}" >&2
 }
 
-# As we have -e set the scripts exit immediately if any command fails.
-# Show a red messge with script name and line number.
+# With -e set, the script exits immediately on command failure.
+# Show a red error message with the script name and line number.
 #
 errorHandler() {
     error "An error occurred, probably in script '$(basename "$0")' in line $1."

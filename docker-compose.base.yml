@@ -125,6 +125,23 @@ services:
       - "host.docker.internal:host-gateway"
     networks:
       - jbt_network
+    depends_on:
+      - novnc
+
+  novnc:
+    container_name: jbt_novnc
+    image: theasp/novnc:latest
+    environment:
+      - DISPLAY_WIDTH=1280
+      - DISPLAY_HEIGHT=720
+      - RUN_XTERM=no
+    restart: unless-stopped
+    ports:
+      - "7900:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - jbt_network
 
   relay:
     container_name: jbt_relay

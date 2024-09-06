@@ -370,14 +370,14 @@ In parallel you can inspect MariaDB and MySQL database with [phpMyAdmin](https:/
 
 If you need to inspect files, they are available in the directory `branch_52` for this Joomla release 5.2 sample.
 
-### Cypress Headless System Tests
+### Cypress Automated System Tests
 
 To simple run the Joomla System Tests with all specs - except for the installation -
-from the [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System) in all branches:
+from the [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System) in all branches with headless Cypress:
 ```
 scripts/test.sh
 ```
-Optional arguments are:
+Some Optional arguments are:
 
 * **Joomla version number(s)**: All versions are tested by default.
 * **Browser to be used**: Choose between electron (default), firefox, chrome, or edge.
@@ -407,11 +407,23 @@ export ELECTRON_ENABLE_LOGGING=1
 scripts/test.sh 44 administrator/components/com_actionlogs/Actionlogs.cy.js
 ```
 
+One more optional argument is `novnc`.
+VNC (Virtual Network Computing) enables remote desktop access over a network.
+The `jbt_vnc` container allows to view the automated browser tests via a web-based VNC viewer.
+This is useful for watching System Tests in real-time without needing a full GUI environment on your local machine.
+In this case Cypress runs headed and uses `jbt_vnc` as DISPLAY and you can watch the
+execution of the automated tests with the URL:
+* [http://host.docker.internal:7900/vnc.html?autoconnect=true&resize=scale](http://host.docker.internal:7900/vnc.html?autoconnect=true&resize=scale)
+```
+scripts/test.sh administrator/components/com_users/Users.cy.js 53 novnc
+```
+
 :fairy: To protect you, the first step `Installation.cy.js` of the Joomla System Tests
-  is excluded here when you run all test specs. If you run the installation, this can lead to inconsistencies
+  is excluded in the automated tests if you run all test specs.
+  If you run the installation, this can lead to inconsistencies
   between the file system and the database, as the Joomla database will be recreated.
 
-### Cypress GUI System Tests
+### Cypress Interactive System Tests
 
 If a test spec fails, the screenshot is helpful. More enlightening is it to execute the single failed test spec
 with the Cypress GUI in interactive mode. You can see all the Cypress log messages, use the time-traveling debugger and
