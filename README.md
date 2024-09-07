@@ -75,7 +75,7 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
 |jbt_madb| **7012**:3306 | | Database Server MariaDB version 10.4 |
 |jbt_pg| **7013**:5432 | | Database Server PostgreSQL version 12.20 |
 |jbt_cypress| SMTP :7125 | | Cypress Headless Test Environment<br />SMTP server is only running during test execution |
-|jbt_novnc| **[7900](http://host.docker.internal:7900)** | | If you run automated Cypress System Tests with the `novnc` option, you can watch them. |
+|jbt_novnc| **[7900](http://host.docker.internal:7900/vnc.html?autoconnect=true&resize=scale)** | | If you run automated Cypress System Tests with the `novnc` option, you can watch them. |
 |jbt_phpmya| **[7001](http://host.docker.internal:7001)** | | Web App to manage MariaDB and MySQL<br />auto-login configured, root / root |
 |jbt_pga| **[7002](http://host.docker.internal:7002)** | | Web App to manage PostgreSQL<br />auto-login configured, root / root, postgres / prostgres |
 |jbt_mail| **[7003](http://host.docker.internal:7003)** <br /> SMTP **7225**:1025 | | Web interface to verify emails. |
@@ -412,9 +412,9 @@ scripts/test.sh 51 52 53 edge 'tests/System/integration/site/**/*.cy.{js,jsx,ts,
 ```
 
 One more optional argument is `novnc`.
-VNC (Virtual Network Computing) enables remote desktop access over a network.
 The `jbt_vnc` container allows to view the automated browser tests via the web-based VNC viewer [noVNC](https://github.com/novnc/noVNC).
-This is useful for watching the automated Cypress System Tests in real-time.
+This is useful for watching the automated Cypress System Tests in real-time, for example,
+when the gnome is too impatient to wait for the 120-second timeout from `installJoomla` again.
 In this case Cypress runs headed and uses `jbt_vnc` as DISPLAY and you can watch the
 execution of the automated tests with the URL:
 * [http://host.docker.internal:7900/vnc.html?autoconnect=true&resize=scale](http://host.docker.internal:7900/vnc.html?autoconnect=true&resize=scale)
@@ -711,6 +711,14 @@ scripts/xdebug.sh off
 
 Used ports are 79xx, for the given example 7953.
 
+### IPv6
+
+As shown in the [Installation](#installation) chapter, you can create the Docker Branches Tester instance using the `scripts/create.sh` script with the `IPv6` option instead of the default IPv4 network. Docker assigns IP addresses from the predefined private, non-routable subnet `4711::0`. To view the assigned IP addresses, use:
+
+```
+docker inspect jbt_network
+```
+
 ### Cleaning Up
 
 If you want to get rid of all these Docker containers and the 2 GB in the `branch_*` directories, you can do so:
@@ -762,6 +770,7 @@ scripts/clean.sh
 * The different Joomla versions exist in parallel, but the test runs sequentially.
 * Database server versions cannot be changed.
 * The setup does not support HTTPS, secure connections issues are not testable.
+* If IPv6 networking is chosen, it is used only within Docker.
 * The predefined port range starts from 7000. If another service is already using this range, it may cause a conflict.
 
 ## License
