@@ -13,31 +13,34 @@ All used Joomla development branches with the different Joomla versions run in p
 Use one, multiple, or all branches for:
 * Manual testing, including database inspections and email verifications.
 * [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System)
-  with [Cypress](https://www.cypress.io/) GUI (interactive mode) or headless (automated mode).
+  with [Cypress](https://www.cypress.io/) interactive mode (GUI) or automated mode (headless or with noVNC).
 * Automated installation of the [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester).
 * Switch between the three database options (MySQL, MariaDB, or PostgreSQL) and the two database drivers
   (MySQLi or PHP Data Objects).
 * Switch between the PHP versions (8.1, 8.2, or 8.3) as supported by the official Docker images.
 * Install Joomla from a cloned 'joomla-cms' Git repository.
-* Grafting a Joomla package onto a branch.
+* Grafting a Joomla package onto a development branch.
+* Using a second PHP installation with Xdebug.
+* Switch to IPv6 network.
 
 ![Joomla Branches Software Architecture](images/joomla-branches-tester.svg)
 
 The idea is to have all used Joomla development branches
 (in this picture 4.4-dev, 5.1-dev, 5.2-dev and 6.0-dev) are available for testing in parallel.
-The installation is carried out with a dozen Docker containers,
-and everything is scripted.
+This installation is performed using 13 Docker containers.
+Everything is scripted and can be parameterized as easily as possible.
 You see the four orange Web Server containers with the four different Joomla versions.
 They are based on the `branch_*` folders, which are also available on the Docker host.
 
 :point_right: The version numbers referenced are current as of early August 2024.
               Since used branches are subject to frequent changes,
               the latest version numbers are always be retrieved directly from the `joomla-cms` repository.
-              As of late August 2024, `5.1-dev` has been removed, and `5.3-dev` has been introduced.
+              As of late August 2024, one more version, `5.3-dev`, has been introduced.
 
 On the right you see three blue containers with the databases MySQL, MariaDB and PostgreSQL.
-To be able to check the databases, two further blue containers with phpMyAdmin and pgAdmin are installed.
-The green Docker container runs Cypress based Joomla System Tests with GUI or headless.
+To be able to check the databases, two further blue containers with phpMyAdmin (for MySQL and MariaDB) and pgAdmin (for PostgreSQL) are installed.
+One green Docker container runs Cypress based Joomla System Tests with GUI or headless.
+The green noVNC container allows real-time viewing of automated Cypress System Tests.
 If you need to inspect a failed test spec, you can run Cypress with the interactive GUI.
 
 The two red mail containers triplicate all emails from manual Joomla tests or System Tests and
@@ -55,7 +58,7 @@ On macOS and Ubuntu, the native Cypress GUI is shown in green.
         For those with a taste for the finer details, the comments are a gourmet treat.
 
 <details>
-  <summary>There are a dozen Docker containers that provide the functionality.</summary>
+  <summary>There are currently 14 Docker containers providing the functionality.</summary>
 
 ---
 
@@ -72,12 +75,13 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
 |jbt_madb| **7012**:3306 | | Database Server MariaDB version 10.4 |
 |jbt_pg| **7013**:5432 | | Database Server PostgreSQL version 12.20 |
 |jbt_cypress| SMTP :7125 | | Cypress Headless Test Environment<br />SMTP server is only running during test execution |
+|jbt_novnc| **[7900](http://host.docker.internal:7900)** | | If you run automated Cypress System Tests with the `novnc` option, you can watch them. |
 |jbt_phpmya| **[7001](http://host.docker.internal:7001)** | | Web App to manage MariaDB and MySQL<br />auto-login configured, root / root |
 |jbt_pga| **[7002](http://host.docker.internal:7002)** | | Web App to manage PostgreSQL<br />auto-login configured, root / root, postgres / prostgres |
 |jbt_mail| **[7003](http://host.docker.internal:7003)** <br /> SMTP **7225**:1025 | | Web interface to verify emails. |
 |jbt_relay| SMTP **7025**:7025 | | SMTP relay triplicator |
 
-:eight_spoked_asterisk: The directories are available on Docker host to:
+:eight_spoked_asterisk: The directories are available on the Docker host inside /jbt to:
 * Inspect and change the configuration files (`configuration.php` or `cypress.config.js`),
 * To edit the test specs below `tests/System` or
 * To inspect screenshots from failed tests or
@@ -377,9 +381,15 @@ from the [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/t
 ```
 scripts/test.sh
 ```
-Some Optional arguments are:
 
-* **Joomla version number(s)**: All versions are tested by default.
+:fairy: To protect you, the first step `Installation.cy.js` of the Joomla System Tests
+  is excluded in the automated tests if you run all test specs.
+  If you run the installation, this can lead to inconsistencies
+  between the file system and the database, as the Joomla database will be recreated.
+
+Some optional arguments are:
+
+* **Joomla version number(s)**: Choose one or multiple versions; all versions are tested by default.
 * **Browser to be used**: Choose between electron (default), firefox, chrome, or edge.
 * **Test spec pattern**: All test specs (except the installation) are used by default.
 
@@ -401,16 +411,10 @@ Test all `site` specs with Microsoft Edge in the branches Joomla 5.1, 5.2 and 5.
 scripts/test.sh 51 52 53 edge 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
 ```
 
-To additional show `console.log` messages from Electron browser by setting environment variable: 
-```
-export ELECTRON_ENABLE_LOGGING=1
-scripts/test.sh 44 administrator/components/com_actionlogs/Actionlogs.cy.js
-```
-
 One more optional argument is `novnc`.
 VNC (Virtual Network Computing) enables remote desktop access over a network.
-The `jbt_vnc` container allows to view the automated browser tests via a web-based VNC viewer.
-This is useful for watching System Tests in real-time without needing a full GUI environment on your local machine.
+The `jbt_vnc` container allows to view the automated browser tests via the web-based VNC viewer [noVNC](https://github.com/novnc/noVNC).
+This is useful for watching the automated Cypress System Tests in real-time.
 In this case Cypress runs headed and uses `jbt_vnc` as DISPLAY and you can watch the
 execution of the automated tests with the URL:
 * [http://host.docker.internal:7900/vnc.html?autoconnect=true&resize=scale](http://host.docker.internal:7900/vnc.html?autoconnect=true&resize=scale)
@@ -418,10 +422,11 @@ execution of the automated tests with the URL:
 scripts/test.sh administrator/components/com_users/Users.cy.js 53 novnc
 ```
 
-:fairy: To protect you, the first step `Installation.cy.js` of the Joomla System Tests
-  is excluded in the automated tests if you run all test specs.
-  If you run the installation, this can lead to inconsistencies
-  between the file system and the database, as the Joomla database will be recreated.
+To additional show `console.log` messages from Electron browser by setting environment variable: 
+```
+export ELECTRON_ENABLE_LOGGING=1
+scripts/test.sh 44 administrator/components/com_actionlogs/Actionlogs.cy.js
+```
 
 ### Cypress Interactive System Tests
 
