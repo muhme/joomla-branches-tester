@@ -169,8 +169,9 @@ function createDockerComposeFile() {
       cp docker-compose.base.yml docker-compose.yml
     else
       sed -e 's/enable_ipv6: false/enable_ipv6: true/' \
-          -e 's/subnet: "192.168.150.0\/24"/subnet: "2003:c2:6727:cb00::\/64"/' \
+          -e 's/subnet: "192.168.150.0\/24"/subnet: "fd00::\/8"/' \
           docker-compose.base.yml > docker-compose.yml
+
     fi
     local version
     for version in "${versions[@]}"; do

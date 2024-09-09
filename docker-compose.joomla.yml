@@ -21,6 +21,5 @@
       - mysql
       - postgres
       - relay
-      - mail
     networks:
       - jbt_network

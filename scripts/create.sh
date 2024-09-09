@@ -92,6 +92,7 @@ log "Running 'docker compose up'."
 docker compose up -d
 
 # Wait until MySQL database is up and running
+# (This isn't accurate when using MariaDB or PostgreSQL, but so far it's working with the delay from MySQL.)
 MAX_ATTEMPTS=60
 attempt=1
 until docker exec jbt_mysql mysqladmin ping -h"127.0.0.1" --silent || [ $attempt -eq $MAX_ATTEMPTS ]; do
@@ -189,7 +190,11 @@ EOF
     rm composer-setup.php && \
     mv composer.phar /usr/local/bin/composer && \
     cp -p /usr/local/bin/composer /usr/local-with-xdebug/bin/composer && \
-    composer install"
+    composer install || \
+    ( log 'composer install failed on the first attempt; give it a second try.' && composer install )"
+    # There is a race condition (perhaps with the parallel downloads), some times composer install fails:
+    # "Failed to open directory: No such file or directory"
+    # As the second run was always successful, we try it directly.
 
   log "jbt_${version} – Running npm clean install."
   docker exec -it "jbt_${version}" bash -c 'cd /var/www/html && npm ci'

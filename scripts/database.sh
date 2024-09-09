@@ -112,8 +112,12 @@ for version in "${versionsToChange[@]}"; do
 
   # Replacement
   PATCH=$(cat <<'EOF'
-// muhme, 9 August 2024 'hack' as long as waiting for PR https://github.com/joomla-projects/joomla-cypress/pull/33 is merged, and new joomla-cypress release is build and used in all active Joomla branches
+// muhme, 9 September 2024 'hack' as long as waiting for PR https://github.com/joomla-projects/joomla-cypress/pull/33 + 36 is merged, and new joomla-cypress release is build and used in all active Joomla branches
 let connection = config.db_host
+if (connection.split(':').length > 2 && !connection.includes('[') && config.db_type !== 'PostgreSQL (PDO)' && config.db_type !== 'pgsql') {
+  // Square brackets required for IPv6 for MariaDB and MySQL, even without port, but not working for PostgreSQL.
+  connection = `[${connection}]`;
+}
 if (config.db_port && config.db_port.trim() !== '') {
   connection += `:${config.db_port.trim()}`;
 }
