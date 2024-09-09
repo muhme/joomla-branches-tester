@@ -713,7 +713,7 @@ Used ports are 79xx, for the given example 7953.
 
 ### IPv6
 
-As shown in the [Installation](#installation) chapter, you can create the Docker Branches Tester instance using the `scripts/create.sh` script with the `IPv6` option instead of the default IPv4 network. Docker assigns IP addresses from the predefined private, non-routable subnet `4711::0`. To view the assigned IP addresses, use:
+As shown in the [Installation](#installation) chapter, you can create the Docker Branches Tester instance using the `scripts/create.sh` script with the `IPv6` option instead of the default IPv4 network. Docker assigns IP addresses from the predefined private, non-routable subnet `fd00::/8`. To view the assigned IP addresses, use:
 
 ```
 docker inspect jbt_network
