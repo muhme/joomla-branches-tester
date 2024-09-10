@@ -19,7 +19,7 @@ function help {
                      Mandatory argument is a valid GitHub personal access token starting with 'ghp_'.
                      Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
 
-                     `random_quote`
+                     $(random_quote)
     "
 }
 

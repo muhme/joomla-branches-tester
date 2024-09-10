@@ -12,7 +12,7 @@ function help {
     clean.sh – Stops and removes all JBT Docker containers, associated Docker networks, and volumes.
                Also deletes all 'branch_*' directories.
 
-               `random_quote`
+               $(random_quote)
     "
 }
 

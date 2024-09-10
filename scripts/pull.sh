@@ -16,7 +16,7 @@ function help {
               Running composer install if changes are detected and npm clean install if needed.
               Optional version can be one or more of the following: ${allVersions[@]} (default is all).
 
-              `random_quote`
+              $(random_quote)
     "
 }
 

@@ -21,7 +21,7 @@ function help {
                 Optional PHP version can be one of: ${JBT_PHP_VERSIONS[@]} (default is php8.1).
                 Optional 'repository:branch', e.g. https://github.com/Elfangor93/joomla-cms:mod_community_info.
 
-                `random_quote`
+                $(random_quote)
     "
 }
 

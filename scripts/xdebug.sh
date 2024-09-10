@@ -12,7 +12,7 @@ function help {
     xdebug.sh – Switches the PHP installation with or without Xdebug in one or more Web Server containers.
                 Mandatory argument 'on' or 'off' is required.
 
-               `random_quote`
+               $(random_quote)
     "
 }
 

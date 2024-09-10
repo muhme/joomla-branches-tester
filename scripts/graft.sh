@@ -18,7 +18,7 @@ function help {
                The Joomla package file argument (e.g. 'Joomla_5.1.2-Stable-Full_Package.zip') is mandatory.
                Optional database variant can be one of: ${JBT_DB_VARIANTS[@]} (default is mariadbi).
 
-               `random_quote`
+               $(random_quote)
     "
 }
 

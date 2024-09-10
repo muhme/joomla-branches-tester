@@ -16,7 +16,7 @@ function help {
                   The mandatory database variant must be one of: ${JBT_DB_VARIANTS[@]}.
                   Optional Joomla version can be one or more of the following: ${versions} (default is all).
 
-                  `random_quote`
+                  $(random_quote)
     "
 }
 

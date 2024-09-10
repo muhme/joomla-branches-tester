@@ -15,7 +15,7 @@ function help {
                  The mandatory Joomla version argument must be one of the following: ${versions}.
                  The optional 'local' argument runs Cypress directly on the Docker host (default is to run from the Docker container).
 
-                 `random_quote`
+                 $(random_quote)
     "
 }
 

@@ -16,7 +16,7 @@ function help {
              Mandatory PHP version is one of: ${JBT_PHP_VERSIONS[@]}.
              Optional Joomla version can be one of: ${allVersions[@]} (default is all).
 
-             `random_quote`
+             $(random_quote)
     "
 }
 

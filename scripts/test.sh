@@ -22,7 +22,7 @@ function help {
               Optional 'novnc' argument sets DISPLAY=jbt_novnc:0 (default is headless).
               Optional 'chrome', 'edge', or 'firefox' can be specified as the browser (default is 'electron').
 
-              `random_quote`
+              $(random_quote)
     "
 }
 
