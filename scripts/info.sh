@@ -8,11 +8,11 @@
 source scripts/helper.sh
 
 function help {
-    echo "
+  echo "
     info.sh – Retrieves Joomla Branches Tester status information.
 
-               `random_quote`
-    "
+              $(random_quote)
+  "
 }
 
 versions=$(getVersions)
@@ -60,6 +60,7 @@ for version in "${allVersions[@]}"; do
     fi
   fi
   if [ -d "branch_${version}" ]; then
+
     version_file="branch_${version}/libraries/src/Version.php"
     if [ -f "${version_file}" ]; then
       product=$(grep "public const PRODUCT" "${version_file}" | awk -F"'" '{print $2}')
@@ -74,6 +75,19 @@ for version in "${allVersions[@]}"; do
       fi
       echo " ${dev_status}"
     fi
+
+    if ${docker_running}; then
+      php_version=$(docker exec jbt_${version} bash -c "php --version")
+      # Extract the PHP version (first line) using sed
+      php_version_number=$(echo "$php_version" | sed -n 's/^PHP \([0-9\.]*\).*/PHP \1/p')
+      # Check if Xdebug is included in the PHP version info
+      if echo "$php_version" | grep -q "Xdebug"; then
+        echo "  $php_version_number with Xdebug"
+      else
+        echo "  $php_version_number"
+      fi
+    fi
+
     config_file="branch_${version}/cypress.config.mjs"
     if [ -f "${config_file}" ]; then
       db_type=$(grep db_type ${config_file} | sed 's/db_type//' | tr -d " :,'")
@@ -83,7 +97,9 @@ for version in "${allVersions[@]}"; do
     else
       echo "  OOPS missing '${config_file}' file"
     fi
+
     echo "  /branch_${version}: $(du -ms branch_${version} | awk '{print $1}')MB"
+
     for git_dir in $(find "branch_${version}" -name ".git"); do
       repo_dir=$(dirname "$git_dir")
       (
