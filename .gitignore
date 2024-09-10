@@ -9,3 +9,6 @@ docker-compose.yml
 
 # Visual Studio Code
 .vscode
+
+# Database servers sockets
+./run

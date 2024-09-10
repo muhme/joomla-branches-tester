@@ -35,6 +35,8 @@ services:
       MYSQL_ROOT_PASSWORD: root
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    volumes:
+      - ./run/mysql-socket:/var/run/mysqld
     networks:
       - jbt_network
 
@@ -48,6 +50,8 @@ services:
       MYSQL_ROOT_PASSWORD: root
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    volumes:
+      - ./run/mariadb-socket:/var/run/mysqld
     networks:
       - jbt_network
 
@@ -62,6 +66,8 @@ services:
       - POSTGRES_PASSWORD=postgres
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    volumes:
+      - ./run/postgresql-socket:/var/run/postgresql
     networks:
       - jbt_network
 
