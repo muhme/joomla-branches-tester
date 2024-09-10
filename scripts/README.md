@@ -2,7 +2,7 @@
 
 These scripts implement the Joomla Branches Tester (JBT), delivering the complete functionality along with necessary configuration files. They are stored in this directory `scripts`.
 
-:point_right: For a quick overview of all mandatory and optional arguments, you can run each script with the 'help' argument. For example:
+:point_right: For a quick overview of all mandatory and optional arguments, you can run each script with the `help` argument. For example:
 ```
 scripts/database.sh help
 ```
