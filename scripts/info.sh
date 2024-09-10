@@ -60,7 +60,7 @@ for version in "${allVersions[@]}"; do
     fi
   fi
   if [ -d "branch_${version}" ]; then
-      version_file="branch_${version}/libraries/src/Version.php"
+    version_file="branch_${version}/libraries/src/Version.php"
     if [ -f "${version_file}" ]; then
       product=$(grep "public const PRODUCT" "${version_file}" | awk -F"'" '{print $2}')
       major_version=$(grep "public const MAJOR_VERSION" "${version_file}" | awk -F" " '{print $NF}' | tr -d ';')
@@ -73,6 +73,15 @@ for version in "${allVersions[@]}"; do
         echo "-$extra_version"
       fi
       echo " ${dev_status}"
+    fi
+    config_file="branch_${version}/cypress.config.mjs"
+    if [ -f "${config_file}" ]; then
+      db_type=$(grep db_type ${config_file} | sed 's/db_type//' | tr -d " :,'")
+      db_host=$(grep db_host ${config_file} | sed 's/db_host//' | tr -d " :,'")
+      db_port=$(grep db_port ${config_file} | sed 's/db_port//' | tr -d " :,")
+      echo "  ${db_type}, ${db_host}, ${db_port}"
+    else
+      echo "  OOPS missing '${config_file}' file"
     fi
     echo "  /branch_${version}: $(du -ms branch_${version} | awk '{print $1}')MB"
     for git_dir in $(find "branch_${version}" -name ".git"); do
