@@ -196,14 +196,15 @@ EOF
   fi
 
   log "jbt_${version} – Running composer install."
-  docker exec -it "jbt_${version}" bash -c "cd /var/www/html && \
+  docker exec "jbt_${version}" bash -c "cd /var/www/html && \
     php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\" && \
     php composer-setup.php && \
     rm composer-setup.php && \
     mv composer.phar /usr/local/bin/composer && \
-    cp -p /usr/local/bin/composer /usr/local-with-xdebug/bin/composer && \
-    composer install || \
-    ( log 'composer install failed on the first attempt; give it a second try.' && composer install )"
+    cp -p /usr/local/bin/composer /usr/local-with-xdebug/bin/composer"
+  docker exec  "jbt_${version}" bash -c "cd /var/www/html && composer install" ||
+    ( log 'composer install failed on the first attempt; give it a second try.' && \
+      docker exec  "jbt_${version}" bash -c "cd /var/www/html && composer install" )
     # There is a race condition (perhaps with the parallel downloads), some times composer install fails:
     # "Failed to open directory: No such file or directory"
     # As the second run was always successful, we try it directly.
