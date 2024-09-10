@@ -611,7 +611,7 @@ Not interested in testing the latest development branch but still need to test a
 Just like in plant grafting, where a scion is joined to a rootstock,
 you can graft a Joomla package onto the development branch for testing.
 Simply choose the same major and minor version numbers from the development branch,
-and graft the package for a seamless experience.:
+and graft the package for a seamless experience:
 
 ```
 scripts/graft.sh 52 ~/Downloads/Joomla_5.2.0-alpha4-dev-Development-Full_Package.zip
