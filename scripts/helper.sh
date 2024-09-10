@@ -6,6 +6,10 @@
 # Record the start time in seconds since 1.1.1970
 start_time=$(date +%s)
 
+# ${TMP} file can be used in the scripts without any worries
+TMP=/tmp/$(basename $0).$$
+trap 'rm -rf $TMP' 0
+
 # The following four arrays are positionally mapped, avoiding associative arrays
 # to ensure compatibility with macOS default Bash 3.2.
 #
@@ -279,6 +283,49 @@ runningTime() {
     fi
 }
 
+# Get random quote from api.zitat-service.de like Joomla module 'zitat-servive.de'
+# https://extensions.joomla.org/extension/news-display/quotes/zitat-service-de/
+#
+# Sample with author and one more without:
+# A day without a smile is a wasted day. Charlie Chaplin
+# Shoot for the moon. Even if you miss, you'll land among the stars.
+#
+function random_quote() {
+
+    # Check the LANG environment variable
+    lang_code=$(echo "$LANG" | cut -c1-2 | tr '[:upper:]' '[:lower:]')
+
+    # Use one of the supported languages or default to English
+    case "$lang_code" in
+        de|es|ja|uk)
+            language=$lang_code
+            ;;
+        *)
+            language="en"
+            ;;
+    esac
+
+    # Fetch JSON from the quote API
+    json=$(curl -s "https://api.zitat-service.de/v1/quote?language=${language}")
+
+    # Extract the quote
+    # Sometimes \r and \n are included and deleted respective replaced
+    quote=$(echo "$json" | sed -n 's/.*"quote":"\([^"]*\)".*/\1/p' | sed 's/\\r//g' | sed 's/\\n/ /g')
+
+    # Extract the author's name
+    author=$(echo "$json" | sed -n 's/.*"authorName":"\([^"]*\)".*/\1/p')
+
+    # If we are offline, we have no quote :(
+    if [ "${quote}" != "" ]; then
+        # Print the author only if it's not "Unknown"
+        if [ "$author" != "Unknown" ]; then
+            echo "\"${quote}\", ${author}"
+        else
+            echo "\"${quote}\""
+        fi
+    fi
+}
+
 # Log message with date and time in bold and green background on stdout.
 #
 log() {
@@ -307,7 +354,11 @@ trap 'errorHandler $LINENO' ERR
 # This is the end.
 #
 theEnd() {
-    log "Script '$(basename "$0")' finished in $(runningTime)."
+    if [ $? -ne 0 ]; then
+        error "Script '$(basename "$0")' failed after $(runningTime)."
+    else
+        log "Script '$(basename "$0")' finished in $(runningTime)."
+    fi
 }
 trap theEnd EXIT
 

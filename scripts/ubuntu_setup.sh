@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# ubuntu_setup.sh - Install all prerequisites on Ubuntu
+# ubuntu_setup.sh - Install all prerequisites on Ubuntu.
 # - tested with
 #   . Windows 11 Pro WSL 2 Ubuntu
 #   . Ubuntu Desktop (GNOME), Version 1.524OS Ubuntu 22.04
@@ -20,6 +20,21 @@
 #   sudo scripts/ubuntu_setup.sh
 #   scripts/create.sh
 #   scripts/test.sh
+
+function help {
+    echo "*** ubuntu_setup.sh – Install all prerequisites on Ubuntu."
+}
+
+while [ $# -ge 1 ]; do
+  if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
+    help
+    exit 0
+  else
+    help
+    echo "*** Error: Argument '$1' is not valid."
+    exit 1
+  fi
+done
 
 # Running as sudo?
 if [ "$(id -u)" -ne 0 ]; then

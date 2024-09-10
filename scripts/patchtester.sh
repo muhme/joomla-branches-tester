@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# patchtester.sh - Install Joomla Patch Tester on all, one or muliple Docker containers, e.g.
+# patchtester.sh - Install Joomla Patch Tester on all, one or multiple Docker containers, e.g.
 #   scripts/patchtester.sh ghp_42g8n8uCZtplQNnbNrEWsTrFfQgYAU4711Tc
 #   scripts/patchtester.sh 44 ghp_42g8n8uCZtplQNnbNrEWsTrFfQgYAU4711Tc
 #   scripts/patchtester.sh 52 53 ghp_42g8n8uCZtplQNnbNrEWsTrFfQgYAU4711Tc
@@ -13,17 +13,29 @@ source scripts/helper.sh
 versions=$(getVersions)
 IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
 
+function help {
+    echo "
+    patchtester.sh – Install Joomla Patch Tester on all, one or multiple Web Server Docker containers.
+                     Mandatory argument is a valid GitHub personal access token starting with 'ghp_'.
+                     Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
+
+                     `random_quote`
+    "
+}
+
 versionsToInstall=()
 while [ $# -ge 1 ]; do
-  if isValidVersion "$1" "$versions"; then
+  if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
+    help
+    exit 0
+  elif isValidVersion "$1" "$versions"; then
     versionsToInstall+=("$1")
     shift # Argument is eaten as one version number.
   elif [[ $1 = ghp_* ]]; then
     token="$1"
     shift # Argument is eaten as GitHub token.
   else
-    log "Please provide a valid GitHub personal access token starting with 'ghp_'."
-    log "Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all)."
+    help
     error "Argument '$1' is not valid."
     exit 1
   fi
@@ -40,6 +52,7 @@ if [ -z "${token}" ]; then
     token="${JBT_GITHUB_TOKEN}"
     log "Using GitHub token from the environment variable 'JBT_GITHUB_TOKEN'."
   else
+    help
     error "Please provide a valid GitHub personal access token starting with 'ghp_'."
     exit 1
   fi

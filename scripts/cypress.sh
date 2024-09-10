@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# cypress.sh - Running Cypress GUI for one branch from Docker container or with locally installed Cypress
+# cypress.sh - Running Cypress GUI for one branch, either from a Docker container or using locally installed Cypress.
 #   scripts/cypress.sh 51
 #   scripts/cypress.sh 51 local
 #
@@ -9,25 +9,38 @@
 
 source scripts/helper.sh
 
+function help {
+    echo "
+    cypress.sh – Running Cypress GUI for one branch, either from a Docker container or using locally installed Cypress.
+                 The mandatory Joomla version argument must be one of the following: ${versions}.
+                 The optional 'local' argument runs Cypress directly on the Docker host (default is to run from the Docker container).
+
+                 `random_quote`
+    "
+}
+
 versions=$(getVersions)
 
 local=false
 while [ $# -ge 1 ]; do
-  if isValidVersion "$1" "$versions"; then
+  if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
+    help
+    exit 0
+  elif isValidVersion "$1" "$versions"; then
     version="$1"
     shift # Argument is eaten as the version number.
   elif [ $1 = "local" ]; then
     local=true
     shift # Argument is eaten to run Cypress directly on the Docker host.
   else
-    log "The mandatory Joomla version argument must be one of the following: ${versions}."
-    log "The optional 'local' argument runs Cypress directly on the Docker host (default is to run from the Docker container)."
+    help
     error "Argument '$1' is not valid."
     exit 1
   fi
 done
 
 if [ -z "${version}" ]; then
+  help
   error "Please provide a Joomla version number from the following: ${versions}."
   exit 1
 fi

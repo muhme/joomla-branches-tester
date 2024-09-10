@@ -8,21 +8,31 @@
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
-TMP=/tmp/$(basename $0).$$
-trap 'rm -rf $TMP' 0
-
 source scripts/helper.sh
+
+function help {
+    echo "
+    pull.sh – Running 'git pull' on one or multiple branches.
+              Running composer install if changes are detected and npm clean install if needed.
+              Optional version can be one or more of the following: ${allVersions[@]} (default is all).
+
+              `random_quote`
+    "
+}
 
 versions=$(getVersions)
 IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
 
 versionsToPull=()
 while [ $# -ge 1 ]; do
-  if isValidVersion "$1" "$versions"; then
+  if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
+    help
+    exit 0
+  elif isValidVersion "$1" "$versions"; then
     versionsToPull+=("$1")
     shift # Argument is eaten as one version number.
   else
-    log "Optional version can be one or more of the following: ${allVersions[@]} (default is all)."
+    help
     error "Argument '$1' is not valid."
     exit 1
   fi

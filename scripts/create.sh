@@ -11,18 +11,19 @@
 
 source scripts/helper.sh
 
-# Zeroth check host.docker.internal entry
-HOSTS_FILE="/etc/hosts"
-if grep -Eq "127.0.0.1[[:space:]]+host.docker.internal" "$HOSTS_FILE"; then
-  log "Entry '127.0.0.1 host.docker.internal' already exists in the file '${HOSTS_FILE}'"
-else
-  log "Adding entry '127.0.0.1 host.docker.internal' to the file '${HOSTS_FILE}'."
-  sudo sh -c "echo '127.0.0.1 host.docker.internal' >> $HOSTS_FILE"
-  if ! grep -Eq "127.0.0.1[[:space:]]+host.docker.internal" "$HOSTS_FILE"; then
-    error "Please add entry '127.0.0.1 host.docker.internal' to the file '${HOSTS_FILE}'."
-    exit 1
-  fi
-fi
+function help {
+    echo "
+    create.sh – Create base Docker containers and containers based on Joomla Git branches.
+                Optional Joomla version can be one or more of the following: ${allVersions[@]} (without version, all are installed).
+                Optional database variant can be one of: ${JBT_DB_VARIANTS[@]} (default is mariadbi).
+                Optional 'IPv6' can be set (default is to use IPv4).
+                Optional 'no-cache' can be set (default is to use cache).
+                Optional PHP version can be one of: ${JBT_PHP_VERSIONS[@]} (default is php8.1).
+                Optional 'repository:branch', e.g. https://github.com/Elfangor93/joomla-cms:mod_community_info.
+
+                `random_quote`
+    "
+}
 
 versions=$(getVersions)
 IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
@@ -34,7 +35,10 @@ no_cache=false
 php_version="php8.1"
 versionsToInstall=()
 while [ $# -ge 1 ]; do
-  if isValidVersion "$1" "$versions"; then
+  if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
+    help
+    exit 0
+  elif isValidVersion "$1" "$versions"; then
     versionsToInstall+=("$1")
     shift # Argument is eaten as one version number.
   elif isValidVariant "$1"; then
@@ -55,16 +59,24 @@ while [ $# -ge 1 ]; do
     arg_branch="${1##*:}" # everythin after the last ':'
     shift # Argument is eaten as repository:branch.
   else
-    log "Optional Joomla version can be one or more of the following: ${allVersions[@]} (without version, all are installed)."
-    log "Optional database variant can be one of: ${JBT_DB_VARIANTS[@]} (default is mariadbi)."
-    log "Optional IPv6 can be set (default is to use IPv4)."
-    log "Optional no-cache can be set (default is to use cache)."
-    log "Optional PHP version can be one of: ${JBT_PHP_VERSIONS[@]} (default is php8.1)."
-    log "Optional repository:branch, e.g. https://github.com/Elfangor93/joomla-cms:mod_community_info."
+    help
     error "Argument '$1' is not valid."
     exit 1
   fi
 done
+
+# Zeroth check host.docker.internal entry
+HOSTS_FILE="/etc/hosts"
+if grep -Eq "127.0.0.1[[:space:]]+host.docker.internal" "$HOSTS_FILE"; then
+  log "Entry '127.0.0.1 host.docker.internal' already exists in the file '${HOSTS_FILE}'"
+else
+  log "Adding entry '127.0.0.1 host.docker.internal' to the file '${HOSTS_FILE}'."
+  sudo sh -c "echo '127.0.0.1 host.docker.internal' >> $HOSTS_FILE"
+  if ! grep -Eq "127.0.0.1[[:space:]]+host.docker.internal" "$HOSTS_FILE"; then
+    error "Please add entry '127.0.0.1 host.docker.internal' to the file '${HOSTS_FILE}'."
+    exit 1
+  fi
+fi
 
 if [ ! -z "${git_repository}" ] && [ ${#versionsToInstall[@]} -ne 1 ]; then
   error "If you use repository:branch, please specify one version as one of the following: ${allVersions[@]}."

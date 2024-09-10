@@ -1,18 +1,30 @@
 #!/bin/bash
 #
-# clean.sh - Switching PHP in web container to installation with or without Xdebug.
+# xdebug.sh - Switches the PHP installation with or without Xdebug in one or more Web Server containers.
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 source scripts/helper.sh
 
+function help {
+    echo "
+    xdebug.sh – Switches the PHP installation with or without Xdebug in one or more Web Server containers.
+                Mandatory argument 'on' or 'off' is required.
+
+               `random_quote`
+    "
+}
+
 versions=$(getVersions)
 IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
 
 versionsToChange=()
 while [ $# -ge 1 ]; do
-  if isValidVersion "$1" "$versions"; then
+  if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
+    help
+    exit 0
+  elif isValidVersion "$1" "$versions"; then
     versionsToChange+=("$1")
     shift # Argument is eaten as the version number.
   elif [ "$1" = "on" ]; then
@@ -22,15 +34,15 @@ while [ $# -ge 1 ]; do
     todo="$1"
     shift # Argument is eaten as enable Xdebug.
   else
-    log "Mandatory argument 'on' or 'off' is needed"
-    log "Optional Joomla version argument could be one or multiple of the following: ${versions}."
+    help
     error "Argument '$1' is not valid."
     exit 1
   fi
 done
 
 if [ -z "${todo}" ]; then
-    error "Please give argument 'on' or 'off'"
+    help
+    error "Please provide the argument 'on' or 'off'."
     exit 1
 fi
 

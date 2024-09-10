@@ -7,9 +7,27 @@
 
 source scripts/helper.sh
 
+function help {
+    echo "
+    info.sh – Retrieves Joomla Branches Tester status information.
+
+               `random_quote`
+    "
+}
+
 versions=$(getVersions)
-IFS=' ' allVersions=($(sort <<<"${versions}"))
-unset IFS # map to array
+IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
+
+while [ $# -ge 1 ]; do
+  if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
+    help
+    exit 0
+  else
+    help
+    error "Argument '$1' is not valid."
+    exit 1
+  fi
+done
 
 docker_running=false
 if docker info >/dev/null 2>&1; then

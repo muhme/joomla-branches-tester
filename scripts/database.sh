@@ -8,17 +8,27 @@
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
-TMP=/tmp/$(basename $0).$$
-trap 'rm -rf $TMP' 0
-
 source scripts/helper.sh
+
+function help {
+    echo "
+    database.sh – Change the database and database driver for all, one or multiple Joomla containers.
+                  The mandatory database variant must be one of: ${JBT_DB_VARIANTS[@]}.
+                  Optional Joomla version can be one or more of the following: ${versions} (default is all).
+
+                  `random_quote`
+    "
+}
 
 versionsToChange=()
 versions=$(getVersions)
 IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
 
 while [ $# -ge 1 ]; do
-  if isValidVersion "$1" "$versions"; then
+  if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
+    help
+    exit 0
+  elif isValidVersion "$1" "$versions"; then
     versionsToChange+=("$1")
     shift # Argument is eaten as version number.
   elif isValidVariant "$1"; then
@@ -28,14 +38,14 @@ while [ $# -ge 1 ]; do
     dbport=$(dbPortForVariant "$dbvariant")
     shift # Argument is eaten as database variant.
   else
-    log "Mandatory database variant can be one of: ${JBT_DB_VARIANTS[@]}."
-    log "Optional Joomla version can be one or more of the following: ${versions} (default is all, e.g. '52 53')."
+    help
     error "Argument '$1' is not valid."
     exit 1
   fi
 done
 
 if [ -z "$dbvariant" ] ; then
+  help
   error "Mandatory database variant is missing. Please use one of: ${JBT_DB_VARIANTS[@]}."
   exit 1
 fi

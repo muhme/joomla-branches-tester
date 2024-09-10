@@ -1,6 +1,22 @@
-# Scripts for a more pleasant and also faster development
+# JBT Scripts
 
-The scripts and configuration files of the Joomla Branch Tester are stored in this directory `/scripts`.
+These scripts implement the Joomla Branches Tester (JBT), delivering the complete functionality along with necessary configuration files. They are stored in this directory `scripts`.
+
+:point_right: For a quick overview of all mandatory and optional arguments, you can run each script with the 'help' argument. For example:
+```
+scripts/database.sh help
+```
+```
+*** 240909 16:00:10 *** Script 'database.sh' started.
+
+    database.sh – Change the database and database driver for all, one or multiple Joomla containers.
+                  The mandatory database variant must be one of: mysqli mysql mariadbi mariadb pgsql.
+                  Optional Joomla version can be one or more of the following: 44 51 52 53 60 (default is all).
+
+                  "惚れた病に薬なし。", 不明
+
+*** 240909 16:00:11 *** Script 'database.sh' finished in 1 second.
+```
 
 ## Your Scripts
 

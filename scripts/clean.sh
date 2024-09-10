@@ -1,14 +1,34 @@
 #!/bin/bash
 #
-# clean.sh - delete all jbt_* Docker containers and the network joomla-branches-tester_default.
+# clean.sh - Stopping and removing JBT Docker containers, associated Docker networks and volumes.
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 source scripts/helper.sh
 
+function help {
+    echo "
+    clean.sh – Stops and removes all JBT Docker containers, associated Docker networks, and volumes.
+               Also deletes all 'branch_*' directories.
+
+               `random_quote`
+    "
+}
+
 versions=$(getVersions)
 IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
+
+while [ $# -ge 1 ]; do
+  if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
+    help
+    exit 0
+  else
+    help
+    error "Argument '$1' is not valid."
+    exit 1
+  fi
+done
 
 # Delete all docker containters. The PHP version and network do not affect the deletion process.
 log "Create 'docker-compose.yml' file with all branch versions to remove Joomla Branches Tester overall."

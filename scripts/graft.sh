@@ -8,16 +8,28 @@
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
-TMP=/tmp/$(basename $0).$$
-trap 'rm -rf $TMP' 0
-
 source scripts/helper.sh
+
+function help {
+    echo "
+    graft.sh – Place Joomla package onto development branch.
+               Just like in plant grafting, where a scion is joined to a rootstock.
+               The mandatory Joomla version argument must be one of the following: ${versions}.
+               The Joomla package file argument (e.g. 'Joomla_5.1.2-Stable-Full_Package.zip') is mandatory.
+               Optional database variant can be one of: ${JBT_DB_VARIANTS[@]} (default is mariadbi).
+
+               `random_quote`
+    "
+}
 
 versions=$(getVersions)
 
 database_variant="mariadbi"
 while [ $# -ge 1 ]; do
-  if isValidVersion "$1" "$versions"; then
+  if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
+    help
+    exit 0
+  elif isValidVersion "$1" "$versions"; then
     version="$1"
     shift # Argument is eaten as the version number.
   elif isValidVariant "$1"; then
@@ -27,20 +39,20 @@ while [ $# -ge 1 ]; do
     package="$1"
     shift # Argument is eaten as package file.
   else
-    log "The mandatory Joomla version argument must be one of the following: ${versions}."
-    log "The Joomla package file argument (e.g. 'Joomla_5.1.2-Stable-Full_Package.zip') is mandatory."
-    log "Optional database variant can be one of: ${JBT_DB_VARIANTS[@]} (default is mariadbi)."
+    help
     error "Argument '$1' is not valid."
     exit 1
   fi
 done
 
 if [ -z "${version}" ]; then
+  help
   error "Please provide a Joomla version number from the following: ${versions}."
   exit 1
 fi
 
 if [ -z "${package}" ]; then
+  help
   error "Please provide a Joomla package argument, e.g. local file 'Joomla_5.1.2-Stable-Full_Package.zip'."
   exit 1
 fi

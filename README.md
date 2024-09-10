@@ -1,6 +1,6 @@
 ⚠️ Under construction ⚠️ 
 
-# Docker based Joomla Branches Tester
+# JBT – Joomla Branches Tester
 
 <img align="right" src="images/magic_world.png">
 Imagine a little slice of a parallel universe where testing all used Joomla branches becomes a fluffy, cosy, and almost magical experience. In this universe, you can effortlessly test with the Patch Tester, glide through the Cypress GUI, or even enjoy the smooth efficiency of Cypress Headless. Picture the warmth of being able to peer into any database table as if through a magical glass, or seamlessly switch between five different database variants with just a small wave of a magic wand. Wouldn't that create a truly fluffy and cosy environment to work in?

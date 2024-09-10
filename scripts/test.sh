@@ -15,6 +15,17 @@ source scripts/helper.sh
 # test script counts errors by own and should not stop on command failures
 trap - ERR
 
+function help {
+    echo "
+    test.sh – Runs Cypress specs on one, multiple, or all branches.
+              Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
+              Optional 'novnc' argument sets DISPLAY=jbt_novnc:0 (default is headless).
+              Optional 'chrome', 'edge', or 'firefox' can be specified as the browser (default is 'electron').
+
+              `random_quote`
+    "
+}
+
 versions=$(getVersions)
 IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
 
@@ -22,7 +33,10 @@ novnc=false
 browser=""
 versionsToTest=()
 while [ $# -ge 1 ]; do
-  if isValidVersion "$1" "$versions"; then
+  if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
+    help
+    exit 0
+  elif isValidVersion "$1" "$versions"; then
     versionsToTest+=("$1")
     shift # Argument is eaten as the Joomla version number.
   elif [ "$1" = "novnc" ]; then
@@ -31,14 +45,6 @@ while [ $# -ge 1 ]; do
   elif [[ "$1" =~ ^(chrome|edge|firefox|electron)$ ]]; then
     browser="--browser $1"
     shift # Argument is eaten as browser to use.
-  elif [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
-    # In principle, all arguments are valid, as they may form a test pattern. But we realise that help is needed.
-    log "Script test.sh runs Cypress specs on one, multiple, or all branches."
-    log "Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all)."
-    log "Optional novnc argument sets DISPLAY=jbt_novnc:0 (default is headless)."
-    log "Optional chrome, edge, or firefox can be specified as the browser (default is electron)."
-    log "Have a nice day!"
-    exit 0
   else
     spec_argument="$1"
     shift # Argument is eaten as test specification.
@@ -109,6 +115,8 @@ done
 
 if [ ${failed} -eq 0 ] ; then
   log "Completed version ${versionsToTest[@]} with ${successful} successful ${spec}."
+  exit 0
 else
   error "Completed version ${versionsToTest[@]} with ${failed} failed and ${successful} successful ${spec}."
+  exit 1
 fi
