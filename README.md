@@ -526,7 +526,24 @@ scripts/patchtester.sh 53 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
 
 :fairy: Remember, if you have changed the database version or the PHP version, you need to reinstall Joomla Patch Tester.
 
-### Switch Database and Database Driver
+### Databases
+
+The Joomla Branches Tester includes one container for each of the three supported databases (version numbers as of September 2024):
+* `jbt_mysql` – MySQL version 8.1.0 Community Server
+* `jbt_madb` – MariaDB version 10.4.34
+* `jbt_pg` PostgreSQL version 12.20
+
+You can set the desired database and database driver using the `create.sh` script or switch them later with the `database.sh` script.
+
+Database Unix sockets are available in the Cypress and Joomla Web Server containers:
+```
+/jbt/run/postgresql-socket/.s.PGSQL.5432
+/jbt/run/mysql-socket/mysqld.sock
+/jbt/run/mysql-socket/mysqlx.sock
+/jbt/run/mariadb-socket/mysqld.sock
+```
+
+#### Switch Database and Database Driver
 
 You can simply switch between one of the three supported databases (MariaDB, PostgreSQL or MySQL) and
 the database driver used (MySQL improved or PHP Data Objects).
