@@ -671,41 +671,45 @@ You can retrieve some interesting Joomla Branches Tester status information:
 ```
 scripts/info.sh
 ```
-The following example illustrates an installation with three branches:
-* `4.4-dev`: A development clone based on version 4.4.9.
-* `5.1-dev`: Grafted with the Joomla 5.1.2 Stable package.
-* `5.2-dev`: A development clone of version 5.2.0 with additional patches applied.
+The following example illustrates an IPv6 installation with three branches:
+* `4.4-dev`: A development clone based on version 4.4.9, PHP 8.1 is running with Xdebug, using PostgreSQL with driver PDO
+* `5.1-dev`: Grafted with the Joomla 5.1.3 Stable package, PHP 8.2, using MariaDB with driver MySQLi
+* `5.2-dev`: A development clone of version 5.2.0 with additional patches applied, using MySQL with driver PDO
 ```
-Docker version 24.0.6 is running with 11 containers and 21 images
+Docker version 27.2.0 is running with 12 containers and 14 images
 Standard Containers:
-  jbt_pga     is running, ports: 80/tcp -> 0.0.0.0:7002
-  jbt_mya     is running, ports: 80/tcp -> 0.0.0.0:7001
-  jbt_mysql   is running, ports: 3306/tcp -> 0.0.0.0:7011
-  jbt_madb    is running, ports: 3306/tcp -> 0.0.0.0:7012
-  jbt_pg      is running, ports: 5432/tcp -> 0.0.0.0:7013
-  jbt_relay   is running, ports: 7025/tcp -> 0.0.0.0:7025
-  jbt_mail    is running, ports: 1025/tcp -> 0.0.0.0:7225; 1080/tcp -> 0.0.0.0:7003
-  jbt_cypress is running, ports: 7125/tcp -> 0.0.0.0:7125
+  jbt_mysql   is running, ports: 3306/tcp -> 0.0.0.0:7011; 3306/tcp -> [::]:7011
+  jbt_madb    is running, ports: 3306/tcp -> 0.0.0.0:7012; 3306/tcp -> [::]:7012
+  jbt_pg      is running, ports: 5432/tcp -> 0.0.0.0:7013; 5432/tcp -> [::]:7013
+  jbt_mya     is running, ports: 80/tcp -> 0.0.0.0:7001; 80/tcp -> [::]:7001
+  jbt_pga     is running, ports: 80/tcp -> 0.0.0.0:7002; 80/tcp -> [::]:7002
+  jbt_cypress is running, ports: 7125/tcp -> 0.0.0.0:7125; 7125/tcp -> [::]:7125
+  jbt_novnc   is running, ports: 8080/tcp -> 0.0.0.0:7900; 8080/tcp -> [::]:7900
+  jbt_relay   is running, ports: 7025/tcp -> 0.0.0.0:7025; 7025/tcp -> [::]:7025
+  jbt_mail    is running, ports: 1025/tcp -> 0.0.0.0:7225; 1025/tcp -> [::]:7225; 1080/tcp -> 0.0.0.0:7003; 1080/tcp -> [::]:7003
 Branch 4.4-dev:
-  jbt_44 is running, ports: 80/tcp -> 0.0.0.0:7044
+  jbt_44 is running, ports: 80/tcp -> 0.0.0.0:7044; 80/tcp -> [::]:7044
   Version: Joomla! 4.4.9 Development
-  /branch_44: 448MB
+  PHP 8.1.29 with Xdebug
+  PostgreSQL(PDO), jbt_pg, ''
+  /branch_44: 438MB
   Repository branch_44: https://github.com/joomla/joomla-cms,  Branch: 4.4-dev,  Status: 0 changes
 Branch 5.1-dev:
-  jbt_51 is running, ports: 80/tcp -> 0.0.0.0:7051
-  Version: Joomla! 5.1.2 Stable
-  /branch_51: 395MB
+  jbt_51 is running, ports: 80/tcp -> 0.0.0.0:7051; 80/tcp -> [::]:7051
+  Version: Joomla! 5.1.3 Stable
+  PHP 8.2.23
+  MySQLi, jbt_madb, ''
+  /branch_51: 386MB
 Branch 5.2-dev:
-  jbt_52 is running, ports: 80/tcp -> 0.0.0.0:7052
+  jbt_52 is running, ports: 80/tcp -> 0.0.0.0:7052; 80/tcp -> [::]:7052
   Version: Joomla! 5.2.0 Development
-  /branch_52: 497MB
+  PHP 8.3.11
+  MySQL(PDO), jbt_mysql, ''
+  /branch_52: 481MB
   Repository branch_52: https://github.com/joomla/joomla-cms,  Branch: 5.2-dev,  Status: 2 changes
 Branch 5.3-dev:
   jbt_53 is NOT running
   /branch_53 is NOT existing
-Branch 6.0-dev:
-  jbt_60 is NOT running
-  /branch_60 is NOT existing
 ```
 
 ### Xdebug
