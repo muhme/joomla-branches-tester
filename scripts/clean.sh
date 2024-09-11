@@ -1,6 +1,7 @@
 #!/bin/bash
 #
 # clean.sh - Stopping and removing JBT Docker containers, associated Docker networks and volumes.
+#            Also deletes dirctory 'run' and all 'branch_*' directories.
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
@@ -10,7 +11,7 @@ source scripts/helper.sh
 function help {
     echo "
     clean.sh – Stops and removes all JBT Docker containers, associated Docker networks, and volumes.
-               Also deletes all 'branch_*' directories.
+               Also deletes dirctory 'run' and all 'branch_*' directories.
 
                $(random_quote)
     "
@@ -45,6 +46,12 @@ for version in "${allVersions[@]}"; do
     rm -rf "branch_${version}" >/dev/null 2>&1 || sudo rm -rf "branch_${version}"
   fi
 done
+
+# Database sockets must be deleted; otherwise, they will be mapped to the new instances.
+if [ -d "run" ]; then
+  log "Removing directory 'run'."
+  rm -rf run || sudo rm -rf run
+fi
 
 # Checking Cypress global binary cache for macOS and Linux
 for dir in  "${HOME}/Library/Caches/Cypress" "${HOME}/.cache/Cypress"; do

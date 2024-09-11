@@ -112,6 +112,7 @@ until docker exec jbt_mysql mysqladmin ping -h"127.0.0.1" --silent || [ $attempt
   attempt=$((attempt + 1))
   sleep 1
 done
+# If the MAX_ATTEMPTS are exceeded, simply try to continue.
 
 # For the tests we need mysql user/password login
 log "jbt_${version} – Enable MySQL user root login with password."
