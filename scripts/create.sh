@@ -2,7 +2,7 @@
 #
 # create.sh - Create Docker containers based on Joomla Git branches.
 #   create.sh
-#   create.sh 51 pgsql no-cache
+#   create.sh 51 pgsql socket no-cache
 #   create.sh 52 53 php8.1
 #   create.sh 52 https://github.com/Elfangor93/joomla-cms:mod_community_info
 #
@@ -16,6 +16,7 @@ function help {
     create.sh – Create base Docker containers and containers based on Joomla Git branches.
                 Optional Joomla version can be one or more of the following: ${allVersions[@]} (without version, all are installed).
                 Optional database variant can be one of: ${JBT_DB_VARIANTS[@]} (default is mariadbi).
+                Optional 'socket' for using the database with a Unix socket (default is using TCP host).
                 Optional 'IPv6' can be set (default is to use IPv4).
                 Optional 'no-cache' can be set (default is to use cache).
                 Optional PHP version can be one of: ${JBT_PHP_VERSIONS[@]} (default is php8.1).
@@ -30,6 +31,7 @@ IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
 
 # Defauls to use MariaDB with MySQLi database driver, to use cache and PHP 8.1.
 database_variant="mariadbi"
+socket=""
 network="IPv4"
 no_cache=false
 php_version="php8.1"
@@ -41,6 +43,9 @@ while [ $# -ge 1 ]; do
   elif isValidVersion "$1" "$versions"; then
     versionsToInstall+=("$1")
     shift # Argument is eaten as one version number.
+  elif [ "$1" = "socket" ]; then
+    socket="socket"
+    shift # Argument is eaten as use database vwith socket.
   elif isValidVariant "$1"; then
     database_variant="$1"
     shift # Argument is eaten as database variant.
@@ -224,7 +229,7 @@ EOF
   docker restart "jbt_${version}"
 
   # Configure and install Joomla with desired database variant
-  scripts/database.sh "${version}" "$database_variant"
+  scripts/database.sh "${version}" "${database_variant}" "${socket}"
 
   log "jbt_${version} – Set container prompt"
   docker exec "jbt_${version}" bash -c "echo PS1=\'jbt_${version} \# \' >> ~/.bashrc" || true # Who cares?

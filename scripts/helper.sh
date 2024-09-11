@@ -13,14 +13,21 @@ trap 'rm -rf $TMP' 0
 # The following four arrays are positionally mapped, avoiding associative arrays
 # to ensure compatibility with macOS default Bash 3.2.
 #
+# Database Unix socket paths into the '/jbt/run' directory
+JBT_S_MY="mysql-socket/mysqld.sock"
+JBT_S_MA="mariadb-socket/mysqld.sock"
+JBT_S_PG="postgresql-socket"
+#
 # Database and driver variants available for 'dbtype' in 'configuration.php'.
-JBT_DB_VARIANTS=("mysqli"      "mysql"         "mariadbi"   "mariadb"       "pgsql"           )
+JBT_DB_VARIANTS=("mysqli"      "mysql"       "mariadbi"    "mariadb"     "pgsql"           )
 # Database driver mapping for the variants as in Web Installer 'database type'.
-   JBT_DB_TYPES=("MySQLi"      "MySQL (PDO)"   "MySQLi"     "MySQL (PDO)"   "PostgreSQL (PDO)")
+   JBT_DB_TYPES=("MySQLi"      "MySQL (PDO)" "MySQLi"      "MySQL (PDO)" "PostgreSQL (PDO)")
 # Database server mapping for the variants.
-   JBT_DB_HOSTS=("jbt_mysql"   "jbt_mysql"     "jbt_madb"   "jbt_madb"      "jbt_pg"          )
+   JBT_DB_HOSTS=("jbt_mysql"   "jbt_mysql"   "jbt_madb"    "jbt_madb"    "jbt_pg"          )
 # Database port mapping for the variants.
-   JBT_DB_PORTS=("7011"        "7011"          "7012"       "7012"          "7013"            )
+   JBT_DB_PORTS=("7011"        "7011"        "7012"        "7012"        "7013"            )
+# Database Unix socket paths into the '/jbt/run' directory
+ JBT_DB_SOCKETS=("${JBT_S_MY}" "${JBT_S_MY}" "${JBT_S_MA}" "${JBT_S_MA}" "${JBT_S_PG}"     )
 
 # PHP versions to choose from, as Docker images with those versions are available.
 JBT_PHP_VERSIONS=("php8.1" "php8.2" "php8.3")
@@ -114,7 +121,7 @@ function dbTypeForVariant() {
             return
         fi
     done
-    error "No database type found for variant '$1'"
+    error "No database type found for '$1' database variant"
 }
 
 # Returns the database host for a given database variant.
@@ -128,7 +135,21 @@ function dbHostForVariant() {
             return
         fi
     done
-    error "No database host found for variant '$1'"
+    error "No database host found for '$1' database variant"
+}
+
+# Returns the database Unix socket path for a given database variant.
+# e.g. dbSocketForVariant "mysql" -> "unix:/jbt/run/mysql-socket/mysqld.sock"
+#
+function dbSocketForVariant() {
+    local variant=$1
+    for i in "${!JBT_DB_VARIANTS[@]}"; do
+        if [ "${JBT_DB_VARIANTS[$i]}" = "$variant" ]; then
+            echo "unix:/jbt/run/${JBT_DB_SOCKETS[$i]}"
+            return
+        fi
+    done
+    error "No database Unix socket found for '$1' database variant"
 }
 
 # Returns the host.docker.internal mapped database port for a given database variant.
@@ -142,7 +163,7 @@ function dbPortForVariant() {
             return
         fi
     done
-    error "No database port found for variant '$1'"
+    error "No database port found for '$1' database variant"
 }
 
 # Check if the given argument is a valid database variant.

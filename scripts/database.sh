@@ -1,7 +1,7 @@
 #!/bin/bash -e
 #
 # database.sh - Change the database and database driver for all, one or multiple Joomla containers.
-#   scripts/database.sh mysqli
+#   scripts/database.sh mysqli socket
 #   scripts/database.sh 44 mariadb
 #   scripts/database.sh 53 60 pgsql
 #
@@ -14,12 +14,14 @@ function help {
     echo "
     database.sh – Change the database and database driver for all, one or multiple Joomla containers.
                   The mandatory database variant must be one of: ${JBT_DB_VARIANTS[@]}.
+                  Optional 'socket' for using the database with a Unix socket (default is using TCP host).
                   Optional Joomla version can be one or more of the following: ${versions} (default is all).
 
                   $(random_quote)
     "
 }
 
+socket=false
 versionsToChange=()
 versions=$(getVersions)
 IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
@@ -31,11 +33,26 @@ while [ $# -ge 1 ]; do
   elif isValidVersion "$1" "$versions"; then
     versionsToChange+=("$1")
     shift # Argument is eaten as version number.
+  elif [ "$1" = "socket" ]; then
+    socket=true
+    if [ ! -z "$dbvariant" ] ; then
+      # Database variant was already given, overwrite with Unix socket
+      dbhost=$(dbSocketForVariant "$dbvariant")
+      dbport=""
+    fi
+    shift # Argument is eaten as use database vwith socket.
   elif isValidVariant "$1"; then
     dbvariant="$1"
     dbtype=$(dbTypeForVariant "$dbvariant")
-    dbhost=$(dbHostForVariant "$dbvariant")
-    dbport=$(dbPortForVariant "$dbvariant")
+    if $socket; then
+      # Use Unix socket
+      dbhost=$(dbSocketForVariant "$dbvariant")
+      dbport=""
+    else
+      # Use TCP host
+      dbhost=$(dbHostForVariant "$dbvariant")
+      dbport=$(dbPortForVariant "$dbvariant")
+    fi
     shift # Argument is eaten as database variant.
   else
     help
@@ -77,26 +94,26 @@ for version in "${versionsToChange[@]}"; do
   #
   # Using database host and default port Docker-inside as performance issues are seen in using host.docker.internal
   docker exec -it "jbt_${version}" bash -c "cd /var/www/html && sed \
-    -e \"s/db_type: .*/db_type: '${dbtype}',/\" \
-    -e \"s/db_name: .*/db_name: 'test_joomla_${version}',/\" \
-    -e \"s/db_prefix: .*/db_prefix: 'jos${version}_',/\" \
-    -e \"s/db_host: .*/db_host: '${dbhost}',/\" \
-    -e \"s/db_port: .*/db_port: '',/\" \
-    -e \"s/baseUrl: .*/baseUrl: 'http:\/\/host.docker.internal:70${version}\/',/\" \
-    -e \"s/db_password: .*/db_password: 'root',/\" \
-    -e \"s/smtp_host: .*/smtp_host: 'host.docker.internal',/\" \
-    -e \"s/smtp_port: .*/smtp_port: '7025',/\" \
+    -e \"s|db_type: .*|db_type: '${dbtype}',|\" \
+    -e \"s|db_name: .*|db_name: 'test_joomla_${version}',|\" \
+    -e \"s|db_prefix: .*|db_prefix: 'jos${version}_',|\" \
+    -e \"s|db_host: .*|db_host: '${dbhost}',|\" \
+    -e \"s|db_port: .*|db_port: '',|\" \
+    -e \"s|baseUrl: .*|baseUrl: 'http:\/\/host.docker.internal:70${version}\/',|\" \
+    -e \"s|db_password: .*|db_password: 'root',|\" \
+    -e \"s|smtp_host: .*|smtp_host: 'host.docker.internal',|\" \
+    -e \"s|smtp_port: .*|smtp_port: '7025',|\" \
     cypress.config.dist.mjs > cypress.config.mjs"
 
   # Create second Cypress config file for running local
   # Using host.docker.internal to have it reachable from outside for Cypress and inside web server container
   log "jbt_${version} – Create additional 'cypress.config.local.mjs' file with using localhost and database port ${dbport}."
   docker exec -it "jbt_${version}" bash -c "cd /var/www/html && sed \
-    -e \"s/db_host: .*/db_host: 'host.docker.internal',/\" \
-    -e \"s/db_port: .*/db_port: '$dbport',/\" \
-    -e \"s/baseUrl: .*/baseUrl: 'http:\/\/localhost:70${version}\/',/\" \
-    -e \"s/smtp_host: .*/smtp_host: 'localhost',/\" \
-    -e \"s/smtp_port: .*/smtp_port: '7325',/\" \
+    -e \"s|db_host: .*|db_host: 'host.docker.internal',|\" \
+    -e \"s|db_port: .*|db_port: '$dbport',|\" \
+    -e \"s|baseUrl: .*|baseUrl: 'http:\/\/localhost:70${version}\/',|\" \
+    -e \"s|smtp_host: .*|smtp_host: 'localhost',|\" \
+    -e \"s|smtp_port: .|*smtp_port: '7325',|\" \
     cypress.config.mjs > cypress.config.local.mjs"
 
   # Joomla System Tests 'Hack' until PR https://github.com/joomla/joomla-cms/pull/43968

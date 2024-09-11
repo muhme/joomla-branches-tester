@@ -25,9 +25,9 @@ The following scripts are available and the use is described in [../README.md](.
 | Script | Description | Additional Info |
 | --- | --- | --- |
 | [scripts/clean.sh](clean.sh) | Delete all `jbt_*`-Docker containers and the `joomla-branches-tester_default` Docker network and `branch_*` folders. | Used by `create.sh` or for you to get rid of all the stuff. |
-| [scripts/create.sh](create.sh) | (Re-)Build all docker containers. | Optional arguments are version number(s), database variant, PHP version, `IPv6` and `no-cache`. |
+| [scripts/create.sh](create.sh) | (Re-)Build all docker containers. | Optional arguments are version number(s), database variant, `socket`, PHP version, `IPv6` and `no-cache`. |
 | [scripts/cypress.sh](cypress.sh) | Running interactive Cypress GUI. | Mandatory argument is the Joomla version number. Optional argument is `local` to use a locally installed Cypress. |
-| [scripts/database.sh](database.sh) | Changes database and database driver. | :warning: The overall database content is lost.<br />Mandatory argument is the database variant. Optional argument(s): Joomla version number(s). |
+| [scripts/database.sh](database.sh) | Changes database and database driver. | :warning: The overall database content is lost.<br />Mandatory argument is the database variant. Optional argument(s): `socket` and Joomla version number(s). |
 | [scripts/graft.sh](graft.sh) | Grafting a Joomla package onto a branch. | :warning: The overall database content is lost.<br />Mandatory argument is the Joomla package. Optional argument is the database variant.|
 | [scripts/info.sh](info.sh) | Retrieves Joomla Branches Tester status information. |  |
 | [scripts/patchtester.sh](patchtester.sh) | Installs and configures Joomla patch tester component in one or all Joomla instances. | The GitHub token comes from environment variable `JBT_GITHUB_TOKEN` or as mandatory argument. Optional argument(s): Joomla version number(s). |

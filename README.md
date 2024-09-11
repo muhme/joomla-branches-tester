@@ -535,14 +535,6 @@ The Joomla Branches Tester includes one container for each of the three supporte
 
 You can set the desired database and database driver using the `create.sh` script or switch them later with the `database.sh` script.
 
-Database Unix sockets are available in the Cypress and Joomla Web Server containers:
-```
-/jbt/run/postgresql-socket/.s.PGSQL.5432
-/jbt/run/mysql-socket/mysqld.sock
-/jbt/run/mysql-socket/mysqlx.sock
-/jbt/run/mariadb-socket/mysqld.sock
-```
-
 #### Switch Database and Database Driver
 
 You can simply switch between one of the three supported databases (MariaDB, PostgreSQL or MySQL) and
@@ -583,6 +575,24 @@ scripts/database.sh pgsql
   "When in doubt, it's wiser to use `create.sh` to ensure a clean installation.
   With a sprinkle of stardust, you can specify the desired database variant,
   and if you're only installing one Joomla version, it will be done in the blink of an eye."
+
+#### Database Unix Sockets
+
+Database Unix sockets are available in the Cypress and Joomla Web Server containers:
+```
+/jbt/run/postgresql-socket
+/jbt/run/mysql-socket/mysqld.sock
+/jbt/run/mysql-socket/mysqlx.sock
+/jbt/run/mariadb-socket/mysqld.sock
+```
+They are used in the scripts `create.sh` and `database.sh` with the `socket` option.
+Without this option, the database connection defaults to using the TCP host.
+
+You can also use these sockets with command line client tools, for example:
+```
+psql -h /jbt/run/postgresql-socket -U root -d test_joomla_53
+mariadb --socket=/jbt/run/mysql-socket/mysqld.sock -u root -p
+```
 
 ### Switch PHP Version
 
@@ -784,7 +794,8 @@ scripts/clean.sh
    ```
 5. If you encounter problems after running `scripts/create.sh` multiple times,
    try using the `no-cache` option to force a fresh build of the containers.
-6. Open an [issue](../../issues).
+6. Always use the latest version of Docker software.
+7. Open an [issue](../../issues).
 
 ## Limitations
 

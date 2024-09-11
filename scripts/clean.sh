@@ -50,7 +50,7 @@ done
 # Database sockets must be deleted; otherwise, they will be mapped to the new instances.
 if [ -d "run" ]; then
   log "Removing directory 'run'."
-  rm -rf run || sudo rm -rf run
+  rm -rf run 2>/dev/null || sudo rm -rf run
 fi
 
 # Checking Cypress global binary cache for macOS and Linux

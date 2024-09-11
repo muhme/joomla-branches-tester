@@ -58,7 +58,7 @@ services:
   postgres:
     container_name: jbt_pg
     restart: unless-stopped
-    image: postgres:12
+    image: postgres
     ports:
       - "7013:5432"
     environment:
