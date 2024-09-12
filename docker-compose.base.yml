@@ -58,7 +58,9 @@ services:
   postgres:
     container_name: jbt_pg
     restart: unless-stopped
-    image: postgres
+    # Not using version 16, as waiting for https://github.com/joomla-framework/database/pull/295
+    # with ERROR: unrecognized configuration parameter "lc_collate"
+    image: postgres:15
     ports:
       - "7013:5432"
     environment:
