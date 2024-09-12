@@ -531,7 +531,7 @@ scripts/patchtester.sh 53 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
 The Joomla Branches Tester includes one container for each of the three supported databases (version numbers as of September 2024):
 * `jbt_mysql` – MySQL version 8.1.0 Community Server
 * `jbt_madb` – MariaDB version 10.4.34
-* `jbt_pg` – PostgreSQL version 12.20
+* `jbt_pg` – PostgreSQL version 15.8
 
 You can set the desired database and database driver using the `create.sh` script or switch them later with the `database.sh` script.
 
@@ -593,6 +593,10 @@ You can also use these sockets with command line client tools, for example:
 psql -h /jbt/run/postgresql-socket -U root -d test_joomla_53
 mariadb --socket=/jbt/run/mysql-socket/mysqld.sock -u root -p
 ```
+
+:point_right: Be aware that Unix sockets currently work (as of August 2024)
+              in the Joomla System Tests for the installation step, 
+              but not for custom database commands.
 
 ### Switch PHP Version
 
