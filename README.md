@@ -766,6 +766,8 @@ You can use the IPv6 address (instead of the hostname) to open the PostgreSQL in
 docker exec -it jbt_pg bash -c "PGPASSWORD=root psql -h fd00::4 -U root -d postgres"
 ```
 :point_right: The `host.docker.internal` feature generally defaults to IPv4, and there is no built-in IPv6 equivalent.
+              As `scripts/cypress.sh local` works with `host.docker.internal`,
+              the database custom commands use the IPv4 address to access the database.
 
 ### Cleaning Up
 
