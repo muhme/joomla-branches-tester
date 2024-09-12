@@ -728,6 +728,8 @@ Branch 5.3-dev:
 
 ### Xdebug
 
+<img align="right" src="images/Xdebug.png">
+
 Joomla web server containers are ready with a second PHP installation for switching to
 [Xdebug](https://github.com/xdebug/xdebug).
 You can switch to the PHP version with Xdebug for example:
