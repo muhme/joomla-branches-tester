@@ -335,11 +335,12 @@ function random_quote() {
 
     # Extract the author's name
     author=$(echo "$json" | sed -n 's/.*"authorName":"\([^"]*\)".*/\1/p')
+    authorID=$(echo "$json" | sed -n 's/.*"authorId":\([0-9]*\).*/\1/p')
 
     # If we are offline, we have no quote :(
     if [ "${quote}" != "" ]; then
-        # Print the author only if it's not "Unknown"
-        if [ "$author" != "Unknown" ]; then
+        # Print the author only if it's not "Unknown" with authorID 0
+        if [ "$authorID" != "0" ]; then
             echo "\"${quote}\", ${author}"
         else
             echo "\"${quote}\""

@@ -4,7 +4,7 @@ These scripts implement the Joomla Branches Tester (JBT), delivering the complet
 
 :point_right: For a quick overview of all mandatory and optional arguments, you can run each script with the `help` argument. For example:
 ```
-scripts/database.sh help
+LANG=ja scripts/database.sh help
 ```
 ```
 *** 240909 16:00:10 *** Script 'database.sh' started.
@@ -17,6 +17,11 @@ scripts/database.sh help
 
 *** 240909 16:00:11 *** Script 'database.sh' finished in 1 second.
 ```
+
+:fairy: The random quote supports five languages, just like the
+        [zitat-service.de](https://extensions.joomla.org/extension/news-display/quotes/zitat-service-de/)
+        Joomla module. Set `LANG` to `de` for Deutsch, `en` for English, `es` for Español, `ja` for 日本語,
+        or `uk` for Українська. The gnome can't stop playing with it.
 
 ## Your Scripts
 
