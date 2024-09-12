@@ -51,6 +51,10 @@ do
     log "jbt_${version} – There is no directory 'branch_${version}', jumped over."
     continue
   fi
+  if [ ! -d "branch_${version}/.git" ]; then
+    log "jbt_${version} – There is no directory 'branch_${version}/.git', grafted Joomla package?, jumped over."
+    continue
+  fi
   log "jbt_${version} – Running Git fetch origin for ${branch}."
   # Prevent dubious ownership in repository
   docker exec -it "jbt_${version}" sh -c "git config --global --add safe.directory /var/www/html"
