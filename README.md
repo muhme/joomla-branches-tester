@@ -748,11 +748,24 @@ Used ports are 79xx, for the given example 7953.
 
 ### IPv6
 
-As shown in the [Installation](#installation) chapter, you can create the Docker Branches Tester instance using the `scripts/create.sh` script with the `IPv6` option instead of the default IPv4 network. Docker assigns IP addresses from the predefined private, non-routable subnet `fd00::/8`. To view the assigned IP addresses, use:
+As shown in the [Installation](#installation) chapter, you can create the Docker Branches Tester instance using the `scripts/create.sh` script with the `IPv6` option instead of the default IPv4 network. Docker assigns IP addresses from the predefined private, non-routable subnet `fd00::/8`. To view the assigned IPv4 and IPv6 dual stack network addresses (they may change on each Docker run), use:
 
 ```
 docker inspect jbt_network
 ```
+You can also see the used IPv6 addresses in using ping command line tool:
+```
+docker exec jbt_cypress ping jbt_pg
+```
+```
+64 bytes from jbt_pg.jbt_network (fd00::4): icmp_seq=1 ttl=64 time=0.092 ms
+...
+```
+You can use the IPv6 address (instead of the hostname) to open the PostgreSQL interactive terminal:
+```
+docker exec -it jbt_pg bash -c "PGPASSWORD=root psql -h fd00::4 -U root -d postgres"
+```
+:point_right: The `host.docker.internal` feature generally defaults to IPv4, and there is no built-in IPv6 equivalent.
 
 ### Cleaning Up
 
