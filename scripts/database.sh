@@ -113,7 +113,7 @@ for version in "${versionsToChange[@]}"; do
     -e \"s|db_port: .*|db_port: '$dbport',|\" \
     -e \"s|baseUrl: .*|baseUrl: 'http:\/\/localhost:70${version}\/',|\" \
     -e \"s|smtp_host: .*|smtp_host: 'localhost',|\" \
-    -e \"s|smtp_port: .|*smtp_port: '7325',|\" \
+    -e \"s|smtp_port: .*|smtp_port: '7325',|\" \
     cypress.config.mjs > cypress.config.local.mjs"
 
   # Joomla System Tests 'Hack' until PR https://github.com/joomla/joomla-cms/pull/43968
