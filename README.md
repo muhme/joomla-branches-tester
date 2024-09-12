@@ -595,7 +595,7 @@ mariadb --socket=/jbt/run/mysql-socket/mysqld.sock -u root -p
 ```
 
 :point_right: Be aware that Unix sockets currently work (as of August 2024)
-              in the Joomla System Tests for the installation step, 
+              in the Joomla System Tests for the installation step,
               but not for custom database commands.
 
 ### Switch PHP Version
