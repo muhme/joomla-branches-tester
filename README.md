@@ -690,6 +690,7 @@ The following example illustrates an IPv6 installation with three branches:
 * `5.1-dev`: Grafted with the Joomla 5.1.3 Stable package, PHP 8.2, using MariaDB with driver MySQLi
 * `5.2-dev`: A development clone of version 5.2.0 with additional patches applied, using MySQL with driver PDO
 ```
+Joomla Branches Tester (JBT) version 0.9.2
 Docker version 27.2.0 is running with 12 containers and 14 images
 Standard Containers:
   jbt_mysql   is running, ports: 3306/tcp -> 0.0.0.0:7011; 3306/tcp -> [::]:7011
