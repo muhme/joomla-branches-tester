@@ -32,8 +32,12 @@ done
 # Get the current local version and the latest version from the GitHub repository
 local_version=$(cat VERSION)
 git_version=$(curl -s -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/muhme/joomla-branches-tester/main/VERSION)
+# Real compare version numbers as raw.githubusercontent.com is always a little behind the times
+version_gt() {
+    [ "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1" ]
+}
 version_message="Joomla Branches Tester (JBT) version ${local_version}"
-if [ "$local_version" != "$git_version" ]; then
+if version_gt "${local_version}" "${git_version}"; then
     echo "${version_message}, there is a newer version ${git_version} available."
 else
   echo "${version_message}"
