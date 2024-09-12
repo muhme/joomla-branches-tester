@@ -31,7 +31,7 @@ IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
 
 # Defauls to use MariaDB with MySQLi database driver, to use cache and PHP 8.1.
 database_variant="mariadbi"
-socket=""
+socket=false
 network="IPv4"
 no_cache=false
 php_version="php8.1"
@@ -44,7 +44,7 @@ while [ $# -ge 1 ]; do
     versionsToInstall+=("$1")
     shift # Argument is eaten as one version number.
   elif [ "$1" = "socket" ]; then
-    socket="socket"
+    socket=true
     shift # Argument is eaten as use database vwith socket.
   elif isValidVariant "$1"; then
     database_variant="$1"
@@ -100,7 +100,7 @@ scripts/clean.sh
 log "Create 'docker-compose.yml' file for version(s) ${versionsToInstall[*]}, based on ${php_version} and ${network}."
 createDockerComposeFile "${versionsToInstall[*]}" "${php_version}" "${network}"
 
-if [ $# -eq 1 ] && [ "$1" = "no-cache" ]; then
+if $no_cache; then
   log "Running 'docker compose build --no-cache'."
   docker compose build --no-cache
 fi
@@ -229,7 +229,11 @@ EOF
   docker restart "jbt_${version}"
 
   # Configure and install Joomla with desired database variant
-  scripts/database.sh "${version}" "${database_variant}" "${socket}"
+  if $socket; then
+    scripts/database.sh "${version}" "${database_variant}" "socket"
+  else
+    scripts/database.sh "${version}" "${database_variant}"
+  fi
 
   log "jbt_${version} – Set container prompt"
   docker exec "jbt_${version}" bash -c "echo PS1=\'jbt_${version} \# \' >> ~/.bashrc" || true # Who cares?
