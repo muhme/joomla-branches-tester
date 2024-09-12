@@ -29,7 +29,16 @@ while [ $# -ge 1 ]; do
   fi
 done
 
-echo "Joomla Branches Tester (JBT) version $(cat VERSION)"
+# Get the current local version and the latest version from the GitHub repository
+local_version=$(cat VERSION)
+git_version=$(curl -s https://raw.githubusercontent.com/muhme/joomla-branches-tester/main/VERSION)
+version_message="Joomla Branches Tester (JBT) version ${local_version}"
+if [ "$local_version" != "$git_version" ]; then
+    echo "${version_message}, there is a newer version ${git_version} available."
+else
+  echo "${version_message}"
+fi
+
 docker_running=false
 if docker info >/dev/null 2>&1; then
   docker_running=true
