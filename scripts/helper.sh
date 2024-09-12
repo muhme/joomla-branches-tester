@@ -260,6 +260,22 @@ function getJoomlaVersion() {
     echo "$version"
 }
 
+# Check if a test name is valid.
+# e.g. isValidTestName "system" "php-cs-fixer" "phpcs" "system"
+#
+isValidTestName() {
+  local test="$1"
+  shift  # First argument is eaten as the test name
+  local all_tests=("$@")  # Remaining arguments are the ALL_TESTS array
+
+  for valid_test in "${all_tests[@]}"; do
+    if [[ "$test" == "$valid_test" ]]; then
+      return 0  # Yes, test name is valid
+    fi
+  done
+  return 1  # No
+}
+
 # Use ANSI escape sequences to colorize JBT log messages to differentiate them from others.
 #
 JBT_LIGHT_GREEN_BG="\033[102m"
