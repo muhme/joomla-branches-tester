@@ -29,6 +29,7 @@ while [ $# -ge 1 ]; do
   fi
 done
 
+echo "Joomla Branches Tester (JBT) version $(cat VERSION)"
 docker_running=false
 if docker info >/dev/null 2>&1; then
   docker_running=true
