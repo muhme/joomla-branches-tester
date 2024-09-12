@@ -374,12 +374,42 @@ In parallel you can inspect MariaDB and MySQL database with [phpMyAdmin](https:/
 
 If you need to inspect files, they are available in the directory `branch_52` for this Joomla release 5.2 sample.
 
+### Drone-like Tests
+
+A subset of the tests from [Drone](https://www.drone.io/) has been implemented:
+
+* `php-cs-fixer` – PHP Coding Standards Fixer (dry-run)
+* `phpcs` – PHP Coding Sniffer
+* `unit` - PHP Testsuite Unit
+* `lint:css` - CSS Linter
+* `lint:js` - JS Linter
+* `lint:testjs` – JS Linter for Tests
+* `system` – System Tests
+
+Running all tests on all branches is simple with the following command:
+```
+scripts/test.sh
+```
+
+Some optional arguments are:
+
+* **Joomla version number(s)**: Choose one or multiple versions; all versions are tested by default.
+* **Test name(s)**: Choose one or multiple tests; all tests are executed by default.
+
+For example run the linter tests on three branches:
+```
+scripts/test.sh 51 52 53 lint:css lint:js lint:testjs
+```
+
+:point_right: The PHP Unit Test Suite integration and the Phan static analyzer for PHP have not been implemented.
+              Additionally, the tests are not configured to run on multiple PHP versions, as Drone typically does in the Joomla CI environment.
+
 ### Cypress Automated System Tests
 
 To simple run the Joomla System Tests with all specs - except for the installation -
 from the [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System) in all branches with headless Cypress:
 ```
-scripts/test.sh
+scripts/test.sh system
 ```
 
 :fairy: To protect you, the first step `Installation.cy.js` of the Joomla System Tests
@@ -387,20 +417,19 @@ scripts/test.sh
   If you run the installation, this can lead to inconsistencies
   between the file system and the database, as the Joomla database will be recreated.
 
-Some optional arguments are:
+Some more optional arguments for System Tests are:
 
-* **Joomla version number(s)**: Choose one or multiple versions; all versions are tested by default.
 * **Browser to be used**: Choose between electron (default), firefox, chrome, or edge.
 * **Test spec pattern**: All test specs (except the installation) are used by default.
 
 As an example, run all the test specs (except the installation) from branch 5.1-dev with Mozilla Firefox:
 ```
-scripts/test.sh 51 firefox
+scripts/test.sh 51 system firefox
 ```
 
 Run one test spec with default Electron in all branches (of course, the spec must exist in all branches):
 ```
-scripts/test.sh administrator/components/com_users/Users.cy.js
+scripts/test.sh system administrator/components/com_users/Users.cy.js
 ```
 
 :point_right: When specifying a single test spec file,
@@ -408,7 +437,7 @@ scripts/test.sh administrator/components/com_users/Users.cy.js
 
 Test all `site` specs with Microsoft Edge in the branches Joomla 5.1, 5.2 and 5.3 using a pattern:
 ```
-scripts/test.sh 51 52 53 edge 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
+scripts/test.sh 51 52 53 system edge 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
 ```
 
 One more optional argument is `novnc`.
@@ -419,13 +448,13 @@ In this case Cypress runs headed and uses `jbt_vnc` as DISPLAY and you can watch
 execution of the automated tests with the URL:
 * [http://host.docker.internal:7900/vnc.html?autoconnect=true&resize=scale](http://host.docker.internal:7900/vnc.html?autoconnect=true&resize=scale)
 ```
-scripts/test.sh administrator/components/com_users/Users.cy.js 53 novnc
+scripts/test.sh 53 system novnc administrator/components/com_users/Users.cy.js
 ```
 
 To additional show `console.log` messages from Electron browser by setting environment variable: 
 ```
 export ELECTRON_ENABLE_LOGGING=1
-scripts/test.sh 44 administrator/components/com_actionlogs/Actionlogs.cy.js
+scripts/test.sh 44 system administrator/components/com_actionlogs/Actionlogs.cy.js
 ```
 
 ### Cypress Interactive System Tests
