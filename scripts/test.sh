@@ -169,20 +169,13 @@ for version in "${versionsToTest[@]}"; do
     if [ "$actualTest" = "system" ]; then
       # Is there one more argument with a test spec pattern?
       if [ -z "$spec_argument" ] ; then
-        # Initiating everything, but without installation step
-        # Handle .js or .mjs from PR https://github.com/joomla/joomla-cms/pull/43676 – [4.4] Move the Cypress Tests to ESM
-        cf="branch_${version}/cypress.config"
-        if [ -f "${cf}.js" ]; then
-          cf="${cf}.js"
-        elif [ -f "${cf}.mjs" ]; then
-          cf="${cf}.mjs"
-        else
-          error "No 'cypress.config.*js' file found in branch_${version}. Please use 'scripts/create.sh' first."
-          exit 1
-        fi
         # Create spec pattern list without installation spec
         i="tests/System/integration/"
-        all=$(grep  "${i}" "${cf}" | grep -v "${i}install/" | tr -d "' " | awk '{printf "%s", $0}' | sed 's/,$//')
+        all=$(grep  "${i}" "branch_${version}/cypress.config.mjs" | \
+              grep -v "${i}install/" | \
+              tr -d "' " | \
+              awk '{printf "%s", $0}' | \
+              sed 's/,$//')
         spec="--spec '${all}'"
       else
         # Use the given test spec pattern and check if we can (no pattern) and must (missing path) insert path
