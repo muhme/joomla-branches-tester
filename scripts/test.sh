@@ -2,11 +2,11 @@
 #
 # test.sh - Runs Cypress specs on one, multiple, or all branches, e.g.
 #   scripts/test.sh
-#   scripts/test.sh novnc firefox
-#   scripts/test.sh 44
-#   scripts/test.sh 52 53 edge site/components/com_contact/Categories.cy.js
-#   scripts/test.sh 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
-#   ELECTRON_ENABLE_LOGGING=1 scripts/test.sh
+#   scripts/test.sh system novnc firefox
+#   scripts/test.sh 44 lint:testjs
+#   scripts/test.sh 52 53 system edge site/components/com_contact/Categories.cy.js
+#   scripts/test.sh system 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
+#   ELECTRON_ENABLE_LOGGING=1 scripts/test.sh system
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
