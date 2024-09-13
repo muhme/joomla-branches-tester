@@ -182,6 +182,10 @@ EOF
   # Seen on Ubuntu, 13.10.0 was installed, but 12.13.2 needed for the branch
   log "jbt_${version} – Install Cypress (if needed)."
   docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && npx cypress install"
+  # Seen on macOS, 13.13.3 was installed, npx cypress install did not install needed 13.13.0
+  docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && npm run cypress:install"
+  # Seen on macOS, "The cypress npm package is installed, but the Cypress binary is missing."
+  docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && cypress install"
 
   # Using Install Joomla from System Tests
   log "jbt_${version} – Cypress-based Joomla installation."

@@ -22,5 +22,6 @@
     volumes:
       - .:/jbt
       - ./branch_XX:/var/www/html
+      - ./cypress-cache:/root/.cache/Cypress # Cypress and web server containers
     networks:
       - jbt_network

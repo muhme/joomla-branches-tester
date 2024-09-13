@@ -53,11 +53,17 @@ if [ -d "run" ]; then
   rm -rf run 2>/dev/null || sudo rm -rf run
 fi
 
+# Cypress and web server containers shared Cypress binaries
+if [ -d "cypress-cache" ]; then
+  log "Removing directory 'cypress-cache'."
+  rm -rf cypress-cache 2>/dev/null || sudo rm -rf cypress-cache
+fi
+
 # Checking Cypress global binary cache for macOS and Linux
 for dir in  "${HOME}/Library/Caches/Cypress" "${HOME}/.cache/Cypress"; do
   if [ -d "${dir}" ]; then
-    log "Found Cypress global binary cache in the '${dir}' directory with the following sizes in MB:"
+    log "Cache for local Cypress runs has been found in the '${dir}' directory with the following sizes (in MB):"
     du -ms ${dir}/* || true
-    log "You may delete this Cypress binary system cache if it's not shared with other projects, or remove outdated versions."
+    log "You may delete outdated versions from the local Cypress cache."
   fi
 done

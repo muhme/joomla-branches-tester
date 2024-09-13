@@ -12,3 +12,6 @@ docker-compose.yml
 
 # Database servers sockets
 run
+
+# Cypress local, Cypress container and all web server containers share
+cypress-cache

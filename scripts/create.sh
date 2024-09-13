@@ -154,7 +154,7 @@ for version in "${versionsToInstall[@]}"; do
 
   # Create two PHP environments: one with Xdebug and one without.
   # Manage them by cloning /usr/local, and use symbolic links to toggle between the two installations.
-  log "jbt_${version} – Configure php.ini for development and parallel install with Xdebug."
+  log "jbt_${version} – Configure 'php.ini' for development and set up parallel installation with Xdebug."
   docker exec -it "jbt_${version}" bash -c ' \
     cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini &&
     cp -r /usr/local /usr/local-without-xdebug &&

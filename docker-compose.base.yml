@@ -127,6 +127,7 @@ services:
       - .:/jbt
       - ~/.Xauthority:/root/.Xauthority:rw
       - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./cypress-cache:/root/.cache/Cypress # Cypress and web server containers
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
