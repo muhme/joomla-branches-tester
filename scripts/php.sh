@@ -89,24 +89,7 @@ for version in "${versionsToInstall[@]}"; do
   log "jbt_${version} – Starting Docker container."
   docker compose up -d "jbt_${version}"
 
-  if [ -f "branch_${version}/composer.json" ]; then
-    log "jbt_${version} – Running composer install, just in case."
-    docker exec -it "jbt_${version}" bash -c "cd /var/www/html && \
-      php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\" && \
-      php composer-setup.php && \
-      rm composer-setup.php && \
-      mv composer.phar /usr/local/bin/composer && \
-      composer install"
-
-    # New image from Docker Hub needs to install at least git for next pull.sh
-    log "jbt_${version} – Installing additional packages."
-    docker exec -it "jbt_${version}" bash -c 'apt-get update -qq && \
-      apt-get upgrade -y && \
-      curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
-      apt-get install -y git vim nodejs iputils-ping net-tools'
-  else
-    log "jbt_${version} – No 'composer.json' file found, assuming it is a grafted release."
-  fi
+  JBT_INTERNAL=42 scripts/setup.sh "${version}"
 
   changed=$((changed + 1))
 
