@@ -19,15 +19,15 @@ JBT_S_MA="mariadb-socket/mysqld.sock"
 JBT_S_PG="postgresql-socket"
 #
 # Database and driver variants available for 'dbtype' in 'configuration.php'.
-JBT_DB_VARIANTS=("mysqli"      "mysql"       "mariadbi"    "mariadb"     "pgsql"           )
+JBT_DB_VARIANTS=("mysqli" "mysql" "mariadbi" "mariadb" "pgsql")
 # Database driver mapping for the variants as in Web Installer 'database type'.
-   JBT_DB_TYPES=("MySQLi"      "MySQL (PDO)" "MySQLi"      "MySQL (PDO)" "PostgreSQL (PDO)")
+JBT_DB_TYPES=("MySQLi" "MySQL (PDO)" "MySQLi" "MySQL (PDO)" "PostgreSQL (PDO)")
 # Database server mapping for the variants.
-   JBT_DB_HOSTS=("jbt_mysql"   "jbt_mysql"   "jbt_madb"    "jbt_madb"    "jbt_pg"          )
+JBT_DB_HOSTS=("jbt_mysql" "jbt_mysql" "jbt_madb" "jbt_madb" "jbt_pg")
 # Database port mapping for the variants.
-   JBT_DB_PORTS=("7011"        "7011"        "7012"        "7012"        "7013"            )
+JBT_DB_PORTS=("7011" "7011" "7012" "7012" "7013")
 # Database Unix socket paths into the '/jbt/run' directory
- JBT_DB_SOCKETS=("${JBT_S_MY}" "${JBT_S_MY}" "${JBT_S_MA}" "${JBT_S_MA}" "${JBT_S_PG}"     )
+JBT_DB_SOCKETS=("${JBT_S_MY}" "${JBT_S_MY}" "${JBT_S_MA}" "${JBT_S_MA}" "${JBT_S_PG}")
 
 # PHP versions to choose from, as Docker images with those versions are available.
 JBT_PHP_VERSIONS=("php8.1" "php8.2" "php8.3")
@@ -35,7 +35,7 @@ JBT_PHP_VERSIONS=("php8.1" "php8.2" "php8.3")
 # Base Docker containers, eg ("jbt_pga" "jbt_mya" "jbt_mysql" "jbt_madb" "jbt_pg" "jbt_relay" "jbt_mail" "jbt_cypress" "jbt_novnc")
 JBT_BASE_CONTAINERS=()
 while read -r line; do
-  JBT_BASE_CONTAINERS+=("$line")
+    JBT_BASE_CONTAINERS+=("$line")
 done < <(grep 'container_name:' docker-compose.base.yml | awk '{print $2}')
 
 # Determine the currently used Joomla branches.
@@ -52,8 +52,8 @@ function getVersions() {
 
     # Extract the names of the branches, only with grep and sed, so as not to install any dependencies, e.g. jq
     # Use sed with -E flag to enable extended regular expressions, which is also working with macOS sed.
-    local branches=$(echo "$json_data" "$stale_json_data"  | grep -o '"name":"[0-9]\+\.[0-9]\+-dev"' | \
-                     sed -E 's/"name":"([0-9]+)\.([0-9]+)-dev"/\1\2/')
+    local branches=$(echo "$json_data" "$stale_json_data" | grep -o '"name":"[0-9]\+\.[0-9]\+-dev"' |
+        sed -E 's/"name":"([0-9]+)\.([0-9]+)-dev"/\1\2/')
 
     # Create as array and add branches from both sources
     local formatted_branches=()
@@ -68,9 +68,9 @@ function getVersions() {
 
     # Are we offline? Set default branch versions with 42 as marker.
     if [ ${#sorted_branches[@]} -eq 0 ]; then
-      echo "42 44 51 52 53 54 60"
+        echo "42 44 51 52 53 54 60"
     else
-      echo "${sorted_branches[*]}"
+        echo "${sorted_branches[*]}"
     fi
 }
 
@@ -188,25 +188,42 @@ function isValidVariant() {
 # 1st argument is e.g. "52" or "44 51 52 53 60"
 # 2nd argument e.g. "php8.1"
 # 3rd argument is "IPv4" or "IPv6"
+# 4th optional argument is "apppend", then the web server is added if it is not already existing
 #
 function createDockerComposeFile() {
     local php_version="$2"
     local network="$3"
+    local working="$4"
     local versions=()
-    IFS=' ' versions=($(sort <<<"$1")); unset IFS # map to array
+    IFS=' ' versions=($(sort <<<"$1"))
+    unset IFS # map to array
 
-    if [ "${network}" = "IPv4" ]; then
-      cp docker-compose.base.yml docker-compose.yml
-    else
-      sed -e 's/enable_ipv6: false/enable_ipv6: true/' \
-          -e 's/subnet: "192.168.150.0\/24"/subnet: "fd00::\/8"/' \
-          docker-compose.base.yml > docker-compose.yml
+    if [ "${working}" != "append" ]; then
+        if [ "${network}" = "IPv4" ]; then
+            cp docker-compose.base.yml docker-compose.yml
+        else
+            sed -e 's/enable_ipv6: false/enable_ipv6: true/' \
+                -e 's/subnet: "192.168.150.0\/24"/subnet: "fd00::\/8"/' \
+                docker-compose.base.yml >docker-compose.yml
 
+        fi
     fi
+
     local version
     for version in "${versions[@]}"; do
         local din=$(dockerImageName "$version" "$php_version")
-        sed -e "s/XX/${version}/" -e "s/Y/${din}/" docker-compose.joomla.yml >> docker-compose.yml
+        local doit=true
+        if [ "${working}" = "append" ]; then
+            if grep -q "^  jbt_${version}" docker-compose.yml; then
+                log "jbt_${version} – An entry already exists in 'docker-compose.base.yml'; leave it unmodified."
+                doit=false
+            else
+                log "jbt_${version} – Adding an entry in 'docker-compose.base.yml'."
+            fi
+        fi
+        if $doit; then
+            sed -e '/^#/d' -e "s/XX/${version}/" -e "s/Y/${din}/" docker-compose.joomla.yml >>docker-compose.yml
+        fi
     done
 }
 
@@ -226,7 +243,7 @@ function dockerImageName() {
         if [ "$php_version" = "php8.3" ]; then
             # There is no PHP 8.3 for Joomla 4.4, simple use PHP 8.2.
             php_to_use="php8.2"
-         fi
+        fi
         base="4.4-${php_to_use}"
     else
         # Currently (August 2024) there are no Joomla 5.3 and Joomla 6.0 Docker images,
@@ -269,16 +286,16 @@ function getJoomlaVersion() {
 # e.g. isValidTestName "system" "php-cs-fixer" "phpcs" "system"
 #
 isValidTestName() {
-  local test="$1"
-  shift  # First argument is eaten as the test name
-  local all_tests=("$@")  # Remaining arguments are the ALL_TESTS array
+    local test="$1"
+    shift                  # First argument is eaten as the test name
+    local all_tests=("$@") # Remaining arguments are the ALL_TESTS array
 
-  for valid_test in "${all_tests[@]}"; do
-    if [[ "$test" == "$valid_test" ]]; then
-      return 0  # Yes, test name is valid
-    fi
-  done
-  return 1  # No
+    for valid_test in "${all_tests[@]}"; do
+        if [[ "$test" == "$valid_test" ]]; then
+            return 0 # Yes, test name is valid
+        fi
+    done
+    return 1 # No
 }
 
 # Use ANSI escape sequences to colorize JBT log messages to differentiate them from others.
@@ -319,7 +336,7 @@ runningTime() {
     else
         if [ $seconds -eq 1 ]; then
             echo "1 second"
-        else 
+        else
             echo "${seconds} seconds"
         fi
     fi
@@ -339,12 +356,12 @@ function random_quote() {
 
     # Use one of the supported languages or default to English
     case "$lang_code" in
-        de|es|ja|uk)
-            language=$lang_code
-            ;;
-        *)
-            language="en"
-            ;;
+    de | es | ja | uk)
+        language=$lang_code
+        ;;
+    *)
+        language="en"
+        ;;
     esac
 
     # Fetch JSON from the quote API

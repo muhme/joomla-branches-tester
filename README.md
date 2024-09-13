@@ -179,7 +179,9 @@ you will need to download approximately 4 GB of data over the network.
 5. The Docker `jbt_network`, used by all containers, defaults to IPv4.
    To use IPv6, run the script with the `IPv6` option.
    This will configure the Docker network to use IPv6.
-6. To force a fresh build with `no-cache`, defaults to build from cache.
+6. The optional `recreate` option is used to create or recreate the web servers containers
+   for the specified versions. Base containers and unnamed web server containers remain unchanged.
+7. To force a fresh build with `no-cache`, defaults to build from cache.
 </details>
 
 :point_right: In case of trouble, see [Trouble-Shooting](#trouble-shooting).

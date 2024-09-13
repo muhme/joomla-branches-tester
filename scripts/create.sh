@@ -3,7 +3,7 @@
 # create.sh - Create Docker containers based on Joomla Git branches.
 #   create.sh
 #   create.sh 51 pgsql socket no-cache
-#   create.sh 52 53 php8.1
+#   create.sh 52 53 php8.1 recreate
 #   create.sh 52 https://github.com/Elfangor93/joomla-cms:mod_community_info
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
@@ -12,13 +12,14 @@
 source scripts/helper.sh
 
 function help {
-    echo "
+  echo "
     create.sh – Create base Docker containers and containers based on Joomla Git branches.
                 Optional Joomla version can be one or more of the following: ${allVersions[@]} (without version, all are installed).
                 Optional database variant can be one of: ${JBT_DB_VARIANTS[@]} (default is mariadbi).
                 Optional 'socket' for using the database with a Unix socket (default is using TCP host).
                 Optional 'IPv6' can be set (default is to use IPv4).
                 Optional 'no-cache' can be set (default is to use cache).
+                Optional 'recreate' to create or recreate only one or more web server containers.
                 Optional PHP version can be one of: ${JBT_PHP_VERSIONS[@]} (default is php8.1).
                 Optional 'repository:branch', e.g. https://github.com/Elfangor93/joomla-cms:mod_community_info.
 
@@ -27,13 +28,15 @@ function help {
 }
 
 versions=$(getVersions)
-IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
+IFS=' ' allVersions=($(sort <<<"${versions}"))
+unset IFS # map to array
 
 # Defauls to use MariaDB with MySQLi database driver, to use cache and PHP 8.1.
 database_variant="mariadbi"
 socket=""
 network="IPv4"
 no_cache=false
+recreate=false
 php_version="php8.1"
 versionsToInstall=()
 while [ $# -ge 1 ]; do
@@ -45,7 +48,10 @@ while [ $# -ge 1 ]; do
     shift # Argument is eaten as one version number.
   elif [ "$1" = "socket" ]; then
     socket="socket"
-    shift # Argument is eaten as use database vwith socket.
+    shift # Argument is eaten as use database with socket.
+  elif [ "$1" = "recreate" ]; then
+    recreate=true
+    shift # Argument is eaten as option recreate.
   elif isValidVariant "$1"; then
     database_variant="$1"
     shift # Argument is eaten as database variant.
@@ -61,8 +67,8 @@ while [ $# -ge 1 ]; do
   elif [[ "$1" == *:* ]]; then
     # Split into repository and branch.
     arg_repository="${1%:*}" # remove everything after the last ':'
-    arg_branch="${1##*:}" # everythin after the last ':'
-    shift # Argument is eaten as repository:branch.
+    arg_branch="${1##*:}"    # everythin after the last ':'
+    shift                    # Argument is eaten as repository:branch.
   else
     help
     error "Argument '$1' is not valid."
@@ -88,25 +94,33 @@ if [ ! -z "${git_repository}" ] && [ ${#versionsToInstall[@]} -ne 1 ]; then
   exit 1
 fi
 
+if [ "$recreate" = true ] && [ ! -f docker-compose.yml ]; then
+  error "The 'recreate' option was given, but no 'docker-compose.yml' file exists. Please run 'scripts/create.sh' first."
+  exit 1
+fi
+
 # If no version was given, use all.
 if [ ${#versionsToInstall[@]} -eq 0 ]; then
   versionsToInstall=(${allVersions[@]})
 fi
 
-# Delete all docker containters and branches_* directories.
-scripts/clean.sh
+if [ "$recreate" = false ]; then
 
-# Create Docker Compose setup with Joomla web servers for all versions to be installed.
-log "Create 'docker-compose.yml' file for version(s) ${versionsToInstall[*]}, based on ${php_version} and ${network}."
-createDockerComposeFile "${versionsToInstall[*]}" "${php_version}" "${network}"
+  # Delete all docker containters and branches_* directories.
+  scripts/clean.sh
 
-if $no_cache; then
-  log "Running 'docker compose build --no-cache'."
-  docker compose build --no-cache
+  # Create Docker Compose setup with Joomla web servers for all versions to be installed.
+  log "Create 'docker-compose.yml' file for version(s) ${versionsToInstall[*]}, based on ${php_version} and ${network}."
+  createDockerComposeFile "${versionsToInstall[*]}" "${php_version}" "${network}"
+
+  if $no_cache; then
+    log "Running 'docker compose build --no-cache'."
+    docker compose build --no-cache
+  fi
+
+  log "Running 'docker compose up'."
+  docker compose up -d
 fi
-
-log "Running 'docker compose up'."
-docker compose up -d
 
 # Wait until MySQL database is up and running
 # (This isn't accurate when using MariaDB or PostgreSQL, but so far it's working with the delay from MySQL.)
@@ -119,19 +133,46 @@ until docker exec jbt_mysql mysqladmin ping -h"127.0.0.1" --silent || [ $attempt
 done
 # If the MAX_ATTEMPTS are exceeded, simply try to continue.
 
-# For the tests we need mysql user/password login
-log "jbt_${version} – Enable MySQL user root login with password."
-docker exec jbt_mysql mysql -uroot -proot -e "ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'root';"
-# And for MariaDB too
-log "jbt_${version} – Enable MariaDB user root login with password."
-docker exec jbt_madb mysql -uroot -proot -e  "ALTER USER 'root'@'%' IDENTIFIED BY 'root';"
-# And Postgres (which have already user postgres with SUPERUSER, but to simplify we will use same user root on postgres)
-log "jbt_${version} – Create PostgreSQL user root with password root and SUPERUSER role."
-docker exec jbt_pg sh -c "\
+if [ "$recreate" = false ]; then
+
+  # For the tests we need mysql user/password login
+  log "jbt_${version} – Enable MySQL user root login with password."
+  docker exec jbt_mysql mysql -uroot -proot -e "ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'root';"
+  # And for MariaDB too
+  log "jbt_${version} – Enable MariaDB user root login with password."
+  docker exec jbt_madb mysql -uroot -proot -e "ALTER USER 'root'@'%' IDENTIFIED BY 'root';"
+  # And Postgres (which have already user postgres with SUPERUSER, but to simplify we will use same user root on postgres)
+  log "jbt_${version} – Create PostgreSQL user root with password root and SUPERUSER role."
+  docker exec jbt_pg sh -c "\
   psql -U postgres -c \"CREATE USER root WITH PASSWORD 'root';\" && \
   psql -U postgres -c \"ALTER USER root WITH SUPERUSER;\""
+fi
 
 for version in "${versionsToInstall[@]}"; do
+
+  if [ "$recreate" = true ]; then
+
+    # Container exists?
+    if docker ps -a --format '{{.Names}}' | grep -q "^jbt_${version}$"; then
+      # Running?
+      if docker ps --format '{{.Names}}' | grep -q "^jbt_${version}$"; then
+        log "jbt_${version} – Stopping Docker Container."
+        docker compose stop "jbt_${version}"
+      fi
+      log "jbt_${version} – Removing Docker container."
+      docker compose rm -f "jbt_${version}" || log "jbt_${version} – Ignoring failure to remove Docker container."
+    fi
+
+    createDockerComposeFile "${version}" "${php_version}" "${network}" "append"
+
+    log "jbt_${version} – Building Docker container."
+    docker compose build "jbt_${version}"
+
+    log "jbt_${version} – Starting Docker container."
+    docker compose up -d "jbt_${version}"
+
+  fi
+
   # If the copying has not yet been completed, then we have to wait, or we will get e.g.
   # rm: cannot remove '/var/www/html/libraries/vendor': Directory not empty.
   max_retries=120
@@ -155,13 +196,13 @@ done
 log "Creating File '.vscode/launch.json' for versions ${versionsToInstall[*]}"
 launch_json=".vscode/launch.json"
 mkdir -p $(dirname "${launch_json}")
-cat > "${launch_json}" <<EOF
+cat >"${launch_json}" <<EOF
 {
     "version": "0.2.0",
     "configurations": [
 EOF
 for version in "${versionsToInstall[@]}"; do
-  cat >> "${launch_json}" <<EOF
+  cat >>"${launch_json}" <<EOF
       {
           "name": "Listen jbt_${version}",
           "type": "php",
@@ -173,7 +214,7 @@ for version in "${versionsToInstall[@]}"; do
       },
 EOF
 done
-cat >> "${launch_json}" <<EOF
+cat >>"${launch_json}" <<EOF
     ]
 }
 EOF
@@ -187,6 +228,6 @@ for container in "jbt_pga" "jbt_mail"; do
 done
 log "Set container prompts for base containers"
 for container in "${JBT_BASE_CONTAINERS[@]}"; do
-  docker exec -u root "${container}" sh -c  \
+  docker exec -u root "${container}" sh -c \
     "echo PS1=\'${container} \# \' >> ~/.bashrc" || true # Who cares?
 done
