@@ -31,7 +31,8 @@ done
 
 # Get the current local version and the latest version from the GitHub repository
 local_version=$(cat VERSION)
-git_version=$(curl -s -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/muhme/joomla-branches-tester/main/VERSION)
+# Ignore failures (e.g., if the system is offline).
+git_version=$(curl -s -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/muhme/joomla-branches-tester/main/VERSION || true)
 # Real compare version numbers as raw.githubusercontent.com is always a little behind the times
 version_gt() {
     [ "$(printf '%s\n' "$@" | sort -V | tail -n 1)" != "$1" ]

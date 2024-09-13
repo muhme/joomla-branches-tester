@@ -66,7 +66,12 @@ function getVersions() {
     IFS=$'\n' sorted_branches=($(sort <<<"${formatted_branches[*]}"))
     unset IFS
 
-    echo "${sorted_branches[*]}"
+    # Are we offline? Set default branch versions.
+    if [ ${#sorted_branches[@]} -eq 0 ]; then
+      echo "44 51 52 53 54 60"
+    else
+      echo "${sorted_branches[*]}"
+    fi
 }
 
 # Check if the given argument is a valid Joomla version.
