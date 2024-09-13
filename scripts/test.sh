@@ -188,10 +188,10 @@ for version in "${versionsToTest[@]}"; do
 
       if [[ "$novnc" == true ]]; then
         log "jbt_${version} – Initiating System Tests with NoVNC and ${spec}."
-        docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && export DISPLAY=jbt_novnc:0 && ${eel1} cypress run --headed ${browser} ${spec}"
+        docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && export DISPLAY=jbt_novnc:0 && ${eel1} cypress run --headed ${browser} ${spec}"
       else
         log "jbt_${version} – Initiating headless System Tests with ${spec}."
-        docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && unset DISPLAY && ${eel1} cypress run ${browser} ${spec}"
+        docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && unset DISPLAY && ${eel1} cypress run ${browser} ${spec}"
       fi
       if [ $? -eq 0 ] ; then
         # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu

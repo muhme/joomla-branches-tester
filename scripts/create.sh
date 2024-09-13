@@ -121,13 +121,13 @@ done
 
 # For the tests we need mysql user/password login
 log "jbt_${version} – Enable MySQL user root login with password."
-docker exec -it jbt_mysql mysql -uroot -proot -e "ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'root';"
+docker exec jbt_mysql mysql -uroot -proot -e "ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'root';"
 # And for MariaDB too
 log "jbt_${version} – Enable MariaDB user root login with password."
-docker exec -it jbt_madb mysql -uroot -proot -e  "ALTER USER 'root'@'%' IDENTIFIED BY 'root';"
+docker exec jbt_madb mysql -uroot -proot -e  "ALTER USER 'root'@'%' IDENTIFIED BY 'root';"
 # And Postgres (which have already user postgres with SUPERUSER, but to simplify we will use same user root on postgres)
 log "jbt_${version} – Create PostgreSQL user root with password root and SUPERUSER role."
-docker exec -it jbt_pg sh -c "\
+docker exec jbt_pg sh -c "\
   psql -U postgres -c \"CREATE USER root WITH PASSWORD 'root';\" && \
   psql -U postgres -c \"ALTER USER root WITH SUPERUSER;\""
 
@@ -146,7 +146,7 @@ for version in "${versionsToInstall[@]}"; do
     exit 1
   fi
   log "jbt_${version} – Deleting original Joomla installation."
-  docker exec -it "jbt_${version}" bash -c 'rm -rf /var/www/html/* && rm -rf /var/www/html/.??*'
+  docker exec "jbt_${version}" bash -c 'rm -rf /var/www/html/* && rm -rf /var/www/html/.??*'
 
   JBT_INTERNAL=42 bash scripts/setup.sh "initial" "${version}" "${database_variant}" "${arg_repository}:${arg_branch}"
 
@@ -179,7 +179,7 @@ cat >> "${launch_json}" <<EOF
 EOF
 
 log "Installing vim, ping, ip, telnet and netstat in the 'jbt_cypress' container."
-docker exec -it jbt_cypress sh -c "apt-get update && apt-get install -y git vim iputils-ping iproute2 telnet net-tools"
+docker exec jbt_cypress sh -c "apt-get update && apt-get install -y git vim iputils-ping iproute2 telnet net-tools"
 
 log "Add bash for Alpine containers"
 for container in "jbt_pga" "jbt_mail"; do

@@ -79,7 +79,7 @@ do
     continue
   fi
   log "jbt_${version} – Installing Joomla Patch Tester."
-  docker exec -it jbt_cypress sh -c " \
+  docker exec jbt_cypress sh -c " \
     cd /jbt/branch_${version} && \
     unset DISPLAY && \
     cypress run --env patchtester_url=${PATCHTESTER_URL},token=${token} \

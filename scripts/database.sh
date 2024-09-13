@@ -93,7 +93,7 @@ for version in "${versionsToChange[@]}"; do
   #   smtp_port: '7025',
   #
   # Using database host and default port Docker-inside as performance issues are seen in using host.docker.internal
-  docker exec -it "jbt_${version}" bash -c "cd /var/www/html && sed \
+  docker exec "jbt_${version}" bash -c "cd /var/www/html && sed \
     -e \"s|db_type: .*|db_type: '${dbtype}',|\" \
     -e \"s|db_name: .*|db_name: 'test_joomla_${version}',|\" \
     -e \"s|db_prefix: .*|db_prefix: 'jos${version}_',|\" \
@@ -108,7 +108,7 @@ for version in "${versionsToChange[@]}"; do
   # Create second Cypress config file for running local
   # Using host.docker.internal to have it reachable from outside for Cypress and inside web server container
   log "jbt_${version} – Create additional 'cypress.config.local.mjs' file with using localhost and database port ${dbport}."
-  docker exec -it "jbt_${version}" bash -c "cd /var/www/html && sed \
+  docker exec "jbt_${version}" bash -c "cd /var/www/html && sed \
     -e \"s|db_host: .*|db_host: 'host.docker.internal',|\" \
     -e \"s|db_port: .*|db_port: '$dbport',|\" \
     -e \"s|baseUrl: .*|baseUrl: 'http:\/\/localhost:70${version}\/',|\" \
@@ -125,7 +125,7 @@ for version in "${versionsToChange[@]}"; do
     log "jbt_${version} – Patch https://github.com/joomla/joomla-cms/pull/43968 has already been applied."
   else
     log "jbt_${version} – Applying changes as in https://github.com/joomla/joomla-cms/pull/43968."
-    docker exec -it "jbt_${version}" bash -c "
+    docker exec "jbt_${version}" bash -c "
       cd /var/www/html/tests/System/integration/install
       sed '/db_host: Cypress.env('\"'\"'db_host'\"'\"'),/a\\      db_port: Cypress.env('\"'\"'db_port'\"'\"'), // muhme, 9 August 2024 \"hack\" waiting for PR https://github.com/joomla/joomla-cms/pull/43968' Installation.cy.js > Installation.cy.js.tmp
       mv Installation.cy.js.tmp Installation.cy.js"
@@ -174,26 +174,26 @@ EOF
   # Since the database will be new, we clean up autoload classes cache file and
   # all com_patchtester directories to prevent the next installation to be fail.
   # Again in Docker container as www-data user.
-  docker exec -it "jbt_${version}" bash -c "
+  docker exec "jbt_${version}" bash -c "
     cd /var/www/html
     rm -rf administrator/components/com_patchtester api/components/com_patchtester
     rm -rf media/com_patchtester administrator/cache/autoload_psr4.php"
 
   # Seen on Ubuntu, 13.10.0 was installed, but 12.13.2 needed for the branch
   log "jbt_${version} – Install Cypress (if needed)."
-  docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && npx cypress install"
+  docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && npx cypress install"
   # Seen on macOS, 13.13.3 was installed, npx cypress install did not install needed 13.13.0
-  docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && npm run cypress:install"
+  docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && npm run cypress:install"
   # Seen on macOS, "The cypress npm package is installed, but the Cypress binary is missing."
-  docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && cypress install"
+  docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && cypress install"
 
   # Using Install Joomla from System Tests
   log "jbt_${version} – Cypress-based Joomla installation."
-  docker exec -it jbt_cypress sh -c "cd /jbt/branch_${version} && unset DISPLAY && cypress run --spec tests/System/integration/install/Installation.cy.js"
+  docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && unset DISPLAY && cypress run --spec tests/System/integration/install/Installation.cy.js"
 
   # Cypress is using own SMTP port to read and reset mails by smtp-tester
   log "jbt_${version} – Set the SMTP port used by Cypress to 7125."
-  docker exec -it "jbt_${version}" bash -c "cd /var/www/html && sed \
+  docker exec "jbt_${version}" bash -c "cd /var/www/html && sed \
     -e \"s/smtp_port: .*/smtp_port: '7125',/\" \
     cypress.config.mjs > cypress.config.mjs.tmp && \
     mv cypress.config.mjs.tmp cypress.config.mjs"
@@ -201,7 +201,7 @@ EOF
   log "jbt_${version} – Changing ownership to www-data for all files and directories."
   # Following error seen on macOS, we ignore it as it does not matter, these files are 444
   # chmod: changing permissions of '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
-  docker exec -it "jbt_${version}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true'
+  docker exec "jbt_${version}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true'
 
   log "jbt_${version} – Joomla based on the $(branchName ${dbvariant}) database variant is installed."
 
