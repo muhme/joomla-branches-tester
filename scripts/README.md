@@ -55,7 +55,7 @@ All messages start with three asterisks, the date and the time. See the followin
 
 | File | Description | Additional Info |
 | --- | --- | --- |
-| [error-logging.ini](error-logging.ini) | Config file to catch all PHP errors, notices and warnings. | Used by `setup.sh`. |
+| [scripts/error-logging.ini](error-logging.ini) | Config file to catch all PHP errors, notices and warnings. | Used by `setup.sh`. |
 | [docker-compose.base.yml](docker-compose.base.yml) | The basic part of the `docker-compose.yml` file. | Used by `create.sh`. |
 | [docker-compose.joomla.yml](docker-compose.joomla.yml) | Part of the `docker-compose.yml` file to be parameterised for one Joomla web server. | Used by `create.sh`. |
 | [dockerfile-relay.yml](dockerfile-relay.yml) | Docker container definition for the SMTP relay doubler. | Used to create `jbt_relay`. |

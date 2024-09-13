@@ -67,7 +67,7 @@ if [ -z "$version" ]; then
 fi
 
 log "jbt_${version} – Configure to catch all PHP errors, including notices and deprecated warnings."
-docker cp error-logging.ini "jbt_${version}:/usr/local/etc/php/conf.d/error-logging.ini"
+docker cp scripts/error-logging.ini "jbt_${version}:/usr/local/etc/php/conf.d/error-logging.ini"
 
 # Create two PHP environments: one with Xdebug and one without.
 # Manage them by cloning /usr/local, and use symbolic links to toggle between the two installations.
