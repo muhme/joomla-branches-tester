@@ -5,6 +5,11 @@
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
+if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
+  echo "Please run me as 'scripts/info.sh'. Thank you for your cooperation! :)"
+  exit 1
+fi
+
 source scripts/helper.sh
 
 function help {

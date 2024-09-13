@@ -1,7 +1,14 @@
+#!/bin/bash
+#
 # helper.sh - General-purpose helper functions for various tasks across all bash scripts.
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
+
+if [[ "${BASH_SOURCE[0]}" = "${0}" ]]; then
+    echo "No, no, no. The script '$0' should only be sourced. cu :)"
+    exit 1
+fi
 
 # Record the start time in seconds since 1.1.1970
 start_time=$(date +%s)
