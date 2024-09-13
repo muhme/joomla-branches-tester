@@ -376,7 +376,7 @@ If you need to inspect files, they are available in the directory `branch_52` fo
 
 ### Drone-like Tests
 
-A subset of the tests from [Drone](https://www.drone.io/) has been implemented:
+A subset of seven tests from the entire [Drone](https://www.drone.io/) test suite has been implemented:
 
 * `php-cs-fixer` – PHP Coding Standards Fixer (dry-run)
 * `phpcs` – PHP Coding Sniffer
@@ -386,7 +386,7 @@ A subset of the tests from [Drone](https://www.drone.io/) has been implemented:
 * `lint:testjs` – JS Linter for Tests
 * `system` – System Tests
 
-Running all tests on all branches is simple with the following command:
+Running all seven tests on all branches is simple with the following command:
 ```
 scripts/test.sh
 ```
