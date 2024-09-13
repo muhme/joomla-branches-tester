@@ -1,15 +1,15 @@
 #!/bin/bash -e
 #
-# graft.sh - Place Joomla package onto development branch.
+# graft - Place Joomla package onto development branch.
 #            Just like in plant grafting, where a scion is joined to a rootstock.
-#   scripts/graft.sh 52 ~/Downloads/Joomla_5.2.0-alpha4-dev-Development-Full_Package.zip
-#   scripts/graft.sh /tmp/Joomla_5.1.2-Stable-Full_Package.zip 51 pgsql
+#   scripts/graft 52 ~/Downloads/Joomla_5.2.0-alpha4-dev-Development-Full_Package.zip
+#   scripts/graft /tmp/Joomla_5.1.2-Stable-Full_Package.zip 51 pgsql
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
-  echo "Please run me as 'scripts/info.sh'. Thank you for your cooperation! :)"
+  echo "Please run me as 'scripts/graft'. Thank you for your cooperation! :)"
   exit 1
 fi
 
@@ -17,13 +17,13 @@ source scripts/helper.sh
 
 function help {
     echo "
-    graft.sh – Place Joomla package onto development branch.
-               Just like in plant grafting, where a scion is joined to a rootstock.
-               The mandatory Joomla version argument must be one of the following: ${versions}.
-               The Joomla package file argument (e.g. 'Joomla_5.1.2-Stable-Full_Package.zip') is mandatory.
-               Optional database variant can be one of: ${JBT_DB_VARIANTS[@]} (default is mariadbi).
+    graft – Place Joomla package onto development branch.
+            Just like in plant grafting, where a scion is joined to a rootstock.
+            The mandatory Joomla version argument must be one of the following: ${versions}.
+            The Joomla package file argument (e.g. 'Joomla_5.1.2-Stable-Full_Package.zip') is mandatory.
+            Optional database variant can be one of: ${JBT_DB_VARIANTS[@]} (default is mariadbi).
 
-               $(random_quote)
+            $(random_quote)
     "
 }
 
@@ -73,15 +73,15 @@ if [ ! -f "$package" ]; then
 fi
 
 if [ ! -f "branch_${version}/cypress.config.dist.mjs" ]; then
-  error "Missing file 'branch_${version}/cypress.config.dist.mjs'. Please use 'scripts/create.sh' first."
+  error "Missing file 'branch_${version}/cypress.config.dist.mjs'. Please use 'scripts/create' first."
   exit 1
 fi
 if [ ! -d "branch_${version}/tests/System" ]; then
-  error "Missing directory 'branch_${version}/tests/System'. Please use 'scripts/create.sh' first."
+  error "Missing directory 'branch_${version}/tests/System'. Please use 'scripts/create' first."
   exit 1
 fi
 if [ ! -d "branch_${version}/node_modules" ]; then
-  error "Missing directory 'branch_${version}/node_modules'. Please use 'scripts/create.sh' first."
+  error "Missing directory 'branch_${version}/node_modules'. Please use 'scripts/create' first."
   exit 1
 fi
 
@@ -165,7 +165,7 @@ if grep -q "public const DEV_STATUS = 'Stable';" "branch_${version}/libraries/sr
 fi
 
 # Configure and install Joomla with desired database variant.
-scripts/database.sh "${version}" "$database_variant"
+scripts/database "${version}" "$database_variant"
 
 package_file=$(basename $package)
 joomla_version=$(getJoomlaVersion branch_${version})

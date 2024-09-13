@@ -18,8 +18,8 @@
 #   git clone https://github.com/muhme/joomla-branches-tester
 #   cd joomla-branches-tester
 #   sudo scripts/ubuntu_setup.sh
-#   scripts/create.sh
-#   scripts/test.sh
+#   scripts/create
+#   scripts/test
 
 function help {
     echo "*** ubuntu_setup.sh – Install all prerequisites on Ubuntu."

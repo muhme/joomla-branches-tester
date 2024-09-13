@@ -1,12 +1,12 @@
 #!/bin/bash
 #
-# xdebug.sh - Switches the PHP installation with or without Xdebug in one or more Web Server containers.
+# xdebug - Switches the PHP installation with or without Xdebug in one or more Web Server containers.
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
-  echo "Please run me as 'scripts/info.sh'. Thank you for your cooperation! :)"
+  echo "Please run me as 'scripts/xdebug'. Thank you for your cooperation! :)"
   exit 1
 fi
 
@@ -14,10 +14,10 @@ source scripts/helper.sh
 
 function help {
     echo "
-    xdebug.sh – Switches the PHP installation with or without Xdebug in one or more Web Server containers.
-                Mandatory argument 'on' or 'off' is required.
+    xdebug – Switches the PHP installation with or without Xdebug in one or more Web Server containers.
+             Mandatory argument 'on' or 'off' is required.
 
-               $(random_quote)
+             $(random_quote)
     "
 }
 

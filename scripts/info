@@ -1,12 +1,12 @@
 #!/bin/bash
 #
-# info.sh - Retrieves Joomla Branches Tester status information.
+# info - Retrieves Joomla Branches Tester status information.
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
-  echo "Please run me as 'scripts/info.sh'. Thank you for your cooperation! :)"
+  echo "Please run me as 'scripts/info'. Thank you for your cooperation! :)"
   exit 1
 fi
 
@@ -14,9 +14,9 @@ source scripts/helper.sh
 
 function help {
   echo "
-    info.sh – Retrieves Joomla Branches Tester status information.
+    info – Retrieves Joomla Branches Tester status information.
 
-              $(random_quote)
+           $(random_quote)
   "
 }
 

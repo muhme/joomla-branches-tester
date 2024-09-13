@@ -1,13 +1,13 @@
 #!/bin/bash
 #
-# clean.sh - Stopping and removing JBT Docker containers, associated Docker networks and volumes.
-#            Also deletes dirctory 'run' and all 'branch_*' directories.
+# clean - Stopping and removing JBT Docker containers, associated Docker networks and volumes.
+#         Also deletes dirctory 'run' and all 'branch_*' directories.
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
-  echo "Please run me as 'scripts/info.sh'. Thank you for your cooperation! :)"
+  echo "Please run me as 'scripts/clean'. Thank you for your cooperation! :)"
   exit 1
 fi
 
@@ -15,10 +15,10 @@ source scripts/helper.sh
 
 function help {
   echo "
-    clean.sh – Stops and removes all JBT Docker containers, associated Docker networks, and volumes.
-               Also deletes dirctory 'run' and all 'branch_*' directories.
+    clean – Stops and removes all JBT Docker containers, associated Docker networks, and volumes.
+            Also deletes dirctory 'run' and all 'branch_*' directories.
 
-               $(random_quote)
+            $(random_quote)
     "
 }
 

@@ -1,15 +1,15 @@
 #!/bin/bash
 #
-# patchtester.sh - Install Joomla Patch Tester on all, one or multiple Docker containers, e.g.
-#   scripts/patchtester.sh ghp_42g8n8uCZtplQNnbNrEWsTrFfQgYAU4711Tc
-#   scripts/patchtester.sh 44 ghp_42g8n8uCZtplQNnbNrEWsTrFfQgYAU4711Tc
-#   scripts/patchtester.sh 52 53 ghp_42g8n8uCZtplQNnbNrEWsTrFfQgYAU4711Tc
+# patchtester - Install Joomla Patch Tester on all, one or multiple Docker containers, e.g.
+#   scripts/patchtester ghp_42g8n8uCZtplQNnbNrEWsTrFfQgYAU4711Tc
+#   scripts/patchtester 44 ghp_42g8n8uCZtplQNnbNrEWsTrFfQgYAU4711Tc
+#   scripts/patchtester 52 53 ghp_42g8n8uCZtplQNnbNrEWsTrFfQgYAU4711Tc
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
-  echo "Please run me as 'scripts/info.sh'. Thank you for your cooperation! :)"
+  echo "Please run me as 'scripts/patchtester'. Thank you for your cooperation! :)"
   exit 1
 fi
 
@@ -20,11 +20,11 @@ IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
 
 function help {
     echo "
-    patchtester.sh – Install Joomla Patch Tester on all, one or multiple Web Server Docker containers.
-                     Mandatory argument is a valid GitHub personal access token starting with 'ghp_'.
-                     Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
+    patchtester – Install Joomla Patch Tester on all, one or multiple Web Server Docker containers.
+                  Mandatory argument is a valid GitHub personal access token starting with 'ghp_'.
+                  Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
 
-                     $(random_quote)
+                  $(random_quote)
     "
 }
 

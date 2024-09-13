@@ -1,14 +1,14 @@
 #!/bin/bash
 #
-# cypress.sh - Running Cypress GUI for one branch, either from a Docker container or using locally installed Cypress.
-#   scripts/cypress.sh 51
-#   scripts/cypress.sh 51 local
+# cypress - Running Cypress GUI for one branch, either from a Docker container or using locally installed Cypress.
+#   scripts/cypress 51
+#   scripts/cypress 51 local
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
-  echo "Please run me as 'scripts/info.sh'. Thank you for your cooperation! :)"
+  echo "Please run me as 'scripts/cypress'. Thank you for your cooperation! :)"
   exit 1
 fi
 
@@ -16,11 +16,11 @@ source scripts/helper.sh
 
 function help {
     echo "
-    cypress.sh – Running Cypress GUI for one branch, either from a Docker container or using locally installed Cypress.
-                 The mandatory Joomla version argument must be one of the following: ${versions}.
-                 The optional 'local' argument runs Cypress directly on the Docker host (default is to run from the Docker container).
+    cypress – Running Cypress GUI for one branch, either from a Docker container or using locally installed Cypress.
+              The mandatory Joomla version argument must be one of the following: ${versions}.
+              The optional 'local' argument runs Cypress directly on the Docker host (default is to run from the Docker container).
 
-                 $(random_quote)
+              $(random_quote)
     "
 }
 

@@ -1,18 +1,18 @@
 #!/bin/bash
 #
-# test.sh - Runs Cypress specs on one, multiple, or all branches, e.g.
-#   scripts/test.sh
-#   scripts/test.sh system novnc firefox
-#   scripts/test.sh 44 lint:testjs
-#   scripts/test.sh 52 53 system edge site/components/com_contact/Categories.cy.js
-#   scripts/test.sh system 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
-#   ELECTRON_ENABLE_LOGGING=1 scripts/test.sh system
+# test - Runs Cypress specs on one, multiple, or all branches, e.g.
+#   scripts/test
+#   scripts/test system novnc firefox
+#   scripts/test 44 lint:testjs
+#   scripts/test 52 53 system edge site/components/com_contact/Categories.cy.js
+#   scripts/test system 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
+#   ELECTRON_ENABLE_LOGGING=1 scripts/test system
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
-  echo "Please run me as 'scripts/info.sh'. Thank you for your cooperation! :)"
+  echo "Please run me as 'scripts/test'. Thank you for your cooperation! :)"
   exit 1
 fi
 
@@ -22,13 +22,13 @@ trap - ERR
 
 function help {
     echo "
-    test.sh – Runs Cypress specs on one, multiple, or all branches.
-              Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
-              Optional 'novnc' argument sets DISPLAY=jbt_novnc:0 (default is headless).
-              Optional 'chrome', 'edge', or 'firefox' can be specified as the browser (default is 'electron').
-              Optional test name can be on or more of the following: ${ALL_TESTS[@]} (default is all).
+    test – Runs Cypress specs on one, multiple, or all branches.
+           Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
+           Optional 'novnc' argument sets DISPLAY=jbt_novnc:0 (default is headless).
+           Optional 'chrome', 'edge', or 'firefox' can be specified as the browser (default is 'electron').
+           Optional test name can be on or more of the following: ${ALL_TESTS[@]} (default is all).
 
-              $(random_quote)
+           $(random_quote)
     "
 }
 

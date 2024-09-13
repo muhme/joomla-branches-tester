@@ -422,13 +422,13 @@ trap 'errorHandler $LINENO' ERR
 #
 theEnd() {
   if [ $? -ne 0 ]; then
-    error "Script '$(basename "$0")' failed after $(runningTime)."
+    error "'$0' failed after $(runningTime)."
   else
-    log "Script '$(basename "$0")' finished in $(runningTime)."
+    log "'$0' finished in $(runningTime)."
   fi
 }
 trap theEnd EXIT
 
 # No, every end is a new beginning :)
 #
-log "Script '$(basename "$0")' started."
+log "'$0' started."

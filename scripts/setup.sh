@@ -8,7 +8,7 @@
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
-  echo "Please run me as 'scripts/info.sh'. Thank you for your cooperation! :)"
+  echo "Please run me as 'scripts/setup'. Thank you for your cooperation! :)"
   exit 1
 fi
 
@@ -16,7 +16,7 @@ source scripts/helper.sh
 
 function help {
   echo "
-    setup.sh – Internal setup the web server Docker container. Used by create.sh and php.sh.
+    setup.sh – Internal setup the web server Docker container. Used by 'scripts/create' and 'scripts/php'.
                Mandatory Joomla version must be one of the following: ${versions}.
                Optional 'initial' for first time installation.
                Optional initial database variant can be one of: ${JBT_DB_VARIANTS[@]} (default is mariadbi).
@@ -61,7 +61,7 @@ done
 
 if [ "${JBT_INTERNAL}" != "42" ]; then
   help
-  error "This script is intended to be called only from create.sh or php.sh."
+  error "This script is intended to be called only from 'scripts/create' or 'scripts/php'."
   exit 1
 fi
 
@@ -163,9 +163,9 @@ docker restart "jbt_${version}"
 # Configure and install Joomla with desired database variant
 if $initial; then
   if ${socket}; then
-    scripts/database.sh "${version}" "${database_variant}" "socket"
+    scripts/database "${version}" "${database_variant}" "socket"
   else
-    scripts/database.sh "${version}" "${database_variant}"
+    scripts/database "${version}" "${database_variant}"
   fi
 fi
 

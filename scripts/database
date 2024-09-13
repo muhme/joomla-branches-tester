@@ -1,15 +1,15 @@
 #!/bin/bash -e
 #
-# database.sh - Change the database and database driver for all, one or multiple Joomla containers.
-#   scripts/database.sh mysqli socket
-#   scripts/database.sh 44 mariadb
-#   scripts/database.sh 53 60 pgsql
+# database - Change the database and database driver for all, one or multiple Joomla containers.
+#   scripts/database mysqli socket
+#   scripts/database 44 mariadb
+#   scripts/database 53 60 pgsql
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
-  echo "Please run me as 'scripts/info.sh'. Thank you for your cooperation! :)"
+  echo "Please run me as 'scripts/database'. Thank you for your cooperation! :)"
   exit 1
 fi
 
@@ -17,12 +17,12 @@ source scripts/helper.sh
 
 function help {
     echo "
-    database.sh – Change the database and database driver for all, one or multiple Joomla containers.
-                  The mandatory database variant must be one of: ${JBT_DB_VARIANTS[@]}.
-                  Optional 'socket' for using the database with a Unix socket (default is using TCP host).
-                  Optional Joomla version can be one or more of the following: ${versions} (default is all).
+    database – Change the database and database driver for all, one or multiple Joomla containers.
+               The mandatory database variant must be one of: ${JBT_DB_VARIANTS[@]}.
+               Optional 'socket' for using the database with a Unix socket (default is using TCP host).
+               Optional Joomla version can be one or more of the following: ${versions} (default is all).
 
-                  $(random_quote)
+               $(random_quote)
     "
 }
 

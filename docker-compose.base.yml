@@ -6,10 +6,9 @@
 # IPv4 (default):
 # - subnet 192.168.150.0/24
 # - enable_ipv6: false
-# IPv6 (create.sh IPv6):
+# IPv6 (scripts/create IPv6):
 # - subnet 2003:c2:6727:cb00::/64
 # - enable_ipv6: true
-# (perhaps both as dual stack network?)
 #
 networks:
   jbt_network:

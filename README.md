@@ -145,17 +145,17 @@ Last tested in August 2024 with:
 * Ubuntu 24 Noble Numbat (the absolute minimum, if you also wish to use the Cypress GUI, is a VPS with 2 shared vCPUs and 4 GB RAM).
 
 You can create all Docker containers and install the current (August 2024)
-five Joomla instances using the `create.sh` script:
+five Joomla instances using `scripts/create`:
 
 ```
 git clone https://github.com/muhme/joomla-branches-tester
 cd joomla-branches-tester
-scripts/create.sh
+scripts/create
 ```
 :point_right: The script can run without `sudo`,
 but depending on the platform, it may ask you to enter your user password for individual sudo actions.
 
-The initial script `create.sh` runs some time,
+The initial `scripts/create` runs some time,
 especially the very first time when the Docker images still need to be downloaded.
 The `joomla-branches-tester` folder requires about of 2 GB of disc space.
 Docker needs additional about of 20 GB for images and volumes.
@@ -255,7 +255,7 @@ you will need to download approximately 4 GB of data over the network.
 7. Now you are ready to create Joomla Branches Tester:
    ```
    cd ~/joomla-branches-tester
-   scripts/create.sh
+   scripts/create
    ```
 
 :point_right: To run the interactive Cypress GUI from the Docker container `jbt_cypress`,
@@ -293,7 +293,7 @@ the Joomla Branches Tester:
 ```
 git clone https://github.com/muhme/joomla-branches-tester
 cd joomla-branches-tester
-scripts/create.sh
+scripts/create
 ```
 
 If you like to run Cypress GUI locally you have to install Node.js. Actual use LTS version 20 and follow the instructions to extend `PATH`:
@@ -307,7 +307,7 @@ You can now run System Tests using the Cypress GUI locally.
 The script will automatically install the appropriate version specified
 for each branch the first time you open it:
 ```
-scripts/cypress.sh 53 local
+scripts/cypress 53 local
 ```
 
 ---
@@ -352,7 +352,7 @@ Installing with a user that is able to run `sudo`.
 6. Now you are ready to create Joomla Branches Tester:
    ```
    cd ~/joomla-branches-tester
-   scripts/create.sh
+   scripts/create
    ```
 
 ---
@@ -390,7 +390,7 @@ A subset of seven tests from the entire [Drone](https://www.drone.io/) test suit
 
 Running all seven tests on all branches is simple with the following command:
 ```
-scripts/test.sh
+scripts/test
 ```
 
 Some optional arguments are:
@@ -400,7 +400,7 @@ Some optional arguments are:
 
 For example run the linter tests on three branches:
 ```
-scripts/test.sh 51 52 53 lint:css lint:js lint:testjs
+scripts/test 51 52 53 lint:css lint:js lint:testjs
 ```
 
 :point_right: The PHP Unit Test Suite integration and the Phan static analyzer for PHP have not been implemented.
@@ -411,7 +411,7 @@ scripts/test.sh 51 52 53 lint:css lint:js lint:testjs
 To simple run the Joomla System Tests with all specs - except for the installation -
 from the [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System) in all branches with headless Cypress:
 ```
-scripts/test.sh system
+scripts/test system
 ```
 
 :fairy: To protect you, the first step `Installation.cy.js` of the Joomla System Tests
@@ -426,12 +426,12 @@ Some more optional arguments for System Tests are:
 
 As an example, run all the test specs (except the installation) from branch 5.1-dev with Mozilla Firefox:
 ```
-scripts/test.sh 51 system firefox
+scripts/test 51 system firefox
 ```
 
 Run one test spec with default Electron in all branches (of course, the spec must exist in all branches):
 ```
-scripts/test.sh system administrator/components/com_users/Users.cy.js
+scripts/test system administrator/components/com_users/Users.cy.js
 ```
 
 :point_right: When specifying a single test spec file,
@@ -439,7 +439,7 @@ scripts/test.sh system administrator/components/com_users/Users.cy.js
 
 Test all `site` specs with Microsoft Edge in the branches Joomla 5.1, 5.2 and 5.3 using a pattern:
 ```
-scripts/test.sh 51 52 53 system edge 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
+scripts/test 51 52 53 system edge 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
 ```
 
 One more optional argument is `novnc`.
@@ -450,13 +450,13 @@ In this case Cypress runs headed and uses `jbt_vnc` as DISPLAY and you can watch
 execution of the automated tests with the URL:
 * [http://host.docker.internal:7900/vnc.html?autoconnect=true&resize=scale](http://host.docker.internal:7900/vnc.html?autoconnect=true&resize=scale)
 ```
-scripts/test.sh 53 system novnc administrator/components/com_users/Users.cy.js
+scripts/test 53 system novnc administrator/components/com_users/Users.cy.js
 ```
 
 To additional show `console.log` messages from Electron browser by setting environment variable: 
 ```
 export ELECTRON_ENABLE_LOGGING=1
-scripts/test.sh 44 system administrator/components/com_actionlogs/Actionlogs.cy.js
+scripts/test 44 system administrator/components/com_actionlogs/Actionlogs.cy.js
 ```
 
 ### Cypress Interactive System Tests
@@ -468,12 +468,12 @@ observe how the browser runs in parallel.
 Cypress GUI can be started from Docker container `jbt_cypress` with X11 forwarding
 (recommeded for Windows 11 WSL 2 Ubuntu):
 ```
-scripts/cypress.sh 51
+scripts/cypress 51
 ```
 
 Or from local installed Cypress (recommended for macOS and native Ubuntu) with additional argument `local`:
 ```
-scripts/cypress.sh 51 local
+scripts/cypress 51 local
 ```
 
 The script will automatically install the appropriate Cypress version locally
@@ -514,7 +514,7 @@ the use cases password reset and System Tests."
    But no System Tests is running, the email cannot be delivered and is thrown away.
 5. The email relay `jbt_relay` tries to deliver the third email to locally running Cypress GUI with `smtp-tester`.
    But no Cypress GUI is running, the email cannot be delivered and is thrown away.
-6. System Test is started with the bash script `test.sh` in the Cypress container `jbt_cypress`.
+6. System Test is started with `scripts/test` in the Cypress container `jbt_cypress`.
    In the Cypress `cypress.config.mjs` file, the `smtp_port` is configured as `7125`.
    While the System Tests is running `smtp-tester` is listening on port 7125.
 7. One of the System Tests specs executes an action in Joomla PHP code that generates an email.
@@ -541,7 +541,7 @@ can be installed on the Joomla instances. The script also sets the GitHub token 
 This can be done without version number for all Joomla instances or for e.g. Joomla 5.3-dev:
 
 ```
-scripts/patchtester.sh 53 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
+scripts/patchtester 53 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
 ```
 
 ```
@@ -564,7 +564,7 @@ The Joomla Branches Tester includes one container for each of the three supporte
 * `jbt_madb` – MariaDB version 10.4.34
 * `jbt_pg` – PostgreSQL version 15.8
 
-You can set the desired database and database driver using the `create.sh` script or switch them later with the `database.sh` script.
+You can set the desired database and database driver using `scripts/create` or switch them later with `scripts/database`.
 
 #### Switch Database and Database Driver
 
@@ -585,12 +585,12 @@ Five variants are available:
 
 Use MariaDB with driver MySQLi for Joomla 5.1 and Joomla 5.2:
 ```
-scripts/database.sh 51 52 mariadbi
+scripts/database 51 52 mariadbi
 ```
 
 Change all Joomla instances to use PostgreSQL:
 ```
-scripts/database.sh pgsql
+scripts/database pgsql
 ```
 
 :point_right: It can also be used to clean a Joomla installation.
@@ -603,7 +603,7 @@ scripts/database.sh pgsql
   This script takes care of this and you can reinstall Joomla Patch Tester without any problems.
 
 :fairy: The good fairy waves her magic wand and says:
-  "When in doubt, it's wiser to use `create.sh` to ensure a clean installation.
+  "When in doubt, it's wiser to use `scripts/create` to ensure a clean installation.
   With a sprinkle of stardust, you can specify the desired database variant,
   and if you're only installing one Joomla version, it will be done in the blink of an eye."
 
@@ -616,7 +616,7 @@ Database Unix sockets are available in the Cypress and Joomla Web Server contain
 /jbt/run/mysql-socket/mysqlx.sock
 /jbt/run/mariadb-socket/mysqld.sock
 ```
-They are used in the scripts `create.sh` and `database.sh` with the `socket` option.
+They are used in `scripts/create` and `scripts/database` with the `socket` option.
 Without this option, the database connection defaults to using the TCP host.
 
 You can also use these sockets with command line client tools, for example:
@@ -638,11 +638,11 @@ and the [Docker Hub page](https://registry.hub.docker.com/_/joomla/)). Thank you
 You can switch between the available Images for PHP 8.1, PHP 8.2, and PHP 8.3
 across all branches:
 ```
-scripts/php.sh php8.3
+scripts/php php8.3
 ```
 Or specify the desired branches:
 ```
-scripts/php.sh 44 51 php8.1
+scripts/php 44 51 php8.1
 ```
 As we are based on the Docker images there are limitations (as of August 2024):
 * There is no Docker image for Joomla 4.4 with PHP 8.3, there is a fall back to PHP 5.2 used.
@@ -659,18 +659,19 @@ Simply choose the same major and minor version numbers from the development bran
 and graft the package for a seamless experience:
 
 ```
-scripts/graft.sh 52 ~/Downloads/Joomla_5.2.0-alpha4-dev-Development-Full_Package.zip
+scripts/graft 52 ~/Downloads/Joomla_5.2.0-alpha4-dev-Development-Full_Package.zip
 ```
 
 Mandatory arguments are the Joomla branch version and the local package file.
 Supported file formats are .zip, .tar, .tar.zst, .tar.gz, and .tar.bz2.
 An optional argument is the database variant, such as PostgreSQL in the following example:
 ```
-scripts/graft.sh 51 pgsql ~/Downloads/Joomla_5.1.3-Stable-Full_Package.zip
+scripts/graft 51 pgsql ~/Downloads/Joomla_5.1.3-Stable-Full_Package.zip
 ```
 
-After grafting, you can do everything except running `scripts/pull.sh`, such as switching the database variant,
-switching PHP version, installing Joomla Patch Tester, or running Joomla System Tests. And grafting can be done multiple times. :smile:
+After grafting, you can do everything except running `scripts/pull` (which will be skipped),
+such as switching the database variant, changing the PHP version, installing the Joomla Patch Tester,
+or running Joomla System Tests. Grafting can also be done multiple times. :smile:
 
 What distinguishes a grafted Joomla from a standard package-installed Joomla?
 A grafted Joomla contains three additional files and two directories from the development branch:
@@ -683,7 +684,7 @@ To avoid recreating everything the next day, you can simply fetch and merge the 
 Joomla GitHub repository into your local branches. This can be done for all branches without any arguments,
 or for specific versions:
 ```
-scripts/pull.sh 53 60
+scripts/pull 53 60
 ```
 
 If changes are pulled then:
@@ -714,7 +715,7 @@ ready for your exploration.
 
 You can retrieve some interesting Joomla Branches Tester status information:
 ```
-scripts/info.sh
+scripts/info
 ```
 The following example illustrates an IPv6 installation with three branches:
 * `4.4-dev`: A development clone based on version 4.4.9, PHP 8.1 is running with Xdebug, using PostgreSQL with driver PDO
@@ -769,7 +770,7 @@ Joomla web server containers are ready with a second PHP installation for switch
 [Xdebug](https://github.com/xdebug/xdebug).
 You can switch to the PHP version with Xdebug for example:
 ```
-scripts/xdebug.sh 53 on
+scripts/xdebug 53 on
 ```
 
 A `.vscode/launch.json` file is also prepared.
@@ -778,14 +779,18 @@ select 'Start Debugging' and choose the corresponding entry `Listen jbt_53`.
 
 Finally, it may be reset again to improve performance:
 ```
-scripts/xdebug.sh off
+scripts/xdebug off
 ```
 
 Used ports are 79xx, for the given example 7953.
 
 ### IPv6
 
-As shown in the [Installation](#installation) chapter, you can create the Docker Branches Tester instance using the `scripts/create.sh` script with the `IPv6` option instead of the default IPv4 network. Docker assigns IP addresses from the predefined private, non-routable subnet `fd00::/8`. To view the assigned IPv4 and IPv6 dual stack network addresses (they may change on each Docker run), use:
+As shown in the [Installation](#installation) chapter,
+you can create the Docker Branches Tester instance using `scripts/create`
+with the `IPv6` option instead of the default IPv4 network.
+Docker assigns IP addresses from the predefined private, non-routable subnet `fd00::/8`.
+To view the assigned IPv4 and IPv6 dual stack network addresses (they may change on each Docker run), use:
 
 ```
 docker inspect jbt_network
@@ -803,14 +808,15 @@ You can use the IPv6 address (instead of the hostname) to open the PostgreSQL in
 docker exec -it jbt_pg bash -c "PGPASSWORD=root psql -h fd00::4 -U root -d postgres"
 ```
 :point_right: The `host.docker.internal` feature generally defaults to IPv4, and there is no built-in IPv6 equivalent.
-              As `scripts/cypress.sh local` works with `host.docker.internal`,
-              the database custom commands use the IPv4 address to access the database.
+              As `scripts/cypress local` works with `host.docker.internal`,
+              the database custom commands from the Cypress local running GUI
+              use the IPv4 address to access the database.
 
 ### Cleaning Up
 
 If you want to get rid of all these Docker containers and the 2 GB in the `branch_*` directories, you can do so:
 ```
-scripts/clean.sh
+scripts/clean
 ```
 
 ## Trouble-Shooting
@@ -825,7 +831,7 @@ scripts/clean.sh
    It takes just 2.5 minutes on a 2024 entry-level MacBook Air to delete everything and
    create 9 new containers with Joomla 5.2-dev, PHP 8.3, and PostgreSQL.
    ```
-   scripts/create.sh pgsql php8.3 52
+   scripts/create pgsql php8.3 52
    ```
 3. Check the Docker container logs to monitor activity.
    For example, the `jbt_relay` container logs will display information about receiving and delivering emails.
@@ -846,9 +852,9 @@ scripts/clean.sh
 4. Run a script with the option `-x` to enable detailed debugging output that shows each command
    executed along with its arguments, for example:
    ```
-   bash -x scripts/pull.sh
+   bash -x scripts/pull
    ```
-5. If you encounter problems after running `scripts/create.sh` multiple times,
+5. If you encounter problems after running `scripts/create` multiple times,
    try using the `no-cache` option to force a fresh build of the containers.
 6. Always use the latest version of Docker software.
 7. Open an [issue](../../issues).

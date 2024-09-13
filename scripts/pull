@@ -1,15 +1,15 @@
 #!/bin/bash
 #
-# pull.sh - Running git pull and more on all, one or multiple branches, e.g.
-#   scripts/pull.sh
-#   scripts/pull.sh 51
-#   scripts/pull.sh 52 53
+# pull - Running git pull and more on all, one or multiple branches, e.g.
+#   scripts/pull
+#   scripts/pull 51
+#   scripts/pull 52 53
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
-  echo "Please run me as 'scripts/info.sh'. Thank you for your cooperation! :)"
+  echo "Please run me as 'scripts/pull'. Thank you for your cooperation! :)"
   exit 1
 fi
 
@@ -17,11 +17,11 @@ source scripts/helper.sh
 
 function help {
     echo "
-    pull.sh – Running 'git pull' on one or multiple branches.
-              Running composer install if changes are detected and npm clean install if needed.
-              Optional version can be one or more of the following: ${allVersions[@]} (default is all).
+    pull – Running 'git pull' on one or multiple branches.
+           Running composer install if changes are detected and npm clean install if needed.
+           Optional version can be one or more of the following: ${allVersions[@]} (default is all).
 
-              $(random_quote)
+           $(random_quote)
     "
 }
 
