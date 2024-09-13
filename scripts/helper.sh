@@ -66,9 +66,9 @@ function getVersions() {
     IFS=$'\n' sorted_branches=($(sort <<<"${formatted_branches[*]}"))
     unset IFS
 
-    # Are we offline? Set default branch versions.
+    # Are we offline? Set default branch versions with 42 as marker.
     if [ ${#sorted_branches[@]} -eq 0 ]; then
-      echo "44 51 52 53 54 60"
+      echo "42 44 51 52 53 54 60"
     else
       echo "${sorted_branches[*]}"
     fi

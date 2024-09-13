@@ -756,6 +756,9 @@ Branch 5.3-dev:
   /branch_53 is NOT existing
 ```
 
+:blossom: If you see '42' as the release number (the answer to all questions),
+          it means the system is offline, and a default set of version numbers is being used.
+
 ### Xdebug
 
 <img align="right" src="images/Xdebug.png">
