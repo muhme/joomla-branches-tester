@@ -9,7 +9,7 @@
 source scripts/helper.sh
 
 function help {
-    echo "
+  echo "
     clean.sh – Stops and removes all JBT Docker containers, associated Docker networks, and volumes.
                Also deletes dirctory 'run' and all 'branch_*' directories.
 
@@ -38,12 +38,27 @@ createDockerComposeFile "${versions}" "php8.2" "IPv4"
 log 'Stopping and removing JBT Docker containers, associated Docker networks and volumes.'
 docker compose down -v
 
+# Old containers existing?
+echo '*** Remove following Docker containers'
+docker ps -a --format '{{.Names}}' | grep "^jbt_" | while read container; do
+  log "Removing non docker-compose container '${container}'."
+  docker rm -f "${container}"
+done
+
 # Clean up branch directories if existing
 for version in "${allVersions[@]}"; do
   if [ -d "branch_${version}" ]; then
     log "Removing directory 'branch_${version}'."
     # sudo is needed on Windows WSL Ubuntu
     rm -rf "branch_${version}" >/dev/null 2>&1 || sudo rm -rf "branch_${version}"
+  fi
+done
+
+# Branch directories from old version numbers?
+for dir in branch_*; do
+  if [ -d "$dir" ]; then
+    log "Removing non-existing version directory '${dir}'."
+    rm -rf "$dir" 2>&1 || sudo rm -rf "$dir"
   fi
 done
 
@@ -60,7 +75,7 @@ if [ -d "cypress-cache" ]; then
 fi
 
 # Checking Cypress global binary cache for macOS and Linux
-for dir in  "${HOME}/Library/Caches/Cypress" "${HOME}/.cache/Cypress"; do
+for dir in "${HOME}/Library/Caches/Cypress" "${HOME}/.cache/Cypress"; do
   if [ -d "${dir}" ]; then
     log "Cache for local Cypress runs has been found in the '${dir}' directory with the following sizes (in MB):"
     du -ms ${dir}/* || true
