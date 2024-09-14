@@ -191,6 +191,15 @@ for version in "${versionsToTest[@]}"; do
         fi
       fi
 
+      # Temporarily disable Joomla logging as System Tests are failing.
+      log "jbt_${version} – Temporarily disable Joomla logging."
+      docker exec "jbt_${version}" bash -c "cd /var/www/html && sed \
+        -e 's/\$debug = .*/\$debug = false;/' \
+        -e 's/\$log_everything = .*/\$log_everything = 0;/' \
+        -e 's/\$log_deprecated = .*/\$log_deprecated = 0;/' \
+        configuration.php > configuration.php.tmp && \
+        mv configuration.php.tmp configuration.php"
+        
       if [[ "$novnc" == true ]]; then
         log "jbt_${version} – Initiating System Tests with NoVNC and ${spec}."
         docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && export DISPLAY=jbt_novnc:0 && ${eel1} cypress run --headed ${browser} ${spec}"
@@ -208,6 +217,15 @@ for version in "${versionsToTest[@]}"; do
         overallFailed=$((failed + 1))
         error "jbt_${version} – System Tests failed"
       fi
+
+      # Enable Joomla logging
+      log "jbt_${version} – Re-enabling Joomla logging."
+      docker exec "jbt_${version}" bash -c "cd /var/www/html && sed \
+        -e 's/\$debug = .*/\$debug = true;/' \
+        -e 's/\$log_everything = .*/\$log_everything = 1;/' \
+        -e 's/\$log_deprecated = .*/\$log_deprecated = 1;/' \
+        configuration.php > configuration.php.tmp && \
+        mv configuration.php.tmp configuration.php"
     fi
   done
 

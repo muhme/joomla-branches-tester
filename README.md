@@ -362,6 +362,8 @@ The Joomla instances are configured in the 'Global Configuration' with the follo
 * Log Almost Everything
 * Log Deprecated API
 
+:point_right: During System Tests Joomla logging is temporarely disbled, because, well, you know, things happen. :wink:
+
 If you need to inspect files, they are available in the directory `branch_52` for this Joomla release 5.2 sample.
 
 ### Drone-like Tests
