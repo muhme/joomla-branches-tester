@@ -114,20 +114,22 @@ Thanks to Docker, it is not necessary to install one of the databases, the datab
 ```
 
 <details>
-  <summary>Ubuntu Setup Script</summary>
+  <summary>Setup Script for Ubuntu (Native and WSL 2 on Windows)</summary>
 
 ---
 
 For setting up and configuring an Ubuntu Linux environment with required Git, Docker, and firewall configuration,
-one of the gnomes has provided the [ubuntu_setup.sh](scripts/ubuntu_setup.sh) script.
-This script is designed to work on both a fresh Ubuntu desktop installation and Ubuntu
+one of the helpful gnomes has crafted the [ubuntu_setup.sh](scripts/ubuntu_setup.sh) script.
+This script is designed to work on both a fresh Ubuntu desktop installation and Ubuntu running
 on Windows Subsystem for Linux (WSL).
 
-Download the script to your current working directory and run with superuser privileges:
+Download the script as raw file to any directory and run in terminal window with superuser privileges:
 ```
 sudo bash ./ubuntu_setup.sh
 ```
 
+After the script completes, please run `sudo reboot`.
+Once your system has rebooted, verify the Docker installation by running `docker ps`.
 ---
 
 </details>
@@ -321,11 +323,10 @@ scripts/cypress 53 local
 
 Installing with a user that is able to run `sudo`.
 
-1. Install `git` if you not have already:
-   ```
-   sudo apt-get update
-   sudo apt-get -y upgrade
-   sudo apt-get -y install git
+1. To setup Git, Docker, and firewall configuration download the [ubuntu_setup.sh](scripts/ubuntu_setup.sh) script as raw file, run in terminal window with superuser privileges and reboot the system:
+   ````
+   sudo bash ./ubuntu_setup.sh
+   sudo reboot
    ```
 2. Clone Joomla Branches Tester repository e.g. in your home directory:
    ```
@@ -885,7 +886,7 @@ scripts/create 53 IPv6 https://github.com/muhme/joomla-cms:pg-for-postgres
 * Database server versions cannot be changed.
 * The setup does not support HTTPS, secure connections issues are not testable.
 * If IPv6 networking is chosen, it is used only within Docker.
-* The predefined port range starts from 7000. If another service is already using this range, it may cause a conflict.
+* The predefined port range run from 7000 to 7900. If another service is already using this range, it may cause a conflict.
 
 ## License
 
