@@ -130,6 +130,7 @@ sudo bash ./ubuntu_setup.sh
 
 After the script completes, please run `sudo reboot`.
 Once your system has rebooted, verify the Docker installation by running `docker ps`.
+
 ---
 
 </details>
