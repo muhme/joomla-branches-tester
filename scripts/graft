@@ -94,7 +94,7 @@ mv "branch_${version}" "branch_${version}-TMP" 2>/dev/null|| sudo mv "branch_${v
 mkdir -p "branch_${version}/tests" 2>/dev/null || sudo mkdir -p "branch_${version}/tests"
 ( cd "branch_${version}-TMP"; \
   mv cypress.config.dist.mjs package.json package-lock.json node_modules "../branch_${version}" 2>/dev/null || \
-     sudo mv cypress.config.dist.mjs node_modules "../branch_${version}"; \
+     sudo mv cypress.config.dist.mjs package.json package-lock.json node_modules "../branch_${version}"; \
   mv tests/System "../branch_${version}/tests" 2>/dev/null || \
      sudo mv tests/System "../branch_${version}/tests" )
 rm -rf "branch_${version}-TMP" 2>/dev/null || sudo rm -rf "branch_${version}-TMP"
@@ -160,7 +160,7 @@ if grep -q "public const DEV_STATUS = 'Stable';" "branch_${version}/libraries/sr
       echo "$line"
     done < "${PATCHED}" > "${TMP}"
     # If copying the file has failed, start a second attempt with sudo.
-    cp "${TMP}" "${PATCHED}" || sudo cp "${TMP}" "${PATCHED}"
+    cp "${TMP}" "${PATCHED}" 2>/dev/null || sudo cp "${TMP}" "${PATCHED}"
   fi
 fi
 
