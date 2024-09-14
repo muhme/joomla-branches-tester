@@ -831,7 +831,7 @@ Here's what we're already using from the future:
 
 * :wrench: [joomla-cypress#33](https://github.com/joomla-projects/joomla-cypress/pull/33) Install Joomla with non-standard db_port
 * :wrench: [joomla-cypress#36](https://github.com/joomla-projects/joomla-cypress/pull/36) Wrap IPv6 address in brackets \[ \] if needed
-* :wrench: [joomly-cms#3968](https://github.com/joomla/joomla-cms/pull/43968) [cypress] Add db_port in Installation.cy.js
+* :wrench: [joomla-cms#3968](https://github.com/joomla/joomla-cms/pull/43968) [cypress] Add db_port in Installation.cy.js
 
 If you're itching to see IPv6 in action with PostgreSQL, don't worry - it will work in the future.
 Just use the `pd` module as a `postgres` replacement:
