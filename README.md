@@ -763,7 +763,9 @@ You can switch to the PHP version with Xdebug for example:
 scripts/xdebug 53 on
 ```
 
-A `.vscode/launch.json` file is also prepared.
+A .vscode/launch.json file is also prepared
+(to simplify life, it's created in advance for all versions,
+even if they are not installed or Xdebug is not enabled).
 In [Visual Studio Code](https://code.visualstudio.com/),
 select 'Start Debugging' and choose the corresponding entry `Listen jbt_53`.
 

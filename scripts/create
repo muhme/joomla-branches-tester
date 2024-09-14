@@ -198,7 +198,7 @@ for version in "${versionsToInstall[@]}"; do
 
 done
 
-log "Creating File '.vscode/launch.json' for versions ${versionsToInstall[*]}"
+log "Creating File '.vscode/launch.json' for all versions ${allVersions[*]}"
 launch_json=".vscode/launch.json"
 mkdir -p $(dirname "${launch_json}")
 cat >"${launch_json}" <<EOF
@@ -206,7 +206,7 @@ cat >"${launch_json}" <<EOF
     "version": "0.2.0",
     "configurations": [
 EOF
-for version in "${versionsToInstall[@]}"; do
+for version in "${allVersions[@]}"; do
   cat >>"${launch_json}" <<EOF
       {
           "name": "Listen jbt_${version}",
