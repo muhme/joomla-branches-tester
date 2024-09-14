@@ -8,49 +8,47 @@ Imagine a little slice of a parallel universe where testing all used Joomla bran
 Alright, alright, apologies to those who enjoyed the whimsical writing style, but now it's time to dive into the technical depths. Let's transition from the cozy, magical universe into the world of technical documentation, where we'll explore the numerous options, parameters, and configurations that power this experience ...
 
 ## Software Architecture
-All used Joomla development branches with the different Joomla versions run in parallel in a [Docker](https://www.docker.com/) container environment.
-*Used* Joomla development branches refers to GitHub [joomla-cms](https://github.com/joomla/joomla-cms) with default, active and stale branches.
+All **used** Joomla development branches, representing different Joomla versions, run in parallel in a [Docker](https://www.docker.com/) container environment. **Used** Joomla development branches refer to the GitHub joomla-cms](https://github.com/joomla/joomla-cms) repository, including default, active, and stale branches.
 Use one, multiple, or all branches for:
 * Manual testing, including database inspections and email verifications.
-* [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System)
-  with [Cypress](https://www.cypress.io/) interactive mode (GUI) or automated mode (headless or with noVNC).
-* Automated installation of the [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester).
-* Switch between the three database options (MySQL, MariaDB, or PostgreSQL) and the two database drivers
-  (MySQLi or PHP Data Objects).
-* Switch between the PHP versions (8.1, 8.2, or 8.3) as supported by the official Docker images.
-* Install Joomla from a cloned 'joomla-cms' Git repository.
+* Running [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System)
+  with [Cypress](https://www.cypress.io/) in interactive mode (GUI) or automated mode (headless or with noVNC).
+* Executing unit tests, verifying coding standards, and checking CSS styles and JavaScript standards, just like Drone.
+* Automating the installation of the [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester).
+* Switching between the three database options: MySQL, MariaDB, or PostgreSQL, and the two database drivers:
+  MySQLi or PHP Data Objects, including the option to use Unix sockets.
+* Switching between PHP versions (8.1, 8.2, or 8.3), as supported by the official Docker images.
+* Installing Joomla from a cloned 'joomla-cms' Git repository.
 * Grafting a Joomla package onto a development branch.
-* Using a second PHP installation with Xdebug.
-* Switch to IPv6 network.
+* Using Xdebug for debuuging.
+* Using IPv6 network.
 
 ![Joomla Branches Software Architecture](images/joomla-branches-tester.svg)
 
-The idea is to have all used Joomla development branches
-(in this picture 4.4-dev, 5.1-dev, 5.2-dev and 6.0-dev) are available for testing in parallel.
-This installation is performed using 13 Docker containers.
-Everything is scripted and can be parameterized as easily as possible.
-You see the four orange Web Server containers with the four different Joomla versions.
-They are based on the `branch_*` folders, which are also available on the Docker host.
+The goal is to have all used Joomla development branches (such as 4.4-dev, 5.1-dev, 5.2-dev, and 6.0-dev) available for parallel testing.
+This setup is achieved using 13 Docker containers.
+Everything is fully scripted and can be easily parameterized for maximum flexibility.
+You'll notice the four orange Web Server containers, each running a different Joomla version.
+These containers are based on the `branch_*` folders, which are also available on the Docker host.
 
 :point_right: The version numbers referenced are current as of early August 2024.
               Since used branches are subject to frequent changes,
               the latest version numbers are always be retrieved directly from the `joomla-cms` repository.
-              As of late August 2024, one more version, `5.3-dev`, has been introduced.
+              As of late August 2024, an additional version, `5.3-dev`, has been introduced.
 
-On the right you see three blue containers with the databases MySQL, MariaDB and PostgreSQL.
-To be able to check the databases, two further blue containers with phpMyAdmin (for MySQL and MariaDB) and pgAdmin (for PostgreSQL) are installed.
-One green Docker container runs Cypress based Joomla System Tests with GUI or headless.
-The green noVNC container allows real-time viewing of automated Cypress System Tests.
-If you need to inspect a failed test spec, you can run Cypress with the interactive GUI.
+On the right, you can see the three blue containers running the databases: MySQL, MariaDB, and PostgreSQL.
+To inspect the databases, two additional blue containers are included: phpMyAdmin (for MySQL and MariaDB) and pgAdmin (for PostgreSQL).
+A green Docker container runs Cypress based Joomla System Tests, either with a GUI or in headless mode.
+The green noVNC container enables real-time viewing of automated Cypress System Tests.
+If you need to investigate a failed test spec, you can easily switch to running Cypress with the interactive GUI.
 
-The two red mail containers triplicate all emails from manual Joomla tests or System Tests and
-make them readable via a web application.
+The red mail relay container triplicates all emails sent during manual Joomla tests or System Tests.
+The second red mail catcher container makes these emails accessible via a web application for easy review.
 
-The `/scripts` folder contains all the scripts and also configuration files.
-Your current working directory must always be `joomla-branches-tester`.
+The `/scripts` folder contains all the necessary scripts as well as configuration files. Ensure that your current working directory is always the `joomla-branches-tester` directory.
 
 On the Docker Host system (left side), your red web browser is running.
-On macOS and Ubuntu, the native Cypress GUI is shown in green.
+On macOS and Ubuntu, the native Cypress GUI is displayed in green.
 
 :point_right: For the complete list of all scripts see [scripts/README.md](scripts/README.md).
 
@@ -58,7 +56,7 @@ On macOS and Ubuntu, the native Cypress GUI is shown in green.
         For those with a taste for the finer details, the comments are a gourmet treat.
 
 <details>
-  <summary>There are currently 14 Docker containers providing the functionality.</summary>
+  <summary>As of mid-September 2024, there are currently 14 Docker containers providing the functionality.</summary>
 
 ---
 
@@ -318,14 +316,14 @@ scripts/cypress 53 local
 </details>
 
 <details>
-  <summary>Ubuntu 22.04.3 LTS (Jammy Jellyfish) Setup</summary>
+  <summary>Ubuntu Setup</summary>
 
 ---
 
-Installing with a user that is able to run `sudo`.
+Installing the Joomla Branches Tester on Ubuntu with a user that is able to run `sudo`.
 
-1. To setup Git, Docker, and firewall configuration download the [ubuntu_setup.sh](scripts/ubuntu_setup.sh) script as raw file, run in terminal window with superuser privileges and reboot the system:
-   ````
+1. To setup Git, Docker, and firewall configuration, download the [ubuntu_setup.sh](scripts/ubuntu_setup.sh) script as a raw file, run in terminal window with superuser privileges and reboot the system:
+   ```
    sudo bash ./ubuntu_setup.sh
    sudo reboot
    ```
@@ -334,24 +332,7 @@ Installing with a user that is able to run `sudo`.
    cd
    git clone https://github.com/muhme/joomla-branches-tester
    ```
-3. Continue the installation with the Ubuntu setup script:
-   ```
-   cd ~/joomla-branches-tester
-   sudo scripts/ubuntu_setup.sh
-   ```
-4. To run Docker as user it is needed to restart Ubuntu:
-   ```
-   sudo reboot
-   ```
-5. Verify Docker is running:
-   ```
-   docker ps
-   ```
-   Should show no containers:
-   ```
-   CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
-   ```
-6. Now you are ready to create Joomla Branches Tester:
+3. Now you are ready to create Joomla Branches Tester:
    ```
    cd ~/joomla-branches-tester
    scripts/create
