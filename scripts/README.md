@@ -43,22 +43,29 @@ The following scripts are available and the use is described in [../README.md](.
 | [scripts/xdebug](xdebug) | Switching PHP in web container to installation with or without Xdebug. | Mandatory argument is `on` or `off`. Optional arguments are the version number(s). |
 
 :point_right: The scripts use [ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code#Colors)
-to color their own log and error messages. 
-Log messages are highlighted in green and directed to the standard output (stdout) stream.
-Error messages are displayed in red and directed to the standard error output (stderr) stream.
-Colouring can be avoided by setting the environment variable [NOCOLOR=1](https://no-color.org/).
-All messages start with three asterisks, the date and the time. See the following example:
+to color their own log and error messages.
+All messages start with three asterisks, the date and the time. 
+Error messages are displayed in red and directed to the standard error output (stderr) stream:
 
-![scripts/test running screen shot](../images/screen-shot.png)
+<img alt="cypress error sample screenshot" src="../images/error.png" width="763">
+
+Log messages are highlighted in green and directed to the standard output (stdout) stream.
+See the following example:
+
+![scripts/test sample screenshot](../images/screen-shot.png)
+
+Colouring can be avoided by setting the environment variable [NOCOLOR=1](https://no-color.org/).
 
 ## Engine Room Scripts and Configurations
 
+The following scripts and configuration files are intended for internal usage only.
+
 | File | Description | Additional Info |
 | --- | --- | --- |
-| [scripts/error-logging.ini](error-logging.ini) | Config file to catch all PHP errors, notices and warnings. | Used by `script/setup.sh`. |
 | [docker-compose.base.yml](docker-compose.base.yml) | The basic part of the `docker-compose.yml` file. | Used by `scripts/create`. |
 | [docker-compose.joomla.yml](docker-compose.joomla.yml) | Part of the `docker-compose.yml` file to be parameterised for one Joomla web server. | Used by `scripts/create`. |
-| [dockerfile-relay.yml](dockerfile-relay.yml) | Docker container definition for the SMTP relay doubler. | Used to create `jbt_relay`. |
+| [dockerfile-relay.yml](dockerfile-relay.yml) | Docker container definition for the SMTP relay tripler. | Used to create `jbt_relay`. |
+| [scripts/error-logging.ini](error-logging.ini) | Config file to catch all PHP errors, notices and warnings. | Used by `script/setup.sh`. |
 | [scripts/helper.sh](helper.sh) | Some commonly used bash script functions and definitions. | Sourced and used by other Bash scripts within the project. |
 | [scripts/patchtester.cy.js](patchtester.cy.js) | Cypress script to install and confgure Joomla Patch Tester component. | Used by `scripts/patchtester`. |
 | [scripts/pgpass](pgpass) | Auto-logon password file. | Used by `pgAdmin`. |
