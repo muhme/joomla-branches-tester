@@ -54,6 +54,7 @@ if docker info >/dev/null 2>&1; then
   docker_running=true
   echo "Docker version $(docker version --format '{{.Server.Version}}') is running with" \
     "$(docker ps -q | wc -l | tr -d ' ') containers and $(docker images -q | wc -l | tr -d ' ') images"
+  docker inspect jbt_network|grep EnableIPv6| sed -e 's/[ ]*//' -e 's/[",]//g'
   echo "Standard Containers:"
   for container in "${JBT_BASE_CONTAINERS[@]}"; do
     if [ "$(docker ps -q -f name=${container})" ]; then

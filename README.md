@@ -368,7 +368,7 @@ If you need to inspect files, they are available in the directory `branch_52` fo
 
 ### Drone-like Tests
 
-A subset of seven tests from the entire [Drone](https://www.drone.io/) test suite has been implemented:
+A subset of seven tests from the full Joomla [Drone](https://www.drone.io/) CI test suite has been implemented:
 
 * `php-cs-fixer` – PHP Coding Standards Fixer (dry-run)
 * `phpcs` – PHP Coding Sniffer
@@ -385,8 +385,8 @@ scripts/test
 
 Some optional arguments are:
 
-* **Joomla version number(s)**: Choose one or multiple versions; all versions are tested by default.
-* **Test name(s)**: Choose one or multiple tests; all tests are executed by default.
+* Joomla version number(s): Choose one or multiple versions; all versions are tested by default.
+* Test name(s): Choose one or multiple tests; all tests are executed by default.
 
 For example run the linter tests on three branches:
 ```
@@ -398,7 +398,7 @@ scripts/test 51 52 53 lint:css lint:js lint:testjs
 
 ### Cypress Automated System Tests
 
-To simple run the Joomla System Tests with all specs - except for the installation -
+To simple run the Joomla System Tests with all specs - except for the installation step -
 from the [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System) in all branches with headless Cypress:
 ```
 scripts/test system
@@ -411,8 +411,8 @@ scripts/test system
 
 Some more optional arguments for System Tests are:
 
-* **Browser to be used**: Choose between electron (default), firefox, chrome, or edge.
-* **Test spec pattern**: All test specs (except the installation) are used by default.
+* Browser to be used: Choose between electron (default), firefox, chrome, or edge.
+* Test spec pattern: All test specs (except the installation) are used by default.
 
 As an example, run all the test specs (except the installation) from branch 5.1-dev with Mozilla Firefox:
 ```
@@ -526,8 +526,10 @@ for running the Cypress GUI locally.
 
 ### Install Joomla Patch Tester
 
-For your convenience [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester)
-can be installed on the Joomla instances. The script also sets the GitHub token and fetch the data.
+For your convenience, the latest version of the
+[Joomla Patch Tester](https://github.com/joomla-extensions/patchtester)
+can be installed on the Joomla instances.
+The script also sets the GitHub token and fetch the data.
 This can be done without version number for all Joomla instances or for e.g. Joomla 5.3-dev:
 
 ```
@@ -609,15 +611,21 @@ Database Unix sockets are available in the Cypress and Joomla Web Server contain
 They are used in `scripts/create` and `scripts/database` with the `socket` option.
 Without this option, the database connection defaults to using the TCP host.
 
-You can also use these sockets with command line client tools, for example:
 ```
-psql -h /jbt/run/postgresql-socket -U root -d test_joomla_53
-mariadb --socket=/jbt/run/mysql-socket/mysqld.sock -u root -p
+scripts/database mysqli socket
 ```
 
-:point_right: Be aware that Unix sockets currently work (as of August 2024)
-              in the Joomla System Tests for the installation step,
-              but not for custom database commands.
+Without using the Unix sockets for Joomla,
+you can still take advantage of them with command-line client tools. For example:
+```
+docker exec -it jbt_pg bash -c "psql -h /var/run/postgresql -U root -d test_joomla_44"
+docker exec -it jbt_madb bash -c "mariadb --socket=/var/run/mysqld/mysqld.sock -u root -proot"
+docker exec -it jbt_mysql bash -c "mysql --socket=/var/run/mysqld/mysqld.sock -u root -proot"
+```
+
+:point_right: Be aware that for the Joomla System Tests,
+              Unix sockets currently work (as of mid-September 2024) only for the installation step,
+              but not for custom database commands that are JavaScript-based.
 
 ### Switch PHP Version
 
@@ -659,8 +667,8 @@ An optional argument is the database variant, such as PostgreSQL in the followin
 scripts/graft 51 pgsql ~/Downloads/Joomla_5.1.3-Stable-Full_Package.zip
 ```
 
-After grafting, you can do everything except running `scripts/pull` (which will be skipped),
-such as switching the database variant, changing the PHP version, installing the Joomla Patch Tester,
+After grafting, you can do everything except running `scripts/pull` (which will be skipped).
+You can switching the database variant, changing the PHP version, installing the Joomla Patch Tester,
 or running Joomla System Tests. Grafting can also be done multiple times. :smile:
 
 What distinguishes a grafted Joomla from a standard package-installed Joomla?
@@ -712,8 +720,9 @@ The following example illustrates an IPv6 installation with three branches:
 * `5.1-dev`: Grafted with the Joomla 5.1.3 Stable package, PHP 8.2, using MariaDB with driver MySQLi
 * `5.2-dev`: A development clone of version 5.2.0 with additional patches applied, using MySQL with driver PDO
 ```
-Joomla Branches Tester (JBT) version 0.9.2
+Joomla Branches Tester (JBT) version 1.0.11
 Docker version 27.2.0 is running with 12 containers and 14 images
+EnableIPv6: true
 Standard Containers:
   jbt_mysql   is running, ports: 3306/tcp -> 0.0.0.0:7011; 3306/tcp -> [::]:7011
   jbt_madb    is running, ports: 3306/tcp -> 0.0.0.0:7012; 3306/tcp -> [::]:7012
