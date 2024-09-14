@@ -821,7 +821,7 @@ scripts/clean
 
 ## Time Travel
 
-As Doc Brown wisely said: *"Roads? Where we're going, we don't need roads."*
+As Doc Brown said: *"Roads? Where we're going, we don't need roads."*
 
 Well, the Joomla Branches Tester has definitely brought some futuristic vibes.
 As of mid-September 2024, it's already taking on draft PRs, open PRs, unreleased PRs,
@@ -830,7 +830,7 @@ not-yet-up-merged PRs... heck, even some code that haven't been imported yet!
 Here's what we're already using from the future:
 
 * :wrench: [joomla-cypress#33](https://github.com/joomla-projects/joomla-cypress/pull/33) Install Joomla with non-standard db_port
-* :wrench: [joomla-cypress#36]https://github.com/joomla-projects/joomla-cypress/pull/36/ Wrap IPv6 address in brackets \[ \] if needed
+* :wrench: [joomla-cypress#36](https://github.com/joomla-projects/joomla-cypress/pull/36) Wrap IPv6 address in brackets \[ \] if needed
 * :wrench: [joomly-cms#3968](https://github.com/joomla/joomla-cms/pull/43968) [cypress] Add db_port in Installation.cy.js
 
 If you're itching to see IPv6 in action with PostgreSQL, don't worry - it will work in the future.
