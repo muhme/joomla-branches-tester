@@ -16,7 +16,7 @@ Use one, multiple, or all branches for:
 * Executing unit tests, verifying coding standards, and checking CSS styles and JavaScript standards, just like Drone.
 * Automating the installation of the [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester).
 * Switching between the three database options: MySQL, MariaDB, or PostgreSQL, and the two database drivers:
-  MySQLi or PHP Data Objects, including the option to use Unix sockets.
+  MySQLi or PHP Data Objects, including the option to use Unix sockets, instead of TCP host.
 * Switching between PHP versions (8.1, 8.2, or 8.3), as supported by the official Docker images.
 * Installing Joomla from a cloned 'joomla-cms' Git repository.
 * Grafting a Joomla package onto a development branch.
@@ -356,6 +356,11 @@ In parallel you can inspect MariaDB and MySQL database with [phpMyAdmin](https:/
 [http://host.docker.internal:7002](http://host.docker.internal:7002). And verify all emails from Joomla and the System Tests with
 [MailDev](https://github.com/maildev/maildev/blob/master/docs/docker.md) on
 [http://host.docker.internal:7003](http://host.docker.internal:7003).
+
+The Joomla instances are configured in the 'Global Configuration' with the following settings:
+* Debug System
+* Log Almost Everything
+* Log Deprecated API
 
 If you need to inspect files, they are available in the directory `branch_52` for this Joomla release 5.2 sample.
 
@@ -860,7 +865,9 @@ scripts/create 53 IPv6 https://github.com/muhme/joomla-cms:pg-for-postgres
 5. If you encounter problems after running `scripts/create` multiple times,
    try using the `no-cache` option to force a fresh build of the containers.
 6. Always use the latest version of Docker software.
-7. Open an [issue](../../issues).
+7. If you need to cancel a running script, send an interrupt by pressing <Ctrl> + <C> together.
+   You may need to press the keys multiple times to fully stop the process.
+8. Open an [issue](../../issues).
 
 ## Limitations
 

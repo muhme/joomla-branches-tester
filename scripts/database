@@ -203,6 +203,15 @@ EOF
     cypress.config.mjs > cypress.config.mjs.tmp && \
     mv cypress.config.mjs.tmp cypress.config.mjs"
 
+  # Enable Joomla logging
+  log "jbt_${version} – Configure Joomla with 'Debug System' and 'Log Almost Everything'"
+  docker exec "jbt_${version}" bash -c "cd /var/www/html && sed \
+    -e 's/\$debug = .*/\$debug = true;/' \
+    -e 's/\$log_everything = .*/\$log_everything = 1;/' \
+    -e 's/\$log_deprecated = .*/\$log_deprecated = 1;/' \
+    configuration.php > configuration.php.tmp && \
+    mv configuration.php.tmp configuration.php"
+
   log "jbt_${version} – Changing ownership to www-data for all files and directories."
   # Following error seen on macOS, we ignore it as it does not matter, these files are 444
   # chmod: changing permissions of '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
