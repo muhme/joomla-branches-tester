@@ -67,7 +67,7 @@ The following scripts and configuration files are intended for internal usage on
 | [dockerfile-relay.yml](dockerfile-relay.yml) | Docker container definition for the SMTP relay tripler. | Used to create `jbt_relay`. |
 | [scripts/error-logging.ini](error-logging.ini) | Config file to catch all PHP errors, notices and warnings. | Used by `script/setup.sh`. |
 | [scripts/helper.sh](helper.sh) | Some commonly used bash script functions and definitions. | Sourced and used by other Bash scripts within the project. |
-| [scripts/patchtester.cy.js](patchtester.cy.js) | Cypress script to install and confgure Joomla Patch Tester component. | Used by `scripts/patchtester`. |
+| [scripts/patchtester.cy.js](patchtester.cy.js) | Cypress script to install and configure Joomla Patch Tester component. | Used by `scripts/patchtester`. |
 | [scripts/pgpass](pgpass) | Auto-logon password file. | Used by `pgAdmin`. |
 | [scripts/servers.json](servers.json) | PostgreSQL server configuration. | Used by `pgAdmin`. |
 | [scripts/setup.sh](setup.sh) | Install and configure Docker web server containers. | Used by `scripts/create` and `scripts/php`. |

@@ -28,7 +28,7 @@ function help {
 }
 
 versions=$(getVersions)
-# Defauls to use MariaDB with MySQLi database driver, to use cache and PHP 8.1.
+# Defaults to use MariaDB with MySQLi database driver, to use cache and PHP 8.1.
 database_variant="mariadbi"
 initial=false
 socket=false
@@ -51,7 +51,7 @@ while [ $# -ge 1 ]; do
   elif [[ "$1" == *:* ]]; then
     # Split into repository and branch.
     arg_repository="${1%:*}" # remove everything after the last ':'
-    arg_branch="${1##*:}"    # everythin after the last ':'
+    arg_branch="${1##*:}"    # everything after the last ':'
     shift                    # Argument is eaten as repository:branch.
   else
     # Ignore empty strings (""), colons (":"), and any other unnecessary arguments.
@@ -104,7 +104,7 @@ docker exec "jbt_${version}" bash -c 'apt-get update -qq && \
     apt-get upgrade -y && \
     curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt-get install -y git unzip vim nodejs iputils-ping iproute2 telnet net-tools'
-# Aditional having vim, ping, netstat
+# Additional having vim, ping, netstat
 
 if $initial; then
   branch=$(branchName "${version}")

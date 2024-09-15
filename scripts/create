@@ -36,7 +36,7 @@ versions=$(getVersions)
 IFS=' ' allVersions=($(sort <<<"${versions}"))
 unset IFS # map to array
 
-# Defauls to use MariaDB with MySQLi database driver, to use cache and PHP 8.1.
+# Defaults to use MariaDB with MySQLi database driver, to use cache and PHP 8.1.
 database_variant="mariadbi"
 socket=""
 network="IPv4"
@@ -72,7 +72,7 @@ while [ $# -ge 1 ]; do
   elif [[ "$1" == *:* ]]; then
     # Split into repository and branch.
     arg_repository="${1%:*}" # remove everything after the last ':'
-    arg_branch="${1##*:}"    # everythin after the last ':'
+    arg_branch="${1##*:}"    # everything after the last ':'
     shift                    # Argument is eaten as repository:branch.
   else
     help
@@ -111,7 +111,7 @@ fi
 
 if [ "$recreate" = false ]; then
 
-  # Delete all docker containters and branches_* directories.
+  # Delete all docker containers and branches_* directories.
   scripts/clean
 
   # Create Docker Compose setup with Joomla web servers for all versions to be installed.

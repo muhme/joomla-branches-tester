@@ -365,7 +365,7 @@ The Joomla instances are configured in the 'Global Configuration' with the follo
 * Log Almost Everything
 * Log Deprecated API
 
-:point_right: During System Tests Joomla logging is temporarely disbled, because, well, you know, things happen. :wink:
+:point_right: During System Tests Joomla logging is temporarily disabled, because, well, you know, things happen. :wink:
 
 If you need to inspect files, they are available in the directory `branch_52` for this Joomla release 5.2 sample.
 
@@ -459,7 +459,7 @@ with the Cypress GUI in interactive mode. You can see all the Cypress log messag
 observe how the browser runs in parallel.
 
 Cypress GUI can be started from Docker container `jbt_cypress` with X11 forwarding
-(recommeded for Windows 11 WSL 2 Ubuntu):
+(recommended for Windows 11 WSL 2 Ubuntu):
 ```
 scripts/cypress 51
 ```
@@ -688,7 +688,7 @@ scripts/pull 53 60
 ```
 
 If changes are pulled then:
-* Just in case the command `composer install` ist executed.
+* Just in case the command `composer install` is executed.
 * If `package-lock.json` file has changed the command `npm ci` is executed.
 
 Finally, the Git status is displayed.
