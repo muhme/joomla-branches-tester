@@ -472,7 +472,8 @@ Using the Cypress container has the advantage of having Chrome, Edge, Electron, 
 If you run Cypress locally, only the browsers installed on your Docker host system will be available.
 
 :imp: Are you see the `Installation.cy.js` test spec? Here you finally have the chance to do it.
-  Who cares about file system and database consistency? Go on, click on it. Go on, go on ...
+      Who cares about [Database and File System Consistency](#database-and-file-system-consistency)?
+      Go on, click on it. Go on, go on ...
 
 ### Check Email
 
@@ -486,12 +487,12 @@ This is done by the SMTP relay triplicator `jbt_relay`.
 :fairy: Oh, dear Gnome, now I can really read all the emails from the System Tests, thank you.
 
 <details>
-  <summary>:imp: "Postal dispatch nonsense picture? Don't open it, you'll get a triple headache!</summary>
+  <summary>:imp: *"Postal dispatch nonsense picture? Don't open it, you'll get a triple headache!"*</summary>
 
 ---
 
-:fairy: "Shut up and listen. The email traffic is explained using the Joomla branch 5.1-dev with
-the use cases password reset and System Tests."
+:fairy: *"Shut up and listen. The email traffic is explained using the Joomla branch 5.1-dev with
+the use cases password reset and System Tests."*
 
 ![Joomla Branches Tester – Email Traffic](images/email.svg)
 
@@ -547,7 +548,8 @@ scripts/patchtester 53 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
 :point_right: The GitHub token can also be given by environment variable `JBT_GITHUB_TOKEN`.
               And of course the sample token does not work.
 
-:fairy: Remember, if you have changed the database version or the PHP version, you need to reinstall Joomla Patch Tester.
+:fairy: You need to reinstall the Joomla Patch Tester if, for example you switch the database.
+        For more details, see [Database and File System Consistency](#database-and-file-system-consistency).
 
 ### Databases
 
@@ -585,19 +587,13 @@ Change all Joomla instances to use PostgreSQL:
 scripts/database pgsql
 ```
 
-:point_right: It can also be used to clean a Joomla installation.
-
-:warning: **Caution:** In your Joomla installation, the database and the files may now have diverged.
-  This can be a problem if you have installed extensions.
-  As an example, the autoload classes file `autoload_psr4.php` and
-  the directories `administrator/components/com_patchtester`, `api/components/com_patchtester` and
-  `media/com_patchtester` must be deleted before the next installation of the Joomla Patch Tester.
-  This script takes care of this and you can reinstall Joomla Patch Tester without any problems.
+:warning: **Caution:** If you have installed the Joomla Patch Tester, you need to reinstall it now.
+          For more details, see [Database and File System Consistency](#database-and-file-system-consistency).
 
 :fairy: The good fairy waves her magic wand and says:
-  "When in doubt, it's wiser to use `scripts/create` to ensure a clean installation.
+  *"When in doubt, it's wiser to use `scripts/create` to ensure a clean installation.
   With a sprinkle of stardust, you can specify the desired database variant,
-  and if you're only installing one Joomla version, it will be done in the blink of an eye."
+  and if you're only installing one Joomla version, it will be done in the blink of an eye."*
 
 #### Database Unix Sockets
 
@@ -809,14 +805,18 @@ You can use the IPv6 address (instead of the hostname) to open the PostgreSQL in
 ```
 docker exec -it jbt_pg bash -c "PGPASSWORD=root psql -h fd00::4 -U root -d postgres"
 ```
-:point_right: The `host.docker.internal` feature generally defaults to IPv4, and there is no built-in IPv6 equivalent.
+:point_right: IPv6 networking is limited to within Docker.
+              The `host.docker.internal` feature generally defaults to IPv4,
+              and there is no built-in IPv6 equivalent.
               As `scripts/cypress local` works with `host.docker.internal`,
-              the database custom commands from the Cypress local running GUI
+              the database custom commands executed by a local running Cypress GUI
               use the IPv4 address to access the database.
 
 ### Cleaning Up
 
-If you want to get rid of all these Docker containers and the 2 GB in the `branch_*` directories, you can do so:
+If you want to get rid of all the Docker containers and
+free up to 2 GB of disc space from the `branch_*` and other directories,
+you can do so by running:
 ```
 scripts/clean
 ```
@@ -841,6 +841,30 @@ Just use the `pd` module as a `postgres` replacement:
 scripts/create 53 IPv6 https://github.com/muhme/joomla-cms:pg-for-postgres
 ```
 
+## Database and File System Consistency
+
+When installing extensions, it's important to be aware of database and file system consistency.
+The following operations will break that consistency, as the Joomla database will be recreated:
+* `scripts/database`
+* `scripts/create` and `scripts/create recreate`
+* `scripts/test system install/Installation.cy.js`
+
+While grafting a Joomla package with `scripts/graft` doesn't break consistency,
+you will lose all additionally installed extensions.
+
+Switching between PHP versions using `scripts/php` or
+enabling/disabling Xdebug with `scripts/xdebug` does not affect consistency.
+Both the file system and the database remain unchanged.
+
+If you've used `scripts/patchtester` to install the Joomla Patch Tester,
+remember that it’s a Joomla extension.
+To protect you, `scripts/database` (which is also used by `scripts/create`)
+will clear the autoload classes cache file and remove all `com_patchtester`
+directories to prevent issues during the next installation.
+After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patchtester`.
+
+:fairy: To protect you, the first step `Installation.cy.js` of the Cypress based Joomla System Tests is excluded if you run all `system` test specs.
+
 ## Trouble-Shooting
 
 1. To fully grasp the process, it's helpful to both see the diagrams and read the explanations provided.
@@ -849,7 +873,7 @@ scripts/create 53 IPv6 https://github.com/muhme/joomla-cms:pg-for-postgres
    In this situation, it’s necessary to create a Joomla Branches Tester for all branches,
    ensuring you can work across all branches.
 2. One advantage of Docker and scripting: you can easily start fresh.
-   As Roy from The IT Crowd says, "Have you tried turning it off and on again?"
+   As Roy from The IT Crowd says, *"Have you tried turning it off and on again?"*
    It takes just 2.5 minutes on a 2024 entry-level MacBook Air to delete everything and
    create 9 new containers with Joomla 5.2-dev, PHP 8.3, and PostgreSQL.
    ```
@@ -869,8 +893,8 @@ scripts/create 53 IPv6 https://github.com/muhme/joomla-cms:pg-for-postgres
    2024-08-22 10:21:45,346 - ERROR - Failed to forward email to host.docker.internal:7325: [Errno 111] Connection refused
    ```
    An email is received by `jbt_relay:7025` and delivered to the Cypress container `smtp-tester` listening on
-   `jbt_cypress:7125`, delivered to the mail catcher listening on `jbt_mail:7225`, and could not be delivered to local
-   the locally running Cypress GUI `smtp-tester` listening on `localhost:7325` (equivalent host names are used for clarity).
+   `jbt_cypress:7125`, delivered to the mail catcher listening on `jbt_mail:7225`,
+   and could not be delivered to the locally running Cypress GUI `smtp-tester` listening on `localhost:7325` (equivalent host names are used for clarity).
 4. Run a script with the option `-x` to enable detailed debugging output that shows each command
    executed along with its arguments, for example:
    ```
@@ -878,8 +902,8 @@ scripts/create 53 IPv6 https://github.com/muhme/joomla-cms:pg-for-postgres
    ```
 5. If you encounter problems after running `scripts/create` multiple times,
    try using the `no-cache` option to force a fresh build of the containers.
-6. Always use the latest version of Docker software.
-7. If you need to cancel a running script, send an interrupt by pressing <Ctrl> + <C> together.
+6. Always use the latest version of Docker software. And I mean it – do it, I’m not joking here!
+7. If you need to cancel a running script, send an interrupt by pressing \<Ctrl\> + \<C\> together.
    You may need to press the keys multiple times to fully stop the process.
 8. Open an [issue](../../issues).
 
