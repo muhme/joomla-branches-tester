@@ -72,8 +72,10 @@ add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu
 apt-get update
 apt-get install -y docker-ce
 
-echo "*** Adding '$USER' user to the docker group."
+# Check if SUDO_USER exists, then use it; otherwise, default to $USER
+TARGET_USER=${SUDO_USER:-$USER}
+echo "*** Adding '${TARGET_USER}' user to the docker group."
 # This can run multiple times
-usermod -aG docker $USER
+usermod -aG docker "${TARGET_USER}"
 
 echo "*** Finished. Please run 'sudo reboot', and after that, try 'docker ps'."
