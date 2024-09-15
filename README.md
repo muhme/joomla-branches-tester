@@ -641,7 +641,7 @@ Or specify the desired branches:
 scripts/php 44 51 php8.1
 ```
 As we are based on the Docker images there are limitations (as of August 2024):
-* There is no Docker image for Joomla 4.4 with PHP 8.3, there is a fall back to PHP 5.2 used.
+* There is no Docker image for Joomla 4.4 with PHP 8.3, there is a fall back to PHP 8.2 used.
 * There are no Docker images for Joomla 5.3 and Joomla 6.0. The Joomla 5.2 images are being used instead.
   This should not cause any issues, as the source code for 5.3 and 6.0 is pulled from the respective
   GitHub branches.
