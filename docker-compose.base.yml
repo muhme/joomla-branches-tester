@@ -107,9 +107,6 @@ services:
     volumes:
       # Make a server entry for 'jbt_pg'
       - ./scripts/servers.json:/pgadmin4/servers.json
-      - ./scripts/pgpass:/pgadmin4/pgpass
-      # pgpass file must me only pgadmin user read & writable
-    entrypoint: /bin/sh -c "chmod 600 /pgadmin4/pgpass; chown pgadmin /pgadmin4/pgpass; /entrypoint.sh"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
