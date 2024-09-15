@@ -50,8 +50,8 @@ On macOS and Ubuntu, the native Cypress GUI is displayed in green.
 
 :point_right: For the complete list of all scripts see [scripts/README.md](scripts/README.md).
 
-:fairy: The scripts have a sprinkle of *hacks* and just a touch of magic to keep things fluffy.
-        For those with a taste for the finer details, the comments are a gourmet treat.
+:fairy: *"The scripts have a sprinkle of hacks and just a touch of magic to keep things fluffy.
+        For those with a taste for the finer details, the comments are a gourmet treat."*
 
 <details>
   <summary>As of mid-September 2024, there are currently 14 Docker containers providing the functionality.</summary>
@@ -185,7 +185,7 @@ you will need to download approximately 4 GB of data over the network.
 
 :point_right: In case of trouble, see [Trouble-Shooting](#trouble-shooting).
 
-For the different operating systems, there are more detailed descriptions available.
+For the different operating systems, there are more detailed descriptions available:
 
 <details>
   <summary>Windows WSL2 Ubuntu Setup</summary>
@@ -407,10 +407,10 @@ from the [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/t
 scripts/test system
 ```
 
-:fairy: To protect you, the first step `Installation.cy.js` of the Joomla System Tests
+:fairy: <i>"To protect you, the first step `Installation.cy.js` of the Joomla System Tests
   is excluded in the automated tests if you run all test specs.
   If you run the installation, this can lead to inconsistencies
-  between the file system and the database, as the Joomla database will be recreated.
+  between the file system and the database, as the Joomla database will be recreated.</i>
 
 Some more optional arguments for System Tests are:
 
@@ -474,9 +474,9 @@ for each branch if it doesn't already exist.
 Using the Cypress container has the advantage of having Chrome, Edge, Electron, and Chromium pre-installed.
 If you run Cypress locally, only the browsers installed on your Docker host system will be available.
 
-:imp: Are you see the `Installation.cy.js` test spec? Here you finally have the chance to do it.
+:imp: <i>Are you see the `Installation.cy.js` test spec? Here you finally have the chance to do it.
       Who cares about [Database and File System Consistency](#database-and-file-system-consistency)?
-      Go on, click on it. Go on, go on ...
+      Go on, click on it. Go on, go on ...</i>
 
 ### Check Email
 
@@ -487,10 +487,10 @@ The Cypress based Joomla System Tests is using an own SMTP server `smtp-tester` 
 Since we run Cypress locally or in a container, it is necessary to triple emails.
 This is done by the SMTP relay triplicator `jbt_relay`.
 
-:fairy: Oh, dear Gnome, now I can really read all the emails from the System Tests, thank you.
+:fairy: *"Oh, dear Gnome, now I can really read all the emails from the System Tests, thank you."*
 
 <details>
-  <summary>:imp: *"Postal dispatch nonsense picture? Don't open it, you'll get a triple headache!"*</summary>
+  <summary>:imp: <i>"Postal dispatch nonsense picture? Don't open it, you'll get a triple headache!"</i> </summary>
 
 ---
 
@@ -551,8 +551,8 @@ scripts/patchtester 53 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
 :point_right: The GitHub token can also be given by environment variable `JBT_GITHUB_TOKEN`.
               And of course the sample token does not work.
 
-:fairy: You need to reinstall the Joomla Patch Tester if, for example you switch the database.
-        For more details, see [Database and File System Consistency](#database-and-file-system-consistency).
+:fairy: *"You need to reinstall the Joomla Patch Tester if, for example you switch the database.
+        For more details, see [Database and File System Consistency](#database-and-file-system-consistency)."*
 
 ### Databases
 
@@ -571,8 +571,6 @@ Firstly, the settings for the database server with `db_host` and the database dr
 are adjusted in the configuration file `Cypress.config.cy.mjs`.
 Secondly, a Joomla installation is performed with the Joomla System Tests.
 
-:warning: The overall database content is lost. For example, Joomla Patch Tester component needs to be installed again.
-
 Five variants are available:
 * mariadbi – MariaDB with MySQLi (improved)
 * mariadb – MariaDB with MySQL PDO (PHP Data Objects)
@@ -590,7 +588,8 @@ Change all Joomla instances to use PostgreSQL:
 scripts/database pgsql
 ```
 
-:warning: **Caution:** If you have installed the Joomla Patch Tester, you need to reinstall it now.
+:warning: The overall database content is lost.
+          If you have installed the Joomla Patch Tester, you need to reinstall it now.
           For more details, see [Database and File System Consistency](#database-and-file-system-consistency).
 
 :fairy: The good fairy waves her magic wand and says:
@@ -665,10 +664,14 @@ An optional argument is the database variant, such as PostgreSQL in the followin
 ```
 scripts/graft 51 pgsql ~/Downloads/Joomla_5.1.3-Stable-Full_Package.zip
 ```
+:warning: The overall database content is lost.
+          If you have installed the Joomla Patch Tester, you need to reinstall it now.
+          For more details, see [Database and File System Consistency](#database-and-file-system-consistency).
 
-After grafting, you can do everything except running `scripts/pull` (which will be skipped).
-You can switching the database variant, changing the PHP version, installing the Joomla Patch Tester,
-or running Joomla System Tests. Grafting can also be done multiple times. :smile:
+After grafting, you can still switch the database variant, change the PHP version,
+install the Joomla Patch Tester, or run Joomla System Tests.
+There is no Git repository, so you cannot run the other tests, and scripts/pull will be skipped.
+Grafting can also be done multiple times. :smile:
 
 What distinguishes a grafted Joomla from a standard package-installed Joomla?
 A grafted Joomla contains three additional files and two directories from the development branch:
@@ -866,7 +869,7 @@ will clear the autoload classes cache file and remove all `com_patchtester`
 directories to prevent issues during the next installation.
 After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patchtester`.
 
-:fairy: To protect you, the first step `Installation.cy.js` of the Cypress based Joomla System Tests is excluded if you run all `system` test specs.
+:fairy: *"To protect you, the first step `Installation.cy.js` of the Cypress based Joomla System Tests is excluded if you run all `system` test specs."*
 
 ## Trouble-Shooting
 
