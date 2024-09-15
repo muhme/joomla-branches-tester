@@ -6,7 +6,7 @@ Imagine a little slice of a parallel universe where testing all used Joomla bran
 Alright, alright, apologies to those who enjoyed the whimsical writing style, but now it's time to dive into the technical depths. Let's transition from the cozy, magical universe into the world of technical documentation, where we'll explore the numerous options, parameters, and configurations that power this experience ...
 
 ## Software Architecture
-All **used** Joomla development branches, representing different Joomla versions, run in parallel in a [Docker](https://www.docker.com/) container environment. **Used** Joomla development branches refer to the GitHub joomla-cms](https://github.com/joomla/joomla-cms) repository, including default, active, and stale branches.
+All **used** Joomla development branches, representing different Joomla versions, run in parallel in a [Docker](https://www.docker.com/) container environment. **Used** Joomla development branches refer to the GitHub [joomla-cms](https://github.com/joomla/joomla-cms) repository, including default, active, and stale branches.
 Use one, multiple, or all branches for:
 * Manual testing, including database inspections and email verifications.
 * Running [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System)
