@@ -692,6 +692,7 @@ If changes are pulled then:
 Finally, the Git status is displayed.
 
 <img align="right" src="images/phpMyAdmin.png">
+<img align="right" src="images/pgAdmin.png" width="240px">
 
 ### :fairy: Gaze Into the Spellbook
 
