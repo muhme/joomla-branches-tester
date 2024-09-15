@@ -195,7 +195,7 @@ function isValidVariant() {
 # 1st argument is e.g. "52" or "44 51 52 53 60"
 # 2nd argument e.g. "php8.1"
 # 3rd argument is "IPv4" or "IPv6"
-# 4th optional argument is "apppend", then the web server is added if it is not already existing
+# 4th optional argument is "append", then the web server is added if it is not already existing
 #
 function createDockerComposeFile() {
   local php_version="$2"
@@ -337,7 +337,7 @@ runningTime() {
   # Having seconds also formatted with a leading zero
   formatted_seconds=$(printf "%02d" $seconds)
 
-  # Human readable outbut
+  # Human readable output
   if [ $minutes -gt 0 ]; then
     echo "${minutes}:${formatted_seconds}"
   else
