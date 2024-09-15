@@ -1,5 +1,3 @@
-⚠️ Under construction ⚠️ 
-
 # JBT – Joomla Branches Tester
 
 <img align="right" src="images/magic_world.png">
@@ -20,7 +18,7 @@ Use one, multiple, or all branches for:
 * Switching between PHP versions (8.1, 8.2, or 8.3), as supported by the official Docker images.
 * Installing Joomla from a cloned 'joomla-cms' Git repository.
 * Grafting a Joomla package onto a development branch.
-* Using Xdebug for debuuging.
+* Using Xdebug for debugging.
 * Using IPv6 network.
 
 ![Joomla Branches Software Architecture](images/joomla-branches-tester.svg)
@@ -187,40 +185,45 @@ you will need to download approximately 4 GB of data over the network.
 
 :point_right: In case of trouble, see [Trouble-Shooting](#trouble-shooting).
 
+For the different operating systems, there are more detailed descriptions available.
+
 <details>
   <summary>Windows WSL2 Ubuntu Setup</summary>
 
 ---
 
-1. Install Windows WSL 2 if it has not already been done. Open PowerShell Window with administrator rights:
+1. Install Windows WSL 2 (if not already installed).
+   Open PowerShell Window with administrator rights and run:
    ```
    wsl --install -d Ubuntu
    ```
-   Restart your computer and in the terminal, type `wsl` to start the WSL environment.
-   The first time you do this, you will be asked to create a user and set a password.
-
-   :point_right: If `wsl` is not open, you may need again `wsl --install Ubuntu` after Windows restart.
-2. Install `git` inside WSL 2 Ubuntu:
+   Restart your computer after the installation.
+2. Install Ubuntu by creating a user and setting a password. Open PowerShell as a regular user and run:
+   ```
+   wsl --install Ubuntu
+   ```
+   :point_right:  In the future, simply type `wsl` to start WSL 2 with Ubuntu.
+3. Install `git` inside WSL 2 Ubuntu:
    ```
    sudo apt-get update
    sudo apt-get -y upgrade
    sudo apt-get -y install git
    ```
-3. Clone Joomla Branches Tester repository e.g. in your home directory:
+4. Clone Joomla Branches Tester repository e.g. in your home directory:
    ```
    cd
    git clone https://github.com/muhme/joomla-branches-tester
    ```
-4. Continue the installation with the Ubuntu setup script:
+5. Continue the installation with the Ubuntu setup script:
    ```
    cd ~/joomla-branches-tester
    sudo scripts/ubuntu_setup.sh
    ```
-   To run Docker as user it is needed to restart Ubuntu:
+   To run Docker as regular user it is needed to restart Ubuntu:
    ```
    sudo reboot
    ```
-5. Open WSL again and verify Docker is running and you have access without sudo:
+6. Open WSL again and verify Docker is running and you have access without sudo:
    ```
    docker ps
    ```
@@ -230,7 +233,7 @@ you will need to download approximately 4 GB of data over the network.
    ```
    :point_right: It may take a moment for the Docker service to run.
    This can also be checked with `sudo service docker status` command.
-6. Create a hosts entry on Windows to map `host.docker.internal` to `127.0.0.1`, follow these steps:
+7. Create a hosts entry on Windows to map `host.docker.internal` to `127.0.0.1`, follow these steps:
    * Open Notepad as Administrator
      * Press the Start button, type `Notepad`.
      * Right-click on Notepad and select Run as administrator.
@@ -239,7 +242,7 @@ you will need to download approximately 4 GB of data over the network.
      * Navigate to the hosts file location: `C:\Windows\System32\drivers\etc\`.
      * In the Open dialog, make sure to select All Files `(*.*)` in the file type dropdown
        at the bottom right (since the hosts file doesn't have a .txt extension).
-       Select the hosts file and click Open.
+       Select the `hosts` file and click Open.
    * Add the Host Entry:
      * At the end of the file, add a new line with the following entry:
        ```
@@ -248,12 +251,12 @@ you will need to download approximately 4 GB of data over the network.
     * Save the Hosts File:
       * Click File -> Save to save your changes.
     * Test the New Hosts Entry:
-      * Open Command Prompt and ping the host.docker.internal to ensure it resolves to 127.0.0.1:
+      * Open Windows Command Prompt Terminal and ping the host.docker.internal to ensure it resolves to 127.0.0.1:
         ```bash
         ping host.docker.internal
         ```
         It should return responses from 127.0.0.1.
-7. Now you are ready to create Joomla Branches Tester:
+8. Now you are ready to create Joomla Branches Tester. Open WSL Ubuntu and run:
    ```
    cd ~/joomla-branches-tester
    scripts/create
@@ -872,14 +875,15 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
    you won’t be able to run tests on branch 5.2-dev.
    In this situation, it’s necessary to create a Joomla Branches Tester for all branches,
    ensuring you can work across all branches.
-2. One advantage of Docker and scripting: you can easily start fresh.
+2. Simply try running it a second time. All scripts are designed to be run multiple times without issues.
+3. One advantage of Docker and scripting: you can easily start fresh.
    As Roy from The IT Crowd says, *"Have you tried turning it off and on again?"*
    It takes just 2.5 minutes on a 2024 entry-level MacBook Air to delete everything and
    create 9 new containers with Joomla 5.2-dev, PHP 8.3, and PostgreSQL.
    ```
    scripts/create pgsql php8.3 52
    ```
-3. Check the Docker container logs to monitor activity.
+4. Check the Docker container logs to monitor activity.
    For example, the `jbt_relay` container logs will display information about receiving and delivering emails.
    ```
    docker logs jbt_relay
@@ -895,17 +899,17 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
    An email is received by `jbt_relay:7025` and delivered to the Cypress container `smtp-tester` listening on
    `jbt_cypress:7125`, delivered to the mail catcher listening on `jbt_mail:7225`,
    and could not be delivered to the locally running Cypress GUI `smtp-tester` listening on `localhost:7325` (equivalent host names are used for clarity).
-4. Run a script with the option `-x` to enable detailed debugging output that shows each command
+5. Run a script with the option `-x` to enable detailed debugging output that shows each command
    executed along with its arguments, for example:
    ```
    bash -x scripts/pull
    ```
-5. If you encounter problems after running `scripts/create` multiple times,
+6. If you encounter problems after running `scripts/create` multiple times,
    try using the `no-cache` option to force a fresh build of the containers.
-6. Always use the latest version of Docker software. And I mean it – do it, I’m not joking here!
-7. If you need to cancel a running script, send an interrupt by pressing \<Ctrl\> + \<C\> together.
+7. Always use the latest version of Docker software. And I mean it – do it, I’m not joking here!
+8. If you need to cancel a running script, send an interrupt by pressing \<Ctrl\> + \<C\> together.
    You may need to press the keys multiple times to fully stop the process.
-8. Open an [issue](../../issues).
+9. Open an [issue](../../issues).
 
 ## Limitations
 
