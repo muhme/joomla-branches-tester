@@ -140,12 +140,16 @@ done
 
 if [ "$recreate" = false ]; then
 
-  # For the tests we need mysql user/password login
+  # For the tests we need old-school user/password login, once over TCP and once for localhost with Unix sockets
   log "jbt_${version} – Enable MySQL user root login with password."
-  docker exec jbt_mysql mysql -uroot -proot -e "ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'root';"
+  docker exec jbt_mysql mysql -uroot -proot \
+    -e "ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'root';" \
+    -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';"
   # And for MariaDB too
   log "jbt_${version} – Enable MariaDB user root login with password."
-  docker exec jbt_madb mysql -uroot -proot -e "ALTER USER 'root'@'%' IDENTIFIED BY 'root';"
+  docker exec jbt_madb mysql -uroot -proot \
+    -e "ALTER USER 'root'@'%' IDENTIFIED BY 'root';" \
+    -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';"
   # And Postgres (which have already user postgres with SUPERUSER, but to simplify we will use same user root on postgres)
   log "jbt_${version} – Create PostgreSQL user root with password root and SUPERUSER role."
   docker exec jbt_pg sh -c "\
@@ -194,7 +198,7 @@ for version in "${versionsToInstall[@]}"; do
   log "jbt_${version} – Deleting original Joomla installation."
   docker exec "jbt_${version}" bash -c 'rm -rf /var/www/html/* && rm -rf /var/www/html/.??*'
 
-  JBT_INTERNAL=42 bash scripts/setup.sh "initial" "${version}" "${database_variant}" "${arg_repository}:${arg_branch}"
+  JBT_INTERNAL=42 bash scripts/setup.sh "initial" "${version}" "${database_variant}" "${socket}" "${arg_repository}:${arg_branch}"
 
 done
 
