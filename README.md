@@ -360,12 +360,12 @@ In parallel you can inspect MariaDB and MySQL database with [phpMyAdmin](https:/
 [MailDev](https://github.com/maildev/maildev/blob/master/docs/docker.md) on
 [http://host.docker.internal:7003](http://host.docker.internal:7003).
 
-The Joomla instances are configured in the 'Global Configuration' with the following settings:
+~~The Joomla instances are configured in the 'Global Configuration' with the following settings:
 * Debug System
 * Log Almost Everything
-* Log Deprecated API
+* Log Deprecated API~~
 
-:point_right: During System Tests Joomla logging is temporarily disabled, because, well, you know, things happen. :wink:
+:warning: *16 September 2024* Disabled because `Error: Unwanted PHP Deprecated`
 
 If you need to inspect files, they are available in the directory `branch_52` for this Joomla release 5.2 sample.
 
