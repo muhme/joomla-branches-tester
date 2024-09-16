@@ -360,10 +360,10 @@ In parallel you can inspect MariaDB and MySQL database with [phpMyAdmin](https:/
 [MailDev](https://github.com/maildev/maildev/blob/master/docs/docker.md) on
 [http://host.docker.internal:7003](http://host.docker.internal:7003).
 
-~~The Joomla instances are configured in the 'Global Configuration' with the following settings:
+<del>The Joomla instances are configured in the 'Global Configuration' with the following settings:
 * Debug System
 * Log Almost Everything
-* Log Deprecated API~~
+* Log Deprecated API</del>
 
 :warning: *16 September 2024* Disabled because `Error: Unwanted PHP Deprecated`
 
