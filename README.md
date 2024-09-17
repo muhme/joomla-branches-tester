@@ -396,6 +396,9 @@ For example run the linter tests on three branches:
 scripts/test 51 52 53 lint:css lint:js lint:testjs
 ```
 
+To avoid issues with running `php-cs-fixer`, the auto-generated file `administrator/cache/autoload_psr4.php` is corrected beforehand.
+And the configurations for `php-cs-fixer` and `phpcs` has been extended to exclude the `com_patchtester` component.
+
 :point_right: The PHP Unit Test Suite integration and the Phan static analyzer for PHP have not been implemented.
               Additionally, the tests are not configured to run on multiple PHP versions, as Drone typically does in the Joomla CI environment.
 
