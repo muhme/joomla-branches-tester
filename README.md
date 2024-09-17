@@ -917,8 +917,9 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
 6. If you encounter problems after running `scripts/create` multiple times,
    try using the `no-cache` option to force a fresh build of the containers.
 7. Always use the latest version of Docker software. And I mean it – do it, I’m not joking here!
-8. If you need to cancel a running script, send an interrupt by pressing \<Ctrl\> + \<C\> together.
+8. If you need to cancel a running script, send an interrupt by pressing **\<Ctrl\> + \<C\>** together.
    You may need to press the keys multiple times to fully stop the process.
+   Automated Cypress runs persist even after `scripts/test` is killed. To stop them, `docker restart jbt_cypress` is used.
 9. Open an [issue](../../issues).
 
 ## Limitations
