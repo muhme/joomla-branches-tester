@@ -101,7 +101,8 @@ for version in "${versionsToTest[@]}"; do
       # 2nd Ignore Joomla Patch Tester
       insert_file="branch_${version}/.php-cs-fixer.dist.php"
       insert_line="    ->notPath('/com_patchtester/')"
-      if [ -f "${insert_file}" ] && ! grep -qF "${insert_line}" "${insert_file}"; then
+      if [ -d "branch_${version}/administrator/components/com_patchtester" ] && \
+           -f "${insert_file}" ] && ! grep -qF "${insert_line}" "${insert_file}"; then
         csplit "${insert_file}" "/->notPath('/" && \
           cat xx00 > "${insert_file}" && \
           echo "${insert_line}" >> "${insert_file}" && \
@@ -123,6 +124,17 @@ for version in "${versionsToTest[@]}"; do
 
     if [ "$actualTest" = "phpcs" ]; then
       log "jbt_${version} – Initiating PHP Coding Sniffer – phpcs"
+      # 1st Ignore Joomla Patch Tester
+      insert_file="branch_${version}/ruleset.xml"
+      insert_line='    <exclude-pattern type="relative">^administrator/components/com_patchtester/*</exclude-pattern>'
+      if [ -d "branch_${version}/administrator/components/com_patchtester" ] && \
+         [ -f "${insert_file}" ] && ! grep -qF "${insert_line}" "${insert_file}"; then
+        csplit "${insert_file}" "/<exclude-pattern /" && \
+          cat xx00 > "${insert_file}" && \
+          echo "${insert_line}" >> "${insert_file}" && \
+          cat xx01 >> "${insert_file}" && \
+          rm xx00 xx01
+      fi
       docker exec "jbt_${version}" bash -c "libraries/vendor/bin/phpcs --extensions=php -p --standard=ruleset.xml ."
       if [ $? -eq 0 ]; then
         successful=$((successful + 1))
