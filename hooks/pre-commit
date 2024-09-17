@@ -1,0 +1,24 @@
+#!/bin/bash
+#
+# hooks/pre-commit - Increment the patch version within the git commit.
+#                    Copy this file to .git/hooks
+#
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+# https://github.com/muhme/joomla-branches-tester
+
+VERSION_FILE="VERSION"
+
+# Check if SKIP_VERSION_BUMP is set
+if [ "$SKIP_VERSION_BUMP" = "1" ]; then
+    echo "Skipping version bump due to SKIP_VERSION_BUMP."
+    exit 0
+fi
+
+# Increment patch version, commit the change and push
+version=$(cat $VERSION_FILE)
+major=$(echo $version | cut -d. -f1)
+minor=$(echo $version | cut -d. -f2)
+patch=$(( $(echo $version | cut -d. -f3) + 1 ))
+
+echo "$major.$minor.$patch" > $VERSION_FILE
+git add $VERSION_FILE
