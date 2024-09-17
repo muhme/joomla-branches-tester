@@ -623,7 +623,8 @@ docker exec -it jbt_mysql bash -c "mysql --socket=/var/run/mysqld/mysqld.sock -u
 
 :point_right: Be aware that for the Joomla System Tests,
               Unix sockets currently work (as of mid-September 2024) only for the installation step,
-              but not for custom database commands that are JavaScript-based.
+              but not for custom database commands that are JavaScript-based,
+              you need to install PR [php-cs-fixer](https://github.com/joomla/joomla-cms/pull/44092).
 
 ### Switch PHP Version
 
@@ -846,6 +847,9 @@ Just use the `pd` module as a `postgres` replacement:
 ```
 scripts/create 53 IPv6 https://github.com/muhme/joomla-cms:pg-for-postgres
 ```
+
+If you need Systems Tests with Database Unix Sockets,
+you need to install PR [php-cs-fixer](https://github.com/joomla/joomla-cms/pull/44092).
 
 ## Database and File System Consistency
 
