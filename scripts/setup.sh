@@ -99,12 +99,13 @@ docker exec "jbt_${version}" bash -c ' \
     ln -s /usr/local-without-xdebug /usr/local'
 # Apache is not restarted because /var/www/html is then in use, and would cause the following git clone to fail.
 
+# Installing Node.js v22 and cron for Joomla Task Scheduler
+# Additional having vim, ping, telnet, netstat for comfort
 log "jbt_${version} – Installing additional packages."
 docker exec "jbt_${version}" bash -c 'apt-get update -qq && \
     apt-get upgrade -y && \
     curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
-    apt-get install -y git unzip vim nodejs iputils-ping iproute2 telnet net-tools'
-# Additional having vim, ping, netstat
+    apt-get install -y cron git unzip vim nodejs iputils-ping iproute2 telnet net-tools'
 
 if $initial; then
   branch=$(branchName "${version}")
@@ -167,6 +168,17 @@ if $initial; then
   else
     scripts/database "${version}" "${database_variant}"
   fi
+fi
+
+# Define the cron job entry
+cronjob="* * * * * /usr/local/bin/php /var/www/html/cli/joomla.php scheduler:run --all --no-interaction --quiet || true"
+# Check if the cron job already exists
+if ! docker exec "jbt_${version}" bash -c "(crontab -l 2>/dev/null || echo '') | grep -F \"$cronjob\" > /dev/null"; then
+  log "jbt_${version} – Adding cron job for Joomla Task Scheduler"
+  docker exec "jbt_${version}" bash -c "
+    ( ( crontab -l 2>/dev/null || echo "" );
+    echo '# Joomla Task Scheduler, ignore exit status e.g. 127 No tasks due!';
+    echo \"$cronjob\" ) | crontab -"
 fi
 
 log "jbt_${version} – Set container prompt"
