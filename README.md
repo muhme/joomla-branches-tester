@@ -138,7 +138,7 @@ are used as a starting point and then overinstalled with the source code from th
 The Joomla Web-Installer is executed by the Cypress spec `Installation.cy.js` from the Joomla System Tests.
 
 Last tested in September 2024 with:
-* Intel chip macOS 14 Sonoma,
+* Intel chip macOS 15 Sequoia,
 * Apple silicon macOS 15 Sequoia,
 * Windows 11 Pro WSL 2 Ubuntu and
 * Ubuntu 24 Noble Numbat (the absolute minimum, if you also wish to use the Cypress GUI, is a VPS with 2 shared vCPUs and 4 GB RAM).
