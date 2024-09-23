@@ -347,6 +347,19 @@ Installing the Joomla Branches Tester on Ubuntu with a user that is able to run 
 
 ## Usage
 
+### Joomla Configuration
+
+The Joomla development version installed in the web server container is configured with the following settings:
+
+- Joomla Super User: `ci-admin` with the password `joomla-17082005` (used from CI System Tests).
+- Used language Pack is English (United Kingdom) (`en-GB`).
+- The `/installation` folder remains intact after the installation.
+- Error Reporting is set to `Maximum` in `Global Configuration | Server`.
+- A cron job is configured to run the Joomla Task Scheduler every minute.
+- The 'System - Joomla! Statistics' plugin is deactivated to prevent prompting users on the backend Home Dashboard.
+- The automatic run of the 'Welcome to Joomla!' guided tour is canceled from Joomla version 5.1 onwards.
+- Not configured for logging, due to deprecation warnings.
+
 ### Manual Testing
 
 From your Docker Host system you can test the Joomla Frontend e.g. for Joomla release 5.2
