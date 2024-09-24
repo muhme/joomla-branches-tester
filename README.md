@@ -731,7 +731,8 @@ ready for your exploration.
 
 ### Info
 
-You can retrieve some interesting Joomla Branches Tester status information:
+You can retrieve some interesting Joomla Branches Tester status information.
+If no argument is provided, all information will be displayed:
 ```
 scripts/info
 ```
@@ -741,8 +742,8 @@ The following example illustrates an IPv6 installation with three branches:
 * `5.2-dev`: A development clone of version 5.2.0 with additional patches applied, using MySQL with driver PDO
 ```
 Joomla Branches Tester (JBT) version 1.0.11
-Docker version 27.2.0 is running with 12 containers and 14 images
-EnableIPv6: true
+  Docker version 27.2.0 is running with 12 containers and 14 images
+  EnableIPv6: true
 Standard Containers:
   jbt_mysql   is running, ports: 3306/tcp -> 0.0.0.0:7011; 3306/tcp -> [::]:7011
   jbt_madb    is running, ports: 3306/tcp -> 0.0.0.0:7012; 3306/tcp -> [::]:7012
@@ -780,6 +781,16 @@ Branch 5.3-dev:
 
 :blossom: If you see '42' (the answer to all questions) as one of the release numbers,
           it indicates that the system is offline and a default set of version numbers is being used.
+
+Optional arguments that can be combined as desired are:
+* `instance` to display Joomla Branches Tester instance information,
+* `base` to display information about all base containers,
+* version number to display information about this version number web server container.
+
+For example, to check only instance and branch 4.4-dev information:
+```
+scripts/info instance 44
+```
 
 ### Xdebug
 
