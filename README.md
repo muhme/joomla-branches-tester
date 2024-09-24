@@ -844,7 +844,7 @@ you can do so by running:
 scripts/clean
 ```
 
-## Time Travel
+## Back to the Future
 
 As Doc Brown said: *"Roads? Where we're going, we don't need roads."*
 
@@ -858,14 +858,21 @@ Here's what we're already using from the future:
 * :wrench: [joomla-cypress#36](https://github.com/joomla-projects/joomla-cypress/pull/36) Wrap IPv6 address in brackets \[ \] if needed
 * :wrench: [joomla-cms#3968](https://github.com/joomla/joomla-cms/pull/43968) [cypress] Add db_port in Installation.cy.js
 
-If you're itching to see IPv6 in action with PostgreSQL, don't worry - it will work in the future.
-Just use the `pd` module as a `postgres` replacement:
-```
-scripts/create 53 IPv6 https://github.com/muhme/joomla-cms:pg-for-postgres
-```
+:point_right: These *hacks* are simple overwritten code. Be aware that these *hacks* will be lost if you run `npm install` or `npmp ci`. 
 
-If you need Systems Tests with Database Unix Sockets,
-you need to install PR [44092](https://github.com/joomla/joomla-cms/pull/44092).
+### DeLorean
+
+You can take a seat and pick up additional code from the future on your own. As of September 2024, the following have not yet been merged:
+
+1. If you're itching to see IPv6 in action with PostgreSQL, don't worry - it will work in the future.
+   Just use the `pd` module as a `postgres` replacement:
+   ```
+   scripts/create 53 IPv6 https://github.com/muhme/joomla-cms:pg-for-postgres
+   ```
+2. If you need Systems Tests with Database Unix Sockets,
+   you need to install PR [44092](https://github.com/joomla/joomla-cms/pull/44092).
+
+
 
 ## Database and File System Consistency
 
