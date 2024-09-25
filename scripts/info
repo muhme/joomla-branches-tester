@@ -142,9 +142,9 @@ for todo in "${all_todos[@]}"; do
 
       config_file="branch_${version}/cypress.config.mjs"
       if [ -f "${config_file}" ]; then
-        db_type=$(grep db_type ${config_file} | sed 's/db_type//' | tr -d " :,'")
-        db_host=$(grep db_host ${config_file} | sed 's/db_host//' | tr -d " :,'")
-        db_port=$(grep db_port ${config_file} | sed 's/db_port//' | tr -d " :,")
+        db_type=$(grep db_type ${config_file} | sed 's/db_type//' | tr -d " ,'" | sed 's/://')
+        db_host=$(grep db_host ${config_file} | sed 's/db_host//' | tr -d " ,'" | sed 's/://')
+        db_port=$(grep db_port ${config_file} | sed 's/db_port//' | tr -d " ,'" | sed 's/://')
         echo "  ${db_type}, ${db_host}, ${db_port}"
       else
         echo "  OOPS missing '${config_file}' file"
