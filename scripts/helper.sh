@@ -20,7 +20,7 @@ trap 'rm -rf $TMP' 0
 # The following four arrays are positionally mapped, avoiding associative arrays
 # to ensure compatibility with macOS default Bash 3.2.
 #
-# Database Unix socket paths into the '/jbt/run' directory
+# Database Unix socket paths into the '/var/run' directory
 JBT_S_MY="mysql-socket/mysqld.sock"
 JBT_S_MA="mariadb-socket/mysqld.sock"
 JBT_S_PG="postgresql-socket"
@@ -151,13 +151,13 @@ function dbHostForVariant() {
 }
 
 # Returns the database Unix socket path for a given database variant.
-# e.g. dbSocketForVariant "mysql" -> "unix:/jbt/run/mysql-socket/mysqld.sock"
+# e.g. dbSocketForVariant "mysql" -> "unix:/var/run/mysql-socket/mysqld.sock"
 #
 function dbSocketForVariant() {
   local variant=$1
   for i in "${!JBT_DB_VARIANTS[@]}"; do
     if [ "${JBT_DB_VARIANTS[$i]}" = "$variant" ]; then
-      echo "unix:/jbt/run/${JBT_DB_SOCKETS[$i]}"
+      echo "unix:/var/run/${JBT_DB_SOCKETS[$i]}"
       return
     fi
   done
@@ -232,6 +232,9 @@ function createDockerComposeFile() {
       sed -e '/^#/d' -e "s/XX/${version}/" -e "s/Y/${din}/" docker-compose.joomla.yml >>docker-compose.yml
     fi
   done
+
+  # Add named volumes definition.
+  sed -e '/^#/d' docker-compose.end.yml >>docker-compose.yml
 }
 
 # Returns existing Docker image name for given Joomla and PHP version.

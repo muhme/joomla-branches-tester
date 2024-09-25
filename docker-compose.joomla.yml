@@ -17,11 +17,15 @@
       - "host.docker.internal:host-gateway"
     depends_on:
       - mysql
+      - mariadb
       - postgres
       - relay
     volumes:
       - .:/jbt
       - ./branch_XX:/var/www/html
       - ./cypress-cache:/root/.cache/Cypress # Cypress and web server containers
+      - mysql-socket:/var/run/mysql-socket
+      - mariadb-socket:/var/run/mariadb-socket
+      - postgresql-socket:/var/run/postgresql-socket
     networks:
       - jbt_network

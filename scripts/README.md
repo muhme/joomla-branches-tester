@@ -63,8 +63,9 @@ The following scripts and configuration files are intended for internal usage on
 | File | Description | Additional Info |
 | --- | --- | --- |
 | [scripts/disableBC.cy.js](isableBC.cy.js) | Cypress script to disable 'Behaviour - Backward Compatibility' Joomla plugin. | Used by `scripts/database`. |
-| [docker-compose.base.yml](docker-compose.base.yml) | The basic part of the `docker-compose.yml` file. | Used by `scripts/create`. |
-| [docker-compose.joomla.yml](docker-compose.joomla.yml) | Part of the `docker-compose.yml` file to be parameterised for one Joomla web server. | Used by `scripts/create`. |
+| [docker-compose.base.yml](docker-compose.base.yml) | The basic part of the `docker-compose.yml` file. | Used by `scripts/helper.sh`. |
+| [docker-compose.end.yml](docker-compose.end.yml) | The last lines of the `docker-compose.yml` file. | Used by `scripts/helper.sh`. |
+| [docker-compose.joomla.yml](docker-compose.joomla.yml) | Part of the `docker-compose.yml` file to be parameterised for one Joomla web server. | Used by `scripts/helper.sh`. |
 | [dockerfile-relay.yml](dockerfile-relay.yml) | Docker container definition for the SMTP relay tripler. | Used to create `jbt_relay`. |
 | [scripts/error-logging.ini](error-logging.ini) | Config file to catch all PHP errors, notices and warnings. | Used by `script/setup.sh`. |
 | [scripts/helper.sh](helper.sh) | Some commonly used bash script functions and definitions. | Sourced and used by other Bash scripts within the project. |

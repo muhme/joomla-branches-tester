@@ -35,7 +35,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - ./run/mysql-socket:/var/run/mysqld
+      - mysql-socket:/var/run/msysqld
     networks:
       - jbt_network
 
@@ -50,7 +50,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - ./run/mariadb-socket:/var/run/mysqld
+      - mariadb-socket:/var/run/msysqld
     networks:
       - jbt_network
 
@@ -68,7 +68,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - ./run/postgresql-socket:/var/run/postgresql
+      - postgresql-socket:/var/run/postgresql
     networks:
       - jbt_network
 
@@ -124,6 +124,9 @@ services:
       - ~/.Xauthority:/root/.Xauthority:rw
       - /tmp/.X11-unix:/tmp/.X11-unix
       - ./cypress-cache:/root/.cache/Cypress # Cypress and web server containers
+      - mysql-socket:/var/run/mysql-socket
+      - mariadb-socket:/var/run/mariadb-socket
+      - postgresql-socket:/var/run/postgresql-socket
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
@@ -131,6 +134,7 @@ services:
     depends_on:
       - novnc
       - mysql
+      - mariadb
       - postgres
 
   novnc:
