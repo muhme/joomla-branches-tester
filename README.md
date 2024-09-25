@@ -356,7 +356,8 @@ The Joomla development version installed in the web server container is configur
 - The `/installation` folder remains intact after the installation.
 - Error Reporting is set to `Maximum` in `Global Configuration | Server`.
 - A cron job is configured to run the Joomla Task Scheduler every minute.
-- The 'System - Joomla! Statistics' plugin is deactivated to prevent prompting users on the backend Home Dashboard.
+- The 'System - Joomla! Statistics' plugin is disabled to prevent prompting users on the backend Home Dashboard.
+- The 'Behaviour - Backward Compatibility' plugin is disabled to detect backward compatibility issues.
 - The automatic run of the 'Welcome to Joomla!' guided tour is canceled from Joomla version 5.1 onwards.
 - Not configured for logging, due to deprecation warnings.
 

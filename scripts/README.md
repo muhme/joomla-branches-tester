@@ -62,6 +62,7 @@ The following scripts and configuration files are intended for internal usage on
 
 | File | Description | Additional Info |
 | --- | --- | --- |
+| [scripts/disableBC.cy.js](isableBC.cy.js) | Cypress script to disable 'Behaviour - Backward Compatibility' Joomla plugin. | Used by `scripts/database`. |
 | [docker-compose.base.yml](docker-compose.base.yml) | The basic part of the `docker-compose.yml` file. | Used by `scripts/create`. |
 | [docker-compose.joomla.yml](docker-compose.joomla.yml) | Part of the `docker-compose.yml` file to be parameterised for one Joomla web server. | Used by `scripts/create`. |
 | [dockerfile-relay.yml](dockerfile-relay.yml) | Docker container definition for the SMTP relay tripler. | Used to create `jbt_relay`. |

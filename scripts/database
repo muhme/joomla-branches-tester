@@ -196,6 +196,9 @@ EOF
   log "jbt_${version} – Cypress-based Joomla installation."
   docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && unset DISPLAY && cypress run --spec tests/System/integration/install/Installation.cy.js"
 
+  log "jbt_${version} – Disable B/C plugin"
+  docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && unset DISPLAY && CYPRESS_specPattern="/jbt/scripts/disableBC.cy.js" cypress run"
+
   # Cypress is using own SMTP port to read and reset mails by smtp-tester
   log "jbt_${version} – Set the SMTP port used by Cypress to 7125."
   docker exec "jbt_${version}" bash -c "cd /var/www/html && sed \
