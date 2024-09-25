@@ -35,7 +35,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - mysql-socket:/var/run/msysqld
+      - mysql-socket:/var/run/mysqld
     networks:
       - jbt_network
 
@@ -50,7 +50,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - mariadb-socket:/var/run/msysqld
+      - mariadb-socket:/var/run/mysqld
     networks:
       - jbt_network
 
