@@ -804,7 +804,7 @@ You can switch to the PHP version with Xdebug for example:
 scripts/xdebug 53 on
 ```
 
-A .vscode/launch.json file is also prepared
+A `.vscode/launch.json` file is also prepared
 (to simplify life, it's created in advance for all versions,
 even if they are not installed or Xdebug is not enabled).
 In [Visual Studio Code](https://code.visualstudio.com/),
@@ -951,8 +951,12 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
 7. Always use the latest version of Docker software. And I mean it – do it, I’m not joking here!
 8. If you need to cancel a running script, send an interrupt by pressing **\<Ctrl\> + \<C\>** together.
    You may need to press the keys multiple times to fully stop the process.
-   Automated Cypress runs persist even after `scripts/test` is killed. To stop them, `docker restart jbt_cypress` is used.
-9. Open an [issue](../../issues).
+
+   Automated Cypress System Test runs may persist even after the `scripts/test` process is terminated.
+   If you attempt to run another Cypress System Tests,
+   you might encounter the: `Error: listen EADDRINUSE: address already in use :::7125`.
+   To stop the still-running Cypress System Tests, use the command: `docker restart jbt_cypress`.
+10. Open an [issue](../../issues).
 
 ## Limitations
 
