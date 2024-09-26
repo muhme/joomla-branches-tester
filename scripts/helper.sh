@@ -195,7 +195,7 @@ function isValidVariant() {
 # 1st argument is e.g. "52" or "44 51 52 53 60"
 # 2nd argument e.g. "php8.1"
 # 3rd argument is "IPv4" or "IPv6"
-# 4th optional argument is "append", then the web server is added if it is not already existing
+# 4th optional argument is "append", then the web server is inserted before volumes, if it is not already existing.
 #
 function createDockerComposeFile() {
   local php_version="$2"
@@ -205,7 +205,12 @@ function createDockerComposeFile() {
   IFS=' ' versions=($(sort <<<"$1"))
   unset IFS # map to array
 
-  if [ "${working}" != "append" ]; then
+  if [ "${working}" = "append" ]; then
+    # Cut named volumes, they are added always in the end.
+    csplit "docker-compose.yml" "/^volumes:/" && \
+      cat xx00 >"docker-compose.yml" && \
+      rm xx00 xx01
+  else
     if [ "${network}" = "IPv4" ]; then
       cp docker-compose.base.yml docker-compose.yml
     else
@@ -229,7 +234,10 @@ function createDockerComposeFile() {
       fi
     fi
     if $doit; then
-      sed -e '/^#/d' -e "s/XX/${version}/" -e "s/Y/${din}/" docker-compose.joomla.yml >>docker-compose.yml
+      # Add Joomla web server entry.
+      sed -e '/^#/d' \
+          -e "s/XX/${version}/" \
+          -e "s/Y/${din}/" docker-compose.joomla.yml >>docker-compose.yml
     fi
   done
 
