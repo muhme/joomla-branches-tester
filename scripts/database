@@ -197,7 +197,9 @@ EOF
   docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && export DISPLAY=jbt_novnc:0 && cypress run --headed --spec tests/System/integration/install/Installation.cy.js"
 
   log "jbt_${version} – Disable B/C plugin"
-  docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && export DISPLAY=jbt_novnc:0 && CYPRESS_specPattern="/jbt/scripts/disableBC.cy.js" cypress run --headed"
+  docker exec jbt_cypress sh -c \
+    "cd /jbt/branch_${version} && export DISPLAY=jbt_novnc:0 && CYPRESS_specPattern="/jbt/scripts/disableBC.cy.js" cypress run --headed" || \
+    ( error "jbt_${version} – Ignoring step 'Disable B/C plugin' as it failed." ; true )
 
   # Cypress is using own SMTP port to read and reset mails by smtp-tester
   log "jbt_${version} – Set the SMTP port used by Cypress to 7125."
