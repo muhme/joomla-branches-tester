@@ -120,32 +120,19 @@ services:
         ipv4_address: 10.0.0.3
         ipv6_address: fd00::3
 
-  cypress:
-    container_name: jbt_cypress
-    image: cypress/included # actual (August 2024) versions are Cypress 13.7, Electron 114, Chrome 116, Edge 116 and Firefox 117
+  mail:
+    container_name: jbt_mail
+    image: maildev/maildev
     restart: unless-stopped
-    entrypoint: ["sleep", "31536000"] # don't use cypress run, instead sleep one year
     ports:
-      - 7125:7125 # smtp-tester port (only available during the test run)
-    volumes:
-      - .:/jbt
-      - ~/.Xauthority:/root/.Xauthority:rw
-      - /tmp/.X11-unix:/tmp/.X11-unix
-      - ./cypress-cache:/root/.cache/Cypress # Cypress and web server containers
-      - mysql-socket:/var/run/mysql-socket
-      - mariadb-socket:/var/run/mariadb-socket
-      - postgresql-socket:/var/run/postgresql-socket
+      - "7004:1080"
+      - "7225:1025"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
       jbt_network:
-        ipv4_address: 10.0.0.7
-        ipv6_address: fd00::7
-    depends_on:
-      - novnc
-      - mysql
-      - mariadb
-      - postgres
+        ipv4_address: 10.0.0.4
+        ipv6_address: fd00::4
 
   novnc:
     container_name: jbt_novnc
@@ -190,16 +177,29 @@ services:
         ipv4_address: 10.0.0.6
         ipv6_address: fd00::6
 
-  mail:
-    container_name: jbt_mail
-    image: maildev/maildev
+  cypress:
+    container_name: jbt_cypress
+    image: cypress/included # actual (August 2024) versions are Cypress 13.7, Electron 114, Chrome 116, Edge 116 and Firefox 117
     restart: unless-stopped
+    entrypoint: ["sleep", "31536000"] # don't use cypress run, instead sleep one year
     ports:
-      - "7004:1080"
-      - "7225:1025"
+      - 7125:7125 # smtp-tester port (only available during the test run)
+    volumes:
+      - .:/jbt
+      - ~/.Xauthority:/root/.Xauthority:rw
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./cypress-cache:/root/.cache/Cypress # Cypress and web server containers
+      - mysql-socket:/var/run/mysql-socket
+      - mariadb-socket:/var/run/mariadb-socket
+      - postgresql-socket:/var/run/postgresql-socket
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
       jbt_network:
-        ipv4_address: 10.0.0.4
-        ipv6_address: fd00::4
+        ipv4_address: 10.0.0.7
+        ipv6_address: fd00::7
+    depends_on:
+      - novnc
+      - mysql
+      - mariadb
+      - postgres
