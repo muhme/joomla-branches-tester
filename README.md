@@ -68,10 +68,10 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
 |jbt_novnc| 10.0.0.5<br />fd00::5 | **[7005](http://host.docker.internal:7005/vnc.html?autoconnect=true&resize=scale)** | | If you run automated Cypress System Tests with the `novnc` option, you can watch them. |
 |jbt_relay| 10.0.0.6<br />fd00::6 | SMTP **7025**:7025 | | SMTP relay triplicator |
 |jbt_cypress| 10.0.0.7<br />fd00::7 | SMTP :7125 | | Cypress Headless Test Environment<br />SMTP server is only running during test execution |
-|jbt_mysql| 10.0.0.11<br />fd00::11 | **7011**:3306 | | Database Server MySQL version 8.1 |
+|jbt_mysql| 10.0.0.11<br />fd00::11 :eight_pointed_black_star: | **7011**:3306 | | Database Server MySQL version 8.1 |
 |jbt_madb| 10.0.0.12<br />fd00::12 | **7012**:3306 | | Database Server MariaDB version 10.4 |
 |jbt_pg| 10.0.0.13<br />fd00::13 | **7013**:5432 | | Database Server PostgreSQL version 12.20 |
-|jbt_44| 10.0.0.44<br />fd00::44 :eight_pointed_black_star: | **[7044](http://host.docker.internal:7044/administrator)** | /branch_44 | Web Server Joomla branch 4.4-dev<br />user ci-admin / joomla-17082005 |
+|jbt_44| 10.0.0.44<br />fd00::44 | **[7044](http://host.docker.internal:7044/administrator)** | /branch_44 | Web Server Joomla branch 4.4-dev<br />user ci-admin / joomla-17082005 |
 |jbt_51| 10.0.0.51<br />fd00::51 | **[7051](http://host.docker.internal:7051/administrator)** | /branch_51 | Web Server Joomla branch 5.1-dev<br />user ci-admin / joomla-17082005 |
 |jbt_52| 10.0.0.52<br />fd00::52 | **[7052](http://host.docker.internal:7052/administrator)** | /branch_52 | Web Server Joomla branch 5.2-dev<br />user ci-admin / joomla-17082005 |
 |jbt_53| 10.0.0.52<br />fd00::52 | **[7053](http://host.docker.internal:7053/administrator)** | /branch_53 | Web Server Joomla branch 5.3-dev<br />user ci-admin / joomla-17082005 |
@@ -83,7 +83,7 @@ The abbreviation `jbt` stands for Joomla Branches Tester:
 * To inspect screenshots from failed tests or
 * To inspect and hack the Joomla sources from Docker host system.
 
-:eight_pointed_black_star: Gnome: *"Yeah, yeah, I know `44` in decimal is `2C` in hex, but for easier visual recognition, we're sticking with `44` — it just needs to be unique!"
+:eight_pointed_black_star: Gnome: *"Yes, yes, I know that `11` in decimal is `B` in hex, but can you instantly recall that `44` is `2C`? That's why, for easier visual recognition, we're sticking with `11` — it just needs to be unique!"*
 
 :point_right: Using `host.docker.internal` ensures consistent hostnames and URLs between containers and the Docker host machine.
               However, there are exceptions to note:
@@ -951,7 +951,8 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
 6. If you encounter problems after running `scripts/create` multiple times,
    try using the `no-cache` option to force a fresh build of the containers.
 7. Always use the latest version of Docker software. And I mean it – do it, I’m not joking here!
-8. If you need to cancel a running script, send an interrupt by pressing **\<Ctrl\> + \<C\>** together.
+8. And always keep JBT up to date. You’ll get a reminder when you run `scripts/info`, and you should run `git pull` to stay current.
+9. If you need to cancel a running script, send an interrupt by pressing **\<Ctrl\> + \<C\>** together.
    You may need to press the keys multiple times to fully stop the process.
 
    Automated Cypress System Test runs may persist even after the `scripts/test` process is terminated.
