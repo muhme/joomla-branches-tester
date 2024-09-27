@@ -3,12 +3,9 @@
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
-# IPv4 (default):
-# - subnet 192.168.150.0/24
-# - enable_ipv6: false
-# IPv6 (scripts/create IPv6):
-# - subnet 2003:c2:6727:cb00::/64
-# - enable_ipv6: true
+# Defining 10.0.0.0/8 for IPv4 subnet to keep addresses simple and easy to remember. Same goes for fd00::/8 in IPv6.
+# Using hardcoded IP addresses since Docker assigns them randomly. Fixed IPs make documenting tests easier.
+# Predefining IPv6 addresses for easier configuration. They are only used if IPv6 is enabled.
 #
 networks:
   jbt_network:
@@ -18,7 +15,8 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: "192.168.150.0/24"
+        - subnet: "10.0.0.0/8"
+        - subnet: "fd00::/8"
 
 services:
 
@@ -37,7 +35,9 @@ services:
     volumes:
       - mysql-socket:/var/run/mysqld
     networks:
-      - jbt_network
+      jbt_network:
+        ipv4_address: 10.0.0.11
+        ipv6_address: fd00::11 # Use decimal digits, even if hex value differs
 
   mariadb:
     container_name: jbt_madb
@@ -52,7 +52,9 @@ services:
     volumes:
       - mariadb-socket:/var/run/mysqld
     networks:
-      - jbt_network
+      jbt_network:
+        ipv4_address: 10.0.0.12
+        ipv6_address: fd00::12 # Use decimal digits, even if hex value differs
 
   postgres:
     container_name: jbt_pg
@@ -70,7 +72,9 @@ services:
     volumes:
       - postgresql-socket:/var/run/postgresql
     networks:
-      - jbt_network
+      jbt_network:
+        ipv4_address: 10.0.0.13
+        ipv6_address: fd00::13 # Use decimal digits, even if hex value differs
 
   myadmin:
     container_name: jbt_mya
@@ -80,7 +84,7 @@ services:
       PMA_USER: root
       PMA_PASSWORD: root
     ports:
-      - "7001:80"
+      - "7002:80"
     restart: unless-stopped
     depends_on:
       - mysql
@@ -88,7 +92,9 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      - jbt_network
+      jbt_network:
+        ipv4_address: 10.0.0.2
+        ipv6_address: fd00::2
 
   pgadmin:
     container_name: jbt_pga
@@ -100,7 +106,7 @@ services:
       PGADMIN_CONFIG_SERVER_MODE: 'False'
       PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
     ports:
-      - "7002:80"
+      - "7003:80"
     restart: unless-stopped
     depends_on:
       - postgres
@@ -110,7 +116,9 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      - jbt_network
+      jbt_network:
+        ipv4_address: 10.0.0.3
+        ipv6_address: fd00::3
 
   cypress:
     container_name: jbt_cypress
@@ -130,7 +138,9 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      - jbt_network
+      jbt_network:
+        ipv4_address: 10.0.0.7
+        ipv6_address: fd00::7
     depends_on:
       - novnc
       - mysql
@@ -146,11 +156,13 @@ services:
       - RUN_XTERM=no
     restart: unless-stopped
     ports:
-      - "7900:8080"
+      - "7005:8080"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      - jbt_network
+      jbt_network:
+        ipv4_address: 10.0.0.5
+        ipv6_address: fd00::5
 
   relay:
     container_name: jbt_relay
@@ -174,16 +186,20 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      - jbt_network
+      jbt_network:
+        ipv4_address: 10.0.0.6
+        ipv6_address: fd00::6
 
   mail:
     container_name: jbt_mail
     image: maildev/maildev
     restart: unless-stopped
     ports:
-      - "7003:1080"
+      - "7004:1080"
       - "7225:1025"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      - jbt_network
+      jbt_network:
+        ipv4_address: 10.0.0.4
+        ipv6_address: fd00::4

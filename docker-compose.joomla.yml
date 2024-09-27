@@ -28,4 +28,6 @@
       - mariadb-socket:/var/run/mariadb-socket
       - postgresql-socket:/var/run/postgresql-socket
     networks:
-      - jbt_network
+      jbt_network:
+        ipv4_address: 10.0.0.XX
+        ipv6_address: fd00::XX

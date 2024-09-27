@@ -60,28 +60,30 @@ On macOS and Ubuntu, the native Cypress GUI is displayed in green.
 
 The abbreviation `jbt` stands for Joomla Branches Tester:
 
-|Name|Host Port:<br />Container Inside|Directory :eight_spoked_asterisk: |Comment|
-|----|----|----------------------------------|-------|
-|jbt_44| **[7044](http://host.docker.internal:7044/administrator)** | /branch_44 | Web Server Joomla branch 4.4-dev<br />user ci-admin / joomla-17082005 |
-|jbt_51| **[7051](http://host.docker.internal:7051/administrator)** | /branch_51 | Web Server Joomla branch 5.1-dev<br />user ci-admin / joomla-17082005 |
-|jbt_52| **[7052](http://host.docker.internal:7052/administrator)** | /branch_52 | Web Server Joomla branch 5.2-dev<br />user ci-admin / joomla-17082005 |
-|jbt_53| **[7053](http://host.docker.internal:7053/administrator)** | /branch_53 | Web Server Joomla branch 5.3-dev<br />user ci-admin / joomla-17082005 |
-|jbt_60| **[7060](http://host.docker.internal:7060/administrator)** | /branch_60 | Web Server Joomla branch 6.0-dev<br />user ci-admin / joomla-17082005 |
-|jbt_mysql| **7011**:3306 | | Database Server MySQL version 8.1 |
-|jbt_madb| **7012**:3306 | | Database Server MariaDB version 10.4 |
-|jbt_pg| **7013**:5432 | | Database Server PostgreSQL version 12.20 |
-|jbt_cypress| SMTP :7125 | | Cypress Headless Test Environment<br />SMTP server is only running during test execution |
-|jbt_novnc| **[7900](http://host.docker.internal:7900/vnc.html?autoconnect=true&resize=scale)** | | If you run automated Cypress System Tests with the `novnc` option, you can watch them. |
-|jbt_phpmya| **[7001](http://host.docker.internal:7001)** | | Web App to manage MariaDB and MySQL<br />auto-login configured, root / root |
-|jbt_pga| **[7002](http://host.docker.internal:7002)** | | Web App to manage PostgreSQL<br />auto-login configured, root / root, postgres / prostgres |
-|jbt_mail| **[7003](http://host.docker.internal:7003)** <br /> SMTP **7225**:1025 | | Web interface to verify emails. |
-|jbt_relay| SMTP **7025**:7025 | | SMTP relay triplicator |
+|Name|Docker IPs|Host Port:<br />Container Inside|Directory :eight_spoked_asterisk: |Comment|
+|----|----------|--------------------------------|----------------------------------|-------|
+|jbt_phpmya| 10.0.0.2<br />fd00::2 | **[7002](http://host.docker.internal:7002)** | | Web App to manage MariaDB and MySQL<br />auto-login configured, root / root |
+|jbt_pga| 10.0.0.3<br />fd00::3 | **[7003](http://host.docker.internal:7003)** | | Web App to manage PostgreSQL<br />auto-login configured, root / root, postgres / prostgres |
+|jbt_mail| 10.0.0.4<br />fd00::4 | **[7004](http://host.docker.internal:7004)** <br /> SMTP **7225**:1025 | | Web interface to verify emails. |
+|jbt_novnc| 10.0.0.5<br />fd00::5 | **[7005](http://host.docker.internal:7005/vnc.html?autoconnect=true&resize=scale)** | | If you run automated Cypress System Tests with the `novnc` option, you can watch them. |
+|jbt_relay| 10.0.0.6<br />fd00::6 | SMTP **7025**:7025 | | SMTP relay triplicator |
+|jbt_cypress| 10.0.0.7<br />fd00::7 | SMTP :7125 | | Cypress Headless Test Environment<br />SMTP server is only running during test execution |
+|jbt_mysql| 10.0.0.11<br />fd00::11 | **7011**:3306 | | Database Server MySQL version 8.1 |
+|jbt_madb| 10.0.0.12<br />fd00::12 | **7012**:3306 | | Database Server MariaDB version 10.4 |
+|jbt_pg| 10.0.0.13<br />fd00::13 | **7013**:5432 | | Database Server PostgreSQL version 12.20 |
+|jbt_44| 10.0.0.44<br />fd00::44 :eight_pointed_black_star: | **[7044](http://host.docker.internal:7044/administrator)** | /branch_44 | Web Server Joomla branch 4.4-dev<br />user ci-admin / joomla-17082005 |
+|jbt_51| 10.0.0.51<br />fd00::51 | **[7051](http://host.docker.internal:7051/administrator)** | /branch_51 | Web Server Joomla branch 5.1-dev<br />user ci-admin / joomla-17082005 |
+|jbt_52| 10.0.0.52<br />fd00::52 | **[7052](http://host.docker.internal:7052/administrator)** | /branch_52 | Web Server Joomla branch 5.2-dev<br />user ci-admin / joomla-17082005 |
+|jbt_53| 10.0.0.52<br />fd00::52 | **[7053](http://host.docker.internal:7053/administrator)** | /branch_53 | Web Server Joomla branch 5.3-dev<br />user ci-admin / joomla-17082005 |
+|jbt_60| 10.0.0.60<br />fd00::60 | **[7060](http://host.docker.internal:7060/administrator)** | /branch_60 | Web Server Joomla branch 6.0-dev<br />user ci-admin / joomla-17082005 |
 
 :eight_spoked_asterisk: The directories are available on the Docker host inside /jbt to:
 * Inspect and change the configuration files (`configuration.php` or `cypress.config.js`),
 * To edit the test specs below `tests/System` or
 * To inspect screenshots from failed tests or
 * To inspect and hack the Joomla sources from Docker host system.
+
+:eight_pointed_black_star: Gnome: *"Yeah, yeah, I know `44` in decimal is `2C` in hex, but for easier visual recognition, we're sticking with `44` — it just needs to be unique!"
 
 :point_right: Using `host.docker.internal` ensures consistent hostnames and URLs between containers and the Docker host machine.
               However, there are exceptions to note:
@@ -369,10 +371,10 @@ with [http://host.docker.internal:7052](http://host.docker.internal:7052) and th
 User *ci-admin* and password *joomla-17082005* (Whose birthday is it anyway?) are from Joomla System Tests.
 
 In parallel you can inspect MariaDB and MySQL database with [phpMyAdmin](https://www.phpmyadmin.net/) on
-[http://host.docker.internal:7001](http://host.docker.internal:7001) or PostgreSQL database with [pgAdmin](https://www.pgadmin.org/) on
-[http://host.docker.internal:7002](http://host.docker.internal:7002). And verify all emails from Joomla and the System Tests with
+[http://host.docker.internal:7002](http://host.docker.internal:7002) or PostgreSQL database with [pgAdmin](https://www.pgadmin.org/) on
+[http://host.docker.internal:7003](http://host.docker.internal:7003). And verify all emails from Joomla and the System Tests with
 [MailDev](https://github.com/maildev/maildev/blob/master/docs/docker.md) on
-[http://host.docker.internal:7003](http://host.docker.internal:7003).
+[http://host.docker.internal:7004](http://host.docker.internal:7004).
 
 <del>The Joomla instances are configured in the 'Global Configuration' with the following settings:
 * Debug System
@@ -458,7 +460,7 @@ This is useful for watching the automated Cypress System Tests in real-time, for
 when the gnome is too impatient to wait for the 120-second timeout from `installJoomla` again.
 In this case Cypress runs headed and uses `jbt_vnc` as DISPLAY and you can watch the
 execution of the automated tests with the URL:
-* [http://host.docker.internal:7900/vnc.html?autoconnect=true&resize=scale](http://host.docker.internal:7900/vnc.html?autoconnect=true&resize=scale)
+* [http://host.docker.internal:7005/vnc.html?autoconnect=true&resize=scale](http://host.docker.internal:7005/vnc.html?autoconnect=true&resize=scale)
 ```
 scripts/test 53 system novnc administrator/components/com_users/Users.cy.js
 ```
@@ -499,7 +501,7 @@ If you run Cypress locally, only the browsers installed on your Docker host syst
 
 To check the emails sent by Joomla,
 the [MailDev](https://hub.docker.com/r/maildev/maildev) container offers you
-provides you with a web interface at [http://host.docker.internal:7003](http://host.docker.internal:7003).
+provides you with a web interface at [http://host.docker.internal:7004](http://host.docker.internal:7004).
 The Cypress based Joomla System Tests is using an own SMTP server `smtp-tester` to receive, check and delete emails.
 Since we run Cypress locally or in a container, it is necessary to triple emails.
 This is done by the SMTP relay triplicator `jbt_relay`.
@@ -724,8 +726,8 @@ Fear not, for magical tools are at your disposal, each one a trusted companion.
 They are so finely attuned to your needs that they require no login, no password — just a single click,
 and the pages of the database open before you as if by magic:
 
-* [http://host.docker.internal:7001](http://host.docker.internal:7001) phpMyAdmin – for MariaDB and MySQL
-* [http://host.docker.internal:7002](http://host.docker.internal:7002) pgAdmin – for PostgreSQL
+* [http://host.docker.internal:7002](http://host.docker.internal:7002) phpMyAdmin – for MariaDB and MySQL
+* [http://host.docker.internal:7003](http://host.docker.internal:7003) pgAdmin – for PostgreSQL
 
 Simply approach these gateways, and the secrets of the database will reveal themselves effortlessly,
 ready for your exploration.
@@ -742,19 +744,19 @@ The following example illustrates an IPv6 installation with three branches:
 * `5.1-dev`: Grafted with the Joomla 5.1.3 Stable package, PHP 8.2, using MariaDB with driver MySQLi
 * `5.2-dev`: A development clone of version 5.2.0 with additional patches applied, using MySQL with driver PDO
 ```
-Joomla Branches Tester (JBT) version 1.0.11
+Joomla Branches Tester (JBT) version 1.0.39
   Docker version 27.2.0 is running with 12 containers and 14 images
   EnableIPv6: true
 Standard Containers:
   jbt_mysql   is running, ports: 3306/tcp -> 0.0.0.0:7011; 3306/tcp -> [::]:7011
   jbt_madb    is running, ports: 3306/tcp -> 0.0.0.0:7012; 3306/tcp -> [::]:7012
   jbt_pg      is running, ports: 5432/tcp -> 0.0.0.0:7013; 5432/tcp -> [::]:7013
-  jbt_mya     is running, ports: 80/tcp -> 0.0.0.0:7001; 80/tcp -> [::]:7001
-  jbt_pga     is running, ports: 80/tcp -> 0.0.0.0:7002; 80/tcp -> [::]:7002
+  jbt_mya     is running, ports: 80/tcp -> 0.0.0.0:7002; 80/tcp -> [::]:7002
+  jbt_pga     is running, ports: 80/tcp -> 0.0.0.0:7003; 80/tcp -> [::]:7003
   jbt_cypress is running, ports: 7125/tcp -> 0.0.0.0:7125; 7125/tcp -> [::]:7125
-  jbt_novnc   is running, ports: 8080/tcp -> 0.0.0.0:7900; 8080/tcp -> [::]:7900
+  jbt_novnc   is running, ports: 8080/tcp -> 0.0.0.0:7005; 8080/tcp -> [::]:7005
   jbt_relay   is running, ports: 7025/tcp -> 0.0.0.0:7025; 7025/tcp -> [::]:7025
-  jbt_mail    is running, ports: 1025/tcp -> 0.0.0.0:7225; 1025/tcp -> [::]:7225; 1080/tcp -> 0.0.0.0:7003; 1080/tcp -> [::]:7003
+  jbt_mail    is running, ports: 1025/tcp -> 0.0.0.0:7225; 1025/tcp -> [::]:7225; 1080/tcp -> 0.0.0.0:7004; 1080/tcp -> [::]:7004
 Branch 4.4-dev:
   jbt_44 is running, ports: 80/tcp -> 0.0.0.0:7044; 80/tcp -> [::]:7044
   Version: Joomla! 4.4.9 Development
@@ -788,7 +790,7 @@ Optional arguments that can be combined as desired are:
 * `base` to display information about all base containers,
 * version number to display information about this version number web server container.
 
-For example, to check only instance and branch 4.4-dev information:
+For example, to check only instance and `4.4-dev` branch information:
 ```
 scripts/info instance 44
 ```
