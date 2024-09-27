@@ -165,6 +165,9 @@ you will need to download approximately 4 GB of data over the network.
 
 <details>
   <summary>The script can be parameterised with optional arguments.</summary>
+
+---
+
 <img align="right" src="images/joomla-branches-tester-52.svg" width="400">
 
 1. Install for a single version number, e.g. `52` only
@@ -183,6 +186,9 @@ you will need to download approximately 4 GB of data over the network.
 6. The optional `recreate` option is used to create or recreate one web server container
    for the specified version. Base containers and unnamed web server containers remain unchanged.
 7. To force a fresh build with `no-cache`, defaults to build from cache.
+
+---
+
 </details>
 
 :point_right: In case of trouble, see [Trouble-Shooting](#trouble-shooting).
