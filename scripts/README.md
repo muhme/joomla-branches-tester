@@ -7,15 +7,16 @@ These scripts implement the Joomla Branches Tester (JBT), delivering the complet
 LANG=ja scripts/database help
 ```
 ```
-*** 240909 16:00:10 *** 'scripts/database' started.
+*** 240909 16:00:10 >>> 'scripts/database' started.
 
     database – Change the database and database driver for all, one or multiple Joomla containers.
                The mandatory database variant must be one of: mysqli mysql mariadbi mariadb pgsql.
+               Optional 'socket' for using the database with a Unix socket (default is using TCP host).
                Optional Joomla version can be one or more of the following: 44 51 52 53 60 (default is all).
 
                "惚れた病に薬なし。", 不明
 
-*** 240909 16:00:11 *** 'scripts/database' finished in 1 second.
+*** 240909 16:00:11 <<< 'scripts/database' finished in 1 second.
 ```
 
 :fairy: The random quote supports five languages, just like the
@@ -44,17 +45,18 @@ The following scripts are available and the use is described in [../README.md](.
 
 :point_right: The scripts use [ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code#Colors)
 to color their own log and error messages.
-All messages start with three asterisks, the date and the time. 
+All messages start with three asterisks, the date and the time.
+Starting a script is marked with `>>>` and ending a script with `<<<`.
 Error messages are displayed in red and directed to the standard error output (stderr) stream:
 
-<img alt="cypress error sample screenshot" src="../images/error.png" width="763">
+<img alt="cypress error sample screenshot" src="../images/error.png" width="760">
 
 Log messages are highlighted in green and directed to the standard output (stdout) stream.
 See the following example:
 
 ![scripts/test sample screenshot](../images/screen-shot.png)
 
-Colouring can be avoided by setting the environment variable [NOCOLOR=1](https://no-color.org/).
+Colouring can be avoided by setting the environment variable [NO_COLOR=1](https://no-color.org/).
 
 ## Engine Room Scripts and Configurations
 

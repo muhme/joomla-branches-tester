@@ -406,16 +406,38 @@ function random_quote() {
 
 # Log message with date and time in bold and green background on stdout.
 #
+# If '>>>' or '<<<' is provided as the first argument, it will replace second '***'' marker.
+# The remaining arguments are treated as the log message.
+#
 log() {
+  # Default second marker is '***''.
+  local marker='***'
+  # Check if the first argument is the starting or the ending marker.
+  if [[ "$1" == '>>>' || "$1" == '<<<' ]]; then
+    marker="$1"
+    shift  # Argument is eaten as marker.
+  fi
+
   # -e enables backslash escapes
-  echo -e "${JBT_GREEN_BG}${JBT_BOLD}*** $(date '+%y%m%d %H:%M:%S') *** $@${JBT_RESET}"
+  echo -e "${JBT_GREEN_BG}${JBT_BOLD}*** $(date '+%y%m%d %H:%M:%S') ${marker} $@${JBT_RESET}"
 }
 
 # Error message with date and time in bold and dark red on stderr.
 #
+# If '<<<' is provided as the first argument, it will replace second '***'' marker.
+# The remaining arguments are treated as the log message.
+#
 error() {
+  # Default second marker is '***''.
+  local marker='***'
+  # Check if the first argument is the the ending marker.
+  if [[ "$1" == '<<<' ]]; then
+    marker="$1"
+    shift  # Argument is eaten as marker.
+  fi
+
   # -e enables backslash escapes
-  echo -e "${JBT_RED}${JBT_BOLD}*** $(date '+%y%m%d %H:%M:%S') *** $@${JBT_RESET}" >&2
+  echo -e "${JBT_RED}${JBT_BOLD}*** $(date '+%y%m%d %H:%M:%S') ${marker} $@${JBT_RESET}" >&2
 }
 
 # With -e set, the script exits immediately on command failure.
@@ -423,7 +445,7 @@ error() {
 #
 errorHandler() {
   error "An error occurred, probably in script '$(basename "$0")' in line $1."
-  error "Script '$(basename "$0")' failed after $(runningTime)."
+  error '<<<' "Script '$(basename "$0")' failed after $(runningTime)."
   trap - EXIT
   exit 1
 }
@@ -435,11 +457,11 @@ theEnd() {
   if [ $? -ne 0 ]; then
     error "'$0' failed after $(runningTime)."
   else
-    log "'$0' finished in $(runningTime)."
+    log "<<<" "'$0' finished in $(runningTime)."
   fi
 }
 trap theEnd EXIT
 
 # No, every end is a new beginning :)
 #
-log "'$0' started."
+log ">>>" "'$0' started."
