@@ -72,7 +72,7 @@ for todo in "${all_todos[@]}"; do
     }
     version_message="Joomla Branches Tester (JBT) version ${local_version}"
     if version_gt "${local_version}" "${git_version}"; then
-        echo "${version_message}, there is a newer version ${git_version} available."
+        echo "${version_message}. There is a newer version ${git_version} available. Please run 'git pull' to stay current."
     else
       echo "${version_message}"
     fi
