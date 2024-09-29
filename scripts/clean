@@ -44,7 +44,7 @@ log 'Stopping and removing JBT Docker containers, associated Docker networks and
 docker compose down -v
 
 # Old containers existing?
-echo '*** Remove following Docker containers'
+log 'Check for any other 'jbt_*' Docker containers'
 docker ps -a --format '{{.Names}}' | grep "^jbt_" | while read container; do
   log "Removing non docker-compose container '${container}'."
   docker rm -f "${container}"
@@ -69,13 +69,13 @@ done
 
 # Database sockets must be deleted; otherwise, they will be mapped to the new instances.
 if [ -d "run" ]; then
-  log "Removing directory 'run'."
+  log "Removing 'run' directory containing Unix socket subdirectories for databases"
   rm -rf run 2>/dev/null || sudo rm -rf run
 fi
 
 # Cypress and web server containers shared Cypress binaries
 if [ -d "cypress-cache" ]; then
-  log "Removing directory 'cypress-cache'."
+  log "Removing shared Cypress binaries directory 'cypress-cache'."
   rm -rf cypress-cache 2>/dev/null || sudo rm -rf cypress-cache
 fi
 
@@ -84,6 +84,14 @@ for dir in "${HOME}/Library/Caches/Cypress" "${HOME}/.cache/Cypress"; do
   if [ -d "${dir}" ]; then
     log "Cache for local Cypress runs has been found in the '${dir}' directory with the following sizes (in MB):"
     du -ms ${dir}/* || true
-    log "You may delete outdated versions from the local Cypress cache."
+    log "You may delete outdated versions from your local Cypress cache."
+  fi
+done
+
+# Deleting files listed in .gitignore, even though it's not required, to ensure cleanup.
+for file in ".vscode" "docker-compose.yml"; do
+  if [ -f "${file}" ]; then
+    log "Deleting file '${file}' to ensure complete cleanup."
+    rm "${file}"
   fi
 done
