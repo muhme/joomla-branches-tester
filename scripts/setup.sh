@@ -158,12 +158,6 @@ log "jbt_${version} – Changing ownership to 'www-data' for all files and direc
 #   '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
 docker exec "jbt_${version}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true'
 
-# Needed on Windows WSL2 Ubuntu to prevent
-#   'fatal: detected dubious ownership in repository' error, as file owner is now 'www-data'.
-directory="$(pwd)/branch_${version}"
-log "jbt_${version} – Add '${directory}' directory as safe for Git."
-git config --global --add safe.directory "${directory}"
-
 # Joomla container needs to be restarted
 log "jbt_${version} – Restarting container."
 docker restart "jbt_${version}"
