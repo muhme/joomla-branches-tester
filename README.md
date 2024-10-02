@@ -876,7 +876,7 @@ Here's what we're already using from the future:
 
 * :wrench: [joomla-cypress#33](https://github.com/joomla-projects/joomla-cypress/pull/33) Install Joomla with non-standard db_port
 * :wrench: [joomla-cypress#36](https://github.com/joomla-projects/joomla-cypress/pull/36) Wrap IPv6 address in brackets \[ \] if needed
-* :wrench: [joomla-cms#3968](https://github.com/joomla/joomla-cms/pull/43968) [cypress] Add db_port in Installation.cy.js
+* :wrench: [joomla-cms#43968](https://github.com/joomla/joomla-cms/pull/43968) [cypress] Add db_port in Installation.cy.js
 
 :point_right: These *hacks* are simple overwritten code. Be aware that these *hacks* will be lost if you run `npm install` or `npmp ci`. 
 
