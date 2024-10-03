@@ -82,7 +82,7 @@ fi
 
 if [ "$unpatched" = true ]; then
   patches=("unpatched")
-elif ${#patches[@]} -eq 0 ]; then
+elif [ ${#patches[@]} -eq 0 ]; then
   patches=(${JBT_DEFAULT_PATCHES[@]})
 fi
 # else: patches are filled in array
@@ -136,13 +136,6 @@ if $initial; then
   log "jbt_${version} – Git shallow cloning ${git_repository}:${git_branch} into the 'branch_${version}' directory."
   docker exec "jbt_${version}" bash -c "git clone -b ${git_branch} --depth 1 ${git_repository} /var/www/html"
 
-  if [ "$unpatched" = true ]; then
-    log "jbt_${version} – Installation remains unpatched."
-  else
-    log "jbt_${version} – Patching installation."
-    scripts/patch "${version}" ${patches[@]}
-  fi
-
   log "jbt_${version} – Git configure '/var/www/html' as safe directory"
   docker exec "jbt_${version}" bash -c "git config --global --add safe.directory \"/var/www/html\""
 fi
@@ -176,6 +169,13 @@ if $initial; then
     log "jbt_${version} – Running npm clean install."
     docker exec "jbt_${version}" bash -c 'cd /var/www/html && npm ci'
   fi
+
+  if [ "$unpatched" = true ]; then
+    log "jbt_${version} – Installation remains unpatched."
+  else
+    log "jbt_${version} – Patching the installation with ${patches[*]}."
+    scripts/patch "${version}" ${patches[@]}
+  fi
 fi
 
 # Needed on Windows WSL2 Ubuntu to be able to run Joomla Web Installer
@@ -192,9 +192,9 @@ docker restart "jbt_${version}"
 # Configure and install Joomla with desired database variant
 if $initial; then
   if [ "${socket}" = true ]; then
-    scripts/database "${version}" "${database_variant}" "socket" ${patches[@]}
+    scripts/database "${version}" "${database_variant}" "socket"
   else
-    scripts/database "${version}" "${database_variant}" ${patches[@]}
+    scripts/database "${version}" "${database_variant}"
   fi
 fi
 

@@ -80,7 +80,7 @@ for patch in ${patches[@]}; do
 
   # Case 0: Directory doesn't exist (don't check for joomla-cms)
   if [ "${repo}" != "joomla-cms" ] && [ ! -d "branch_${version}/$(dirname ${dir})/${repo}" ]; then
-    error "Missing 'branch_${version}/${dir}/${repo}' directory, '${patch}' patch will be ignored."
+    error "Missing 'branch_${version}/$(dirname ${dir})/${repo}' directory, '${patch}' patch will be ignored."
     continue
   fi
 
