@@ -147,7 +147,7 @@ for todo in "${all_todos[@]}"; do
         db_port=$(grep db_port ${config_file} | sed 's/db_port//' | tr -d " ,'" | sed 's/://')
         echo "  ${db_type}, ${db_host}, ${db_port}"
       else
-        echo "  OOPS missing '${config_file}' file"
+        echo "  OOPS missing '${config_file}' file?"
       fi
 
       echo "  /branch_${version}: $(du -ms branch_${version} | awk '{print $1}')MB"

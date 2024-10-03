@@ -130,39 +130,7 @@ docker exec "jbt_${version}" bash -c 'chown -R www-data:www-data /var/www/html >
 
 # For stable releases the Joomla Web Installer stops with different 'We detected development mode' Congratulations!
 # screen and you have to click in either 'Open Site' or 'Open Administrator' or all URLs end in Web Installer.
-#   public const DEV_STATUS = 'Development';
-#   public const DEV_STATUS = 'Stable';
-if grep -q "public const DEV_STATUS = 'Stable';" "branch_${version}/libraries/src/Version.php"; then
-  log "Stable Joomla version detected"
-  # Is the patch already there?
-  PATCHED="branch_${version}/node_modules/joomla-cypress/src/joomla.js"
-  if grep -q "button.complete-installation" "${PATCHED}"; then
-    log "jbt_${version} – Patch https://github.com/joomla-projects/joomla-cypress/pull/35 has already been applied"
-  else
-    log "jbt_${version} – Applying changes as in https://github.com/joomla-projects/joomla-cypress/pull/35"
-    while IFS= read -r line; do
-      if [[ "$line" == *"--Install Joomla--"* ]]; then
-        # Insert the patch
-        echo "// muhme, 25 August 2024 'hack' as long as waiting for PR https://github.com/joomla-projects/joomla-cypress/pull/35"
-        echo "// is merged, and new joomla-cypress release is build and used in all active Joomla branches"
-        echo ""
-        echo "// In case of Joomla Stable release the Joomla Web Installer needs one more click to complete the installation"
-        echo "cy.get('button.complete-installation')"
-        echo '    .then($button => {'
-        echo "    // Check if the button exists"
-        echo '  if ($button.length > 0) {'
-        echo "    // If the button exists, click it"
-        echo '    cy.wrap($button).first().click()'
-        echo "  }"
-        echo "})"
-      fi
-      # Always print the original line.
-      echo "$line"
-    done < "${PATCHED}" > "${TMP}"
-    # If copying the file has failed, start a second attempt with sudo.
-    cp "${TMP}" "${PATCHED}" 2>/dev/null || sudo cp "${TMP}" "${PATCHED}"
-  fi
-fi
+# The joomla-cypress-35 patch fixes this issue and is included in the default patch list.
 
 # Configure and install Joomla with desired database variant.
 scripts/database "${version}" "$database_variant"
