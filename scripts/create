@@ -219,16 +219,18 @@ for version in "${versionsToInstall[@]}"; do
 
 done
 
-log "Creating File '.vscode/launch.json' for all versions ${allVersions[*]}"
-launch_json=".vscode/launch.json"
-mkdir -p $(dirname "${launch_json}")
-cat >"${launch_json}" <<EOF
+# Final actions if performing a base installation.
+if [ "$recreate" = false ]; then
+  log "Creating File '.vscode/launch.json' for all versions ${allVersions[*]}"
+  launch_json=".vscode/launch.json"
+  mkdir -p $(dirname "${launch_json}")
+  cat >"${launch_json}" <<EOF
 {
     "version": "0.2.0",
     "configurations": [
 EOF
-for version in "${allVersions[@]}"; do
-  cat >>"${launch_json}" <<EOF
+  for version in "${allVersions[@]}"; do
+    cat >>"${launch_json}" <<EOF
       {
           "name": "Listen jbt_${version}",
           "type": "php",
@@ -239,27 +241,28 @@ for version in "${allVersions[@]}"; do
           }
       },
 EOF
-done
-cat >>"${launch_json}" <<EOF
+  done
+  cat >>"${launch_json}" <<EOF
     ]
 }
 EOF
 
-log "Installing vim, ping, ip, telnet and netstat in the 'jbt_cypress' container"
-docker exec jbt_cypress sh -c "apt-get update && apt-get install -y git vim iputils-ping iproute2 telnet net-tools"
+  log "Installing vim, ping, ip, telnet and netstat in the 'jbt_cypress' container"
+  docker exec jbt_cypress sh -c "apt-get update && apt-get install -y git vim iputils-ping iproute2 telnet net-tools"
 
-log "Add bash for Alpine containers"
-for container in "jbt_pga" "jbt_mail"; do
-  docker exec -u root ${container} apk add bash || true # Who cares?
-done
+  log "Add bash for Alpine containers"
+  for container in "jbt_pga" "jbt_mail"; do
+    docker exec -u root ${container} apk add bash || true # Who cares?
+  done
 
-log "Set container prompts for base containers"
-for container in "${JBT_BASE_CONTAINERS[@]}"; do
-  docker exec -u root "${container}" sh -c \
-    "echo PS1=\'${container} \# \' >> ~/.bashrc" || true # Who cares?
-done
+  log "Set container prompts for base containers"
+  for container in "${JBT_BASE_CONTAINERS[@]}"; do
+    docker exec -u root "${container}" sh -c \
+      "echo PS1=\'${container} \# \' >> ~/.bashrc" || true # Who cares?
+  done
 
-# pgpass file must me only pgadmin user read & writable
-log "Create pgAdmin password file with owner pgadmin and file mask 600"
-docker cp scripts/pgpass jbt_pga:/pgadmin4/pgpass
-docker exec -u 0 jbt_pga bash -c "chmod 600 /pgadmin4/pgpass && chown pgadmin /pgadmin4/pgpass"
+  # pgpass file must me only pgadmin user read & writable
+  log "Create pgAdmin password file with owner pgadmin and file mask 600"
+  docker cp scripts/pgpass jbt_pga:/pgadmin4/pgpass
+  docker exec -u 0 jbt_pga bash -c "chmod 600 /pgadmin4/pgpass && chown pgadmin /pgadmin4/pgpass"
+fi
