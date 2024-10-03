@@ -152,22 +152,7 @@ for todo in "${all_todos[@]}"; do
 
       echo "  /branch_${version}: $(du -ms branch_${version} | awk '{print $1}')MB"
 
-      for git_dir in $(find "branch_${version}" -name ".git"); do
-        repo_dir=$(dirname "$git_dir")
-        # Count changes, excluding four files changed by JBT itself.
-        # Do not run this command on the Docker host, as it will result in the following error
-        # on Windows WSL2 Ubuntu: 'fatal: detected dubious ownership in repository'.
-        # This occurs because the file owner has been changed to 'www-data'.
-        docker exec jbt_${version} bash -c "
-          echo \"  Repository ${repo_dir}:\" \
-            '$(git config --get remote.origin.url), ' \
-            'Branch: $(git branch --show-current), ' \
-            'Status: $(git status -s | grep -v \
-              -e 'tests/System/integration/install/Installation.cy.js' \
-              -e 'cypress.config.local.mjs' \
-              -e '.php-cs-fixer.dist.php' \
-              -e 'ruleset.xml' | wc -l | tr -d ' ') changes'"
-      done
+      docker exec jbt_${version} bash -c "JBT_INTERNAL=42 /jbt/scripts/repos.sh \"branch_${version}\""
     else
       echo "  /branch_${version} is NOT existing"
     fi

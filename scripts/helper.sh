@@ -45,6 +45,9 @@ while read -r line; do
   JBT_BASE_CONTAINERS+=("$line")
 done < <(grep 'container_name:' docker-compose.base.yml | awk '{print $2}')
 
+# If the 'unpatched' option is not set and no patch is provided, use the following list:
+JBT_DEFAULT_PATCHES=("joomla-cms-43968" "joomla-cypress-33" "joomla-cypress-36" )
+
 # Determine the currently used Joomla branches.
 # e.g. getVersions -> "44 52 53 60"
 #

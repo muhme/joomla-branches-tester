@@ -27,6 +27,7 @@ function help {
              Optional 'recreate' to create or recreate only one or more web server containers.
              Optional PHP version can be one of: ${JBT_PHP_VERSIONS[@]} (default is php8.1).
              Optional 'repository:branch', e.g. https://github.com/Elfangor93/joomla-cms:mod_community_info.
+             Optional 'unpatched' or one or multiple patches (default: ${JBT_DEFAULT_PATCHES[@]})
 
              $(random_quote)
     "
@@ -44,6 +45,8 @@ no_cache=false
 recreate=false
 php_version="php8.1"
 versionsToInstall=()
+unpatched=false
+patches=()
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
@@ -74,6 +77,12 @@ while [ $# -ge 1 ]; do
     arg_repository="${1%:*}" # remove everything after the last ':'
     arg_branch="${1##*:}"    # everything after the last ':'
     shift                    # Argument is eaten as repository:branch.
+  elif [ "$1" = "unpatched" ]; then
+    unpatched=true
+    shift # Argument is eaten as unpatched option.
+  elif [[ "$1" =~ ^(joomla-cms|joomla-cypress|database)-[0-9]+$ ]]; then
+    patches+=("$1")
+    shift # Argument is eaten as a patch.
   else
     help
     error "Argument '$1' is not valid."
@@ -108,6 +117,13 @@ fi
 if [ ${#versionsToInstall[@]} -eq 0 ]; then
   versionsToInstall=(${allVersions[@]})
 fi
+
+if [ "$unpatched" = true ]; then
+  patches=("unpatched")
+elif [ ${#patches[@]} -eq 0 ]; then
+  patches=(${JBT_DEFAULT_PATCHES[@]})
+fi
+# else: patches are already filled in the array
 
 if [ "$recreate" = false ]; then
 
@@ -198,7 +214,8 @@ for version in "${versionsToInstall[@]}"; do
   log "jbt_${version} – Deleting original Joomla installation."
   docker exec "jbt_${version}" bash -c 'rm -rf /var/www/html/* && rm -rf /var/www/html/.??*'
 
-  JBT_INTERNAL=42 bash scripts/setup.sh "initial" "${version}" "${database_variant}" "${socket}" "${arg_repository}:${arg_branch}"
+  JBT_INTERNAL=42 bash scripts/setup.sh "initial" "${version}" "${database_variant}" "${socket}" \
+                                        "${arg_repository}:${arg_branch}" ${patches[@]}
 
 done
 

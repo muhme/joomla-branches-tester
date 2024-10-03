@@ -22,6 +22,7 @@ function help {
                Optional initial database variant can be one of: ${JBT_DB_VARIANTS[@]} (default is mariadbi).
                Optional initial 'repository:branch', e.g. https://github.com/Elfangor93/joomla-cms:mod_community_info.
                Optional initial 'socket' for using the database with a Unix socket (default is using TCP host).
+               Optional 'unpatched' or one or multiple patches (default: ${JBT_DEFAULT_PATCHES[@]})
 
                $(random_quote)
     "
@@ -32,6 +33,8 @@ versions=$(getVersions)
 database_variant="mariadbi"
 initial=false
 socket=false
+unpatched=false
+patches=()
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
@@ -53,6 +56,12 @@ while [ $# -ge 1 ]; do
     arg_repository="${1%:*}" # remove everything after the last ':'
     arg_branch="${1##*:}"    # everything after the last ':'
     shift                    # Argument is eaten as repository:branch.
+  elif [ "$1" = "unpatched" ]; then
+    unpatched=true
+    shift # Argument is eaten as unpatched option.
+  elif [[ "$1" =~ ^(joomla-cms|joomla-cypress|database)-[0-9]+$ ]]; then
+    patches+=("$1")
+    shift # Argument is eaten as a patch.
   else
     # Ignore empty strings (""), colons (":"), and any other unnecessary arguments.
     shift
@@ -70,6 +79,13 @@ if [ -z "$version" ]; then
   error "Please provide one version number from ${versions}"
   exit 1
 fi
+
+if [ "$unpatched" = true ]; then
+  patches=("unpatched")
+elif ${#patches[@]} -eq 0 ]; then
+  patches=(${JBT_DEFAULT_PATCHES[@]})
+fi
+# else: patches are filled in array
 
 log "jbt_${version} – Configure to catch all PHP errors, including notices and deprecated warnings."
 docker cp scripts/error-logging.ini "jbt_${version}:/usr/local/etc/php/conf.d/error-logging.ini"
@@ -116,8 +132,19 @@ if $initial; then
     git_repository="$arg_repository"
     git_branch="${arg_branch}"
   fi
-  log "jbt_${version} – Cloning ${git_repository}:${git_branch} into the 'branch_${version}' directory."
+  # Starting here with a shallow clone for speed and space; unshallow in 'scripts/patch' if patches are to be applied
+  log "jbt_${version} – Git shallow cloning ${git_repository}:${git_branch} into the 'branch_${version}' directory."
   docker exec "jbt_${version}" bash -c "git clone -b ${git_branch} --depth 1 ${git_repository} /var/www/html"
+
+  if [ "$unpatched" = true ]; then
+    log "jbt_${version} – Installation remains unpatched."
+  else
+    log "jbt_${version} – Patching installation."
+    scripts/patch "${version}" ${patches[@]}
+  fi
+
+  log "jbt_${version} – Git configure '/var/www/html' as safe directory"
+  docker exec "jbt_${version}" bash -c "git config --global --add safe.directory \"/var/www/html\""
 fi
 
 if [ "$version" -ge 51 ]; then
@@ -164,10 +191,10 @@ docker restart "jbt_${version}"
 
 # Configure and install Joomla with desired database variant
 if $initial; then
-  if ${socket}; then
-    scripts/database "${version}" "${database_variant}" "socket"
+  if [ "${socket}" = true ]; then
+    scripts/database "${version}" "${database_variant}" "socket" ${patches[@]}
   else
-    scripts/database "${version}" "${database_variant}"
+    scripts/database "${version}" "${database_variant}" ${patches[@]}
   fi
 fi
 
