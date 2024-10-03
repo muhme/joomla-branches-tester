@@ -50,6 +50,13 @@ docker ps -a --format '{{.Names}}' | grep "^jbt_" | while read container; do
   docker rm -f "${container}"
 done
 
+# Old network existing?
+log 'Check for existing 'jbt_network' Docker network'
+docker network ls --format '{{.Name}}' | grep "^jbt_network$" | while read network; do
+  log "Removing non docker-compose network '${network}'."
+  docker network rm "${network}"
+done
+
 # Clean up branch directories if existing
 for version in "${allVersions[@]}"; do
   if [ -d "branch_${version}" ]; then
