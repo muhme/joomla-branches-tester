@@ -76,7 +76,7 @@ fi
 
 if [ -z "$version" ]; then
   help
-  error "Please provide one version number from ${versions}"
+  error "Please provide one version number from ${versions}."
   exit 1
 fi
 
@@ -87,12 +87,12 @@ elif [ ${#patches[@]} -eq 0 ]; then
 fi
 # else: patches are filled in array
 
-log "jbt_${version} – Configure to catch all PHP errors, including notices and deprecated warnings."
+log "jbt_${version} – Configure to catch all PHP errors, including notices and deprecated warnings"
 docker cp scripts/error-logging.ini "jbt_${version}:/usr/local/etc/php/conf.d/error-logging.ini"
 
 # Create two PHP environments: one with Xdebug and one without.
 # Manage them by cloning /usr/local, and use symbolic links to toggle between the two installations.
-log "jbt_${version} – Configure 'php.ini' for development and set up parallel installation with Xdebug."
+log "jbt_${version} – Configure 'php.ini' for development and set up parallel installation with Xdebug"
 docker exec "jbt_${version}" bash -c ' \
     cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini &&
     cp -r /usr/local /usr/local-without-xdebug &&
@@ -117,7 +117,7 @@ docker exec "jbt_${version}" bash -c ' \
 
 # Installing Node.js v22 and cron for Joomla Task Scheduler
 # Additional having vim, ping, telnet, netstat for comfort
-log "jbt_${version} – Installing additional packages."
+log "jbt_${version} – Installing additional packages"
 docker exec "jbt_${version}" bash -c 'apt-get update -qq && \
     apt-get upgrade -y && \
     curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
@@ -133,7 +133,7 @@ if $initial; then
     git_branch="${arg_branch}"
   fi
   # Starting here with a shallow clone for speed and space; unshallow in 'scripts/patch' if patches are to be applied
-  log "jbt_${version} – Git shallow cloning ${git_repository}:${git_branch} into the 'branch_${version}' directory."
+  log "jbt_${version} – Git shallow cloning ${git_repository}:${git_branch} into the 'branch_${version}' directory"
   docker exec "jbt_${version}" bash -c "git clone -b ${git_branch} --depth 1 ${git_repository} /var/www/html"
 
   log "jbt_${version} – Git configure '/var/www/html' as safe directory"
@@ -141,14 +141,14 @@ if $initial; then
 fi
 
 if [ "$version" -ge 51 ]; then
-  log "jbt_${version} – Installing missing libraries."
+  log "jbt_${version} – Installing missing libraries"
   docker exec "jbt_${version}" bash -c "cd /var/www/html && \
       apt-get install -y libzip4 libmagickwand-6.q16-6 libmemcached11"
 fi
 
 # Running composer install even if we are not initial - just in case.
 if [ -f "branch_${version}/composer.json" ]; then
-  log "jbt_${version} – Running composer install."
+  log "jbt_${version} – Running composer install"
   docker exec "jbt_${version}" bash -c "cd /var/www/html && \
     php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\" && \
     php composer-setup.php && \
@@ -156,7 +156,7 @@ if [ -f "branch_${version}/composer.json" ]; then
     mv composer.phar /usr/local/bin/composer && \
     cp -p /usr/local/bin/composer /usr/local-with-xdebug/bin/composer"
   docker exec "jbt_${version}" bash -c "cd /var/www/html && composer install" ||
-    (log 'composer install failed on the first attempt; give it a second try.' &&
+    (log 'composer install failed on the first attempt; give it a second try' &&
       docker exec "jbt_${version}" bash -c "cd /var/www/html && composer install")
   # There is a race condition (perhaps with the parallel downloads), some times composer install fails:
   # "Failed to open directory: No such file or directory"
@@ -166,27 +166,27 @@ fi
 if $initial; then
   # npm clean install only initial, with switching PHP version nothing changed for JavaScript
   if [ -f "branch_${version}/package.json" ]; then
-    log "jbt_${version} – Running npm clean install."
+    log "jbt_${version} – Running npm clean install"
     docker exec "jbt_${version}" bash -c 'cd /var/www/html && npm ci'
   fi
 
   if [ "$unpatched" = true ]; then
-    log "jbt_${version} – Installation remains unpatched."
+    log "jbt_${version} – Installation remains unpatched"
   else
-    log "jbt_${version} – Patching the installation with ${patches[*]}."
+    log "jbt_${version} – Patching the installation with ${patches[*]}"
     scripts/patch "${version}" ${patches[@]}
   fi
 fi
 
 # Needed on Windows WSL2 Ubuntu to be able to run Joomla Web Installer
-log "jbt_${version} – Changing ownership to 'www-data' for all files and directories."
+log "jbt_${version} – Changing ownership to 'www-data' for all files and directories"
 # Following error seen on macOS, we ignore it as it does not matter, these files are 444
 # chmod: changing permissions of
 #   '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
 docker exec "jbt_${version}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true'
 
 # Joomla container needs to be restarted
-log "jbt_${version} – Restarting container."
+log "jbt_${version} – Restarting container"
 docker restart "jbt_${version}"
 
 # Configure and install Joomla with desired database variant

@@ -84,7 +84,7 @@ overallSuccessful=0
 for version in "${versionsToTest[@]}"; do
 
   if [ ! -d "branch_${version}" ]; then
-    log "jbt_${version} – There is no directory 'branch_${version}', jumped over."
+    log "jbt_${version} – There is no directory 'branch_${version}', jumped over"
     continue
   fi
 
@@ -118,7 +118,7 @@ for version in "${versionsToTest[@]}"; do
       else
         failed=$((failed + 1))
         overallFailed=$((failed + 1))
-        error "jbt_${version} – php-cs-fixer failed"
+        error "jbt_${version} – php-cs-fixer failed."
       fi
     fi
 
@@ -143,7 +143,7 @@ for version in "${versionsToTest[@]}"; do
       else
         failed=$((failed + 1))
         overallFailed=$((failed + 1))
-        error "jbt_${version} – phpcs failed"
+        error "jbt_${version} – phpcs failed."
       fi
     fi
 
@@ -159,7 +159,7 @@ for version in "${versionsToTest[@]}"; do
       else
         failed=$((failed + 1))
         overallFailed=$((failed + 1))
-        error "jbt_${version} – unit failed"
+        error "jbt_${version} – unit failed."
       fi
     fi
 
@@ -174,7 +174,7 @@ for version in "${versionsToTest[@]}"; do
     #   else
     #     failed=$((failed + 1))
     #     overallFailed=$((failed + 1))
-    #     error "jbt_${version} – integration failed"
+    #     error "jbt_${version} – integration failed."
     #   fi
     # fi
 
@@ -191,7 +191,7 @@ for version in "${versionsToTest[@]}"; do
         else
           failed=$((failed + 1))
           overallFailed=$((failed + 1))
-          error "jbt_${version} – lint:${lint} failed"
+          error "jbt_${version} – lint:${lint} failed."
         fi
     fi
     done
@@ -218,7 +218,7 @@ for version in "${versionsToTest[@]}"; do
 
       # 16 September 2024 disabled, because Error: Unwanted PHP Deprecated
       # # Temporarily disable Joomla logging as System Tests are failing.
-      # log "jbt_${version} – Temporarily disable Joomla logging."
+      # log "jbt_${version} – Temporarily disable Joomla logging"
       # docker exec "jbt_${version}" bash -c "cd /var/www/html && sed \
       #   -e 's/\$debug = .*/\$debug = false;/' \
       #   -e 's/\$log_everything = .*/\$log_everything = 0;/' \
@@ -227,10 +227,10 @@ for version in "${versionsToTest[@]}"; do
       #   mv configuration.php.tmp configuration.php"
         
       if [[ "$novnc" == true ]]; then
-        log "jbt_${version} – Initiating System Tests with NoVNC and ${spec}."
+        log "jbt_${version} – Initiating System Tests with NoVNC and ${spec}"
         docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && export DISPLAY=jbt_novnc:0 && ${eel1} cypress run --headed ${browser} ${spec}"
       else
-        log "jbt_${version} – Initiating headless System Tests with ${spec}."
+        log "jbt_${version} – Initiating headless System Tests with ${spec}"
         docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && unset DISPLAY && ${eel1} cypress run ${browser} ${spec}"
       fi
       if [ $? -eq 0 ] ; then
@@ -241,12 +241,12 @@ for version in "${versionsToTest[@]}"; do
       else
         failed=$((failed + 1))
         overallFailed=$((failed + 1))
-        error "jbt_${version} – System Tests failed"
+        error "jbt_${version} – System Tests failed."
       fi
 
       # 16 September 2024 disabled, because Error: Unwanted PHP Deprecated
       # Enable Joomla logging
-      # log "jbt_${version} – Re-enabling Joomla logging."
+      # log "jbt_${version} – Re-enabling Joomla logging"
       # docker exec "jbt_${version}" bash -c "cd /var/www/html && sed \
       #   -e 's/\$debug = .*/\$debug = true;/' \
       #   -e 's/\$log_everything = .*/\$log_everything = 1;/' \
@@ -259,7 +259,7 @@ for version in "${versionsToTest[@]}"; do
   if [ ${failed} -eq 0 ] ; then
     log "jbt_${version} – Test run completed: ${successful} test(s) passed ${spec}"
   else
-    error "jbt_${version} – Test run completed: ${failed} test(s) failed, ${successful} test(s) passed ${spec}"
+    error "jbt_${version} – Test run completed: ${failed} test(s) failed, ${successful} test(s) passed ${spec}."
   fi
 
 done
@@ -269,7 +269,7 @@ if [ ${#versionsToTest[@]} -gt 1 ]; then
     log "${versionsToTest[@]} – All tests completed: ${overallSuccessful} test(s) successful ${spec}"
     exit 0
   else
-    error "${versionsToTest[@]} – All tests completed: ${overallFailed} test(s) failed, ${overallSuccessful} test(s) passed ${spec}"
+    error "${versionsToTest[@]} – All tests completed: ${overallFailed} test(s) failed, ${overallSuccessful} test(s) passed ${spec}."
     exit 1
   fi
 fi

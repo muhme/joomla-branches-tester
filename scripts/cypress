@@ -54,7 +54,7 @@ fi
 if $local; then
   cd "branch_${version}"
   # Install the Cypress version used in this branch, if needed
-  log "Installing Cypress if needed."
+  log "Installing Cypress if needed"
 
   # If it fails, try again with sudo, but specify the user's cache directory and chown afterwards.
   npm install cypress 2>/dev/null || \
@@ -63,11 +63,11 @@ if $local; then
   npx cypress install 2>/dev/null || \
     sudo bash -c "CYPRESS_CACHE_FOLDER=~$USER/.cache/Cypress npx cypress install && chown -R $USER ~$USER/.cache/Cypress"
 
-  log "Open locally installed Cypress GUI for version ${version}."
+  log "Open locally installed Cypress GUI for version ${version}"
   npx cypress open --e2e --project . --config-file cypress.config.local.mjs
   # By the way, the same way it is possible to run Cypress headless from Docker host.
 else
-  log "Open jbt_cypress container Cypress GUI for version ${version}."
+  log "Open jbt_cypress container Cypress GUI for version ${version}"
   # Open Cypress e.g. on Windows WSL2 Docker container.
   docker exec jbt_cypress bash -c "cd \"/jbt/branch_${version}\" && DISPLAY=:0 cypress open --env smtp_port=7325 --e2e --project ."
 fi

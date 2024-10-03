@@ -89,7 +89,7 @@ fi
 # As a result, retry any file system operation with sudo if the first attempt fails.
 # And suppress stderr on the first attempt to avoid unnecessary error messages.
 
-log "Creating new directory 'branch_${version}' and copy three files and two directories."
+log "Creating new directory 'branch_${version}' and copy three files and two directories"
 mv "branch_${version}" "branch_${version}-TMP" 2>/dev/null|| sudo mv "branch_${version}" "branch_${version}-TMP"
 mkdir -p "branch_${version}/tests" 2>/dev/null || sudo mkdir -p "branch_${version}/tests"
 ( cd "branch_${version}-TMP"; \
@@ -99,7 +99,7 @@ mkdir -p "branch_${version}/tests" 2>/dev/null || sudo mkdir -p "branch_${versio
      sudo mv tests/System "../branch_${version}/tests" )
 rm -rf "branch_${version}-TMP" 2>/dev/null || sudo rm -rf "branch_${version}-TMP"
 
-log "Extracting package file '${package}'."
+log "Extracting package file '${package}'"
 cd "branch_${version}"
 case "$package" in
   *.zip)
@@ -119,11 +119,11 @@ esac
 cd ..
 
 # Joomla container needs to be restarted to access the new folder.
-log "Restarting Docker containers."
+log "Restarting Docker containers"
 docker restart "jbt_${version}"
 docker restart "jbt_cypress"
 
-log "Changing ownership to www-data for all files and directories."
+log "Changing ownership to www-data for all files and directories"
 # Following error seen on macOS, we ignore it as it does not matter, these files are all 444.
 # chmod: changing permissions of '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
 docker exec "jbt_${version}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true'
@@ -133,13 +133,13 @@ docker exec "jbt_${version}" bash -c 'chown -R www-data:www-data /var/www/html >
 #   public const DEV_STATUS = 'Development';
 #   public const DEV_STATUS = 'Stable';
 if grep -q "public const DEV_STATUS = 'Stable';" "branch_${version}/libraries/src/Version.php"; then
-  log "Stable Joomla version detected."
+  log "Stable Joomla version detected"
   # Is the patch already there?
   PATCHED="branch_${version}/node_modules/joomla-cypress/src/joomla.js"
   if grep -q "button.complete-installation" "${PATCHED}"; then
-    log "jbt_${version} – Patch https://github.com/joomla-projects/joomla-cypress/pull/35 has already been applied."
+    log "jbt_${version} – Patch https://github.com/joomla-projects/joomla-cypress/pull/35 has already been applied"
   else
-    log "jbt_${version} – Applying changes as in https://github.com/joomla-projects/joomla-cypress/pull/35."
+    log "jbt_${version} – Applying changes as in https://github.com/joomla-projects/joomla-cypress/pull/35"
     while IFS= read -r line; do
       if [[ "$line" == *"--Install Joomla--"* ]]; then
         # Insert the patch
@@ -169,4 +169,4 @@ scripts/database "${version}" "$database_variant"
 
 package_file=$(basename $package)
 joomla_version=$(getJoomlaVersion branch_${version})
-log "Grafting the package '${package_file}' with Joomla ${joomla_version} onto branch_${version} is complete."
+log "Grafting the package '${package_file}' with Joomla ${joomla_version} onto branch_${version} is complete"

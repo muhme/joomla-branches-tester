@@ -55,7 +55,7 @@ fi
 if [ -z "${token}" ]; then
   if [[ "${JBT_GITHUB_TOKEN}" =~ ghp_* ]]; then
     token="${JBT_GITHUB_TOKEN}"
-    log "Using GitHub token from the environment variable 'JBT_GITHUB_TOKEN'."
+    log "Using GitHub token from the environment variable 'JBT_GITHUB_TOKEN'"
   else
     help
     error "Please provide a valid GitHub personal access token starting with 'ghp_'."
@@ -69,10 +69,10 @@ REPO="joomla-extensions/patchtester"
 LATEST_TAG_URL=$(curl -s -I https://github.com/${REPO}/releases/latest | grep -i Location | awk '{print $2}' | tr -d '\r')
 # e.g. 4.3.3 from https://github.com/joomla-extensions/patchtester/releases/tag/4.3.3
 LATEST_TAG=$(basename "${LATEST_TAG_URL}")
-log "The latest patch tester release puzzled out as ${LATEST_TAG}."
+log "The latest patch tester release puzzled out as ${LATEST_TAG}"
 # e.g. https://github.com/joomla-extensions/patchtester/releases/download/4.3.3/com_patchtester_4.3.3.tar.bz2
 PATCHTESTER_URL="https://github.com/${REPO}/releases/download/${LATEST_TAG}/com_patchtester_${LATEST_TAG}.tar.bz2"
-log "Using URL '${PATCHTESTER_URL}'."
+log "Using URL '${PATCHTESTER_URL}'"
 
 failed=0
 successful=0
@@ -80,10 +80,10 @@ for version in "${versionsToInstall[@]}"
 do
   branch=$(branchName "${version}")
   if [ ! -d "branch_${version}" ]; then
-    log "jbt_${version} – There is no directory 'branch_${version}', jumped over."
+    log "jbt_${version} – There is no directory 'branch_${version}', jumped over"
     continue
   fi
-  log "jbt_${version} – Installing Joomla Patch Tester."
+  log "jbt_${version} – Installing Joomla Patch Tester"
   docker exec jbt_cypress sh -c " \
     cd /jbt/branch_${version} && \
     unset DISPLAY && \
@@ -98,7 +98,7 @@ do
 done
 
 if [ ${failed} -eq 0 ] ; then
-  log "Completed ${versionsToInstall[@]} with ${successful} successful."
+  log "Completed ${versionsToInstall[@]} with ${successful} successful"
 else
   error "Completed ${versionsToInstall[@]} with ${failed} failed and ${successful} successful."
 fi

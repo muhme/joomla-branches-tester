@@ -62,24 +62,24 @@ without="/usr/local-without-xdebug/"
 for version in "${versionsToChange[@]}"; do
 
   if [ ! -d "branch_${version}" ]; then
-    log "jbt_${version} – There is no directory 'branch_${version}', jumped over."
+    log "jbt_${version} – There is no directory 'branch_${version}', jumped over"
     continue
   fi
 
   link=$(docker exec "jbt_${version}" readlink "/usr/local")
   if [ "$todo" = "on" ]; then
     if [ "$link" = "$with" ]; then
-      log "jbt_${version} – Xdebug is already enabled."
+      log "jbt_${version} – Xdebug is already enabled"
     else
-      log "jbt_${version} – Switching to Xdebug-enabled PHP installation and restarting container."
+      log "jbt_${version} – Switching to Xdebug-enabled PHP installation and restarting container"
       docker exec "jbt_${version}" bash -c "rm -f /usr/local && ln -s $with /usr/local"
       docker restart "jbt_${version}"
     fi
   else
     if [ "$link" = "$without" ]; then
-      log "jbt_${version} – Xdebug is not currently enabled."
+      log "jbt_${version} – Xdebug is not currently enabled"
     else
-      log "jbt_${version} – Switching to PHP installation without Xdebug and restarting container."
+      log "jbt_${version} – Switching to PHP installation without Xdebug and restarting container"
       docker exec "jbt_${version}" bash -c "rm -f /usr/local && ln -s $without /usr/local"
       docker restart "jbt_${version}"
     fi

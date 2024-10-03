@@ -80,11 +80,11 @@ fi
 for version in "${versionsToChange[@]}"; do
 
   if [ ! -d "branch_${version}" ]; then
-    log "jbt_${version} – There is no directory 'branch_${version}', jumped over."
+    log "jbt_${version} – There is no directory 'branch_${version}', jumped over"
     continue
   fi
 
-  log "jbt_${version} – Create 'cypress.config.mjs' file for variant ${dbvariant} (driver '${dbtype}' host '${dbhost}')."
+  log "jbt_${version} – Create 'cypress.config.mjs' file for variant ${dbvariant} (driver '${dbtype}' host '${dbhost}')"
 
   # adopt e.g.:
   #   db_type: 'PostgreSQL (PDO)',
@@ -112,7 +112,7 @@ for version in "${versionsToChange[@]}"; do
 
   # Create second Cypress config file for running local
   # Using host.docker.internal to have it reachable from outside for Cypress and inside web server container
-  log "jbt_${version} – Create additional 'cypress.config.local.mjs' file with using localhost and database port ${dbport}."
+  log "jbt_${version} – Create additional 'cypress.config.local.mjs' file with using localhost and database port ${dbport}"
   docker exec "jbt_${version}" bash -c "cd /var/www/html && sed \
     -e \"s|db_host: .*|db_host: 'host.docker.internal',|\" \
     -e \"s|db_port: .*|db_port: '$dbport',|\" \
@@ -130,7 +130,7 @@ for version in "${versionsToChange[@]}"; do
     rm -rf media/com_patchtester administrator/cache/autoload_psr4.php"
 
   # Seen on Ubuntu, 13.10.0 was installed, but 12.13.2 needed for the branch
-  log "jbt_${version} – Install Cypress (if needed)."
+  log "jbt_${version} – Install Cypress (if needed)"
   docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && npx cypress install"
   # Seen on macOS, 13.13.3 was installed, npx cypress install did not install needed 13.13.0
   docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && npm run cypress:install"
@@ -138,7 +138,7 @@ for version in "${versionsToChange[@]}"; do
   docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && cypress install"
 
   # Using Install Joomla from System Tests
-  log "jbt_${version} – Cypress-based Joomla installation."
+  log "jbt_${version} – Cypress-based Joomla installation"
   docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && export DISPLAY=jbt_novnc:0 && cypress run --headed --spec tests/System/integration/install/Installation.cy.js"
 
   log "jbt_${version} – Disable B/C plugin"
@@ -147,7 +147,7 @@ for version in "${versionsToChange[@]}"; do
     ( error "jbt_${version} – Ignoring step 'Disable B/C plugin' as it failed." ; true )
 
   # Cypress is using own SMTP port to read and reset mails by smtp-tester
-  log "jbt_${version} – Set the SMTP port used by Cypress to 7125."
+  log "jbt_${version} – Set the SMTP port used by Cypress to 7125"
   docker exec "jbt_${version}" bash -c "cd /var/www/html && sed \
     -e \"s/smtp_port: .*/smtp_port: '7125',/\" \
     cypress.config.mjs > cypress.config.mjs.tmp && \
@@ -163,11 +163,11 @@ for version in "${versionsToChange[@]}"; do
   #   configuration.php > configuration.php.tmp && \
   #   mv configuration.php.tmp configuration.php"
 
-  log "jbt_${version} – Changing ownership to www-data for all files and directories."
+  log "jbt_${version} – Changing ownership to www-data for all files and directories"
   # Following error seen on macOS, we ignore it as it does not matter, these files are 444
   # chmod: changing permissions of '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
   docker exec "jbt_${version}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true'
 
-  log "jbt_${version} – Joomla based on the $(branchName ${dbvariant}) database variant is installed."
+  log "jbt_${version} – Joomla based on the $(branchName ${dbvariant}) database variant is installed"
 
 done

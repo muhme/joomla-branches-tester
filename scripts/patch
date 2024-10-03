@@ -43,12 +43,12 @@ done
 
 if [ -z "$version" ]; then
   help
-  error "Please provide one version number from ${versions}"
+  error "Please provide one version number from ${versions}."
   exit 1
 fi
 if [ ${#patches[@]} -eq 0 ]; then
   help
-  error "Please provide at least one patch, e.g. 'joomla-cypress-33'"
+  error "Please provide at least one patch, e.g. 'joomla-cypress-33'."
   exit 1
 fi
 
@@ -109,7 +109,7 @@ for patch in ${patches[@]}; do
       [ \"${repo}\" != \"joomla-cms\" ] && cd \"$(dirname ${dir})/${repo}\"
       git fetch origin \"pull/${patch_number}/head:jbt-pr-${patch_number}\"
       git merge-base --is-ancestor \"jbt-pr-${patch_number}\" jbt-${repo_version}"; then
-      log "jbt_${version} - PR '${patch}' has already been applied."
+      log "jbt_${version} - PR '${patch}' has already been applied"
     continue
   else
     # Case 3: Apply the patch to the existing Git repository

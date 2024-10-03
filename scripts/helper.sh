@@ -136,7 +136,7 @@ function dbTypeForVariant() {
       return
     fi
   done
-  error "No database type found for '$1' database variant"
+  error "No database type found for '$1' database variant."
 }
 
 # Returns the database host for a given database variant.
@@ -150,7 +150,7 @@ function dbHostForVariant() {
       return
     fi
   done
-  error "No database host found for '$1' database variant"
+  error "No database host found for '$1' database variant."
 }
 
 # Returns the database Unix socket path for a given database variant.
@@ -164,7 +164,7 @@ function dbSocketForVariant() {
       return
     fi
   done
-  error "No database Unix socket found for '$1' database variant"
+  error "No database Unix socket found for '$1' database variant."
 }
 
 # Returns the host.docker.internal mapped database port for a given database variant.
@@ -178,7 +178,7 @@ function dbPortForVariant() {
       return
     fi
   done
-  error "No database port found for '$1' database variant"
+  error "No database port found for '$1' database variant."
 }
 
 # Check if the given argument is a valid database variant.
@@ -230,10 +230,10 @@ function createDockerComposeFile() {
     local doit=true
     if [ "${working}" = "append" ]; then
       if grep -q "^  jbt_${version}" docker-compose.yml; then
-        log "jbt_${version} – An entry already exists in 'docker-compose.base.yml'; leave it unmodified."
+        log "jbt_${version} – An entry already exists in 'docker-compose.base.yml'; leave it unmodified"
         doit=false
       else
-        log "jbt_${version} – Adding an entry in 'docker-compose.base.yml'."
+        log "jbt_${version} – Adding an entry in 'docker-compose.base.yml'"
       fi
     fi
     if $doit; then
@@ -286,7 +286,7 @@ function getJoomlaVersion() {
   local versions_file="$1/libraries/src/Version.php"
 
   if [ ! -f "$versions_file" ]; then
-    error "There is no file \"${versions_file}\""
+    error "There is no file \"${versions_file}\"."
     exit 1
   fi
 
@@ -297,7 +297,7 @@ function getJoomlaVersion() {
 
   # Two digits?
   if [[ ! $version =~ ^[0-9]{2}$ ]]; then
-    error "Could not find Joomla major and minor number in file \"${versions_file}\""
+    error "Could not find Joomla major and minor number in file \"${versions_file}\"."
   fi
 
   echo "$version"
@@ -460,11 +460,11 @@ theEnd() {
   if [ $? -ne 0 ]; then
     error "'$0' failed after $(runningTime)."
   else
-    log "<<<" "'$0' finished in $(runningTime)."
+    log "<<<" "'$0' finished in $(runningTime)"
   fi
 }
 trap theEnd EXIT
 
 # No, every end is a new beginning :)
 #
-log ">>>" "'$0' started."
+log ">>>" "'$0' started"
