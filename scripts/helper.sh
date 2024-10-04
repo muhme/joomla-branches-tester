@@ -467,4 +467,4 @@ trap theEnd EXIT
 
 # No, every end is a new beginning :)
 #
-log ">>>" "'$0' started"
+log ">>>" "'$0 $*' started"

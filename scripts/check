@@ -1,0 +1,89 @@
+#!/bin/bash
+#
+# check - Searching a JBT log file for critical issues or selected information.
+#
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+# https://github.com/muhme/joomla-branches-tester
+
+if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
+  echo "Please run me as 'scripts/info'. Thank you for your cooperation! :)"
+  exit 1
+fi
+
+function help {
+  echo "
+    info – Searching a JBT log file for critical issues or selected information.
+           Optional argument 'jbt' to show JBT log messages only.
+           Optional argument 'scripts' to display only the start and stop messages for all JBT scripts.
+           If no file is provided, the newest log file is used.
+
+           $(random_quote)
+  "
+}
+
+if [ $# -eq 0 ]; then
+  all_todos=("instance" "base" ${allVersions[@]})
+else
+  all_todo=()
+fi
+
+file=""
+jbt=false
+scripts=false
+while [ $# -ge 1 ]; do
+  if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
+    source scripts/helper.sh
+    help
+    exit 0
+  elif [ "$1" = "jbt" ]; then
+    jbt=true
+    shift # Argument is eaten as to show JBT information.
+  elif [ "$1" = "scripts" ]; then
+    scripts=true
+    shift # Argument is eaten as to show only the start and stop messages.
+  elif [ -f "logs/$1" ] || [ -f "$1" ]; then
+    file="logs/$(basename $1)"
+    shift # Argument is eaten as log file name.
+  else
+    source scripts/helper.sh
+    help
+    error "Argument '$1' is not valid."
+    exit 1
+  fi
+done
+
+if [[ ! -f "${file}" ]]; then
+  file="logs/$(ls logs | tail -1)"
+  if [[ ! -f "${file}" ]]; then
+    source scripts/helper.sh
+    error "No log file."
+    exit 1
+  fi
+fi
+# We assume now '$file' exists
+echo "${file}:"
+
+if [ "${jbt}" = "true" ]; then
+  grep '\*\*\*' "${file}"
+elif [ "${scripts}" = "true" ]; then
+  grep -e '<<<' -e '>>>' "${file}"
+else
+  grep -i \
+      -e error \
+      -e fatal \
+      -e stop \
+    "${file}" | grep -v \
+      -e 'Configure to catch all PHP errors' \
+      -e 'liberror-perl' \
+      -e 'symfony/error-handler' \
+      -e 'fatal-error.html' \
+      -e 'system-admin-error.css' \
+      -e 'system-site-error.css' \
+      -e 'system-site-error_rtl.css' \
+      -e 'languageErrors/widget.css' \
+      -e 'Stopping and removing JBT Docker container' \
+      -e 'Container .* Stopping' \
+      -e 'Container .* Stopped' \
+      -e 'symfony/stopwatch'
+
+fi
