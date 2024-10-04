@@ -69,6 +69,7 @@ elif [ "${scripts}" = "true" ]; then
   grep -e '<<<' -e '>>>' "${file}"
 else
   grep -i \
+      -e ERR \
       -e error \
       -e fatal \
       -e stop \

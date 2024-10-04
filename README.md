@@ -738,6 +738,60 @@ and the pages of the database open before you as if by magic:
 Simply approach these gateways, and the secrets of the database will reveal themselves effortlessly,
 ready for your exploration.
 
+### Xdebug
+
+<img align="right" src="images/Xdebug.png">
+
+Joomla web server containers are ready with a second PHP installation for switching to
+[Xdebug](https://github.com/xdebug/xdebug).
+You can switch to the PHP version with Xdebug for example:
+```
+scripts/xdebug 53 on
+```
+
+A `.vscode/launch.json` file is also prepared
+(to simplify life, it's created in advance for all versions,
+even if they are not installed or Xdebug is not enabled).
+In [Visual Studio Code](https://code.visualstudio.com/),
+select 'Start Debugging' and choose the corresponding entry `Listen jbt_53`.
+
+Finally, it may be reset again to improve performance:
+```
+scripts/xdebug off
+```
+
+Used ports are 79xx, for the given example 7953.
+
+### IPv6
+
+As shown in the [Installation](#installation) chapter,
+you can create the Docker Branches Tester instance using `scripts/create`
+with the `IPv6` option instead of the default IPv4 network.
+Docker assigns IP addresses from the predefined private, non-routable subnet `fd00::/8`.
+To view the assigned IPv4 and IPv6 dual stack network addresses (they may change on each Docker run), use:
+
+```
+docker inspect jbt_network
+```
+You can also see the used IPv6 addresses in using ping command line tool:
+```
+docker exec jbt_cypress ping jbt_pg
+```
+```
+64 bytes from jbt_pg.jbt_network (fd00::4): icmp_seq=1 ttl=64 time=0.092 ms
+...
+```
+You can use the IPv6 address (instead of the hostname) to open the PostgreSQL interactive terminal:
+```
+docker exec -it jbt_pg bash -c "PGPASSWORD=root psql -h fd00::4 -U root -d postgres"
+```
+:point_right: IPv6 networking is limited to within Docker.
+              The `host.docker.internal` feature generally defaults to IPv4,
+              and there is no built-in IPv6 equivalent.
+              As `scripts/cypress local` works with `host.docker.internal`,
+              the database custom commands executed by a local running Cypress GUI
+              use the IPv4 address to access the database.
+
 ### Info
 
 You can retrieve some interesting Joomla Branches Tester status information.
@@ -801,59 +855,28 @@ For example, to check only instance and `4.4-dev` branch information:
 scripts/info instance 44
 ```
 
-### Xdebug
+### Check & Logging
 
-<img align="right" src="images/Xdebug.png">
-
-Joomla web server containers are ready with a second PHP installation for switching to
-[Xdebug](https://github.com/xdebug/xdebug).
-You can switch to the PHP version with Xdebug for example:
+Most scripts automatically duplicate their output to a log file in the `logs` folder.
+This allows you to review the logs later:
 ```
-scripts/xdebug 53 on
+more -rf logs/241004173051_create.txt
 ```
 
-A `.vscode/launch.json` file is also prepared
-(to simplify life, it's created in advance for all versions,
-even if they are not installed or Xdebug is not enabled).
-In [Visual Studio Code](https://code.visualstudio.com/),
-select 'Start Debugging' and choose the corresponding entry `Listen jbt_53`.
+The `scripts/check` command supports searching JBT log files for critical issues or specific information.
+You can run `scripts/check` without any arguments to check the latest log file,
+or specify a log file name to review a particular log.
 
-Finally, it may be reset again to improve performance:
-```
-scripts/xdebug off
-```
+Optional Arguments:
+* `scripts`: Show only the start and end lines of scripts.
+* `jbt`: Show only JBT-specific log messages.
 
-Used ports are 79xx, for the given example 7953.
+If no argument is provided, the log file will be checked for errors and critical messages by default.
 
-### IPv6
-
-As shown in the [Installation](#installation) chapter,
-you can create the Docker Branches Tester instance using `scripts/create`
-with the `IPv6` option instead of the default IPv4 network.
-Docker assigns IP addresses from the predefined private, non-routable subnet `fd00::/8`.
-To view the assigned IPv4 and IPv6 dual stack network addresses (they may change on each Docker run), use:
-
+Example:
 ```
-docker inspect jbt_network
+scripts/check jbt
 ```
-You can also see the used IPv6 addresses in using ping command line tool:
-```
-docker exec jbt_cypress ping jbt_pg
-```
-```
-64 bytes from jbt_pg.jbt_network (fd00::4): icmp_seq=1 ttl=64 time=0.092 ms
-...
-```
-You can use the IPv6 address (instead of the hostname) to open the PostgreSQL interactive terminal:
-```
-docker exec -it jbt_pg bash -c "PGPASSWORD=root psql -h fd00::4 -U root -d postgres"
-```
-:point_right: IPv6 networking is limited to within Docker.
-              The `host.docker.internal` feature generally defaults to IPv4,
-              and there is no built-in IPv6 equivalent.
-              As `scripts/cypress local` works with `host.docker.internal`,
-              the database custom commands executed by a local running Cypress GUI
-              use the IPv4 address to access the database.
 
 ### Cleaning Up
 

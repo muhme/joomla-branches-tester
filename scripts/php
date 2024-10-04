@@ -1,12 +1,12 @@
 #!/bin/bash -e
 #
-# create - Logger frame for create.sh.
+# php - Logger frame for php.sh.
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
-log_file="logs/$(date '+%y%m%d%H%M%S')_create.txt"
+log_file="logs/$(date '+%y%m%d%H%M%S')_php.txt"
 mkdir -p logs 2>/dev/null || (sudo mkdir -p logs && sudo chmod 777 logs)
 echo "*** Using log file: ${log_file}"
-scripts/create.sh $* 2>&1 | tee -a "${log_file}"
+scripts/php.sh $* 2>&1 | tee -a "${log_file}"
 echo "*** Log file used: ${log_file}"

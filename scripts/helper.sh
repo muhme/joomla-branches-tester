@@ -319,24 +319,6 @@ isValidTestName() {
   return 1 # No
 }
 
-# Use ANSI escape sequences to colorize JBT log messages to differentiate them from others.
-#
-JBT_LIGHT_GREEN_BG="\033[102m"
-JBT_GREEN_BG="\033[42m"
-JBT_RED="\033[0;31m"
-JBT_BOLD="\033[1m"
-JBT_RESET="\033[0m"
-
-# Is the 'NO_COLOR' environment variable set and non-empty?
-if [ -n "${NO_COLOR}" ]; then
-  # Do not use color for log messages.
-  JBT_LIGHT_GREEN_BG=""
-  JBT_GREEN_BG=""
-  JBT_RED=""
-  JBT_BOLD=""
-  JBT_RESET=""
-fi
-
 # Return script running time e.g. as "17 seconds" or as "3:18".
 #
 runningTime() {
@@ -407,6 +389,22 @@ function random_quote() {
   fi
 }
 
+# Use ANSI escape sequences to colorize JBT log messages to differentiate them from others.
+#
+JBT_GREEN_BG="\033[42m"
+JBT_RED="\033[0;31m"
+JBT_BOLD="\033[1m"
+JBT_RESET="\033[0m"
+
+# Is the 'NO_COLOR' environment variable set and non-empty?
+if [ -n "${NO_COLOR}" ]; then
+  # Do not use color for log messages.
+  JBT_GREEN_BG=""
+  JBT_RED=""
+  JBT_BOLD=""
+  JBT_RESET=""
+fi
+
 # Log message with date and time in bold and green background on stdout.
 #
 # If '>>>' or '<<<' is provided as the first argument, it will replace second '***'' marker.
@@ -432,7 +430,7 @@ log() {
 #
 error() {
   # Default second marker is '***''.
-  local marker='***'
+  local marker='ERR'
   # Check if the first argument is the the ending marker.
   if [[ "$1" == '<<<' ]]; then
     marker="$1"

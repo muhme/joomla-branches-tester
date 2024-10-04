@@ -91,7 +91,7 @@ fi
 
 log "Creating new directory 'branch_${version}' and copy three files and two directories"
 mv "branch_${version}" "branch_${version}-TMP" 2>/dev/null|| sudo mv "branch_${version}" "branch_${version}-TMP"
-mkdir -p "branch_${version}/tests" 2>/dev/null || sudo mkdir -p "branch_${version}/tests"
+mkdir -p "branch_${version}/tests" 2>/dev/null || (sudo mkdir -p "branch_${version}/tests" && sudo chmod 777 "branch_${version}/tests")
 ( cd "branch_${version}-TMP"; \
   mv cypress.config.dist.mjs package.json package-lock.json node_modules "../branch_${version}" 2>/dev/null || \
      sudo mv cypress.config.dist.mjs package.json package-lock.json node_modules "../branch_${version}"; \
@@ -133,7 +133,7 @@ docker exec "jbt_${version}" bash -c 'chown -R www-data:www-data /var/www/html >
 # The joomla-cypress-35 patch fixes this issue and is included in the default patch list.
 
 # Configure and install Joomla with desired database variant.
-scripts/database "${version}" "$database_variant"
+scripts/database.sh "${version}" "$database_variant"
 
 package_file=$(basename $package)
 joomla_version=$(getJoomlaVersion branch_${version})

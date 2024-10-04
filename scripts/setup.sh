@@ -174,7 +174,7 @@ if $initial; then
     log "jbt_${version} – Installation remains unpatched"
   else
     log "jbt_${version} – Patching the installation with ${patches[*]}"
-    scripts/patch "${version}" ${patches[@]}
+    scripts/patch.sh "${version}" ${patches[@]}
   fi
 fi
 
@@ -192,9 +192,9 @@ docker restart "jbt_${version}"
 # Configure and install Joomla with desired database variant
 if $initial; then
   if [ "${socket}" = true ]; then
-    scripts/database "${version}" "${database_variant}" "socket"
+    scripts/database.sh "${version}" "${database_variant}" "socket"
   else
-    scripts/database "${version}" "${database_variant}"
+    scripts/database.sh "${version}" "${database_variant}"
   fi
 fi
 

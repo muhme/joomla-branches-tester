@@ -128,7 +128,7 @@ fi
 if [ "$recreate" = false ]; then
 
   # Delete all docker containers and branches_* directories.
-  scripts/clean
+  scripts/clean.sh
 
   # Create Docker Compose setup with Joomla web servers for all versions to be installed.
   log "Create 'docker-compose.yml' file for version(s) ${versionsToInstall[*]}, based on ${php_version} and ${network}"
@@ -223,7 +223,8 @@ done
 if [ "$recreate" = false ]; then
   log "Creating File '.vscode/launch.json' for all versions ${allVersions[*]}"
   launch_json=".vscode/launch.json"
-  mkdir -p $(dirname "${launch_json}")
+  dir=$(dirname "${launch_json}")
+  mkdir -p "${dir}" 2>/dev/null || (sudo mkdir -p "${dir}" && sudo 777 "${dir}")
   cat >"${launch_json}" <<EOF
 {
     "version": "0.2.0",
