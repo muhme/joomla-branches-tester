@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# php - Change PHP version on all, one or multiple Docker containers, e.g.
+# php.sh - Change PHP version on all, one or multiple Docker containers, e.g.
 #   scripts/php php8.1
 #   scripts/php 51 php8.2
 #   scripts/php 52 53 php8.3

@@ -1,6 +1,6 @@
 #!/bin/bash -e
 #
-# graft - Place Joomla package onto development branch.
+# graft.sh - Place Joomla package onto development branch.
 #            Just like in plant grafting, where a scion is joined to a rootstock.
 #   scripts/graft 52 ~/Downloads/Joomla_5.2.0-alpha4-dev-Development-Full_Package.zip
 #   scripts/graft /tmp/Joomla_5.1.2-Stable-Full_Package.zip 51 pgsql

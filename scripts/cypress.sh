@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# cypress - Running Cypress GUI for one branch, either from a Docker container or using locally installed Cypress.
+# cypress.sh - Running Cypress GUI for one branch, either from a Docker container or using locally installed Cypress.
 #   scripts/cypress 51
 #   scripts/cypress 51 local
 #

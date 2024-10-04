@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# clean - Stopping and removing JBT Docker containers, associated Docker networks and volumes.
-#         Also deletes directory 'run' and all 'branch_*' directories.
+# clean.sh - Stopping and removing JBT Docker containers, associated Docker networks and volumes.
+#            Also deletes directory 'run' and all 'branch_*' directories.
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# test - Runs Cypress specs on one, multiple, or all branches, e.g.
+# test.sh - Runs Cypress specs on one, multiple, or all branches, e.g.
 #   scripts/test
 #   scripts/test system novnc firefox
 #   scripts/test 44 lint:testjs

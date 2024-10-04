@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# xdebug - Switches the PHP installation with or without Xdebug in one or more Web Server containers.
+# xdebug.sh - Switches the PHP installation with or without Xdebug in one or more Web Server containers.
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester

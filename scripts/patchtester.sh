@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# patchtester - Install Joomla Patch Tester on all, one or multiple Docker containers, e.g.
+# patchtester.sh - Install Joomla Patch Tester on all, one or multiple Docker containers, e.g.
 #   scripts/patchtester ghp_42g8n8uCZtplQNnbNrEWsTrFfQgYAU4711Tc
 #   scripts/patchtester 44 ghp_42g8n8uCZtplQNnbNrEWsTrFfQgYAU4711Tc
 #   scripts/patchtester 52 53 ghp_42g8n8uCZtplQNnbNrEWsTrFfQgYAU4711Tc

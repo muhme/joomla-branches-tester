@@ -1,6 +1,6 @@
 #!/bin/bash -e
 #
-# database - Change the database and database driver for all, one or multiple Joomla containers.
+# database.sh - Change the database and database driver for all, one or multiple Joomla containers.
 #   scripts/database mysqli socket
 #   scripts/database 44 mariadb
 #   scripts/database 53 60 pgsql

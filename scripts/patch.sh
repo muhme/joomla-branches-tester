@@ -1,6 +1,6 @@
 #!/bin/bash -e
 #
-# patch - Apply Git patches in 'joomla-cms', 'joomla-cypress' or 'joomla-framework/database'.
+# patch.sh - Apply Git patches in 'joomla-cms', 'joomla-cypress' or 'joomla-framework/database'.
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
