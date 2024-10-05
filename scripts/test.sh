@@ -102,7 +102,8 @@ for version in "${versionsToTest[@]}"; do
       insert_file="branch_${version}/.php-cs-fixer.dist.php"
       insert_line="    ->notPath('/com_patchtester/')"
       if [ -d "branch_${version}/administrator/components/com_patchtester" ] && \
-           -f "${insert_file}" ] && ! grep -qF "${insert_line}" "${insert_file}"; then
+         [ -f "${insert_file}" ] && ! grep -qF "${insert_line}" "${insert_file}"; then
+        log "jbt_${version} – Patch Tester is installed, excluding from php-cs-fixer"
         csplit "${insert_file}" "/->notPath('/" && \
           cat xx00 > "${insert_file}" && \
           echo "${insert_line}" >> "${insert_file}" && \
