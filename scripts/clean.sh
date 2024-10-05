@@ -82,8 +82,9 @@ fi
 
 # Database sockets must be deleted; otherwise, they will be mapped to the new instances.
 if [ -d "logs" ]; then
-  log "Removing 'logs' directory containing old log files"
-  rm -rf logs 2>/dev/null || sudo rm -rf logs
+  log "Removing all files in the 'logs' directory, except for the most recent one"
+  mkdir -p logs 2>/dev/null || sudo mkdir -p logs
+  (cd logs; ls -t | tail -n +2 >"${TMP}"; xargs rm -- <"${TMP}" 2>/dev/null || sudo xargs rm -- <"${TMP}")
 fi
 
 # Cypress and web server containers shared Cypress binaries
