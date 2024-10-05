@@ -73,6 +73,7 @@ else
       -e error \
       -e fatal \
       -e stop \
+      -e 'not found' \
     "${file}" | grep -v \
       -e 'Configure to catch all PHP errors' \
       -e 'liberror-perl' \
@@ -85,6 +86,7 @@ else
       -e 'Stopping and removing JBT Docker container' \
       -e 'Container .* Stopping' \
       -e 'Container .* Stopped' \
-      -e 'symfony/stopwatch'
+      -e 'symfony/stopwatch' \
+      -e 'overrid'
 
 fi
