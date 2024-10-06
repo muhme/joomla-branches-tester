@@ -80,7 +80,7 @@ The following scripts and configuration files are intended for internal usage on
 | [scripts/helper.sh](helper.sh) | Some commonly used bash script functions and definitions. | Sourced and used by other Bash scripts within the project. |
 | [scripts/patchtester.cy.js](patchtester.cy.js) | Cypress script to install and configure Joomla Patch Tester component. | Used by `scripts/patchtester`. |
 | [scripts/pgpass](pgpass) | Auto-logon password file. | Used by `pgAdmin`. |
-| [scripts/repos.sh](repos.sh) | Get information about Git repositories. | Used by `info` and running inside Docker container. |
+| [scripts/repos.sh](repos.sh) | Get information about Git repositories. | Used by `scripts/info` and running inside Docker container. |
 | [scripts/servers.json](servers.json) | PostgreSQL server configuration. | Used by `pgAdmin`. |
 | [scripts/setup.sh](setup.sh) | Install and configure Docker web server containers. | Used by `scripts/create` and `scripts/php`. |
 | [scripts/smtp_double_relay.py](smtp_double_relay.py) | SMTP relay triplicator source code. | Used by `jbt_relay`. |
