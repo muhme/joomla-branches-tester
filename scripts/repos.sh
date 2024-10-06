@@ -27,11 +27,15 @@ for git_dir in $(find . -name ".git" | sed -e 's|^.||' -e 's|.git$||' ); do
     cd $abs_git_dir
     echo "  Git Repository ${branch_dir}${git_dir}"
     echo "    Remote Origin: $(git config --get remote.origin.url)"
-    current_branch=$(git branch --show-current | sed 's|jbt-||')
+    current_branch=$(git branch --show-current)
     echo -n "    Branch: ${current_branch}"
     for branch in $(git branch | sed 's|^* ||' ); do
       if [[ "${branch}" = jbt-pr-* ]]; then
-        repo=$(basename ${git_dir})
+        if [ "${git_dir}" = "/" ]; then
+          repo="joomla-cms"
+        else
+          repo=$(basename ${git_dir})
+        fi
         echo -n " ${branch}" | sed "s|jbt-pr|${repo}|"
       fi
     done
