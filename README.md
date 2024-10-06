@@ -880,42 +880,53 @@ scripts/check jbt
 
 ### Cleaning Up
 
-If you want to get rid of all the Docker containers and
-free up to 2 GB of disc space from the `branch_*` and other directories,
-you can do so by running:
+If you want to rid of all Docker containers and free up multiple gigabytes of disk space from the `branch_*` and other directories, simply run:
+
 ```
 scripts/clean
 ```
 
-## Back to the Future
+## Back to the Future - Patch
 
 As Doc Brown said: *"Roads? Where we're going, we don't need roads."*
 
-Well, the Joomla Branches Tester has definitely brought some futuristic vibes.
-As of mid-September 2024, it's already taking on draft PRs, open PRs, unreleased PRs,
-not-yet-up-merged PRs... heck, even some code that haven't been imported yet!
+JBT can install patches on its own using Git merge from pull requests (PRs) with `scripts/patch` (or even with `scripts/create`),
+applicable to the following repositories:
+* joomla-cms - [joomla/joomla-cms](https://github.com/joomla/joomla-cms)
+* joomla-cypress - [joomla-projects/joomla-cypress](https://github.com/joomla-projects/joomla-cypress)
+* database - [joomla-framework/database](https://github.com/joomla-framework/database)
 
-Here's what we're already using from the future:
+This can be done for all branches without any arguments, or for specific versions:
+```
+# Apply non-standard database port for 4.4-dev and 5.2-dev branches
+scripts/patch 44 52 joomla-cypress-33 joomla-cms-43968
 
-* :wrench: [joomla-cypress#33](https://github.com/joomla-projects/joomla-cypress/pull/33) Install Joomla with non-standard db_port
-* :wrench: [joomla-cypress#36](https://github.com/joomla-projects/joomla-cypress/pull/36) Wrap IPv6 address in brackets \[ \] if needed
-* :wrench: [joomla-cms#43968](https://github.com/joomla/joomla-cms/pull/43968) [cypress] Add db_port in Installation.cy.js
+# Allow to specify port number or UNIX socket in 5.3-dev branch
+scripts/patch 53 database-310
+```
 
-:point_right: These *hacks* are simple overwritten code. Be aware that these *hacks* will be lost if you run `npm install` or `npmp ci`. 
+:warning: Be cautious when applying patches, as we perform a full merge, which could introduce additional changes to the original pull request. Always monitor the number of modified lines.
+
+As of early October 2024, the default installation remains unpatched.
+While there's no way to remove a patch, you can use the `scripts/create recreate` to *go back in time* and restore the branch to the original state.
 
 ### DeLorean
 
-You can take a seat and pick up additional code from the future on your own. As of September 2024, the following have not yet been merged:
+You can take a seat and pick up additional code from the future on your own.
+As of early October 2024, the following pull requests (PRs) have not yet been merged, released, or included in certain branches - but tested to be included in the branches:
 
-1. If you're itching to see IPv6 in action with PostgreSQL, don't worry - it will work in the future.
-   Just use the `pd` module as a `postgres` replacement:
-   ```
-   scripts/create 53 IPv6 https://github.com/muhme/joomla-cms:pg-for-postgres
-   ```
-2. If you need Systems Tests with Database Unix Sockets,
-   you need to install PR [44092](https://github.com/joomla/joomla-cms/pull/44092).
-
-
+* :wrench: [joomla-cypress-33](https://github.com/joomla-projects/joomla-cypress/pull/33) Install Joomla with non-standard db_port
+  * Working for 4.4-dev, 5.1-dev (but updates joomla-cypress version from 1.0.3 to 1.1.1), 5.2-dev, 5.3-dev and 6.0-dev
+* :wrench: [joomla-cms-43968](https://github.com/joomla/joomla-cms/pull/43968) [cypress] Add db_port in Installation.cy.js
+  * Working for 4.4-dev, 5.2-dev and 5.3-dev
+* :wrench: [joomla-cypress-36](https://github.com/joomla-projects/joomla-cypress/pull/36) Wrap IPv6 address in brackets \[ \] if needed
+  * Working for 4.4-dev, 5.1-dev (but updates joomla-cypress version from 1.0.3 to 1.1.1), 5.2-dev, 5.3-dev and 6.0-dev
+* :wrench: [database-310](https://github.com/joomla-framework/database/pull/310) [3.x] Allow to specify port number or UNIX socket in host option also for MySQL (PDO) and PostgreSQL (PDO)
+  * Working for 5.1-dev, 5.2-dev, 5.3-dev and 6.0-dev
+* :wrench: [joomla-cms-44084](https://github.com/joomla/joomla-cms/pull/44084) [cypress] Using NPM Module 'pg' for 'postgres'
+  * Working for 4.4-dev
+* :wrench: [joomla-cms-44092](https://github.com/joomla/joomla-cms/pull/44092) [cypress] Database Unix Sockets for System Tests
+  * Working for 4.4-dev
 
 ## Database and File System Consistency
 
