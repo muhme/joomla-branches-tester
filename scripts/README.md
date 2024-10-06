@@ -2,7 +2,7 @@
 
 These scripts implement the Joomla Branches Tester (JBT), delivering the complete functionality along with necessary configuration files. They are stored in this directory `scripts`.
 
-You can run all scripts multiple times.
+You can run all scripts multiple times. The order of the arguments is like a shuffle playlist — anything goes.
 For a quick overview of all mandatory and optional arguments, run each script with the `help` argument. For example:
 
 ```
