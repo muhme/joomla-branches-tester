@@ -16,6 +16,7 @@ function help {
     echo "
     xdebug – Switches the PHP installation with or without Xdebug in one or more Web Server containers.
              Mandatory argument 'on' or 'off' is required.
+             Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
 
              $(random_quote)
     "

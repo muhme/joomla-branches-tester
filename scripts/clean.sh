@@ -16,7 +16,7 @@ source scripts/helper.sh
 function help {
   echo "
     clean – Stops and removes all JBT Docker containers, associated Docker networks, and volumes.
-            Also deletes directory 'run' and all 'branch_*' directories.
+            Also deletes JBT directories, such as 'run' and all 'branch_*' directories.
 
             $(random_quote)
     "

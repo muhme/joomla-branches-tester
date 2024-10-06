@@ -17,7 +17,7 @@ function help {
     info – Retrieves Joomla Branches Tester status information.
            Optional argument 'instance' to display Joomla Branches Tester instance information.
            Optional argument 'base' to display information about the base Docker containers.
-           Optional web server Docker container can be one or more of the following: ${allVersions[@]}.
+           Optional Joomla version can be one or more of the following: ${allVersions[@]}.
            If no argument is provided, all information will be displayed.
 
            $(random_quote)

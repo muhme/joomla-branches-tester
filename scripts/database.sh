@@ -19,8 +19,8 @@ function help {
     echo "
     database – Change the database and database driver for all, one or multiple Joomla containers.
                The mandatory database variant must be one of: ${JBT_DB_VARIANTS[@]}.
+               Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
                Optional 'socket' for using the database with a Unix socket (default is using TCP host).
-               Optional Joomla version can be one or more of the following: ${versions} (default is all).
 
                $(random_quote)
     "

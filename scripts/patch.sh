@@ -15,7 +15,7 @@ source scripts/helper.sh
 function help {
   echo "
     patch – Apply Git patches in the repositories ‘joomla-cms’, ‘joomla-cypress’ or ‘joomla-framework/database’.
-            Optional Joomla version can be one of: ${allVersions[@]} (default is all).
+            Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
             One or multipe patches, e.g. joomla-cms-43968, joomla-cypress-33 or database-310
 
             $(random_quote)

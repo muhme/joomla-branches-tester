@@ -19,7 +19,7 @@ function help {
     echo "
     php – Change PHP version on all, one or multiple Docker containers.
           Mandatory PHP version is one of: ${JBT_PHP_VERSIONS[@]}.
-          Optional Joomla version can be one of: ${allVersions[@]} (default is all).
+          Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
 
           $(random_quote)
     "

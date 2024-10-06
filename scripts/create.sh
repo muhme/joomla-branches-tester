@@ -19,7 +19,7 @@ source scripts/helper.sh
 function help {
   echo "
     create – Create base Docker containers and containers based on Joomla Git branches.
-             Optional Joomla version can be one or more of the following: ${allVersions[@]} (without version, all are installed).
+             Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
              Optional database variant can be one of: ${JBT_DB_VARIANTS[@]} (default is mariadbi).
              Optional 'socket' for using the database with a Unix socket (default is using TCP host).
              Optional 'IPv6' can be set (default is to use IPv4).
