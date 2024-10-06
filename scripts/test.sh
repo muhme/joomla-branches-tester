@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# test.sh - Runs Cypress specs on one, multiple, or all branches, e.g.
+# test.sh - Runs tests on one, multiple, or all branches, e.g.
 #   scripts/test
 #   scripts/test system novnc firefox
 #   scripts/test 44 lint:testjs
@@ -22,11 +22,12 @@ trap - ERR
 
 function help {
     echo "
-    test – Runs Cypress specs on one, multiple, or all branches.
+    test – Runs tests on one, multiple, or all branches.
            Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
            Optional 'novnc' argument sets DISPLAY=jbt_novnc:0 (default is headless).
            Optional 'chrome', 'edge', or 'firefox' can be specified as the browser (default is 'electron').
            Optional test name can be on or more of the following: ${ALL_TESTS[@]} (default is all).
+           Optional Cypress spec file pattern for 'system' tests (default is to run all w/o the installation step)
 
            $(random_quote)
     "
@@ -56,9 +57,14 @@ while [ $# -ge 1 ]; do
   elif isValidTestName "$1" "${ALL_TESTS[@]}"; then
     testsToRun+=("$1")
     shift # Argument is eaten as test name.
-  else
+  # Check argument contains at least one slash to prevent typos, to be taken as the test pattern.
+  elif [[ "$1" == */* ]]; then
     spec_argument="$1"
-    shift # Argument is eaten as test specification.
+    shift # Argument is eaten as test spec pattern.
+  else
+    help
+    error "Argument '$1' is not valid."
+    exit 1
   fi
 done
 
