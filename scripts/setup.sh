@@ -117,7 +117,7 @@ docker exec "jbt_${version}" bash -c ' \
 
 # Installing Node.js v22 and cron for Joomla Task Scheduler
 # Additional having vim, ping, telnet, netstat for comfort
-log "jbt_${version} – Installing additional packages"
+log "jbt_${version} – Installing additional Linux packages"
 docker exec "jbt_${version}" bash -c 'apt-get update -qq && \
     apt-get upgrade -y && \
     curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \

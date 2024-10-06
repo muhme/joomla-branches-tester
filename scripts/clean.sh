@@ -44,7 +44,7 @@ log 'Stopping and removing JBT Docker containers, associated Docker networks and
 docker compose down -v
 
 # Old containers existing?
-log "Check for any other Docker containers with names starting with 'jbt_\*'"
+log "Check for any other Docker containers with names starting with 'jbt_*'"
 docker ps -a --format '{{.Names}}' | grep "^jbt_" | while read container; do
   log "Removing non docker-compose container '${container}'"
   docker rm -f "${container}"

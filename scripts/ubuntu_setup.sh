@@ -22,7 +22,7 @@
 #   scripts/test
 
 function help {
-    echo "*** ubuntu_setup.sh – Install all prerequisites on Ubuntu."
+    echo "*** ubuntu_setup.sh – Install all prerequisites for Joomla Branches Tester on Ubuntu"
 }
 
 while [ $# -ge 1 ]; do
@@ -45,26 +45,26 @@ fi
 # Make the hosts entry
 HOSTS_FILE="/etc/hosts"
 if grep -q host.docker.internal "${HOSTS_FILE}"; then
-  echo "*** Entry 'host.docker.internal' exists already in '${HOSTS_FILE}' file."
+  echo "*** Entry 'host.docker.internal' exists already in '${HOSTS_FILE}' file"
 else
-  echo "*** Adding entry '127.0.0.1 host.docker.internal' to the file '${HOSTS_FILE}'."
+  echo "*** Adding entry '127.0.0.1 host.docker.internal' to the file '${HOSTS_FILE}'"
   echo "127.0.0.1 host.docker.internal" >> "${HOSTS_FILE}"
 fi
 
 # Enable SMTP port in Ubuntu Uncomplicated Firewall (UFW)
-echo "*** Allow port range 7000:7999/tcp in Ubuntu Uncomplicated Firewall (UFW)."
+echo "*** Allow port range 7000:7999/tcp in Ubuntu Uncomplicated Firewall (UFW)"
 # This is possible even UFW is disabled or the rules exist already
 ufw allow 7000:7999/tcp
 
 # Some basics with git
-echo "*** Installing git and some base packages."
+echo "*** Installing Git and some base packages"
 # This can run multiple times
 apt-get update
 apt-get upgrade -y
 apt-get install -y git vim iputils-ping net-tools telnet unzip
 
 # Docker
-echo "*** Installing Docker."
+echo "*** Installing Docker"
 # This can run multiple times
 apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg > /etc/apt/trusted.gpg.d/docker.asc
@@ -74,8 +74,8 @@ apt-get install -y docker-ce
 
 # Check if SUDO_USER exists, then use it; otherwise, default to $USER
 TARGET_USER=${SUDO_USER:-$USER}
-echo "*** Adding '${TARGET_USER}' user to the docker group."
+echo "*** Adding '${TARGET_USER}' user to the docker group"
 # This can run multiple times
 usermod -aG docker "${TARGET_USER}"
 
-echo "*** Finished. Please run 'sudo reboot', and after that, try 'docker ps'."
+echo "*** Finished, please run 'sudo reboot', and after that, you may try 'docker ps'"
