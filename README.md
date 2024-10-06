@@ -54,11 +54,13 @@ On macOS and Ubuntu, the native Cypress GUI is displayed in green.
         For those with a taste for the finer details, the comments are a gourmet treat."*
 
 <details>
-  <summary>As of mid-September 2024, there are currently 14 Docker containers providing the functionality.</summary>
+  <summary>As of early October 2024, there are currently 14 Docker containers providing the functionality.</summary>
 
 ---
 
-The abbreviation `jbt` stands for Joomla Branches Tester:
+The abbreviation `jbt` stands for Joomla Branches Tester.
+
+### Docker Container List
 
 |Name|Docker IPs|Host Port:<br />Container Inside|Directory :eight_spoked_asterisk: |Comment|
 |----|----------|--------------------------------|----------------------------------|-------|
@@ -139,13 +141,13 @@ For the web server containers, to simplify life, the standard Docker Joomla imag
 are used as a starting point and then overinstalled with the source code from the corresponding Joomla development branch.
 The Joomla Web-Installer is executed by the Cypress spec `Installation.cy.js` from the Joomla System Tests.
 
-Last tested in September 2024 with:
+Last tested in early October 2024 with:
 * Intel chip macOS 15 Sequoia,
 * Apple silicon macOS 15 Sequoia,
 * Windows 11 Pro WSL 2 Ubuntu and
 * Ubuntu 24 Noble Numbat (the absolute minimum, if you also wish to use the Cypress GUI, is a VPS with 2 shared vCPUs and 4 GB RAM).
 
-You can create all Docker containers and install the current (August 2024)
+You can create all Docker containers and install the current (early October 2024)
 five Joomla instances using `scripts/create`:
 
 ```
@@ -660,7 +662,7 @@ Or specify the desired branches:
 ```
 scripts/php 44 51 php8.1
 ```
-As we are based on the Docker images there are limitations (as of August 2024):
+As we are based on the Docker images there are limitations (as of early October 2024):
 * There is no Docker image for Joomla 4.4 with PHP 8.3, there is a fall back to PHP 8.2 used.
 * There are no Docker images for Joomla 5.3 and Joomla 6.0. The Joomla 5.2 images are being used instead.
   This should not cause any issues, as the source code for 5.3 and 6.0 is pulled from the respective
@@ -761,23 +763,11 @@ Used ports are 79xx, for the given example 7953.
 As shown in the [Installation](#installation) chapter,
 you can create the Docker Branches Tester instance using `scripts/create`
 with the `IPv6` option instead of the default IPv4 network.
-Docker assigns IP addresses from the predefined private, non-routable subnet `fd00::/8`.
-To view the assigned IPv4 and IPv6 dual stack network addresses (they may change on each Docker run), use:
+IP addresses are fixed (see [Docker Container List](#docker-container-list)) from the predefined private, non-routable subnet `fd00::/8`.
 
-```
-docker inspect jbt_network
-```
-You can also see the used IPv6 addresses in using ping command line tool:
-```
-docker exec jbt_cypress ping jbt_pg
-```
-```
-64 bytes from jbt_pg.jbt_network (fd00::4): icmp_seq=1 ttl=64 time=0.092 ms
-...
-```
 You can use the IPv6 address (instead of the hostname) to open the PostgreSQL interactive terminal:
 ```
-docker exec -it jbt_pg bash -c "PGPASSWORD=root psql -h fd00::4 -U root -d postgres"
+docker exec -it jbt_pg bash -c "PGPASSWORD=root psql -h fd00::13 -U root -d postgres"
 ```
 :point_right: IPv6 networking is limited to within Docker.
               The `host.docker.internal` feature generally defaults to IPv4,
