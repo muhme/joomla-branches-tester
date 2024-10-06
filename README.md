@@ -965,9 +965,9 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
    `jbt_cypress:7125`, delivered to the mail catcher listening on `jbt_mail:7225`,
    and could not be delivered to the locally running Cypress GUI `smtp-tester` listening on `localhost:7325` (equivalent host names are used for clarity).
 5. Run a script with the option `-x` to enable detailed debugging output that shows each command
-   executed along with its arguments, for example:
+   executed along with its arguments. You have to use the `.sh` variant, for example:
    ```
-   bash -x scripts/pull
+   bash -x scripts/pull.sh 53
    ```
 6. If you encounter problems after running `scripts/create` multiple times,
    try using the `no-cache` option to force a fresh build of the containers.
