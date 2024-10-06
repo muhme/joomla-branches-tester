@@ -382,13 +382,6 @@ In parallel you can inspect MariaDB and MySQL database with [phpMyAdmin](https:/
 [MailDev](https://github.com/maildev/maildev/blob/master/docs/docker.md) on
 [http://host.docker.internal:7004](http://host.docker.internal:7004).
 
-<del>The Joomla instances are configured in the 'Global Configuration' with the following settings:
-* Debug System
-* Log Almost Everything
-* Log Deprecated API</del>
-
-:warning: *16 September 2024* Disabled because `Error: Unwanted PHP Deprecated`
-
 If you need to inspect files, they are available in the directory `branch_52` for this Joomla release 5.2 sample.
 
 ### Drone-like Tests
@@ -647,9 +640,10 @@ docker exec -it jbt_mysql bash -c "mysql --socket=/var/run/mysqld/mysqld.sock -u
 ```
 
 :point_right: Be aware that for the Joomla System Tests,
-              Unix sockets currently work (as of mid-September 2024) only for the installation step,
+              Unix sockets currently work (as of early October 2024) only for the installation step,
               but not for custom database commands that are JavaScript-based,
               you need to install PR [44092](https://github.com/joomla/joomla-cms/pull/44092).
+              See [Back to the Future - Patch](#back-to-the-future---patch).
 
 ### Switch PHP Version
 
