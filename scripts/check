@@ -68,25 +68,25 @@ if [ "${jbt}" = "true" ]; then
 elif [ "${scripts}" = "true" ]; then
   grep -e '<<<' -e '>>>' "${file}"
 else
-  grep -i \
-      -e ERR \
-      -e error \
-      -e fatal \
-      -e stop \
-      -e 'not found' \
-    "${file}" | grep -v \
-      -e 'Configure to catch all PHP errors' \
-      -e 'liberror-perl' \
-      -e 'symfony/error-handler' \
-      -e 'fatal-error.html' \
-      -e 'system-admin-error.css' \
-      -e 'system-site-error.css' \
-      -e 'system-site-error_rtl.css' \
-      -e 'languageErrors/widget.css' \
-      -e 'Stopping and removing JBT Docker container' \
-      -e 'Container .* Stopping' \
-      -e 'Container .* Stopped' \
-      -e 'symfony/stopwatch' \
-      -e 'overrid'
-
+  grep -v \
+    -e 'Configure to catch all PHP errors' \
+    -e 'liberror-perl' \
+    -e 'symfony/error-handler' \
+    -e 'fatal-error.html' \
+    -e 'system-admin-error.css' \
+    -e 'system-site-error.css' \
+    -e 'system-site-error_rtl.css' \
+    -e 'languageErrors/widget.css' \
+    -e 'Stopping and removing JBT Docker container' \
+    -e 'Container .* Stopping' \
+    -e 'Container .* Stopped' \
+    -e 'symfony/stopwatch' \
+    -e 'overrid' "${file}" \
+    -e 'pear-build-defaultuser' | \
+  grep -i --color=always \
+    -e ERR \
+    -e error \
+    -e fatal \
+    -e stop \
+    -e 'not found'
 fi
