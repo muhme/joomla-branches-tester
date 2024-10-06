@@ -640,9 +640,10 @@ docker exec -it jbt_mysql bash -c "mysql --socket=/var/run/mysqld/mysqld.sock -u
 ```
 
 :point_right: Be aware that for the Joomla System Tests,
-              Unix sockets currently work (as of mid-September 2024) only for the installation step,
+              Unix sockets currently work (as of early October 2024) only for the installation step,
               but not for custom database commands that are JavaScript-based,
               you need to install PR [44092](https://github.com/joomla/joomla-cms/pull/44092).
+              See [Back to the Future - Patch](#back-to-the-future---patch).
 
 ### Switch PHP Version
 
