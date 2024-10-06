@@ -546,32 +546,6 @@ for running the Cypress GUI locally.
 
 </details>
 
-### Install Joomla Patch Tester
-
-For your convenience, the latest version of the
-[Joomla Patch Tester](https://github.com/joomla-extensions/patchtester)
-can be installed on the Joomla instances.
-The script also sets the GitHub token and fetch the data.
-This can be done without version number for all Joomla instances or for e.g. Joomla 5.3-dev:
-
-```
-scripts/patchtester 53 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
-```
-
-```
-  Running:  patchtester.cy.js                             (1 of 1)
-    Install 'Joomla! Patch Tester' with
-    ✓ install component (7747ms)
-    ✓ set GitHub token (2556ms)
-    ✓ fetch data (6254ms)
-```
-
-:point_right: The GitHub token can also be given by environment variable `JBT_GITHUB_TOKEN`.
-              And of course the sample token does not work.
-
-:fairy: *"You need to reinstall the Joomla Patch Tester if, for example you switch the database.
-        For more details, see [Database and File System Consistency](#database-and-file-system-consistency)."*
-
 ### Databases
 
 The Joomla Branches Tester includes one container for each of the three supported databases (version numbers as of September 2024):
@@ -774,6 +748,78 @@ docker exec -it jbt_pg bash -c "PGPASSWORD=root psql -h fd00::13 -U root -d post
               the database custom commands executed by a local running Cypress GUI
               use the IPv4 address to access the database.
 
+### Install Joomla Patch Tester
+
+For your convenience, the latest version of the
+[Joomla Patch Tester](https://github.com/joomla-extensions/patchtester)
+can be installed on the Joomla instances.
+The script also sets the GitHub token and fetch the data.
+This can be done without version number for all Joomla instances or for e.g. Joomla 5.3-dev:
+
+```
+scripts/patchtester 53 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
+```
+
+```
+  Running:  patchtester.cy.js                             (1 of 1)
+    Install 'Joomla! Patch Tester' with
+    ✓ install component (7747ms)
+    ✓ set GitHub token (2556ms)
+    ✓ fetch data (6254ms)
+```
+
+:point_right: The GitHub token can also be given by environment variable `JBT_GITHUB_TOKEN`.
+              And of course the sample token does not work.
+
+:fairy: *"You need to reinstall the Joomla Patch Tester if, for example you switch the database.
+        For more details, see [Database and File System Consistency](#database-and-file-system-consistency)."*
+
+:point_right: Alternatively, to apply patches, you can use `scripts/patch`, see [Back to the Future - Patch](#back-to-the-future---patch).
+
+### Back to the Future - Patch
+
+As Doc Brown said: *"Roads? Where we're going, we don't need roads."*
+
+JBT can install patches on its own using Git merge from pull requests (PRs) with `scripts/patch` (or even with `scripts/create`),
+applicable to the following repositories:
+* joomla-cms - [joomla/joomla-cms](https://github.com/joomla/joomla-cms)
+* joomla-cypress - [joomla-projects/joomla-cypress](https://github.com/joomla-projects/joomla-cypress)
+* database - [joomla-framework/database](https://github.com/joomla-framework/database)
+
+This can be done for all branches without any arguments, or for specific versions:
+```
+# Apply non-standard database port for 4.4-dev and 5.2-dev branches
+scripts/patch 44 52 joomla-cypress-33 joomla-cms-43968
+
+# Allow to specify port number or UNIX socket in 5.3-dev branch
+scripts/patch 53 database-310
+```
+
+:warning: Be cautious when applying patches, as we perform a full merge, which could introduce additional changes to the original pull request. Always monitor the number of modified lines.
+
+As of early October 2024, the default installation remains unpatched.
+While there's no way to remove a patch, you can use the `scripts/create recreate` to *go back in time* and restore the branch to the original state.
+
+:point_right: Alternatively, to apply `joomla-cms` patches, you can use [Joomla Patch Tester](#install-joomla-patch-tester).
+
+#### DeLorean
+
+You can take a seat and pick up additional code from the future on your own.
+As of early October 2024, the following pull requests (PRs) have not yet been merged, released, or included in certain branches - but tested to be included in the branches:
+
+* :wrench: [joomla-cypress-33](https://github.com/joomla-projects/joomla-cypress/pull/33) Install Joomla with non-standard db_port
+  * Working for 4.4-dev, 5.1-dev (but updates joomla-cypress version from 1.0.3 to 1.1.1), 5.2-dev, 5.3-dev and 6.0-dev
+* :wrench: [joomla-cms-43968](https://github.com/joomla/joomla-cms/pull/43968) [cypress] Add db_port in Installation.cy.js
+  * Working for 4.4-dev, 5.2-dev and 5.3-dev
+* :wrench: [joomla-cypress-36](https://github.com/joomla-projects/joomla-cypress/pull/36) Wrap IPv6 address in brackets \[ \] if needed
+  * Working for 4.4-dev, 5.1-dev (but updates joomla-cypress version from 1.0.3 to 1.1.1), 5.2-dev, 5.3-dev and 6.0-dev
+* :wrench: [database-310](https://github.com/joomla-framework/database/pull/310) [3.x] Allow to specify port number or UNIX socket in host option also for MySQL (PDO) and PostgreSQL (PDO)
+  * Working for 5.1-dev, 5.2-dev, 5.3-dev and 6.0-dev
+* :wrench: [joomla-cms-44084](https://github.com/joomla/joomla-cms/pull/44084) [cypress] Using NPM Module 'pg' for 'postgres'
+  * Working for 4.4-dev
+* :wrench: [joomla-cms-44092](https://github.com/joomla/joomla-cms/pull/44092) [cypress] Database Unix Sockets for System Tests
+  * Working for 4.4-dev
+
 ### Info
 
 You can retrieve some interesting Joomla Branches Tester status information.
@@ -840,11 +886,6 @@ scripts/info instance 44
 ### Check & Logging
 
 Most scripts automatically duplicate their output to a log file in the `logs` folder.
-This allows you to review the logs later:
-```
-more -rf logs/241004173051_create.txt
-```
-
 The `scripts/check` command supports searching JBT log files for critical issues or specific information.
 You can run `scripts/check` without any arguments to check the latest log file,
 or specify a log file name to review a particular log.
@@ -867,48 +908,6 @@ If you want to rid of all Docker containers and free up multiple gigabytes of di
 ```
 scripts/clean
 ```
-
-## Back to the Future - Patch
-
-As Doc Brown said: *"Roads? Where we're going, we don't need roads."*
-
-JBT can install patches on its own using Git merge from pull requests (PRs) with `scripts/patch` (or even with `scripts/create`),
-applicable to the following repositories:
-* joomla-cms - [joomla/joomla-cms](https://github.com/joomla/joomla-cms)
-* joomla-cypress - [joomla-projects/joomla-cypress](https://github.com/joomla-projects/joomla-cypress)
-* database - [joomla-framework/database](https://github.com/joomla-framework/database)
-
-This can be done for all branches without any arguments, or for specific versions:
-```
-# Apply non-standard database port for 4.4-dev and 5.2-dev branches
-scripts/patch 44 52 joomla-cypress-33 joomla-cms-43968
-
-# Allow to specify port number or UNIX socket in 5.3-dev branch
-scripts/patch 53 database-310
-```
-
-:warning: Be cautious when applying patches, as we perform a full merge, which could introduce additional changes to the original pull request. Always monitor the number of modified lines.
-
-As of early October 2024, the default installation remains unpatched.
-While there's no way to remove a patch, you can use the `scripts/create recreate` to *go back in time* and restore the branch to the original state.
-
-### DeLorean
-
-You can take a seat and pick up additional code from the future on your own.
-As of early October 2024, the following pull requests (PRs) have not yet been merged, released, or included in certain branches - but tested to be included in the branches:
-
-* :wrench: [joomla-cypress-33](https://github.com/joomla-projects/joomla-cypress/pull/33) Install Joomla with non-standard db_port
-  * Working for 4.4-dev, 5.1-dev (but updates joomla-cypress version from 1.0.3 to 1.1.1), 5.2-dev, 5.3-dev and 6.0-dev
-* :wrench: [joomla-cms-43968](https://github.com/joomla/joomla-cms/pull/43968) [cypress] Add db_port in Installation.cy.js
-  * Working for 4.4-dev, 5.2-dev and 5.3-dev
-* :wrench: [joomla-cypress-36](https://github.com/joomla-projects/joomla-cypress/pull/36) Wrap IPv6 address in brackets \[ \] if needed
-  * Working for 4.4-dev, 5.1-dev (but updates joomla-cypress version from 1.0.3 to 1.1.1), 5.2-dev, 5.3-dev and 6.0-dev
-* :wrench: [database-310](https://github.com/joomla-framework/database/pull/310) [3.x] Allow to specify port number or UNIX socket in host option also for MySQL (PDO) and PostgreSQL (PDO)
-  * Working for 5.1-dev, 5.2-dev, 5.3-dev and 6.0-dev
-* :wrench: [joomla-cms-44084](https://github.com/joomla/joomla-cms/pull/44084) [cypress] Using NPM Module 'pg' for 'postgres'
-  * Working for 4.4-dev
-* :wrench: [joomla-cms-44092](https://github.com/joomla/joomla-cms/pull/44092) [cypress] Database Unix Sockets for System Tests
-  * Working for 4.4-dev
 
 ## Database and File System Consistency
 
