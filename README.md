@@ -77,8 +77,8 @@ The abbreviation `jbt` stands for Joomla Branches Tester.
 |jbt_53| 10.0.0.52<br />fd00::52 | **[7053](http://host.docker.internal:7053/administrator)** | /branch_53 | Web Server Joomla branch 5.3-dev<br />user ci-admin / joomla-17082005 |
 |jbt_60| 10.0.0.60<br />fd00::60 | **[7060](http://host.docker.internal:7060/administrator)** | /branch_60 | Web Server Joomla branch 6.0-dev<br />user ci-admin / joomla-17082005 |
 
-:eight_spoked_asterisk: The directories are available on the Docker host inside /jbt to:
-* Inspect and change the configuration files (`configuration.php` or `cypress.config.js`),
+:eight_spoked_asterisk: The directories are available on the Docker host inside `/jbt` to:
+* Inspect and change the configuration files (`configuration.php` or `cypress.config.mjs`),
 * To edit the test specs below `tests/System` or
 * To inspect screenshots from failed tests or
 * To inspect and hack the Joomla sources from Docker host system.
