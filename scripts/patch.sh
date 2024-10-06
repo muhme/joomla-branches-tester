@@ -61,19 +61,21 @@ for version in "${versionsToPatch[@]}"; do
   fi
 
   for patch in ${patches[@]}; do
-    repo="${patch%-*}"
-    patch_number="${patch##*-}"
+    repo="${patch%-*}" # 'joomla-cms', 'database' or 'joomla-cypress'
+    patch_number="${patch##*-}" # e.g. 43968, 31 or 33
+    # Don't use "jbt-${repo_version}", use 'jbt-merged' as constant as with Git merge the repository version may change.
+    merge_branch="jbt-merged"
 
     if [ "${repo}" = "joomla-cms" ]; then
       repo_version=$(grep '"version":' "branch_${version}/package.json" | sed -n 's/.*"version": "\([0-9.]*\)".*/\1/p')
       dir="."
       current_branch=$(docker exec "jbt_${version}" bash -c "git branch --show-current")
-      if [ "${current_branch}" != "jbt-${repo_version}" ]; then
+      if [ "${current_branch}" != "${merge_branch}" ]; then
         # Unshallow 'joomla-cms' as it was cloned with --depth 1 in setup.sh for speed and space
         log "jbt_${version} - Git unshallow '${repo}' repository"
         docker exec "jbt_${version}" git fetch --unshallow
-        log "jbt_${version} - Checkout 'jbt-${repo_version}' branch on 'joomla-cms' repository"
-        docker exec "jbt_${version}" git checkout -b "jbt-${repo_version}"
+        log "jbt_${version} - Create '${merge_branch}' branch on 'joomla-cms' repository and switch to it"
+        docker exec "jbt_${version}" git checkout -b "${merge_branch}"
       fi
     elif [ "${repo}" = "database" ]; then
       dir="libraries/vendor/joomla/joomla-framework"
@@ -86,62 +88,53 @@ for version in "${versionsToPatch[@]}"; do
       continue
     fi
 
+    #      dir is '.', 'libraries/vendor/joomla/joomla-framework' or 'node_modules/joomla-projects'
+    # base_dir is '.', 'libraries/vendor/joomla'                  or 'node_modules'
+    basedir=$(dirname ${dir})
+
     # Case 0: Directory doesn't exist (don't check for joomla-cms)
-    if [ "${repo}" != "joomla-cms" ] && [ ! -d "branch_${version}/$(dirname ${dir})/${repo}" ]; then
-      error "Missing 'branch_${version}/$(dirname ${dir})/${repo}' directory, '${patch}' patch will be ignored."
+    if [ "${repo}" != "joomla-cms" ] && [ ! -d "branch_${version}/${basedir}/${repo}" ]; then
+      error "Missing 'branch_${version}/${basedir}/${repo}' directory, '${patch}' patch will be ignored."
       continue
     fi
 
     # Case 1: Clone to new Git repository and apply the patch (never for joomla-cms)
-    if [ "${repo}" != "joomla-cms" ] && [ ! -d "branch_${version}/$(dirname ${dir})/${repo}/.git" ]; then
-      log "jbt_${version} - Delete 'branch_${version}/$(dirname ${dir})/${repo}' directory"
-      rm -rf "branch_${version}/$(dirname ${dir})/${repo}" 2>/dev/null || sudo rm -rf "branch_${version}/$(dirname ${dir})/${repo}"
+    if [ "${repo}" != "joomla-cms" ] && [ ! -d "branch_${version}/${basedir}/${repo}/.git" ]; then
+      log "jbt_${version} - Delete 'branch_${version}/${basedir}/${repo}' directory"
+      rm -rf "branch_${version}/${basedir}/${repo}" 2>/dev/null || sudo rm -rf "branch_${version}/${basedir}/${repo}"
       log "jbt_${version} - Git clone $(basename ${dir})/${repo}, version ${repo_version}"
       docker exec "jbt_${version}" bash -c "
-        cd $(dirname ${dir})
+        cd ${basedir}
         git clone \"https://github.com/$(basename ${dir})/${repo}\"
         cd ${repo}
-        git checkout -b \"jbt-${repo_version}\" \"refs/tags/${repo_version}\""
+        git checkout -b \"${merge_branch}\" \"refs/tags/${repo_version}\""
       # Merge given PR
       log "jbt_${version} - Apply PR ${patch}"
-      # Not using simple 'git merge \"jbt-pr-${patch_number}\"' as this gets all changes in PR branch.
-      # Use a three-way diff to apply only the specific PR differences between the two branches.
+      # Using a simple Git merge (instead of a three-way diff) to apply the specific PR differences between
+      # the two branches. This may introduce additional changes, but ensures the merge is possible.
       docker exec "jbt_${version}" bash -c "
-        cd \"$(dirname ${dir})/${repo}\"
+        cd \"${basedir}/${repo}\"
         git fetch origin \"pull/${patch_number}/head:jbt-pr-${patch_number}\"
-        git diff main \"jbt-pr-${patch_number}\" > \"/tmp/jbt-pr-${patch_number}\"
-        git config --global --add safe.directory \"/var/www/html/$(dirname ${dir})/${repo}\""
-      # Do it.
-      if ! docker exec "jbt_${version}" git apply --stat "/tmp/jbt-pr-${patch_number}"; then
-        error "jbt_${version} - 'git apply --stat \"/tmp/jbt-pr-${patch_number}\"' faild. You could use 'unpatched'."
-        exit
-      fi
+        git merge \"jbt-pr-${patch_number}\"
+        git config --global --add safe.directory \"/var/www/html/${basedir}/${repo}\""
       continue
     elif
       # Case 2: Check if the patch has already been applied in existing Git repository.
       # TODO: ?Needed? check PR is already included in the release
       docker exec "jbt_${version}" bash -c "
-        [ \"${repo}\" != \"joomla-cms\" ] && cd \"$(dirname ${dir})/${repo}\"
+        [ \"${repo}\" != \"joomla-cms\" ] && cd \"${basedir}/${repo}\"
         git fetch origin \"pull/${patch_number}/head:jbt-pr-${patch_number}\"
-        git merge-base --is-ancestor \"jbt-pr-${patch_number}\" jbt-${repo_version}"; then
-        log "jbt_${version} - PR '${patch}' has already been applied"
+        git merge-base --is-ancestor \"jbt-pr-${patch_number}\" \"${merge_branch}\""; then
+          log "jbt_${version} - PR '${patch}' has already been applied"
       continue
     else
       # Case 3: Apply the patch to the existing Git repository
-      # Not using simple 'git merge \"jbt-pr-${patch_number}\"' as this gets all changes in PR branch.
-      # Use a three-way diff to apply only the specific PR differences between the two branches.
+      # Using a simple Git merge (instead of a three-way diff) to apply the specific PR differences between
+      # the two branches. This may introduce additional changes, but ensures the merge is possible.
       log "jbt_${version} - Apply PR ${patch}"
       docker exec "jbt_${version}" bash -c "
-        [ \"${repo}\" != \"joomla-cms\" ] && cd \"$(dirname ${dir})/${repo}\"
-        git fetch origin \"pull/${patch_number}/head:jbt-pr-${patch_number}\"
-        git diff main \"jbt-pr-${patch_number}\" > \"/tmp/jbt-pr-${patch_number}\""
-      # Do it.
-      if ! docker exec "jbt_${version}" bash -c "
-        [ \"${repo}\" != \"joomla-cms\" ] && cd \"$(dirname ${dir})/${repo}\"
-        git apply --stat \"/tmp/jbt-pr-${patch_number}\""; then
-          error "jbt_${version} - 'git apply --stat \"/tmp/jbt-pr-${patch_number}\"' faild. You could use 'unpatched'."
-          exit
-      fi
+        [ \"${repo}\" != \"joomla-cms\" ] && cd \"${basedir}/${repo}\"
+        git merge \"jbt-pr-${patch_number}\""
       continue
     fi
   done
