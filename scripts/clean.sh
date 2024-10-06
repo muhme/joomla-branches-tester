@@ -80,11 +80,11 @@ if [ -d "run" ]; then
   rm -rf run 2>/dev/null || sudo rm -rf run
 fi
 
-# Database sockets must be deleted; otherwise, they will be mapped to the new instances.
+# Delete all log files, except the actual one :)
 if [ -d "logs" ]; then
   log "Removing all files in the 'logs' directory, except for the most recent one"
   mkdir -p logs 2>/dev/null || sudo mkdir -p logs
-  (cd logs; ls -t | tail -n +2 >"${TMP}"; xargs rm -- <"${TMP}" 2>/dev/null || sudo xargs rm -- <"${TMP}")
+  (cd logs; ls -t | tail -n +2 >"${TMP}"; xargs -r rm -- <"${TMP}" 2>/dev/null || sudo xargs -r rm -- <"${TMP}")
 fi
 
 # Cypress and web server containers shared Cypress binaries
