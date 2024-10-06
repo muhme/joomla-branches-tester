@@ -12,13 +12,14 @@ Use one, multiple, or all branches for:
 * Running [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System)
   with [Cypress](https://www.cypress.io/) in interactive mode (GUI) or automated mode (headless or with noVNC).
 * Executing unit tests, verifying coding standards, and checking CSS styles and JavaScript standards, just like Drone.
-* Automating the installation of the [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester).
-* Switching between the three database options: MySQL, MariaDB, or PostgreSQL, and the two database drivers:
-  MySQLi or PHP Data Objects, including the option to use Unix sockets, instead of TCP host.
-* Switching between PHP versions (8.1, 8.2, or 8.3), as supported by the official Docker images.
+* Automated [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester) installation.
+* Apply pull requests (PR) from Git repositories `joomla-cms`, `joomla-cypress` and `joomla-framework/database`.
+* Switching between 10 database variants (MySQL, MariaDB, or PostgreSQL, and the two database drivers:
+  MySQLi or PHP Data Objects, and the option to use Unix sockets, instead of TCP host).
+* Switching between PHP versions (8.1, 8.2, or 8.3).
 * Installing Joomla from a cloned 'joomla-cms' Git repository.
 * Grafting a Joomla package onto a development branch.
-* Using Xdebug for debugging.
+* Using Xdebug for PHP debugging.
 * Using IPv6 network.
 
 ![Joomla Branches Software Architecture](images/joomla-branches-tester.svg)
