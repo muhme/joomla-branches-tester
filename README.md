@@ -60,8 +60,6 @@ On macOS and Ubuntu, the native Cypress GUI is displayed in green.
 
 The abbreviation `jbt` stands for Joomla Branches Tester.
 
-### Docker Container List
-
 |Name|Docker IPs|Host Port:<br />Container Inside|Directory :eight_spoked_asterisk: |Comment|
 |----|----------|--------------------------------|----------------------------------|-------|
 |jbt_phpmya| 10.0.0.2<br />fd00::2 | **[7002](http://host.docker.internal:7002)** | | Web App to manage MariaDB and MySQL<br />auto-login configured, root / root |
@@ -763,7 +761,7 @@ Used ports are 79xx, for the given example 7953.
 As shown in the [Installation](#installation) chapter,
 you can create the Docker Branches Tester instance using `scripts/create`
 with the `IPv6` option instead of the default IPv4 network.
-IP addresses are fixed (see [Docker Container List](#docker-container-list)) from the predefined private, non-routable subnet `fd00::/8`.
+IP addresses are fixed from the predefined private, non-routable subnet `fd00::/8`.
 
 You can use the IPv6 address (instead of the hostname) to open the PostgreSQL interactive terminal:
 ```
