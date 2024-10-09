@@ -63,20 +63,20 @@ The abbreviation `jbt` stands for Joomla Branches Tester.
 
 |Name|Docker IPs|Host Port:<br />Container Inside|Directory :eight_spoked_asterisk: |Comment|
 |----|----------|--------------------------------|----------------------------------|-------|
-|jbt_phpmya| 10.0.0.2<br />fd00::2 | **[7002](http://host.docker.internal:7002)** | | Web App to manage MariaDB and MySQL<br />auto-login configured, root / root |
-|jbt_pga| 10.0.0.3<br />fd00::3 | **[7003](http://host.docker.internal:7003)** | | Web App to manage PostgreSQL<br />auto-login configured, root / root, postgres / prostgres |
-|jbt_mail| 10.0.0.4<br />fd00::4 | **[7004](http://host.docker.internal:7004)** <br /> SMTP **7225**:1025 | | Web interface to verify emails. |
-|jbt_novnc| 10.0.0.5<br />fd00::5 | **[7005](http://host.docker.internal:7005/vnc.html?autoconnect=true&resize=scale)** | | If you run automated Cypress System Tests with the `novnc` option, you can watch them. |
-|jbt_relay| 10.0.0.6<br />fd00::6 | SMTP **7025**:7025 | | SMTP relay triplicator |
-|jbt_cypress| 10.0.0.7<br />fd00::7 | SMTP :7125 | | Cypress Headless Test Environment<br />SMTP server is only running during test execution |
-|jbt_mysql| 10.0.0.11<br />fd00::11 :eight_pointed_black_star: | **7011**:3306 | | Database Server MySQL version 8.1 |
-|jbt_madb| 10.0.0.12<br />fd00::12 | **7012**:3306 | | Database Server MariaDB version 10.4 |
-|jbt_pg| 10.0.0.13<br />fd00::13 | **7013**:5432 | | Database Server PostgreSQL version 12.20 |
-|jbt_44| 10.0.0.44<br />fd00::44 | **[7044](http://host.docker.internal:7044/administrator)** | /branch_44 | Web Server Joomla branch 4.4-dev<br />user ci-admin / joomla-17082005 |
-|jbt_51| 10.0.0.51<br />fd00::51 | **[7051](http://host.docker.internal:7051/administrator)** | /branch_51 | Web Server Joomla branch 5.1-dev<br />user ci-admin / joomla-17082005 |
-|jbt_52| 10.0.0.52<br />fd00::52 | **[7052](http://host.docker.internal:7052/administrator)** | /branch_52 | Web Server Joomla branch 5.2-dev<br />user ci-admin / joomla-17082005 |
-|jbt_53| 10.0.0.52<br />fd00::52 | **[7053](http://host.docker.internal:7053/administrator)** | /branch_53 | Web Server Joomla branch 5.3-dev<br />user ci-admin / joomla-17082005 |
-|jbt_60| 10.0.0.60<br />fd00::60 | **[7060](http://host.docker.internal:7060/administrator)** | /branch_60 | Web Server Joomla branch 6.0-dev<br />user ci-admin / joomla-17082005 |
+|jbt-mya| 10.0.0.2<br />fd00::2 | **[7002](http://host.docker.internal:7002)** | | Web App to manage MariaDB and MySQL<br />auto-login configured, root / root |
+|jbt-pga| 10.0.0.3<br />fd00::3 | **[7003](http://host.docker.internal:7003)** | | Web App to manage PostgreSQL<br />auto-login configured, root / root, postgres / prostgres |
+|jbt-mail| 10.0.0.4<br />fd00::4 | **[7004](http://host.docker.internal:7004)** <br /> SMTP **7225**:1025 | | Web interface to verify emails. |
+|jbt-novnc| 10.0.0.5<br />fd00::5 | **[7005](http://host.docker.internal:7005/vnc.html?autoconnect=true&resize=scale)** | | If you run automated Cypress System Tests with the `novnc` option, you can watch them. |
+|jbt-relay| 10.0.0.6<br />fd00::6 | SMTP **7025**:7025 | | SMTP relay triplicator |
+|jbt-cypress| 10.0.0.7<br />fd00::7 | SMTP :7125 | | Cypress Headless Test Environment<br />SMTP server is only running during test execution |
+|jbt-mysql| 10.0.0.11<br />fd00::11 :eight_pointed_black_star: | **7011**:3306 | | Database Server MySQL version 8.1 |
+|jbt-madb| 10.0.0.12<br />fd00::12 | **7012**:3306 | | Database Server MariaDB version 10.4 |
+|jbt-pg| 10.0.0.13<br />fd00::13 | **7013**:5432 | | Database Server PostgreSQL version 12.20 |
+|jbt-44| 10.0.0.44<br />fd00::44 | **[7044](http://host.docker.internal:7044/administrator)** | /branch_44 | Web Server Joomla branch 4.4-dev<br />user ci-admin / joomla-17082005 |
+|jbt-51| 10.0.0.51<br />fd00::51 | **[7051](http://host.docker.internal:7051/administrator)** | /branch_51 | Web Server Joomla branch 5.1-dev<br />user ci-admin / joomla-17082005 |
+|jbt-52| 10.0.0.52<br />fd00::52 | **[7052](http://host.docker.internal:7052/administrator)** | /branch_52 | Web Server Joomla branch 5.2-dev<br />user ci-admin / joomla-17082005 |
+|jbt-53| 10.0.0.52<br />fd00::52 | **[7053](http://host.docker.internal:7053/administrator)** | /branch_53 | Web Server Joomla branch 5.3-dev<br />user ci-admin / joomla-17082005 |
+|jbt-60| 10.0.0.60<br />fd00::60 | **[7060](http://host.docker.internal:7060/administrator)** | /branch_60 | Web Server Joomla branch 6.0-dev<br />user ci-admin / joomla-17082005 |
 
 :eight_spoked_asterisk: The directories are available on the Docker host inside `/jbt` to:
 * Inspect and change the configuration files (`configuration.php` or `cypress.config.mjs`),
@@ -181,7 +181,7 @@ you will need to download approximately 4 GB of data over the network.
    For example, using `https://github.com/Elfangor93/joomla-cms:mod_community_info`.
    In this case, exactly one version must be provided,
    and it should match the version of the given `joomla-cms` cloned repository.
-5. The Docker `jbt_network`, used by all containers, defaults to IPv4.
+5. The Docker `jbt-network`, used by all containers, defaults to IPv4.
    To use IPv6, run the script with the `IPv6` option.
    This will configure the Docker network to use IPv6.
 6. The optional `recreate` option is used to create or recreate one web server container
@@ -271,7 +271,7 @@ For the different operating systems, there are more detailed descriptions availa
    scripts/create
    ```
 
-:point_right: To run the interactive Cypress GUI from the Docker container `jbt_cypress`,
+:point_right: To run the interactive Cypress GUI from the Docker container `jbt-cypress`,
   Windows 11 (with included Windows Subsystem for Linux GUI – WSLg) is required.
 
 ---
@@ -455,10 +455,10 @@ scripts/test 51 52 53 system edge 'tests/System/integration/site/**/*.cy.{js,jsx
 ```
 
 One more optional argument is `novnc`.
-The `jbt_vnc` container allows to view the automated browser tests via the web-based VNC viewer [noVNC](https://github.com/novnc/noVNC).
+The `jbt-vnc` container allows to view the automated browser tests via the web-based VNC viewer [noVNC](https://github.com/novnc/noVNC).
 This is useful for watching the automated Cypress System Tests in real-time, for example,
 when the gnome is too impatient to wait for the 120-second timeout from `installJoomla` again.
-In this case Cypress runs headed and uses `jbt_vnc` as DISPLAY and you can watch the
+In this case Cypress runs headed and uses `jbt-vnc` as DISPLAY and you can watch the
 execution of the automated tests with the URL:
 * [http://host.docker.internal:7005/vnc.html?autoconnect=true&resize=scale](http://host.docker.internal:7005/vnc.html?autoconnect=true&resize=scale)
 ```
@@ -477,7 +477,7 @@ If a test spec fails, the screenshot is helpful. More enlightening is it to exec
 with the Cypress GUI in interactive mode. You can see all the Cypress log messages, use the time-traveling debugger and
 observe how the browser runs in parallel.
 
-Cypress GUI can be started from Docker container `jbt_cypress` with X11 forwarding
+Cypress GUI can be started from Docker container `jbt-cypress` with X11 forwarding
 (recommended for Windows 11 WSL 2 Ubuntu):
 ```
 scripts/cypress 51
@@ -504,7 +504,7 @@ the [MailDev](https://hub.docker.com/r/maildev/maildev) container offers you
 provides you with a web interface at [http://host.docker.internal:7004](http://host.docker.internal:7004).
 The Cypress based Joomla System Tests is using an own SMTP server `smtp-tester` to receive, check and delete emails.
 Since we run Cypress locally or in a container, it is necessary to triple emails.
-This is done by the SMTP relay triplicator `jbt_relay`.
+This is done by the SMTP relay triplicator `jbt-relay`.
 
 :fairy: *"Oh, dear Gnome, now I can really read all the emails from the System Tests, thank you."*
 
@@ -519,24 +519,24 @@ the use cases password reset and System Tests."*
 ![Joomla Branches Tester – Email Traffic](images/email.svg)
 
 1. A user (not in the Super User group) requests a password reset by clicking 'Forgot your Password?' in their web browser.
-   This request is sent to the Joomla PHP code on the web server jbt_51.
-2. An email is sent via SMTP from the web server `jbt_51` to the email relay `jbt_relay`.
+   This request is sent to the Joomla PHP code on the web server `jbt-51`.
+2. An email is sent via SMTP from the web server `jbt-51` to the email relay `jbt-relay`.
    In the Joomla `configuration.php` file, the `smtpport` is configured as `7025`.
-3. The email relay `jbt_relay` triplicates the email and sends the first email via SMTP to the email catcher `jbt_mail`.
-4. The email relay `jbt_relay` tries to deliver the second email to `smtp-tester`.
+3. The email relay `jbt-relay` triplicates the email and sends the first email via SMTP to the email catcher `jbt-mail`.
+4. The email relay `jbt-relay` tries to deliver the second email to `smtp-tester`.
    But no System Tests is running, the email cannot be delivered and is thrown away.
-5. The email relay `jbt_relay` tries to deliver the third email to locally running Cypress GUI with `smtp-tester`.
+5. The email relay `jbt-relay` tries to deliver the third email to locally running Cypress GUI with `smtp-tester`.
    But no Cypress GUI is running, the email cannot be delivered and is thrown away.
-6. System Test is started with `scripts/test` in the Cypress container `jbt_cypress`.
+6. System Test is started with `scripts/test` in the Cypress container `jbt-cypress`.
    In the Cypress `cypress.config.mjs` file, the `smtp_port` is configured as `7125`.
    While the System Tests is running `smtp-tester` is listening on port 7125.
 7. One of the System Tests specs executes an action in Joomla PHP code that generates an email.
-8. Again the email is sent via SMTP from the web server `jbt_51` to the email relay `jbt_relay`.
-9. Again the email relay `jbt_relay` triplicates the email and
-   sends the one email via SMTP to the `jbt_cypress` container with `smtp-tester` running in .
+8. Again the email is sent via SMTP from the web server `jbt-51` to the email relay `jbt-relay`.
+9. Again the email relay `jbt-relay` triplicates the email and
+   sends the one email via SMTP to the `jbt-cypress` container with `smtp-tester` running in .
    The Cypress test can check and validate the email.
-10. Again the email relay `jbt_relay` sents one copy via SMTP to the email catcher `jbt_mail`.
-11. Again the email relay `jbt_relay` tries to deliver the third email to locally running Cypress GUI with
+10. Again the email relay `jbt-relay` sents one copy via SMTP to the email catcher `jbt-mail`.
+11. Again the email relay `jbt-relay` tries to deliver the third email to locally running Cypress GUI with
     `smtp-tester`. But no Cypress GUI is running, the email cannot be delivered and is thrown away.
 
 Therefore, the `cypress.config.mjs` file uses a different SMTP port (7125) than the `configuration.php` file (7025).
@@ -550,9 +550,9 @@ for running the Cypress GUI locally.
 ### Databases
 
 The Joomla Branches Tester includes one container for each of the three supported databases (version numbers as of September 2024):
-* `jbt_mysql` – MySQL version 8.1.0 Community Server
-* `jbt_madb` – MariaDB version 10.4.34
-* `jbt_pg` – PostgreSQL version 15.8
+* `jbt-mysql` – MySQL version 8.1.0 Community Server
+* `jbt-madb` – MariaDB version 10.4.34
+* `jbt-pg` – PostgreSQL version 15.8
 
 You can set the desired database and database driver using `scripts/create` or switch them later with `scripts/database`.
 
@@ -609,9 +609,9 @@ scripts/database mysqli socket
 Without using the Unix sockets for Joomla,
 you can still take advantage of them with command-line client tools. For example:
 ```
-docker exec -it jbt_pg bash -c "psql -h /var/run/postgresql -U root -d test_joomla_44"
-docker exec -it jbt_madb bash -c "mariadb --socket=/var/run/mysqld/mysqld.sock -u root -proot"
-docker exec -it jbt_mysql bash -c "mysql --socket=/var/run/mysqld/mysqld.sock -u root -proot"
+docker exec -it jbt-pg bash -c "psql -h /var/run/postgresql -U root -d test_joomla_44"
+docker exec -it jbt-madb bash -c "mariadb --socket=/var/run/mysqld/mysqld.sock -u root -proot"
+docker exec -it jbt-mysql bash -c "mysql --socket=/var/run/mysqld/mysqld.sock -u root -proot"
 ```
 
 :point_right: Be aware that for the Joomla System Tests,
@@ -722,7 +722,7 @@ A `.vscode/launch.json` file is also prepared
 (to simplify life, it's created in advance for all versions,
 even if they are not installed or Xdebug is not enabled).
 In [Visual Studio Code](https://code.visualstudio.com/),
-select 'Start Debugging' and choose the corresponding entry `Listen jbt_53`.
+select 'Start Debugging' and choose the corresponding entry `Listen jbt-53`.
 
 Finally, it may be reset again to improve performance:
 ```
@@ -740,7 +740,7 @@ IP addresses are fixed from the predefined private, non-routable subnet `fd00::/
 
 You can use the IPv6 address (instead of the hostname) to open the PostgreSQL interactive terminal:
 ```
-docker exec -it jbt_pg bash -c "PGPASSWORD=root psql -h fd00::13 -U root -d postgres"
+docker exec -it jbt-pg bash -c "PGPASSWORD=root psql -h fd00::13 -U root -d postgres"
 ```
 :point_right: IPv6 networking is limited to within Docker.
               The `host.docker.internal` feature generally defaults to IPv4,
@@ -837,37 +837,37 @@ Joomla Branches Tester (JBT) version 1.0.39
   Docker version 27.2.0 is running with 12 containers and 14 images
   EnableIPv6: true
 Standard Containers:
-  jbt_mysql   is running, ports: 3306/tcp -> 0.0.0.0:7011; 3306/tcp -> [::]:7011
-  jbt_madb    is running, ports: 3306/tcp -> 0.0.0.0:7012; 3306/tcp -> [::]:7012
-  jbt_pg      is running, ports: 5432/tcp -> 0.0.0.0:7013; 5432/tcp -> [::]:7013
-  jbt_mya     is running, ports: 80/tcp -> 0.0.0.0:7002; 80/tcp -> [::]:7002
-  jbt_pga     is running, ports: 80/tcp -> 0.0.0.0:7003; 80/tcp -> [::]:7003
-  jbt_cypress is running, ports: 7125/tcp -> 0.0.0.0:7125; 7125/tcp -> [::]:7125
-  jbt_novnc   is running, ports: 8080/tcp -> 0.0.0.0:7005; 8080/tcp -> [::]:7005
-  jbt_relay   is running, ports: 7025/tcp -> 0.0.0.0:7025; 7025/tcp -> [::]:7025
-  jbt_mail    is running, ports: 1025/tcp -> 0.0.0.0:7225; 1025/tcp -> [::]:7225; 1080/tcp -> 0.0.0.0:7004; 1080/tcp -> [::]:7004
+  jbt-mysql   is running, ports: 3306/tcp -> 0.0.0.0:7011; 3306/tcp -> [::]:7011
+  jbt-madb    is running, ports: 3306/tcp -> 0.0.0.0:7012; 3306/tcp -> [::]:7012
+  jbt-pg      is running, ports: 5432/tcp -> 0.0.0.0:7013; 5432/tcp -> [::]:7013
+  jbt-mya     is running, ports: 80/tcp -> 0.0.0.0:7002; 80/tcp -> [::]:7002
+  jbt-pga     is running, ports: 80/tcp -> 0.0.0.0:7003; 80/tcp -> [::]:7003
+  jbt-cypress is running, ports: 7125/tcp -> 0.0.0.0:7125; 7125/tcp -> [::]:7125
+  jbt-novnc   is running, ports: 8080/tcp -> 0.0.0.0:7005; 8080/tcp -> [::]:7005
+  jbt-relay   is running, ports: 7025/tcp -> 0.0.0.0:7025; 7025/tcp -> [::]:7025
+  jbt-mail    is running, ports: 1025/tcp -> 0.0.0.0:7225; 1025/tcp -> [::]:7225; 1080/tcp -> 0.0.0.0:7004; 1080/tcp -> [::]:7004
 Branch 4.4-dev:
-  jbt_44 is running, ports: 80/tcp -> 0.0.0.0:7044; 80/tcp -> [::]:7044
+  jbt-44 is running, ports: 80/tcp -> 0.0.0.0:7044; 80/tcp -> [::]:7044
   Version: Joomla! 4.4.9 Development
   PHP 8.1.29 with Xdebug
-  PostgreSQL(PDO), jbt_pg, ''
+  PostgreSQL(PDO), jbt-pg, ''
   /branch_44: 438MB
   Repository branch_44: https://github.com/joomla/joomla-cms,  Branch: 4.4-dev,  Status: 0 changes
 Branch 5.1-dev:
-  jbt_51 is running, ports: 80/tcp -> 0.0.0.0:7051; 80/tcp -> [::]:7051
+  jbt-51 is running, ports: 80/tcp -> 0.0.0.0:7051; 80/tcp -> [::]:7051
   Version: Joomla! 5.1.3 Stable
   PHP 8.2.23
-  MySQLi, jbt_madb, ''
+  MySQLi, jbt-madb, ''
   /branch_51: 386MB
 Branch 5.2-dev:
-  jbt_52 is running, ports: 80/tcp -> 0.0.0.0:7052; 80/tcp -> [::]:7052
+  jbt-52 is running, ports: 80/tcp -> 0.0.0.0:7052; 80/tcp -> [::]:7052
   Version: Joomla! 5.2.0 Development
   PHP 8.3.11
-  MySQL(PDO), jbt_mysql, ''
+  MySQL(PDO), jbt-mysql, ''
   /branch_52: 481MB
   Repository branch_52: https://github.com/joomla/joomla-cms,  Branch: 5.2-dev,  Status: 2 changes
 Branch 5.3-dev:
-  jbt_53 is NOT running
+  jbt-53 is NOT running
   /branch_53 is NOT existing
 ```
 
@@ -950,9 +950,9 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
    scripts/create pgsql php8.3 52
    ```
 4. Check the Docker container logs to monitor activity.
-   For example, the `jbt_relay` container logs will display information about receiving and delivering emails.
+   For example, the `jbt-relay` container logs will display information about receiving and delivering emails.
    ```
-   docker logs jbt_relay
+   docker logs jbt-relay
    ```
    ```
    2024-08-22 10:09:34,082 - INFO - SMTP relay running on port 7025 and forwarding emails...
@@ -962,8 +962,8 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
    2024-08-22 10:21:45,345 - INFO - Email forwarded to host.docker.internal:7225
    2024-08-22 10:21:45,346 - ERROR - Failed to forward email to host.docker.internal:7325: [Errno 111] Connection refused
    ```
-   An email is received by `jbt_relay:7025` and delivered to the Cypress container `smtp-tester` listening on
-   `jbt_cypress:7125`, delivered to the mail catcher listening on `jbt_mail:7225`,
+   An email is received by `jbt-relay:7025` and delivered to the Cypress container `smtp-tester` listening on
+   `jbt-cypress:7125`, delivered to the mail catcher listening on `jbt-mail:7225`,
    and could not be delivered to the locally running Cypress GUI `smtp-tester` listening on `localhost:7325` (equivalent host names are used for clarity).
 5. Run a script with the option `-x` to enable detailed debugging output that shows each command
    executed along with its arguments. You have to use the `.sh` variant, for example:
@@ -980,7 +980,7 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
    Automated Cypress System Test runs may persist even after the `scripts/test` process is terminated.
    If you attempt to run another Cypress System Tests,
    you might encounter the: `Error: listen EADDRINUSE: address already in use :::7125`.
-   To stop the still-running Cypress System Tests, use the command: `docker restart jbt_cypress`.
+   To stop the still-running Cypress System Tests, use the command: `docker restart jbt-cypress`.
 10. Open an [issue](../../issues).
 
 ## Limitations

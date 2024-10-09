@@ -67,7 +67,7 @@ if $local; then
   npx cypress open --e2e --project . --config-file cypress.config.local.mjs
   # By the way, the same way it is possible to run Cypress headless from Docker host.
 else
-  log "Open jbt_cypress container Cypress GUI for version ${version}"
+  log "Open jbt-cypress container Cypress GUI for version ${version}"
   # Open Cypress e.g. on Windows WSL2 Docker container.
-  docker exec jbt_cypress bash -c "cd \"/jbt/branch_${version}\" && DISPLAY=:0 cypress open --env smtp_port=7325 --e2e --project ."
+  docker exec jbt-cypress bash -c "cd \"/jbt/branch_${version}\" && DISPLAY=:0 cypress open --env smtp_port=7325 --e2e --project ."
 fi

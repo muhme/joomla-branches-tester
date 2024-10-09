@@ -44,6 +44,13 @@ log 'Stopping and removing JBT Docker containers, associated Docker networks and
 docker compose down -v
 
 # Old containers existing?
+log "Check for any other Docker containers with names starting with 'jbt-*'"
+docker ps -a --format '{{.Names}}' | grep "^jbt-" | while read container; do
+  log "Removing non docker-compose container '${container}'"
+  docker rm -f "${container}"
+done
+
+# Older containers with underscore hostnames existing?
 log "Check for any other Docker containers with names starting with 'jbt_*'"
 docker ps -a --format '{{.Names}}' | grep "^jbt_" | while read container; do
   log "Removing non docker-compose container '${container}'"
@@ -51,6 +58,13 @@ docker ps -a --format '{{.Names}}' | grep "^jbt_" | while read container; do
 done
 
 # Old network existing?
+log "Checking for the existence of the 'jbt-network' Docker network'"
+docker network ls --format '{{.Name}}' | grep "^jbt-network$" | while read network; do
+  log "Removing non docker-compose network '${network}'"
+  docker network rm "${network}"
+done
+
+# Older network with underscore existing?
 log "Checking for the existence of the 'jbt_network' Docker network'"
 docker network ls --format '{{.Name}}' | grep "^jbt_network$" | while read network; do
   log "Removing non docker-compose network '${network}'"

@@ -8,8 +8,8 @@
 # Predefining IPv6 addresses for easier configuration. They are only used if IPv6 is enabled.
 #
 networks:
-  jbt_network:
-    name: jbt_network
+  jbt-network:
+    name: jbt-network
     driver: bridge
     enable_ipv6: false
     ipam:
@@ -21,7 +21,7 @@ networks:
 services:
 
   mysql:
-    container_name: jbt_mysql
+    container_name: jbt-mysql
     # Joomla 5 needs >= 8.0.13, actual 8.1.0
     # and hardwire as 8.1 as 8.4 needs mysql_native_password=ON
     restart: unless-stopped
@@ -35,12 +35,12 @@ services:
     volumes:
       - mysql-socket:/var/run/mysqld
     networks:
-      jbt_network:
+      jbt-network:
         ipv4_address: 10.0.0.11
         ipv6_address: fd00::11 # Use decimal digits, even if hex value differs
 
   mariadb:
-    container_name: jbt_madb
+    container_name: jbt-madb
     restart: unless-stopped
     image: mariadb:10.4
     ports:
@@ -52,12 +52,12 @@ services:
     volumes:
       - mariadb-socket:/var/run/mysqld
     networks:
-      jbt_network:
+      jbt-network:
         ipv4_address: 10.0.0.12
         ipv6_address: fd00::12 # Use decimal digits, even if hex value differs
 
   postgres:
-    container_name: jbt_pg
+    container_name: jbt-pg
     restart: unless-stopped
     # Not using version 16, as waiting for https://github.com/joomla-framework/database/pull/295
     # with ERROR: unrecognized configuration parameter "lc_collate"
@@ -72,15 +72,15 @@ services:
     volumes:
       - postgresql-socket:/var/run/postgresql
     networks:
-      jbt_network:
+      jbt-network:
         ipv4_address: 10.0.0.13
         ipv6_address: fd00::13 # Use decimal digits, even if hex value differs
 
   myadmin:
-    container_name: jbt_mya
+    container_name: jbt-mya
     image: phpmyadmin/phpmyadmin
     environment:
-      PMA_HOSTS: jbt_mysql:3306, jbt_madb:3306
+      PMA_HOSTS: jbt-mysql:3306, jbt-madb:3306
       PMA_USER: root
       PMA_PASSWORD: root
     ports:
@@ -92,12 +92,12 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      jbt_network:
+      jbt-network:
         ipv4_address: 10.0.0.2
         ipv6_address: fd00::2
 
   pgadmin:
-    container_name: jbt_pga
+    container_name: jbt-pga
     image: dpage/pgadmin4
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@example.com
@@ -111,17 +111,17 @@ services:
     depends_on:
       - postgres
     volumes:
-      # Make a server entry for 'jbt_pg'
+      # Make a server entry for 'jbt-pg'
       - ./scripts/servers.json:/pgadmin4/servers.json
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      jbt_network:
+      jbt-network:
         ipv4_address: 10.0.0.3
         ipv6_address: fd00::3
 
   mail:
-    container_name: jbt_mail
+    container_name: jbt-mail
     image: maildev/maildev
     restart: unless-stopped
     ports:
@@ -130,12 +130,12 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      jbt_network:
+      jbt-network:
         ipv4_address: 10.0.0.4
         ipv6_address: fd00::4
 
   novnc:
-    container_name: jbt_novnc
+    container_name: jbt-novnc
     image: theasp/novnc:latest
     environment:
       - DISPLAY_WIDTH=1280
@@ -147,12 +147,12 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      jbt_network:
+      jbt-network:
         ipv4_address: 10.0.0.5
         ipv6_address: fd00::5
 
   relay:
-    container_name: jbt_relay
+    container_name: jbt-relay
     build:
       context: .
       dockerfile: dockerfile-relay.yml
@@ -173,12 +173,12 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      jbt_network:
+      jbt-network:
         ipv4_address: 10.0.0.6
         ipv6_address: fd00::6
 
   cypress:
-    container_name: jbt_cypress
+    container_name: jbt-cypress
     image: cypress/included # actual (August 2024) versions are Cypress 13.7, Electron 114, Chrome 116, Edge 116 and Firefox 117
     restart: unless-stopped
     entrypoint: ["sleep", "31536000"] # don't use cypress run, instead sleep one year
@@ -195,7 +195,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      jbt_network:
+      jbt-network:
         ipv4_address: 10.0.0.7
         ipv6_address: fd00::7
     depends_on:

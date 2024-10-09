@@ -80,7 +80,7 @@ for todo in "${all_todos[@]}"; do
     if ${docker_running}; then
       echo "  Docker version $(docker version --format '{{.Server.Version}}') is running with" \
         "$(docker ps -q | wc -l | tr -d ' ') containers and $(docker images -q | wc -l | tr -d ' ') images"
-      docker inspect jbt_network|grep EnableIPv6| sed -e 's/[ ]*//' -e 's/[",]//g' -e 's/^/  /'
+      docker inspect jbt-network|grep EnableIPv6| sed -e 's/[ ]*//' -e 's/[",]//g' -e 's/^/  /'
     fi
 
   elif [ "$todo" = "base" ]; then
@@ -104,11 +104,11 @@ for todo in "${all_todos[@]}"; do
     branch_name=$(branchName "${version}")
     echo "Branch ${branch_name}:"
     if ${docker_running}; then
-      if [ "$(docker ps -q -f name=jbt_${version})" ]; then
-        ports=$(docker port jbt_${version} | awk '{printf "%s; ", $0} END {print ""}' | sed 's/; $/\n/')
-        echo "  jbt_${version} is running, ports: $ports"
+      if [ "$(docker ps -q -f name=jbt-${version})" ]; then
+        ports=$(docker port jbt-${version} | awk '{printf "%s; ", $0} END {print ""}' | sed 's/; $/\n/')
+        echo "  jbt-${version} is running, ports: $ports"
       else
-        echo "  jbt_${version} is NOT running"
+        echo "  jbt-${version} is NOT running"
       fi
     fi
     if [ -d "branch_${version}" ]; then
@@ -129,7 +129,7 @@ for todo in "${all_todos[@]}"; do
       fi
 
       if ${docker_running}; then
-        php_version=$(docker exec jbt_${version} bash -c "php --version")
+        php_version=$(docker exec jbt-${version} bash -c "php --version")
         # Extract the PHP version (first line) using sed
         php_version_number=$(echo "$php_version" | sed -n 's/^PHP \([0-9\.]*\).*/PHP \1/p')
         # Check if Xdebug is included in the PHP version info
@@ -152,7 +152,7 @@ for todo in "${all_todos[@]}"; do
 
       echo "  /branch_${version}: $(du -ms branch_${version} | awk '{print $1}')MB"
 
-      docker exec jbt_${version} bash -c "JBT_INTERNAL=42 /jbt/scripts/repos.sh \"branch_${version}\""
+      docker exec jbt-${version} bash -c "JBT_INTERNAL=42 /jbt/scripts/repos.sh \"branch_${version}\""
     else
       echo "  /branch_${version} is NOT existing"
     fi

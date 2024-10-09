@@ -6,7 +6,7 @@
 # https://github.com/muhme/joomla-branches-tester
 
 if ! [ -f /.dockerenv ] && ! [ -f /run/.containerenv ]; then
-  echo "*** Error: Please run in Docker container, e.g. docker exec jbt_44 /jbt/scripts/repos.sh branch_44." >&2
+  echo "*** Error: Please run in Docker container, e.g. docker exec jbt-44 /jbt/scripts/repos.sh branch_44." >&2
   exit 1
 fi
 if [ "${JBT_INTERNAL}" != "42" ]; then

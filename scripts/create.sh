@@ -147,7 +147,7 @@ fi
 # (This isn't accurate when using MariaDB or PostgreSQL, but so far it's working with the delay from MySQL.)
 MAX_ATTEMPTS=60
 attempt=1
-until docker exec jbt_mysql mysqladmin ping -h"127.0.0.1" --silent || [ $attempt -eq $MAX_ATTEMPTS ]; do
+until docker exec jbt-mysql mysqladmin ping -h"127.0.0.1" --silent || [ $attempt -eq $MAX_ATTEMPTS ]; do
   log "Waiting for MySQL to be ready, attempt $attempt of $MAX_ATTEMPTS"
   attempt=$((attempt + 1))
   sleep 1
@@ -157,18 +157,18 @@ done
 if [ "$recreate" = false ]; then
 
   # For the tests we need old-school user/password login, once over TCP and once for localhost with Unix sockets
-  log "jbt_${version} – Enable MySQL user root login with password"
-  docker exec jbt_mysql mysql -uroot -proot \
+  log "jbt-${version} – Enable MySQL user root login with password"
+  docker exec jbt-mysql mysql -uroot -proot \
     -e "ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'root';" \
     -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';"
   # And for MariaDB too
-  log "jbt_${version} – Enable MariaDB user root login with password"
-  docker exec jbt_madb mysql -uroot -proot \
+  log "jbt-${version} – Enable MariaDB user root login with password"
+  docker exec jbt-madb mysql -uroot -proot \
     -e "ALTER USER 'root'@'%' IDENTIFIED BY 'root';" \
     -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';"
   # And Postgres (which have already user postgres with SUPERUSER, but to simplify we will use same user root on postgres)
-  log "jbt_${version} – Create PostgreSQL user root with password root and SUPERUSER role"
-  docker exec jbt_pg sh -c "\
+  log "jbt-${version} – Create PostgreSQL user root with password root and SUPERUSER role"
+  docker exec jbt-pg sh -c "\
   psql -U postgres -c \"CREATE USER root WITH PASSWORD 'root';\" && \
   psql -U postgres -c \"ALTER USER root WITH SUPERUSER;\""
 fi
@@ -178,23 +178,23 @@ for version in "${versionsToInstall[@]}"; do
   if [ "$recreate" = true ]; then
 
     # Container exists?
-    if docker ps -a --format '{{.Names}}' | grep -q "^jbt_${version}$"; then
+    if docker ps -a --format '{{.Names}}' | grep -q "^jbt-${version}$"; then
       # Running?
-      if docker ps --format '{{.Names}}' | grep -q "^jbt_${version}$"; then
-        log "jbt_${version} – Stopping Docker Container"
-        docker compose stop "jbt_${version}"
+      if docker ps --format '{{.Names}}' | grep -q "^jbt-${version}$"; then
+        log "jbt-${version} – Stopping Docker Container"
+        docker compose stop "jbt-${version}"
       fi
-      log "jbt_${version} – Removing Docker container"
-      docker compose rm -f "jbt_${version}" || log "jbt_${version} – Ignoring failure to remove Docker container"
+      log "jbt-${version} – Removing Docker container"
+      docker compose rm -f "jbt-${version}" || log "jbt-${version} – Ignoring failure to remove Docker container"
     fi
 
     createDockerComposeFile "${version}" "${php_version}" "${network}" "append"
 
-    log "jbt_${version} – Building Docker container"
-    docker compose build "jbt_${version}"
+    log "jbt-${version} – Building Docker container"
+    docker compose build "jbt-${version}"
 
-    log "jbt_${version} – Starting Docker container"
-    docker compose up -d "jbt_${version}"
+    log "jbt-${version} – Starting Docker container"
+    docker compose up -d "jbt-${version}"
 
   fi
 
@@ -202,7 +202,7 @@ for version in "${versionsToInstall[@]}"; do
   # rm: cannot remove '/var/www/html/libraries/vendor': Directory not empty.
   max_retries=120
   for ((i = 1; i < $max_retries; i++)); do
-    docker logs "jbt_${version}" 2>&1 | grep 'This server is now configured to run Joomla!' && break || {
+    docker logs "jbt-${version}" 2>&1 | grep 'This server is now configured to run Joomla!' && break || {
       log "Waiting for original Joomla installation, attempt ${i} of ${max_retries}"
       sleep 1
     }
@@ -211,8 +211,8 @@ for version in "${versionsToInstall[@]}"; do
     error "Failed after $max_retries attempts. Giving up."
     exit 1
   fi
-  log "jbt_${version} – Deleting original Joomla installation"
-  docker exec "jbt_${version}" bash -c 'rm -rf /var/www/html/* && rm -rf /var/www/html/.??*'
+  log "jbt-${version} – Deleting original Joomla installation"
+  docker exec "jbt-${version}" bash -c 'rm -rf /var/www/html/* && rm -rf /var/www/html/.??*'
 
   JBT_INTERNAL=42 bash scripts/setup.sh "initial" "${version}" "${database_variant}" "${socket}" \
                                         "${arg_repository}:${arg_branch}" ${patches[@]}
@@ -233,7 +233,7 @@ EOF
   for version in "${allVersions[@]}"; do
     cat >>"${launch_json}" <<EOF
       {
-          "name": "Listen jbt_${version}",
+          "name": "Listen jbt-${version}",
           "type": "php",
           "request": "launch",
           "port": 79${version},
@@ -248,11 +248,11 @@ EOF
 }
 EOF
 
-  log "Installing vim, ping, ip, telnet and netstat in the 'jbt_cypress' container"
-  docker exec jbt_cypress sh -c "apt-get update && apt-get install -y git vim iputils-ping iproute2 telnet net-tools"
+  log "Installing vim, ping, ip, telnet and netstat in the 'jbt-cypress' container"
+  docker exec jbt-cypress sh -c "apt-get update && apt-get install -y git vim iputils-ping iproute2 telnet net-tools"
 
   log "Add bash for Alpine containers"
-  for container in "jbt_pga" "jbt_mail"; do
+  for container in "jbt-pga" "jbt-mail"; do
     docker exec -u root ${container} apk add bash || true # Who cares?
   done
 
@@ -264,6 +264,6 @@ EOF
 
   # pgpass file must me only pgadmin user read & writable
   log "Create pgAdmin password file with owner pgadmin and file mask 600"
-  docker cp scripts/pgpass jbt_pga:/pgadmin4/pgpass
-  docker exec -u 0 jbt_pga bash -c "chmod 600 /pgadmin4/pgpass && chown pgadmin /pgadmin4/pgpass"
+  docker cp scripts/pgpass jbt-pga:/pgadmin4/pgpass
+  docker exec -u 0 jbt-pga bash -c "chmod 600 /pgadmin4/pgpass && chown pgadmin /pgadmin4/pgpass"
 fi

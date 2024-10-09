@@ -30,7 +30,7 @@ JBT_DB_VARIANTS=("mysqli" "mysql" "mariadbi" "mariadb" "pgsql")
 # Database driver mapping for the variants as in Web Installer 'database type'.
 JBT_DB_TYPES=("MySQLi" "MySQL (PDO)" "MySQLi" "MySQL (PDO)" "PostgreSQL (PDO)")
 # Database server mapping for the variants.
-JBT_DB_HOSTS=("jbt_mysql" "jbt_mysql" "jbt_madb" "jbt_madb" "jbt_pg")
+JBT_DB_HOSTS=("jbt-mysql" "jbt-mysql" "jbt-madb" "jbt-madb" "jbt-pg")
 # Database port mapping for the variants.
 JBT_DB_PORTS=("7011" "7011" "7012" "7012" "7013")
 # Database Unix socket paths into the '/jbt/run' directory
@@ -39,7 +39,7 @@ JBT_DB_SOCKETS=("${JBT_S_MY}" "${JBT_S_MY}" "${JBT_S_MA}" "${JBT_S_MA}" "${JBT_S
 # PHP versions to choose from, as Docker images with those versions are available.
 JBT_PHP_VERSIONS=("php8.1" "php8.2" "php8.3")
 
-# Base Docker containers, eg ("jbt_pga" "jbt_mya" "jbt_mysql" "jbt_madb" "jbt_pg" "jbt_relay" "jbt_mail" "jbt_cypress" "jbt_novnc")
+# Base Docker containers, eg ("jbt-pga" "jbt-mya" "jbt-mysql" "jbt-madb" "jbt-pg" "jbt-relay" "jbt-mail" "jbt-cypress" "jbt-novnc")
 JBT_BASE_CONTAINERS=()
 while read -r line; do
   JBT_BASE_CONTAINERS+=("$line")
@@ -141,7 +141,7 @@ function dbTypeForVariant() {
 }
 
 # Returns the database host for a given database variant.
-# e.g. dbHostForVariant "mysql" -> "jbt_mysql"
+# e.g. dbHostForVariant "mysql" -> "jbt-mysql"
 #
 function dbHostForVariant() {
   local variant=$1
@@ -230,11 +230,11 @@ function createDockerComposeFile() {
     local din=$(dockerImageName "$version" "$php_version")
     local doit=true
     if [ "${working}" = "append" ]; then
-      if grep -q "^  jbt_${version}" docker-compose.yml; then
-        log "jbt_${version} – An entry already exists in 'docker-compose.base.yml'; leave it unmodified"
+      if grep -q "^  jbt-${version}" docker-compose.yml; then
+        log "jbt-${version} – An entry already exists in 'docker-compose.base.yml'; leave it unmodified"
         doit=false
       else
-        log "jbt_${version} – Adding an entry in 'docker-compose.base.yml'"
+        log "jbt-${version} – Adding an entry in 'docker-compose.base.yml'"
       fi
     fi
     if $doit; then

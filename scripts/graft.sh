@@ -120,13 +120,12 @@ cd ..
 
 # Joomla container needs to be restarted to access the new folder.
 log "Restarting Docker containers"
-docker restart "jbt_${version}"
-docker restart "jbt_cypress"
+docker restart "jbt-${version}" "jbt-cypress"
 
 log "Changing ownership to www-data for all files and directories"
 # Following error seen on macOS, we ignore it as it does not matter, these files are all 444.
 # chmod: changing permissions of '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
-docker exec "jbt_${version}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true'
+docker exec "jbt-${version}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true'
 
 # For stable releases the Joomla Web Installer stops with different 'We detected development mode' Congratulations!
 # screen and you have to click in either 'Open Site' or 'Open Administrator' or all URLs end in Web Installer.

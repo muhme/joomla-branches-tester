@@ -80,11 +80,11 @@ for version in "${versionsToInstall[@]}"
 do
   branch=$(branchName "${version}")
   if [ ! -d "branch_${version}" ]; then
-    log "jbt_${version} – There is no directory 'branch_${version}', jumped over"
+    log "jbt-${version} – There is no directory 'branch_${version}', jumped over"
     continue
   fi
-  log "jbt_${version} – Installing Joomla Patch Tester"
-  docker exec jbt_cypress sh -c " \
+  log "jbt-${version} – Installing Joomla Patch Tester"
+  docker exec jbt-cypress sh -c " \
     cd /jbt/branch_${version} && \
     unset DISPLAY && \
     cypress run --env patchtester_url=${PATCHTESTER_URL},token=${token} \

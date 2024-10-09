@@ -24,7 +24,7 @@ function help {
     echo "
     test – Runs tests on one, multiple, or all branches.
            Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
-           Optional 'novnc' argument sets DISPLAY=jbt_novnc:0 (default is headless).
+           Optional 'novnc' argument sets DISPLAY=jbt-novnc:0 (default is headless).
            Optional 'chrome', 'edge', or 'firefox' can be specified as the browser (default is 'electron').
            Optional test name can be on or more of the following: ${ALL_TESTS[@]} (default is all).
            Optional Cypress spec file pattern for 'system' tests (default is to run all w/o the installation step)
@@ -90,7 +90,7 @@ overallSuccessful=0
 for version in "${versionsToTest[@]}"; do
 
   if [ ! -d "branch_${version}" ]; then
-    log "jbt_${version} – There is no directory 'branch_${version}', jumped over"
+    log "jbt-${version} – There is no directory 'branch_${version}', jumped over"
     continue
   fi
 
@@ -100,16 +100,16 @@ for version in "${versionsToTest[@]}"; do
   for actualTest in "${testsToRun[@]}"; do
 
     if [ "$actualTest" = "php-cs-fixer" ]; then
-      log "jbt_${version} – Initiating PHP Coding Standards Fixer – php-cs-fixer"
+      log "jbt-${version} – Initiating PHP Coding Standards Fixer – php-cs-fixer"
       # 1st To prevent failure, we fix the auto-generated file before
-      docker exec "jbt_${version}" bash -c \
+      docker exec "jbt-${version}" bash -c \
         'file="administrator/cache/autoload_psr4.php"; [ -f "${file}" ] && libraries/vendor/bin/php-cs-fixer fix "${file}"' || true
       # 2nd Ignore Joomla Patch Tester
       insert_file="branch_${version}/.php-cs-fixer.dist.php"
       insert_line="    ->notPath('/com_patchtester/')"
       if [ -d "branch_${version}/administrator/components/com_patchtester" ] && \
          [ -f "${insert_file}" ] && ! grep -qF "${insert_line}" "${insert_file}"; then
-        log "jbt_${version} – Patch Tester installation found, excluding from PHP-CS-Fixer"
+        log "jbt-${version} – Patch Tester installation found, excluding from PHP-CS-Fixer"
         # file is owned by 'www-data' user on Linux
         chmod 666 "${insert_file}" 2>/dev/null || sudo chmod 666 "${insert_file}"
         csplit "${insert_file}" "/->notPath('/" && \
@@ -118,21 +118,21 @@ for version in "${versionsToTest[@]}"; do
           cat xx01 >> "${insert_file}" && \
           rm xx00 xx01
       fi
-      docker exec "jbt_${version}" bash -c "libraries/vendor/bin/php-cs-fixer fix -vvv --dry-run --diff"
+      docker exec "jbt-${version}" bash -c "libraries/vendor/bin/php-cs-fixer fix -vvv --dry-run --diff"
       if [ $? -eq 0 ]; then
         # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
         successful=$((successful + 1))
         overallSuccessful=$((overallSuccessful + 1))
-        log "jbt_${version} – php-cs-fixer passed successfully"
+        log "jbt-${version} – php-cs-fixer passed successfully"
       else
         failed=$((failed + 1))
         overallFailed=$((failed + 1))
-        error "jbt_${version} – php-cs-fixer failed."
+        error "jbt-${version} – php-cs-fixer failed."
       fi
     fi
 
     if [ "$actualTest" = "phpcs" ]; then
-      log "jbt_${version} – Initiating PHP Coding Sniffer – phpcs"
+      log "jbt-${version} – Initiating PHP Coding Sniffer – phpcs"
       # 1st Ignore Joomla Patch Tester
       insert_file="branch_${version}/ruleset.xml"
       insert_line='    <exclude-pattern type="relative">^administrator/components/com_patchtester/*</exclude-pattern>'
@@ -144,46 +144,46 @@ for version in "${versionsToTest[@]}"; do
           cat xx01 >> "${insert_file}" && \
           rm xx00 xx01
       fi
-      docker exec "jbt_${version}" bash -c "libraries/vendor/bin/phpcs --extensions=php -p --standard=ruleset.xml ."
+      docker exec "jbt-${version}" bash -c "libraries/vendor/bin/phpcs --extensions=php -p --standard=ruleset.xml ."
       if [ $? -eq 0 ]; then
         successful=$((successful + 1))
         overallSuccessful=$((overallSuccessful + 1))
-        log "jbt_${version} – phpcs passed successfully"
+        log "jbt-${version} – phpcs passed successfully"
       else
         failed=$((failed + 1))
         overallFailed=$((failed + 1))
-        error "jbt_${version} – phpcs failed."
+        error "jbt-${version} – phpcs failed."
       fi
     fi
 
     # TODO phan
 
     if [ "$actualTest" = "unit" ]; then
-      log "jbt_${version} – Initiating PHP Testsuite Unit – unit"
-      docker exec "jbt_${version}" bash -c "libraries/vendor/bin/phpunit --testsuite Unit"
+      log "jbt-${version} – Initiating PHP Testsuite Unit – unit"
+      docker exec "jbt-${version}" bash -c "libraries/vendor/bin/phpunit --testsuite Unit"
       if [ $? -eq 0 ]; then
         successful=$((successful + 1))
         overallSuccessful=$((overallSuccessful + 1))
-        log "jbt_${version} – unit passed successfully"
+        log "jbt-${version} – unit passed successfully"
       else
         failed=$((failed + 1))
         overallFailed=$((failed + 1))
-        error "jbt_${version} – unit failed."
+        error "jbt-${version} – unit failed."
       fi
     fi
 
     # TODO ?needs? LDAP
     # if [ "$actualTest" = "integration" ]; then
-    #   log "jbt_${version} – Initiating PHP Unit Testsuite Integration – integration"
-    #   docker exec "jbt_${version}" bash -c "libraries/vendor/bin/phpunit --testsuite Integration"
+    #   log "jbt-${version} – Initiating PHP Unit Testsuite Integration – integration"
+    #   docker exec "jbt-${version}" bash -c "libraries/vendor/bin/phpunit --testsuite Integration"
     #   if [ $? -eq 0 ]; then
     #     successful=$((successful + 1))
     #     overallSuccessful=$((overallSuccessful + 1))
-    #     log "jbt_${version} – integration passed successfully"
+    #     log "jbt-${version} – integration passed successfully"
     #   else
     #     failed=$((failed + 1))
     #     overallFailed=$((failed + 1))
-    #     error "jbt_${version} – integration failed."
+    #     error "jbt-${version} – integration failed."
     #   fi
     # fi
 
@@ -191,16 +191,16 @@ for version in "${versionsToTest[@]}"; do
 
     for lint in "css" "js" "testjs" ; do
       if [ "$actualTest" = "lint:${lint}" ]; then
-        log "jbt_${version} – Initiating ${lint} Linter – lint:${lint}"
-        docker exec "jbt_${version}" bash -c "npm run lint:${lint}"
+        log "jbt-${version} – Initiating ${lint} Linter – lint:${lint}"
+        docker exec "jbt-${version}" bash -c "npm run lint:${lint}"
         if [ $? -eq 0 ]; then
           successful=$((successful + 1))
           overallSuccessful=$((overallSuccessful + 1))
-          log "jbt_${version} – lint:${lint} passed successfully"
+          log "jbt-${version} – lint:${lint} passed successfully"
         else
           failed=$((failed + 1))
           overallFailed=$((failed + 1))
-          error "jbt_${version} – lint:${lint} failed."
+          error "jbt-${version} – lint:${lint} failed."
         fi
     fi
     done
@@ -227,8 +227,8 @@ for version in "${versionsToTest[@]}"; do
 
       # 16 September 2024 disabled, because Error: Unwanted PHP Deprecated
       # # Temporarily disable Joomla logging as System Tests are failing.
-      # log "jbt_${version} – Temporarily disable Joomla logging"
-      # docker exec "jbt_${version}" bash -c "cd /var/www/html && sed \
+      # log "jbt-${version} – Temporarily disable Joomla logging"
+      # docker exec "jbt-${version}" bash -c "cd /var/www/html && sed \
       #   -e 's/\$debug = .*/\$debug = false;/' \
       #   -e 's/\$log_everything = .*/\$log_everything = 0;/' \
       #   -e 's/\$log_deprecated = .*/\$log_deprecated = 0;/' \
@@ -236,27 +236,27 @@ for version in "${versionsToTest[@]}"; do
       #   mv configuration.php.tmp configuration.php"
         
       if [[ "$novnc" == true ]]; then
-        log "jbt_${version} – Initiating System Tests with NoVNC and ${spec}"
-        docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && export DISPLAY=jbt_novnc:0 && ${eel1} cypress run --headed ${browser} ${spec}"
+        log "jbt-${version} – Initiating System Tests with NoVNC and ${spec}"
+        docker exec jbt-cypress sh -c "cd /jbt/branch_${version} && export DISPLAY=jbt-novnc:0 && ${eel1} cypress run --headed ${browser} ${spec}"
       else
-        log "jbt_${version} – Initiating headless System Tests with ${spec}"
-        docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && unset DISPLAY && ${eel1} cypress run ${browser} ${spec}"
+        log "jbt-${version} – Initiating headless System Tests with ${spec}"
+        docker exec jbt-cypress sh -c "cd /jbt/branch_${version} && unset DISPLAY && ${eel1} cypress run ${browser} ${spec}"
       fi
       if [ $? -eq 0 ] ; then
         # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
         successful=$((successful + 1))
         overallSuccessful=$((overallSuccessful + 1))
-        log "jbt_${version} – System Tests passed successfully"
+        log "jbt-${version} – System Tests passed successfully"
       else
         failed=$((failed + 1))
         overallFailed=$((failed + 1))
-        error "jbt_${version} – System Tests failed."
+        error "jbt-${version} – System Tests failed."
       fi
 
       # 16 September 2024 disabled, because Error: Unwanted PHP Deprecated
       # Enable Joomla logging
-      # log "jbt_${version} – Re-enabling Joomla logging"
-      # docker exec "jbt_${version}" bash -c "cd /var/www/html && sed \
+      # log "jbt-${version} – Re-enabling Joomla logging"
+      # docker exec "jbt-${version}" bash -c "cd /var/www/html && sed \
       #   -e 's/\$debug = .*/\$debug = true;/' \
       #   -e 's/\$log_everything = .*/\$log_everything = 1;/' \
       #   -e 's/\$log_deprecated = .*/\$log_deprecated = 1;/' \
@@ -266,9 +266,9 @@ for version in "${versionsToTest[@]}"; do
   done
 
   if [ ${failed} -eq 0 ] ; then
-    log "jbt_${version} – Test run completed: ${successful} test(s) passed ${spec}"
+    log "jbt-${version} – Test run completed: ${successful} test(s) passed ${spec}"
   else
-    error "jbt_${version} – Test run completed: ${failed} test(s) failed, ${successful} test(s) passed ${spec}."
+    error "jbt-${version} – Test run completed: ${failed} test(s) failed, ${successful} test(s) passed ${spec}."
   fi
 
 done

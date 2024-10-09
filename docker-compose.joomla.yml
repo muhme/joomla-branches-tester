@@ -4,9 +4,9 @@
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
-  jbt_XX:
-    container_name: jbt_XX
-    image: Y # jbt_XX PHP version
+  jbt-XX:
+    container_name: jbt-XX
+    image: Y # jbt-XX PHP version
     restart: unless-stopped
     ports:
       - 70XX:80
@@ -28,6 +28,6 @@
       - mariadb-socket:/var/run/mariadb-socket
       - postgresql-socket:/var/run/postgresql-socket
     networks:
-      jbt_network:
+      jbt-network:
         ipv4_address: 10.0.0.XX
         ipv6_address: fd00::XX

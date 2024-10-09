@@ -61,23 +61,23 @@ changed=0
 for version in "${versionsToInstall[@]}"; do
 
   if [ ! -d "branch_${version}" ]; then
-    log "jbt_${version} – There is no directory 'branch_${version}', jumped over"
+    log "jbt-${version} – There is no directory 'branch_${version}', jumped over"
     continue
   fi
 
-  log "jbt_${version} – Stopping Docker container"
-  docker compose stop "jbt_${version}"
+  log "jbt-${version} – Stopping Docker container"
+  docker compose stop "jbt-${version}"
 
-  log "jbt_${version} – Removing Docker container"
-  docker compose rm -f "jbt_${version}" || log "jbt_${version} – Ignoring failure to remove Docker container"
+  log "jbt-${version} – Removing Docker container"
+  docker compose rm -f "jbt-${version}" || log "jbt-${version} – Ignoring failure to remove Docker container"
 
   # Change (simplified by comment marker) e.g.
-  # > image: joomla:4.4-php8.1-apache # jbt_44 PHP version
-  # < image: joomla:4.4-php8.3-apache # jbt_44 PHP version
+  # > image: joomla:4.4-php8.1-apache # jbt-44 PHP version
+  # < image: joomla:4.4-php8.3-apache # jbt-44 PHP version
   din=$(dockerImageName "$version" "$php_version")
-  search="image: joomla:[0-9].[0-9]-php[0-9].[0-9]-apache # jbt_${version} PHP version"
-  replace="image: ${din} # jbt_${version} PHP version"
-  log "jbt_${version} – Change 'docker-compose.yml' to use '${din}' Docker image for jbt_${version}"
+  search="image: joomla:[0-9].[0-9]-php[0-9].[0-9]-apache # jbt-${version} PHP version"
+  replace="image: ${din} # jbt-${version} PHP version"
+  log "jbt-${version} – Change 'docker-compose.yml' to use '${din}' Docker image for jbt-${version}"
   # Don't use sed inplace editing as it is not supported on macOS's sed.
   sed -E "s|${search}|${replace}|" "docker-compose.yml" > "${TMP}"
   cp "${TMP}" "docker-compose.yml" || sudo cp "${TMP}" "docker-compose.yml"
@@ -88,17 +88,17 @@ for version in "${versionsToInstall[@]}"; do
       exit 1
   fi
 
-  log "jbt_${version} – Building Docker container"
-  docker compose build "jbt_${version}"
+  log "jbt-${version} – Building Docker container"
+  docker compose build "jbt-${version}"
 
-  log "jbt_${version} – Starting Docker container"
-  docker compose up -d "jbt_${version}"
+  log "jbt-${version} – Starting Docker container"
+  docker compose up -d "jbt-${version}"
 
   JBT_INTERNAL=42 scripts/setup.sh "${version}"
 
   changed=$((changed + 1))
 
-  log "jbt_${version} – Changed to use $din"
+  log "jbt-${version} – Changed to use $din"
 
 done
 

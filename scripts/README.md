@@ -33,7 +33,7 @@ The following scripts are available and the use is described in [../README.md](.
 | Script | Description | Additional Info |
 | --- | --- | --- |
 | [scripts/check](check) | Searching a JBT log file for critical issues or selected information. | Optional argument(s): `logfile`, `jbt` and `scripts`. |
-| [scripts/clean](clean.sh) | Delete all `jbt_*`-Docker containers and the `joomla-branches-tester_default` Docker network and `branch_*` folders. | Used by `scripts/create` or for you to get rid of all the stuff. |
+| [scripts/clean](clean.sh) | Delete all `jbt-*`-Docker containers and the `joomla-branches-tester_default` Docker network and `branch_*` folders. | Used by `scripts/create` or for you to get rid of all the stuff. |
 | [scripts/create](create.sh) | (Re-)Build all docker containers. | Optional arguments are version number(s), database variant, `socket`, PHP version, `IPv6` and `no-cache`. |
 | [scripts/cypress](cypress.sh) | Running interactive Cypress GUI. | Mandatory argument is the Joomla version number. Optional argument is `local` to use a locally installed Cypress. |
 | [scripts/database](database.sh) | Changes database and database driver. | :warning: The overall database content is lost.<br />Mandatory argument is the database variant. Optional argument(s): `socket` and Joomla version number(s). |
@@ -75,7 +75,7 @@ The following scripts and configuration files are intended for internal usage on
 | [docker-compose.base.yml](docker-compose.base.yml) | The basic part of the `docker-compose.yml` file. | Used by `scripts/helper.sh`. |
 | [docker-compose.end.yml](docker-compose.end.yml) | The last lines of the `docker-compose.yml` file. | Used by `scripts/helper.sh`. |
 | [docker-compose.joomla.yml](docker-compose.joomla.yml) | Part of the `docker-compose.yml` file to be parameterised for one Joomla web server. | Used by `scripts/helper.sh`. |
-| [dockerfile-relay.yml](dockerfile-relay.yml) | Docker container definition for the SMTP relay tripler. | Used to create `jbt_relay`. |
+| [dockerfile-relay.yml](dockerfile-relay.yml) | Docker container definition for the SMTP relay tripler. | Used to create `jbt-relay`. |
 | [scripts/error-logging.ini](error-logging.ini) | Config file to catch all PHP errors, notices and warnings. | Used by `script/setup.sh`. |
 | [scripts/helper.sh](helper.sh) | Some commonly used bash script functions and definitions. | Sourced and used by other Bash scripts within the project. |
 | [scripts/patchtester.cy.js](patchtester.cy.js) | Cypress script to install and configure Joomla Patch Tester component. | Used by `scripts/patchtester`. |
@@ -83,4 +83,4 @@ The following scripts and configuration files are intended for internal usage on
 | [scripts/repos.sh](repos.sh) | Get information about Git repositories. | Used by `scripts/info` and running inside Docker container. |
 | [scripts/servers.json](servers.json) | PostgreSQL server configuration. | Used by `pgAdmin`. |
 | [scripts/setup.sh](setup.sh) | Install and configure Docker web server containers. | Used by `scripts/create` and `scripts/php`. |
-| [scripts/smtp_double_relay.py](smtp_double_relay.py) | SMTP relay triplicator source code. | Used by `jbt_relay`. |
+| [scripts/smtp_double_relay.py](smtp_double_relay.py) | SMTP relay triplicator source code. | Used by `jbt-relay`. |

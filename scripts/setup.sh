@@ -87,19 +87,19 @@ elif [ ${#patches[@]} -eq 0 ]; then
 fi
 # else: patches are filled in array
 
-log "jbt_${version} – Configure to catch all PHP errors, including notices and deprecated warnings"
-docker cp scripts/error-logging.ini "jbt_${version}:/usr/local/etc/php/conf.d/error-logging.ini"
+log "jbt-${version} – Configure to catch all PHP errors, including notices and deprecated warnings"
+docker cp scripts/error-logging.ini "jbt-${version}:/usr/local/etc/php/conf.d/error-logging.ini"
 
 # Create two PHP environments: one with Xdebug and one without.
 # Manage them by cloning /usr/local, and use symbolic links to toggle between the two installations.
-log "jbt_${version} – Configure 'php.ini' for development and set up parallel installation with Xdebug"
-docker exec "jbt_${version}" bash -c ' \
+log "jbt-${version} – Configure 'php.ini' for development and set up parallel installation with Xdebug"
+docker exec "jbt-${version}" bash -c ' \
     cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini &&
     cp -r /usr/local /usr/local-without-xdebug &&
     pecl install xdebug && \
     docker-php-ext-enable xdebug'
-xdebug_path=$(docker exec "jbt_${version}" bash -c 'find /usr/local/lib/php/extensions/ -name "xdebug.so" | head -n 1')
-docker exec "jbt_${version}" bash -c "
+xdebug_path=$(docker exec "jbt-${version}" bash -c 'find /usr/local/lib/php/extensions/ -name "xdebug.so" | head -n 1')
+docker exec "jbt-${version}" bash -c "
 cat <<EOF > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 zend_extension=${xdebug_path}
 xdebug.mode=debug
@@ -110,15 +110,15 @@ xdebug.log=/var/log/xdebug.log
 xdebug.discover_client_host=true
 EOF
 "
-docker exec "jbt_${version}" bash -c ' \
+docker exec "jbt-${version}" bash -c ' \
     mv /usr/local /usr/local-with-xdebug && \
     ln -s /usr/local-without-xdebug /usr/local'
 # Apache is not restarted because /var/www/html is then in use, and would cause the following git clone to fail.
 
 # Installing Node.js v22 and cron for Joomla Task Scheduler
 # Additional having vim, ping, telnet, netstat for comfort
-log "jbt_${version} – Installing additional Linux packages"
-docker exec "jbt_${version}" bash -c 'apt-get update -qq && \
+log "jbt-${version} – Installing additional Linux packages"
+docker exec "jbt-${version}" bash -c 'apt-get update -qq && \
     apt-get upgrade -y && \
     curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt-get install -y cron git unzip vim nodejs iputils-ping iproute2 telnet net-tools'
@@ -133,31 +133,31 @@ if $initial; then
     git_branch="${arg_branch}"
   fi
   # Starting here with a shallow clone for speed and space; unshallow in 'scripts/patch' if patches are to be applied
-  log "jbt_${version} – Git shallow cloning ${git_repository}:${git_branch} into the 'branch_${version}' directory"
-  docker exec "jbt_${version}" bash -c "git clone -b ${git_branch} --depth 1 ${git_repository} /var/www/html"
+  log "jbt-${version} – Git shallow cloning ${git_repository}:${git_branch} into the 'branch_${version}' directory"
+  docker exec "jbt-${version}" bash -c "git clone -b ${git_branch} --depth 1 ${git_repository} /var/www/html"
 
-  log "jbt_${version} – Git configure '/var/www/html' as safe directory"
-  docker exec "jbt_${version}" bash -c "git config --global --add safe.directory \"/var/www/html\""
+  log "jbt-${version} – Git configure '/var/www/html' as safe directory"
+  docker exec "jbt-${version}" bash -c "git config --global --add safe.directory \"/var/www/html\""
 fi
 
 if [ "$version" -ge 51 ]; then
-  log "jbt_${version} – Installing missing libraries"
-  docker exec "jbt_${version}" bash -c "cd /var/www/html && \
+  log "jbt-${version} – Installing missing libraries"
+  docker exec "jbt-${version}" bash -c "cd /var/www/html && \
       apt-get install -y libzip4 libmagickwand-6.q16-6 libmemcached11"
 fi
 
 # Running composer install even if we are not initial - just in case.
 if [ -f "branch_${version}/composer.json" ]; then
-  log "jbt_${version} – Running composer install"
-  docker exec "jbt_${version}" bash -c "cd /var/www/html && \
+  log "jbt-${version} – Running composer install"
+  docker exec "jbt-${version}" bash -c "cd /var/www/html && \
     php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\" && \
     php composer-setup.php && \
     rm composer-setup.php && \
     mv composer.phar /usr/local/bin/composer && \
     cp -p /usr/local/bin/composer /usr/local-with-xdebug/bin/composer"
-  docker exec "jbt_${version}" bash -c "cd /var/www/html && composer install" ||
+  docker exec "jbt-${version}" bash -c "cd /var/www/html && composer install" ||
     (log 'composer install failed on the first attempt; give it a second try' &&
-      docker exec "jbt_${version}" bash -c "cd /var/www/html && composer install")
+      docker exec "jbt-${version}" bash -c "cd /var/www/html && composer install")
   # There is a race condition (perhaps with the parallel downloads), some times composer install fails:
   # "Failed to open directory: No such file or directory"
   # As the second run was always successful, we try it directly.
@@ -166,28 +166,28 @@ fi
 if $initial; then
   # npm clean install only initial, with switching PHP version nothing changed for JavaScript
   if [ -f "branch_${version}/package.json" ]; then
-    log "jbt_${version} – Running npm clean install"
-    docker exec "jbt_${version}" bash -c 'cd /var/www/html && npm ci'
+    log "jbt-${version} – Running npm clean install"
+    docker exec "jbt-${version}" bash -c 'cd /var/www/html && npm ci'
   fi
 
   if [ "$unpatched" = true ]; then
-    log "jbt_${version} – Installation remains unpatched"
+    log "jbt-${version} – Installation remains unpatched"
   else
-    log "jbt_${version} – Patching the installation with ${patches[*]}"
+    log "jbt-${version} – Patching the installation with ${patches[*]}"
     scripts/patch.sh "${version}" ${patches[@]}
   fi
 fi
 
 # Needed on Windows WSL2 Ubuntu to be able to run Joomla Web Installer
-log "jbt_${version} – Changing ownership to 'www-data' for all files and directories"
+log "jbt-${version} – Changing ownership to 'www-data' for all files and directories"
 # Following error seen on macOS, we ignore it as it does not matter, these files are 444
 # chmod: changing permissions of
 #   '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
-docker exec "jbt_${version}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true'
+docker exec "jbt-${version}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true'
 
 # Joomla container needs to be restarted
-log "jbt_${version} – Restarting container"
-docker restart "jbt_${version}"
+log "jbt-${version} – Restarting container"
+docker restart "jbt-${version}"
 
 # Configure and install Joomla with desired database variant
 if $initial; then
@@ -201,13 +201,13 @@ fi
 # Define the cron job entry
 cronjob="* * * * * /usr/local/bin/php /var/www/html/cli/joomla.php scheduler:run --all --no-interaction --quiet || true"
 # Check if the cron job already exists
-if ! docker exec "jbt_${version}" bash -c "(crontab -l 2>/dev/null || echo '') | grep -F \"$cronjob\" > /dev/null"; then
-  log "jbt_${version} – Adding cron job for Joomla Task Scheduler"
-  docker exec "jbt_${version}" bash -c "
+if ! docker exec "jbt-${version}" bash -c "(crontab -l 2>/dev/null || echo '') | grep -F \"$cronjob\" > /dev/null"; then
+  log "jbt-${version} – Adding cron job for Joomla Task Scheduler"
+  docker exec "jbt-${version}" bash -c "
     ( ( crontab -l 2>/dev/null || echo "" );
     echo '# Joomla Task Scheduler, ignore exit status e.g. 127 No tasks due!';
     echo \"$cronjob\" ) | crontab -"
 fi
 
-log "jbt_${version} – Set container prompt"
-docker exec "jbt_${version}" bash -c "echo PS1=\'jbt_${version} \# \' >> ~/.bashrc" || true # Who cares?
+log "jbt-${version} – Set container prompt"
+docker exec "jbt-${version}" bash -c "echo PS1=\'jbt-${version} \# \' >> ~/.bashrc" || true # Who cares?
