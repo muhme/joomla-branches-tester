@@ -991,6 +991,11 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
 * If IPv6 networking is chosen, it is used only within Docker.
 * The predefined port range run from 7000 to 7900. If another service is already using this range, it may cause a conflict.
 
+## More Information
+
+* Join the discussion on Mattermost: [joomla-branches-tester](https://joomlacommunity.cloud.mattermost.com/main/channels/joomla-branches-tester)
+* Watch the presentation on the architecture and live demo (in German) from JoomlaDay DACH, September 2024: [Video Ticket](https://dach.joomladay.org/de/tickets)
+
 ## License
 
 Distributed under the GNU General Public License version 2 or later, see [LICENSE](LICENSE)
