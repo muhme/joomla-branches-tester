@@ -17,29 +17,32 @@ source scripts/helper.sh
 function help {
   echo "
     setup.sh – Internal setup the web server Docker container. Used by 'scripts/create' and 'scripts/php'.
-               Mandatory Joomla version must be one of the following: ${versions}.
+               Mandatory Joomla version must be one of the following: ${allVersions[*]}.
                Optional 'initial' for first time installation.
-               Optional initial database variant can be one of: ${JBT_DB_VARIANTS[@]} (default is mariadbi).
+               Optional initial database variant can be one of: ${JBT_DB_VARIANTS[*]} (default is mariadbi).
                Optional initial 'repository:branch', e.g. https://github.com/Elfangor93/joomla-cms:mod_community_info.
                Optional initial 'socket' for using the database with a Unix socket (default is using TCP host).
-               Optional 'unpatched' or one or multiple patches (default: ${JBT_DEFAULT_PATCHES[@]})
+               Optional 'unpatched' or one or multiple patches (default: ${JBT_DEFAULT_PATCHES[*]})
 
                $(random_quote)
     "
 }
 
-versions=$(getVersions)
+# shellcheck disable=SC2207 # There are no spaces in version numbers
+allVersions=($(getVersions))
+
 # Defaults to use MariaDB with MySQLi database driver, to use cache and PHP 8.1.
 database_variant="mariadbi"
 initial=false
 socket=false
 unpatched=false
 patches=()
+
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
     exit 0
-  elif isValidVersion "$1" "${versions}"; then
+  elif isValidVersion "$1" "${allVersions[*]}"; then
     version="$1"
     shift # Argument is eaten as onthee version number.
   elif [ "$1" = "initial" ]; then
@@ -76,14 +79,14 @@ fi
 
 if [ -z "$version" ]; then
   help
-  error "Please provide one version number from ${versions}."
+  error "Please provide one version number from ${allVersions[*]}."
   exit 1
 fi
 
 if [ "$unpatched" = true ]; then
   patches=("unpatched")
 elif [ ${#patches[@]} -eq 0 ]; then
-  patches=(${JBT_DEFAULT_PATCHES[@]})
+  patches=("${JBT_DEFAULT_PATCHES[@]}")
 fi
 # else: patches are filled in array
 
@@ -174,7 +177,7 @@ if $initial; then
     log "jbt-${version} – Installation remains unpatched"
   else
     log "jbt-${version} – Patching the installation with ${patches[*]}"
-    scripts/patch.sh "${version}" ${patches[@]}
+    scripts/patch.sh "${version}" "${patches[@]}"
   fi
 fi
 

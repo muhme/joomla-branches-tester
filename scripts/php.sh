@@ -18,22 +18,22 @@ source scripts/helper.sh
 function help {
     echo "
     php – Change PHP version on all, one or multiple Docker containers.
-          Mandatory PHP version is one of: ${JBT_PHP_VERSIONS[@]}.
-          Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
+          Mandatory PHP version is one of: ${JBT_PHP_VERSIONS[*]}.
+          Optional Joomla version can be one or more of the following: ${allVersions[*]} (default is all).
 
           $(random_quote)
     "
 }
 
-versions=$(getVersions)
-IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
+# shellcheck disable=SC2207 # There are no spaces in version numbers
+allVersions=($(getVersions))
 
 versionsToInstall=()
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
     exit 0
-  elif isValidVersion "$1" "$versions"; then
+  elif isValidVersion "$1" "${allVersions[*]}"; then
     versionsToInstall+=("$1")
     shift # Argument is eaten as one version number.
   elif isValidPHP "$1"; then
@@ -48,13 +48,13 @@ done
 
 if [ -z "$php_version" ]; then
   help
-  error "Mandatory PHP version is missing. Please use one of: ${JBT_PHP_VERSIONS[@]}."
+  error "Mandatory PHP version is missing. Please use one of: ${JBT_PHP_VERSIONS[*]}."
   exit 1
 fi
 
 # If no version was given, use all.
 if [ ${#versionsToInstall[@]} -eq 0 ]; then
-  versionsToInstall=(${allVersions[@]})
+  versionsToInstall=("${allVersions[*]}")
 fi
 
 changed=0
@@ -102,4 +102,4 @@ for version in "${versionsToInstall[@]}"; do
 
 done
 
-log "Completed ${versionsToInstall[@]} with ${changed} changed"
+log "Completed ${versionsToInstall[*]} with ${changed} changed"

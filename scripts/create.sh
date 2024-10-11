@@ -19,23 +19,22 @@ source scripts/helper.sh
 function help {
   echo "
     create – Create base Docker containers and containers based on Joomla Git branches.
-             Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
-             Optional database variant can be one of: ${JBT_DB_VARIANTS[@]} (default is mariadbi).
+             Optional Joomla version can be one or more of the following: ${allVersions[*]} (default is all).
+             Optional database variant can be one of: ${JBT_DB_VARIANTS[*]} (default is mariadbi).
              Optional 'socket' for using the database with a Unix socket (default is using TCP host).
              Optional 'IPv6' can be set (default is to use IPv4).
              Optional 'no-cache' can be set (default is to use cache).
              Optional 'recreate' to create or recreate only one or more web server containers.
-             Optional PHP version can be one of: ${JBT_PHP_VERSIONS[@]} (default is php8.1).
+             Optional PHP version can be one of: ${JBT_PHP_VERSIONS[*]} (default is php8.1).
              Optional 'repository:branch', e.g. https://github.com/Elfangor93/joomla-cms:mod_community_info.
-             Optional 'unpatched' or one or multiple patches (default: ${JBT_DEFAULT_PATCHES[@]})
+             Optional 'unpatched' or one or multiple patches (default: ${JBT_DEFAULT_PATCHES[*]})
 
              $(random_quote)
     "
 }
 
-versions=$(getVersions)
-IFS=' ' allVersions=($(sort <<<"${versions}"))
-unset IFS # map to array
+# shellcheck disable=SC2207 # There are no spaces in version numbers
+allVersions=($(getVersions))
 
 # Defaults to use MariaDB with MySQLi database driver, to use cache and PHP 8.1.
 database_variant="mariadbi"
@@ -51,7 +50,7 @@ while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
     exit 0
-  elif isValidVersion "$1" "$versions"; then
+  elif isValidVersion "$1" "${allVersions[*]}"; then
     versionsToInstall+=("$1")
     shift # Argument is eaten as one version number.
   elif [ "$1" = "socket" ]; then
@@ -103,8 +102,8 @@ else
   fi
 fi
 
-if [ ! -z "${git_repository}" ] && [ ${#versionsToInstall[@]} -ne 1 ]; then
-  error "If you use repository:branch, please specify one version as one of the following: ${allVersions[@]}."
+if [ -n "${git_repository}" ] && [ ${#versionsToInstall[@]} -ne 1 ]; then
+  error "If you use repository:branch, please specify one version as one of the following: ${allVersions[*]}."
   exit 1
 fi
 
@@ -115,13 +114,13 @@ fi
 
 # If no version was given, use all.
 if [ ${#versionsToInstall[@]} -eq 0 ]; then
-  versionsToInstall=(${allVersions[@]})
+  versionsToInstall=("${allVersions[@]}")
 fi
 
 if [ "$unpatched" = true ]; then
   patches=("unpatched")
 elif [ ${#patches[@]} -eq 0 ]; then
-  patches=(${JBT_DEFAULT_PATCHES[@]})
+  patches=("${JBT_DEFAULT_PATCHES[@]}")
 fi
 # else: patches are already filled in the array
 
@@ -157,17 +156,17 @@ done
 if [ "$recreate" = false ]; then
 
   # For the tests we need old-school user/password login, once over TCP and once for localhost with Unix sockets
-  log "jbt-${version} – Enable MySQL user root login with password"
+  log "Enable MySQL user root login with password"
   docker exec jbt-mysql mysql -uroot -proot \
     -e "ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'root';" \
     -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';"
   # And for MariaDB too
-  log "jbt-${version} – Enable MariaDB user root login with password"
+  log "Enable MariaDB user root login with password"
   docker exec jbt-madb mysql -uroot -proot \
     -e "ALTER USER 'root'@'%' IDENTIFIED BY 'root';" \
     -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';"
   # And Postgres (which have already user postgres with SUPERUSER, but to simplify we will use same user root on postgres)
-  log "jbt-${version} – Create PostgreSQL user root with password root and SUPERUSER role"
+  log "Create PostgreSQL user root with password root and SUPERUSER role"
   docker exec jbt-pg sh -c "\
   psql -U postgres -c \"CREATE USER root WITH PASSWORD 'root';\" && \
   psql -U postgres -c \"ALTER USER root WITH SUPERUSER;\""
@@ -201,25 +200,27 @@ for version in "${versionsToInstall[@]}"; do
   # If the copying has not yet been completed, then we have to wait, or we will get e.g.
   # rm: cannot remove '/var/www/html/libraries/vendor': Directory not empty.
   max_retries=120
-  for ((i = 1; i < $max_retries; i++)); do
-    docker logs "jbt-${version}" 2>&1 | grep 'This server is now configured to run Joomla!' && break || {
-      log "Waiting for original Joomla installation, attempt ${i} of ${max_retries}"
+  for ((i = 1; i < max_retries; i++)); do
+    if docker logs "jbt-${version}" 2>&1 | grep 'This server is now configured to run Joomla!'; then
+      break
+    else
+      log "jbt-${version} – Waiting for original Joomla installation, attempt ${i} of ${max_retries}"
       sleep 1
-    }
+    fi
   done
   if [ $i -ge $max_retries ]; then
-    error "Failed after $max_retries attempts. Giving up."
+    error "jbt-${version} – Failed after $max_retries attempts. Giving up."
     exit 1
   fi
   log "jbt-${version} – Deleting original Joomla installation"
   docker exec "jbt-${version}" bash -c 'rm -rf /var/www/html/* && rm -rf /var/www/html/.??*'
 
   JBT_INTERNAL=42 bash scripts/setup.sh "initial" "${version}" "${database_variant}" "${socket}" \
-                                        "${arg_repository}:${arg_branch}" ${patches[@]}
+                                        "${arg_repository}:${arg_branch}" "${patches[@]}"
 
 done
 
-# Final actions if performing a base installation.
+# Performing additional version-independent configurations to complete the base installation.
 if [ "$recreate" = false ]; then
   log "Creating File '.vscode/launch.json' for all versions ${allVersions[*]}"
   launch_json=".vscode/launch.json"

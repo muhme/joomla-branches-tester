@@ -18,8 +18,8 @@ source scripts/helper.sh
 function help {
     echo "
     database – Change the database and database driver for all, one or multiple Joomla containers.
-               The mandatory database variant must be one of: ${JBT_DB_VARIANTS[@]}.
-               Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
+               The mandatory database variant must be one of: ${JBT_DB_VARIANTS[*]}.
+               Optional Joomla version can be one or more of the following: ${allVersions[*]} (default is all).
                Optional 'socket' for using the database with a Unix socket (default is using TCP host).
 
                $(random_quote)
@@ -28,35 +28,35 @@ function help {
 
 socket=false
 versionsToChange=()
-versions=$(getVersions)
-IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
+# shellcheck disable=SC2207 # There are no spaces in version numbers
+allVersions=($(getVersions))
 
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
     exit 0
-  elif isValidVersion "$1" "$versions"; then
+  elif isValidVersion "$1" "${allVersions[*]}"; then
     versionsToChange+=("$1")
     shift # Argument is eaten as version number.
   elif [ "$1" = "socket" ]; then
     socket=true
-    if [ ! -z "$dbvariant" ] ; then
+    if [ -n "${dbvariant}" ] ; then
       # Database variant was already given, overwrite with Unix socket
-      dbhost=$(dbSocketForVariant "$dbvariant")
+      dbhost=$(dbSocketForVariant "${dbvariant}")
       dbport=""
     fi
     shift # Argument is eaten as use database vwith socket.
   elif isValidVariant "$1"; then
     dbvariant="$1"
-    dbtype=$(dbTypeForVariant "$dbvariant")
+    dbtype=$(dbTypeForVariant "${dbvariant}")
     if $socket; then
       # Use Unix socket
-      dbhost=$(dbSocketForVariant "$dbvariant")
+      dbhost=$(dbSocketForVariant "${dbvariant}")
       dbport=""
     else
       # Use TCP host
-      dbhost=$(dbHostForVariant "$dbvariant")
-      dbport=$(dbPortForVariant "$dbvariant")
+      dbhost=$(dbHostForVariant "${dbvariant}")
+      dbport=$(dbPortForVariant "${dbvariant}")
     fi
     shift # Argument is eaten as database variant.
   else
@@ -68,13 +68,13 @@ done
 
 if [ -z "$dbvariant" ] ; then
   help
-  error "Mandatory database variant is missing. Please use one of: ${JBT_DB_VARIANTS[@]}."
+  error "Mandatory database variant is missing. Please use one of: ${JBT_DB_VARIANTS[*]}."
   exit 1
 fi
 
 # If no version was given, use all.
 if [ ${#versionsToChange[@]} -eq 0 ]; then
-  versionsToChange=(${allVersions[@]})
+  versionsToChange=("${allVersions[@]}")
 fi
 
 for version in "${versionsToChange[@]}"; do
@@ -139,12 +139,14 @@ for version in "${versionsToChange[@]}"; do
 
   # Using Install Joomla from System Tests
   log "jbt-${version} – Cypress-based Joomla installation"
-  docker exec jbt-cypress sh -c "cd /jbt/branch_${version} && export DISPLAY=jbt-novnc:0 && cypress run --headed --spec tests/System/integration/install/Installation.cy.js"
+  docker exec jbt-cypress sh -c "cd /jbt/branch_${version} && \
+       DISPLAY=jbt-novnc:0 cypress run --headed --spec tests/System/integration/install/Installation.cy.js"
 
   log "jbt-${version} – Disable B/C plugin"
-  docker exec jbt-cypress sh -c \
-    "cd /jbt/branch_${version} && export DISPLAY=jbt-novnc:0 && CYPRESS_specPattern="/jbt/scripts/disableBC.cy.js" cypress run --headed" || \
-    ( error "jbt-${version} – Ignoring step 'Disable B/C plugin' as it failed." ; true )
+  if ! docker exec jbt-cypress sh -c "cd /jbt/branch_${version} && \
+        DISPLAY=jbt-novnc:0 CYPRESS_specPattern='/jbt/scripts/disableBC.cy.js' cypress run --headed"; then
+    error "jbt-${version} – Ignoring failed step 'Disable B/C plugin'."
+  fi
 
   # Cypress is using own SMTP port to read and reset mails by smtp-tester
   log "jbt-${version} – Set the SMTP port used by Cypress to 7125"
@@ -168,6 +170,5 @@ for version in "${versionsToChange[@]}"; do
   # chmod: changing permissions of '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
   docker exec "jbt-${version}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true'
 
-  log "jbt-${version} – Joomla based on the $(branchName ${dbvariant}) database variant is installed"
-
+  log "jbt-${version} – Joomla has been freshly installed using the '${dbvariant}' database variant."
 done

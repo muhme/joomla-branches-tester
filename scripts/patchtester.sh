@@ -15,25 +15,25 @@ fi
 
 source scripts/helper.sh
 
-versions=$(getVersions)
-IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
-
 function help {
     echo "
     patchtester – Install Joomla Patch Tester on all, one or multiple Web Server Docker containers.
                   Mandatory argument is a valid GitHub personal access token starting with 'ghp_'.
-                  Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
+                  Optional Joomla version can be one or more of the following: ${allVersions[*]} (default is all).
 
                   $(random_quote)
     "
 }
+
+# shellcheck disable=SC2207 # There are no spaces in version numbers
+allVersions=($(getVersions))
 
 versionsToInstall=()
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
     exit 0
-  elif isValidVersion "$1" "$versions"; then
+  elif isValidVersion "$1" "${allVersions[*]}"; then
     versionsToInstall+=("$1")
     shift # Argument is eaten as one version number.
   elif [[ $1 = ghp_* ]]; then
@@ -48,7 +48,7 @@ done
 
 # If no version was given, use all.
 if [ ${#versionsToInstall[@]} -eq 0 ]; then
-  versionsToInstall=(${allVersions[@]})
+  versionsToInstall=("${allVersions[@]}")
 fi
 
 # Check if the given token looks like a GitHub personal access token
@@ -76,20 +76,17 @@ log "Using URL '${PATCHTESTER_URL}'"
 
 failed=0
 successful=0
-for version in "${versionsToInstall[@]}"
-do
-  branch=$(branchName "${version}")
+for version in "${versionsToInstall[@]}"; do
   if [ ! -d "branch_${version}" ]; then
     log "jbt-${version} – There is no directory 'branch_${version}', jumped over"
     continue
   fi
   log "jbt-${version} – Installing Joomla Patch Tester"
-  docker exec jbt-cypress sh -c " \
+  if docker exec jbt-cypress sh -c " \
     cd /jbt/branch_${version} && \
     unset DISPLAY && \
     cypress run --env patchtester_url=${PATCHTESTER_URL},token=${token} \
-                --config specPattern=/jbt/scripts/patchtester.cy.js"
-  if [ $? -eq 0 ] ; then
+                --config specPattern=/jbt/scripts/patchtester.cy.js"; then
     # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
     successful=$((successful + 1))
   else
@@ -98,7 +95,7 @@ do
 done
 
 if [ ${failed} -eq 0 ] ; then
-  log "Completed ${versionsToInstall[@]} with ${successful} successful"
+  log "Completed ${versionsToInstall[*]} with ${successful} successful"
 else
-  error "Completed ${versionsToInstall[@]} with ${failed} failed and ${successful} successful."
+  error "Completed ${versionsToInstall[*]} with ${failed} failed and ${successful} successful."
 fi

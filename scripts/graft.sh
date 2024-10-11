@@ -19,22 +19,23 @@ function help {
     echo "
     graft – Place Joomla package onto development branch.
             Just like in plant grafting, where a scion is joined to a rootstock.
-            The mandatory Joomla version argument must be one of the following: ${versions}.
+            The mandatory Joomla version argument must be one of the following: ${allVersions[*]}.
             The Joomla package file argument (e.g. 'Joomla_5.1.2-Stable-Full_Package.zip') is mandatory.
-            Optional database variant can be one of: ${JBT_DB_VARIANTS[@]} (default is mariadbi).
+            Optional database variant can be one of: ${JBT_DB_VARIANTS[*]} (default is mariadbi).
 
             $(random_quote)
     "
 }
 
-versions=$(getVersions)
+# shellcheck disable=SC2207 # There are no spaces in version numbers
+allVersions=($(getVersions))
 
 database_variant="mariadbi"
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
     exit 0
-  elif isValidVersion "$1" "$versions"; then
+  elif isValidVersion "$1" "${allVersions[*]}"; then
     version="$1"
     shift # Argument is eaten as the version number.
   elif isValidVariant "$1"; then
@@ -52,7 +53,7 @@ done
 
 if [ -z "${version}" ]; then
   help
-  error "Please provide a Joomla version number from the following: ${versions}."
+  error "Please provide a Joomla version number from the following: ${allVersions[*]}."
   exit 1
 fi
 
@@ -134,6 +135,6 @@ docker exec "jbt-${version}" bash -c 'chown -R www-data:www-data /var/www/html >
 # Configure and install Joomla with desired database variant.
 scripts/database.sh "${version}" "$database_variant"
 
-package_file=$(basename $package)
-joomla_version=$(getJoomlaVersion branch_${version})
-log "Grafting the package '${package_file}' with Joomla ${joomla_version} onto branch_${version} is complete"
+package_file=$(basename "${package}")
+joomla_version=$(getJoomlaVersion "branch_${version}")
+log "Grafting the package '${package_file}' with Joomla ${joomla_version} onto 'branch_${version}' is complete"

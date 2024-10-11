@@ -16,21 +16,21 @@ function help {
     echo "
     xdebug – Switches the PHP installation with or without Xdebug in one or more Web Server containers.
              Mandatory argument 'on' or 'off' is required.
-             Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
+             Optional Joomla version can be one or more of the following: ${allVersions[*]} (default is all).
 
              $(random_quote)
     "
 }
 
-versions=$(getVersions)
-IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
+# shellcheck disable=SC2207 # There are no spaces in version numbers
+allVersions=($(getVersions))
 
 versionsToChange=()
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
     exit 0
-  elif isValidVersion "$1" "$versions"; then
+  elif isValidVersion "$1" "${allVersions[*]}"; then
     versionsToChange+=("$1")
     shift # Argument is eaten as the version number.
   elif [ "$1" = "on" ]; then
@@ -54,7 +54,8 @@ fi
 
 # If no version was given, use all.
 if [ ${#versionsToChange[@]} -eq 0 ]; then
-  versionsToChange=(${allVersions[@]})
+  # shellcheck disable=SC2207 # There are no spaces in version numbers
+  versionsToChange=("${allVersions[@]}")
 fi
 
 # Clean up branch directories if existing

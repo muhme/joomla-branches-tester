@@ -19,21 +19,21 @@ function help {
     echo "
     pull – Running 'git pull' on one or multiple branches.
            Running composer install if changes are detected and npm clean install if needed.
-           Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
+           Optional Joomla version can be one or more of the following: ${allVersions[*]} (default is all).
 
            $(random_quote)
     "
 }
 
-versions=$(getVersions)
-IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
+# shellcheck disable=SC2207 # There are no spaces in version numbers
+allVersions=($(getVersions))
 
 versionsToPull=()
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
     exit 0
-  elif isValidVersion "$1" "$versions"; then
+  elif isValidVersion "$1" "${allVersions[*]}"; then
     versionsToPull+=("$1")
     shift # Argument is eaten as one version number.
   else
@@ -45,12 +45,11 @@ done
 
 # If no version was given, use all.
 if [ ${#versionsToPull[@]} -eq 0 ]; then
-  versionsToPull=(${allVersions[@]})
+  versionsToPull=("${allVersions[@]}")
 fi
 
 pulled=0
-for version in "${versionsToPull[@]}"
-do
+for version in "${versionsToPull[@]}"; do
   branch=$(branchName "${version}")
   if [ ! -d "branch_${version}" ]; then
     log "jbt-${version} – There is no directory 'branch_${version}', jumped over"
@@ -84,4 +83,4 @@ do
   docker exec "jbt-${version}" sh -c "git status"
 done
 
-log "Completed ${versionsToPull[@]} with ${pulled} pull's"
+log "Completed ${versionsToPull[*]} with ${pulled} pull's"

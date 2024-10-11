@@ -21,12 +21,6 @@ function help {
   "
 }
 
-if [ $# -eq 0 ]; then
-  all_todos=("instance" "base" ${allVersions[@]})
-else
-  all_todo=()
-fi
-
 file=""
 jbt=false
 scripts=false
@@ -42,7 +36,9 @@ while [ $# -ge 1 ]; do
     scripts=true
     shift # Argument is eaten as to show only the start and stop messages.
   elif [ -f "logs/$1" ] || [ -f "$1" ]; then
-    file="logs/$(basename $1)"
+    # Ensure file name only, relative and absolute file names are working.
+    file=$(basename "$1")
+    file="logs/${file}"
     shift # Argument is eaten as log file name.
   else
     source scripts/helper.sh
@@ -53,6 +49,7 @@ while [ $# -ge 1 ]; do
 done
 
 if [[ ! -f "${file}" ]]; then
+  # shellcheck disable=SC2012 # find newest file, as ordered by file name
   file="logs/$(ls logs | tail -1)"
   if [[ ! -f "${file}" ]]; then
     source scripts/helper.sh

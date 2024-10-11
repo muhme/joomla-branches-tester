@@ -14,7 +14,7 @@ fi
 start_time=$(date +%s)
 
 # ${TMP} file can be used in the scripts without any worries
-TMP=/tmp/$(basename $0).$$
+TMP=/tmp/$(basename "$0").$$
 trap 'rm -rf $TMP' 0
 
 # The following four arrays are positionally mapped, avoiding associative arrays
@@ -47,41 +47,37 @@ done < <(grep 'container_name:' docker-compose.base.yml | awk '{print $2}')
 
 # If the 'unpatched' option is not set and no patch is provided, use the following list:
 # As of early October 2024, the main functionality is working without the need for patches.
+# shellcheck disable=SC2034 # It is used by other scripts after sourcing
 JBT_DEFAULT_PATCHES=("unpatched")
 
 # Determine the currently used Joomla branches.
-# e.g. getVersions -> "44 52 53 60"
+# Returns an array, e.g. getVersions -> "44" "52" "53" "60"
 #
 # We are using default, active and stale branches.
 # With ugly screen-scraping, because no git command found and GitHub API with token looks too oversized.
 #
 function getVersions() {
 
+  # Declare all local variables to prevent SC2155 - Declare and assign separately to avoid masking return values.
+  local json_data stale_json_data branches sorted_branches=()
+
   # Get the JSON data from both the main branches and stale branches URLs
-  local json_data=$(curl -s "https://github.com/joomla/joomla-cms/branches")
-  local stale_json_data=$(curl -s "https://github.com/joomla/joomla-cms/branches/stale")
+  json_data=$(curl -s "https://github.com/joomla/joomla-cms/branches")
+  stale_json_data=$(curl -s "https://github.com/joomla/joomla-cms/branches/stale")
 
   # Extract the names of the branches, only with grep and sed, so as not to install any dependencies, e.g. jq
   # Use sed with -E flag to enable extended regular expressions, which is also working with macOS sed.
-  local branches=$(echo "$json_data" "$stale_json_data" | grep -o '"name":"[0-9]\+\.[0-9]\+-dev"' |
+  branches=$(echo "$json_data" "$stale_json_data" | grep -o '"name":"[0-9]\+\.[0-9]\+-dev"' |
     sed -E 's/"name":"([0-9]+)\.([0-9]+)-dev"/\1\2/')
 
-  # Create as array and add branches from both sources
-  local formatted_branches=()
-  for branch in ${branches}; do
-    formatted_branches+=("${branch}")
-  done
-
-  # Sort
-  local sorted_branches=()
-  IFS=$'\n' sorted_branches=($(sort <<<"${formatted_branches[*]}"))
-  unset IFS
+  # shellcheck disable=SC2162 # Sort (ignore, for old Bashes, 2nd option -r will mangle backslashes, there are no here)
+  read -a sorted_branches <<< "$(echo "${branches}" | tr ' ' '\n' | sort -n | tr '\n' ' ')"
 
   # Are we offline? Set default branch versions with 42 as marker.
   if [ ${#sorted_branches[@]} -eq 0 ]; then
-    echo "42 44 51 52 53 54 60"
+    echo "42" "44" "51" "52" "53" "54" "60"
   else
-    echo "${sorted_branches[*]}"
+    echo "${sorted_branches[@]}"
   fi
 }
 
@@ -89,9 +85,10 @@ function getVersions() {
 # e.g. isValidVersion "44" "44 51 52 60" -> 0
 #
 function isValidVersion() {
-  local version="$1"
-  local versions=()
-  IFS=' ' read -r -a versions <<<"$2" # convert to array
+  local version="$1" versions=()
+
+  # shellcheck disable=SC2162 # Convert to array (ignore, for old Bashes, 2nd option -r will mangle backslashes, there are no here)
+  read -a versions <<< "$2"
 
   for v in "${versions[@]}"; do
     if [[ "$v" == "$version" ]]; then
@@ -205,9 +202,11 @@ function createDockerComposeFile() {
   local php_version="$2"
   local network="$3"
   local working="$4"
-  local versions=()
-  IFS=' ' versions=($(sort <<<"$1"))
-  unset IFS # map to array
+
+  # Declare all local variables to prevent SC2155 - Declare and assign separately to avoid masking return values.
+  local version versions=() din doit=true
+  # shellcheck disable=SC2162 # (ignore, for old Bashes, 2nd option -r will mangle backslashes, there are no here)
+  read -a versions <<< "$(echo "${1}" | tr ' ' '\n' | sort -n | tr '\n' ' ')"
 
   if [ "${working}" = "append" ]; then
     # Cut named volumes, they are added always in the end.
@@ -225,10 +224,8 @@ function createDockerComposeFile() {
     fi
   fi
 
-  local version
   for version in "${versions[@]}"; do
-    local din=$(dockerImageName "$version" "$php_version")
-    local doit=true
+    din=$(dockerImageName "$version" "$php_version")
     if [ "${working}" = "append" ]; then
       if grep -q "^  jbt-${version}" docker-compose.yml; then
         log "jbt-${version} – An entry already exists in 'docker-compose.base.yml'; leave it unmodified"
@@ -256,12 +253,11 @@ function createDockerComposeFile() {
 #   - There are no Joomla 5.3 and 6.0 images fallback to Joomla 5.2
 #
 function dockerImageName() {
-  local version="$1"
-  local php_version="$2"
+  local version="$1" php_version="$2" php_to_use version_to_use
 
   # joomla:4 or joomla:5 image?
   if [ "$version" = "44" ]; then
-    local php_to_use="$php_version"
+    php_to_use="$php_version"
     if [ "$php_version" = "php8.3" ]; then
       # There is no PHP 8.3 for Joomla 4.4, simple use PHP 8.2.
       php_to_use="php8.2"
@@ -270,7 +266,7 @@ function dockerImageName() {
   else
     # Currently (August 2024) there are no Joomla 5.3 and Joomla 6.0 Docker images,
     # simple use 5.2 as base.
-    local version_to_use="$version"
+    version_to_use="$version"
     if [ "$version" -gt "52" ]; then
       version_to_use="52"
     fi
@@ -421,7 +417,7 @@ log() {
   fi
 
   # -e enables backslash escapes
-  echo -e "${JBT_GREEN_BG}${JBT_BOLD}*** $(date '+%y%m%d %H:%M:%S') ${marker} $@${JBT_RESET}"
+  echo -e "${JBT_GREEN_BG}${JBT_BOLD}*** $(date '+%y%m%d %H:%M:%S') ${marker} $*${JBT_RESET}"
 }
 
 # Error message with date and time in bold and dark red on stderr.
@@ -439,7 +435,7 @@ error() {
   fi
 
   # -e enables backslash escapes
-  echo -e "${JBT_RED}${JBT_BOLD}*** $(date '+%y%m%d %H:%M:%S') ${marker} $@${JBT_RESET}" >&2
+  echo -e "${JBT_RED}${JBT_BOLD}*** $(date '+%y%m%d %H:%M:%S') ${marker} $*${JBT_RESET}" >&2
 }
 
 # With -e set, the script exits immediately on command failure.

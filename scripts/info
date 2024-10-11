@@ -17,20 +17,20 @@ function help {
     info – Retrieves Joomla Branches Tester status information.
            Optional argument 'instance' to display Joomla Branches Tester instance information.
            Optional argument 'base' to display information about the base Docker containers.
-           Optional Joomla version can be one or more of the following: ${allVersions[@]}.
+           Optional Joomla version can be one or more of the following: ${allVersions[*]}.
            If no argument is provided, all information will be displayed.
 
            $(random_quote)
   "
 }
 
-versions=$(getVersions)
-IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
+# shellcheck disable=SC2207 # There are no spaces in version numbers
+allVersions=($(getVersions))
 
 if [ $# -eq 0 ]; then
-  all_todos=("instance" "base" ${allVersions[@]})
+  all_todos=("instance" "base" "${allVersions[@]}")
 else
-  all_todo=()
+  all_todos=()
 fi
 
 while [ $# -ge 1 ]; do
@@ -43,7 +43,7 @@ while [ $# -ge 1 ]; do
   elif [ "$1" = "base" ]; then
     all_todos+=("$1")
     shift # Argument is eaten as to show base containers.
-  elif isValidVersion "$1" "$versions"; then
+  elif isValidVersion "$1" "${allVersions[*]}"; then
     all_todos+=("$1")
     shift # Argument is eaten as to show web server with given version number.
   else
@@ -88,9 +88,9 @@ for todo in "${all_todos[@]}"; do
     if ${docker_running}; then
       echo "Standard Containers:"
       for container in "${JBT_BASE_CONTAINERS[@]}"; do
-        if [ "$(docker ps -q -f name=${container})" ]; then
+        if [ "$(docker ps -q -f "name=${container}")" ]; then
           padded_container=$(printf "%-11s" "$container")
-          ports=$(docker port ${container} | awk '{printf "%s; ", $0} END {print ""}' | sed 's/; $/\n/')
+          ports=$(docker port "${container}" | awk '{printf "%s; ", $0} END {print ""}' | sed 's/; $/\n/')
           echo "  $padded_container is running, ports: $ports"
         else
           echo "  " && error "${container} is not running."
@@ -98,14 +98,14 @@ for todo in "${all_todos[@]}"; do
       done
     fi
 
-  elif isValidVersion "$todo" "$versions"; then
+  elif isValidVersion "$todo" "${allVersions[*]}"; then
 
     version="$todo"
     branch_name=$(branchName "${version}")
     echo "Branch ${branch_name}:"
     if ${docker_running}; then
-      if [ "$(docker ps -q -f name=jbt-${version})" ]; then
-        ports=$(docker port jbt-${version} | awk '{printf "%s; ", $0} END {print ""}' | sed 's/; $/\n/')
+      if [ "$(docker ps -q -f "name=jbt-${version}")" ]; then
+        ports=$(docker port "jbt-${version}" | awk '{printf "%s; ", $0} END {print ""}' | sed 's/; $/\n/')
         echo "  jbt-${version} is running, ports: $ports"
       else
         echo "  jbt-${version} is NOT running"
@@ -122,14 +122,14 @@ for todo in "${all_todos[@]}"; do
         extra_version=$(grep "public const EXTRA_VERSION" "${version_file}" | awk -F"'" '{print $NF}' | tr -d ';')
         dev_status=$(grep "public const DEV_STATUS" "${version_file}" | awk -F"'" '{print $2}')
         echo -n "  Version: $product $major_version.$minor_version.$patch_version"
-        if [ ! -z "${extra_version}"]; then
+        if [ -n "${extra_version}" ]; then
           echo "-$extra_version"
         fi
         echo " ${dev_status}"
       fi
 
       if ${docker_running}; then
-        php_version=$(docker exec jbt-${version} bash -c "php --version")
+        php_version=$(docker exec "jbt-${version}" bash -c "php --version")
         # Extract the PHP version (first line) using sed
         php_version_number=$(echo "$php_version" | sed -n 's/^PHP \([0-9\.]*\).*/PHP \1/p')
         # Check if Xdebug is included in the PHP version info
@@ -142,17 +142,17 @@ for todo in "${all_todos[@]}"; do
 
       config_file="branch_${version}/cypress.config.mjs"
       if [ -f "${config_file}" ]; then
-        db_type=$(grep db_type ${config_file} | sed 's/db_type//' | tr -d " ,'" | sed 's/://')
-        db_host=$(grep db_host ${config_file} | sed 's/db_host//' | tr -d " ,'" | sed 's/://')
-        db_port=$(grep db_port ${config_file} | sed 's/db_port//' | tr -d " ,'" | sed 's/://')
+        db_type=$(grep db_type "${config_file}" | sed 's/db_type//' | tr -d " ,'" | sed 's/://')
+        db_host=$(grep db_host "${config_file}" | sed 's/db_host//' | tr -d " ,'" | sed 's/://')
+        db_port=$(grep db_port "${config_file}" | sed 's/db_port//' | tr -d " ,'" | sed 's/://')
         echo "  ${db_type}, ${db_host}, ${db_port}"
       else
         echo "  OOPS missing '${config_file}' file?"
       fi
 
-      echo "  /branch_${version}: $(du -ms branch_${version} | awk '{print $1}')MB"
+      echo "  /branch_${version}: $(du -ms "branch_${version}" | awk '{print $1}')MB"
 
-      docker exec jbt-${version} bash -c "JBT_INTERNAL=42 /jbt/scripts/repos.sh \"branch_${version}\""
+      docker exec "jbt-${version}" bash -c "JBT_INTERNAL=42 /jbt/scripts/repos.sh \"branch_${version}\""
     else
       echo "  /branch_${version} is NOT existing"
     fi

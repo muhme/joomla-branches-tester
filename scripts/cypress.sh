@@ -17,24 +17,25 @@ source scripts/helper.sh
 function help {
     echo "
     cypress – Running Cypress GUI for one branch, either from a Docker container or using locally installed Cypress.
-              The mandatory Joomla version argument must be one of the following: ${versions}.
+              The mandatory Joomla version argument must be one of the following: ${allVersions[*]}.
               The optional 'local' argument runs Cypress directly on the Docker host (default is to run from the Docker container).
 
               $(random_quote)
     "
 }
 
-versions=$(getVersions)
+# shellcheck disable=SC2207 # There are no spaces in version numbers
+allVersions=($(getVersions))
 
 local=false
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
     exit 0
-  elif isValidVersion "$1" "$versions"; then
+  elif isValidVersion "$1" "${allVersions[*]}"; then
     version="$1"
     shift # Argument is eaten as the version number.
-  elif [ $1 = "local" ]; then
+  elif [ "$1" = "local" ]; then
     local=true
     shift # Argument is eaten to run Cypress directly on the Docker host.
   else
@@ -46,13 +47,16 @@ done
 
 if [ -z "${version}" ]; then
   help
-  error "Please provide a Joomla version number from the following: ${versions}."
+  error "Please provide a Joomla version number from the following: ${allVersions[*]}."
   exit 1
 fi
 
 # Use of SMTP port 7325 for the smtp-tester, as port 7125 is occupied by the mapping for the Cypress container.
 if $local; then
-  cd "branch_${version}"
+  cd "branch_${version}" || {
+    error "OOPS - Unable to move into the 'branch_${version}' directory, giving up."
+    exit 1
+  }
   # Install the Cypress version used in this branch, if needed
   log "Installing Cypress if needed"
 

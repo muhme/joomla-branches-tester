@@ -14,8 +14,8 @@ source scripts/helper.sh
 
 function help {
   echo "
-    patch – Apply Git patches in the repositories ‘joomla-cms’, ‘joomla-cypress’ or ‘joomla-framework/database’.
-            Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
+    patch – Apply Git patches in the repositories 'joomla-cms', 'joomla-cypress' or 'joomla-framework/database'.
+            Optional Joomla version can be one or more of the following: ${allVersions[*]} (default is all).
             One or multipe patches, e.g. joomla-cms-43968, joomla-cypress-33 or database-310
 
             $(random_quote)
@@ -23,14 +23,15 @@ function help {
 }
 
 patches=()
-versions=$(getVersions)
-IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
+# shellcheck disable=SC2207 # There are no spaces in version numbers
+allVersions=($(getVersions))
 versionsToPatch=()
+
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
     exit 0
-  elif isValidVersion "$1" "${versions}"; then
+  elif isValidVersion "$1" "${allVersions[*]}"; then
     versionsToPatch+=("$1")
     shift # Argument is eaten as onthee version number.
   elif [[ "$1" =~ ^(joomla-cms|joomla-cypress|database)-[0-9]+$ ]]; then
@@ -45,7 +46,7 @@ done
 
 # If no version was given, use all.
 if [ ${#versionsToPatch[@]} -eq 0 ]; then
-  versionsToPatch=(${allVersions[@]})
+  versionsToPatch=("${allVersions[@]}")
 fi
 if [ ${#patches[@]} -eq 0 ]; then
   help
@@ -60,7 +61,7 @@ for version in "${versionsToPatch[@]}"; do
     continue
   fi
 
-  for patch in ${patches[@]}; do
+  for patch in "${patches[@]}"; do
     repo="${patch%-*}" # 'joomla-cms', 'database' or 'joomla-cypress'
     patch_number="${patch##*-}" # e.g. 43968, 31 or 33
     # Don't use "jbt-${repo_version}", use 'jbt-merged' as constant as with Git merge the repository version may change.
@@ -90,7 +91,7 @@ for version in "${versionsToPatch[@]}"; do
 
     #      dir is '.', 'libraries/vendor/joomla/joomla-framework' or 'node_modules/joomla-projects'
     # base_dir is '.', 'libraries/vendor/joomla'                  or 'node_modules'
-    basedir=$(dirname ${dir})
+    basedir=$(dirname "${dir}")
 
     # Case 0: Directory doesn't exist (don't check for joomla-cms)
     if [ "${repo}" != "joomla-cms" ] && [ ! -d "branch_${version}/${basedir}/${repo}" ]; then
@@ -102,10 +103,10 @@ for version in "${versionsToPatch[@]}"; do
     if [ "${repo}" != "joomla-cms" ] && [ ! -d "branch_${version}/${basedir}/${repo}/.git" ]; then
       log "jbt-${version} - Delete 'branch_${version}/${basedir}/${repo}' directory"
       rm -rf "branch_${version}/${basedir}/${repo}" 2>/dev/null || sudo rm -rf "branch_${version}/${basedir}/${repo}"
-      log "jbt-${version} - Git clone $(basename ${dir})/${repo}, version ${repo_version}"
+      log "jbt-${version} - Git clone $(basename "${dir}")/${repo}, version ${repo_version}"
       docker exec "jbt-${version}" bash -c "
         cd ${basedir}
-        git clone \"https://github.com/$(basename ${dir})/${repo}\"
+        git clone \"https://github.com/$(basename "${dir}")/${repo}\"
         cd ${repo}
         git checkout -b \"${merge_branch}\" \"refs/tags/${repo_version}\""
       # Merge given PR

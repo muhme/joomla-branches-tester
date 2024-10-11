@@ -24,7 +24,7 @@ for git_dir in $(find . -name ".git" | sed -e 's|^.||' -e 's|.git$||' ); do
     if ! git config --global --get-all safe.directory | grep -q "^${abs_git_dir}$"; then
       git config --global --add safe.directory "${abs_git_dir}"
     fi
-    cd $abs_git_dir
+    cd "${abs_git_dir}"
     echo "  Git Repository ${branch_dir}${git_dir}"
     echo "    Remote Origin: $(git config --get remote.origin.url)"
     current_branch=$(git branch --show-current)
@@ -34,15 +34,15 @@ for git_dir in $(find . -name ".git" | sed -e 's|^.||' -e 's|.git$||' ); do
         if [ "${git_dir}" = "/" ]; then
           repo="joomla-cms"
         else
-          repo=$(basename ${git_dir})
+          repo=$(basename "${git_dir}")
         fi
         echo -n " ${branch}" | sed "s|jbt-pr|${repo}|"
       fi
     done
     echo ""
-    echo "    Status: $(git status -s | grep -v \
+    echo "    Status: $(git status -s | grep -c -v \
         -e 'tests/System/integration/install/Installation.cy.js' \
         -e 'cypress.config.local.mjs' \
         -e '.php-cs-fixer.dist.php' \
-        -e 'ruleset.xml' | wc -l | tr -d ' ') changes"
+        -e 'ruleset.xml' | tr -d ' ') changes"
 done

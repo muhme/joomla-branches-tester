@@ -23,18 +23,18 @@ trap - ERR
 function help {
     echo "
     test – Runs tests on one, multiple, or all branches.
-           Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
+           Optional Joomla version can be one or more of the following: ${allVersions[*]} (default is all).
            Optional 'novnc' argument sets DISPLAY=jbt-novnc:0 (default is headless).
            Optional 'chrome', 'edge', or 'firefox' can be specified as the browser (default is 'electron').
-           Optional test name can be on or more of the following: ${ALL_TESTS[@]} (default is all).
+           Optional test name can be on or more of the following: ${ALL_TESTS[*]} (default is all).
            Optional Cypress spec file pattern for 'system' tests (default is to run all w/o the installation step)
 
            $(random_quote)
     "
 }
 
-versions=$(getVersions)
-IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
+# shellcheck disable=SC2207 # There are no spaces in version numbers
+allVersions=($(getVersions))
 
 ALL_TESTS=("php-cs-fixer" "phpcs" "unit" "lint:css" "lint:js" "lint:testjs" "system")
 testsToRun=()
@@ -45,7 +45,7 @@ while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
     exit 0
-  elif isValidVersion "$1" "$versions"; then
+  elif isValidVersion "$1" "${allVersions[*]}"; then
     versionsToTest+=("$1")
     shift # Argument is eaten as the Joomla version number.
   elif [ "$1" = "novnc" ]; then
@@ -70,12 +70,12 @@ done
 
 # If no version was given, use all.
 if [ ${#versionsToTest[@]} -eq 0 ]; then
-  versionsToTest=(${allVersions[@]})
+  versionsToTest=("${allVersions[@]}")
 fi
 
 # If no test name was given, use all.
 if [ ${#testsToRun[@]} -eq 0 ]; then
-  testsToRun=(${ALL_TESTS[@]})
+  testsToRun=("${ALL_TESTS[@]}")
 fi
 
 # Pass through the environment variable to show 'console.log()' messages
@@ -118,8 +118,7 @@ for version in "${versionsToTest[@]}"; do
           cat xx01 >> "${insert_file}" && \
           rm xx00 xx01
       fi
-      docker exec "jbt-${version}" bash -c "libraries/vendor/bin/php-cs-fixer fix -vvv --dry-run --diff"
-      if [ $? -eq 0 ]; then
+      if docker exec "jbt-${version}" bash -c "libraries/vendor/bin/php-cs-fixer fix -vvv --dry-run --diff"; then
         # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
         successful=$((successful + 1))
         overallSuccessful=$((overallSuccessful + 1))
@@ -144,8 +143,7 @@ for version in "${versionsToTest[@]}"; do
           cat xx01 >> "${insert_file}" && \
           rm xx00 xx01
       fi
-      docker exec "jbt-${version}" bash -c "libraries/vendor/bin/phpcs --extensions=php -p --standard=ruleset.xml ."
-      if [ $? -eq 0 ]; then
+      if docker exec "jbt-${version}" bash -c "libraries/vendor/bin/phpcs --extensions=php -p --standard=ruleset.xml ."; then
         successful=$((successful + 1))
         overallSuccessful=$((overallSuccessful + 1))
         log "jbt-${version} – phpcs passed successfully"
@@ -160,8 +158,7 @@ for version in "${versionsToTest[@]}"; do
 
     if [ "$actualTest" = "unit" ]; then
       log "jbt-${version} – Initiating PHP Testsuite Unit – unit"
-      docker exec "jbt-${version}" bash -c "libraries/vendor/bin/phpunit --testsuite Unit"
-      if [ $? -eq 0 ]; then
+      if docker exec "jbt-${version}" bash -c "libraries/vendor/bin/phpunit --testsuite Unit"; then
         successful=$((successful + 1))
         overallSuccessful=$((overallSuccessful + 1))
         log "jbt-${version} – unit passed successfully"
@@ -192,8 +189,7 @@ for version in "${versionsToTest[@]}"; do
     for lint in "css" "js" "testjs" ; do
       if [ "$actualTest" = "lint:${lint}" ]; then
         log "jbt-${version} – Initiating ${lint} Linter – lint:${lint}"
-        docker exec "jbt-${version}" bash -c "npm run lint:${lint}"
-        if [ $? -eq 0 ]; then
+        if docker exec "jbt-${version}" bash -c "npm run lint:${lint}"; then
           successful=$((successful + 1))
           overallSuccessful=$((overallSuccessful + 1))
           log "jbt-${version} – lint:${lint} passed successfully"
@@ -242,6 +238,7 @@ for version in "${versionsToTest[@]}"; do
         log "jbt-${version} – Initiating headless System Tests with ${spec}"
         docker exec jbt-cypress sh -c "cd /jbt/branch_${version} && unset DISPLAY && ${eel1} cypress run ${browser} ${spec}"
       fi
+      # shellcheck disable=SC2181 # Check either Cypress headed or headless status 
       if [ $? -eq 0 ] ; then
         # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
         successful=$((successful + 1))
@@ -275,10 +272,10 @@ done
 
 if [ ${#versionsToTest[@]} -gt 1 ]; then
   if [ ${overallFailed} -eq 0 ] ; then
-    log "${versionsToTest[@]} – All tests completed: ${overallSuccessful} test(s) successful ${spec}"
+    log "${versionsToTest[*]} – All tests completed: ${overallSuccessful} test(s) successful ${spec}"
     exit 0
   else
-    error "${versionsToTest[@]} – All tests completed: ${overallFailed} test(s) failed, ${overallSuccessful} test(s) passed ${spec}."
+    error "${versionsToTest[*]} – All tests completed: ${overallFailed} test(s) failed, ${overallSuccessful} test(s) passed ${spec}."
     exit 1
   fi
 fi
