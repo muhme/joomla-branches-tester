@@ -172,53 +172,6 @@ if [ "$recreate" = false ]; then
   psql -U postgres -c \"ALTER USER root WITH SUPERUSER;\""
 fi
 
-for version in "${versionsToInstall[@]}"; do
-
-  if [ "$recreate" = true ]; then
-
-    # Container exists?
-    if docker ps -a --format '{{.Names}}' | grep -q "^jbt-${version}$"; then
-      # Running?
-      if docker ps --format '{{.Names}}' | grep -q "^jbt-${version}$"; then
-        log "jbt-${version} – Stopping Docker Container"
-        docker compose stop "jbt-${version}"
-      fi
-      log "jbt-${version} – Removing Docker container"
-      docker compose rm -f "jbt-${version}" || log "jbt-${version} – Ignoring failure to remove Docker container"
-    fi
-
-    createDockerComposeFile "${version}" "${php_version}" "${network}" "append"
-
-    log "jbt-${version} – Building Docker container"
-    docker compose build "jbt-${version}"
-
-    log "jbt-${version} – Starting Docker container"
-    docker compose up -d "jbt-${version}"
-
-  fi
-
-  # If the copying has not yet been completed, then we have to wait, or we will get e.g.
-  # rm: cannot remove '/var/www/html/libraries/vendor': Directory not empty.
-  max_retries=120
-  for ((i = 1; i < max_retries; i++)); do
-    if docker logs "jbt-${version}" 2>&1 | grep 'This server is now configured to run Joomla!'; then
-      break
-    else
-      log "jbt-${version} – Waiting for original Joomla installation, attempt ${i} of ${max_retries}"
-      sleep 1
-    fi
-  done
-  if [ $i -ge $max_retries ]; then
-    error "jbt-${version} – Failed after $max_retries attempts. Giving up."
-    exit 1
-  fi
-  log "jbt-${version} – Deleting original Joomla installation"
-  docker exec "jbt-${version}" bash -c 'rm -rf /var/www/html/* && rm -rf /var/www/html/.??*'
-
-  JBT_INTERNAL=42 bash scripts/setup.sh "initial" "${version}" "${database_variant}" "${socket}" \
-                                        "${arg_repository}:${arg_branch}" "${patches[@]}"
-
-done
 
 # Performing additional version-independent configurations to complete the base installation.
 if [ "$recreate" = false ]; then
@@ -268,3 +221,54 @@ EOF
   docker cp scripts/pgpass jbt-pga:/pgadmin4/pgpass
   docker exec -u 0 jbt-pga bash -c "chmod 600 /pgadmin4/pgpass && chown pgadmin /pgadmin4/pgpass"
 fi
+
+log "Base installation is completed. If there should be an issue with any of the upcoming version-dependent installations,"
+log "the failed version-dependent installation could be repeated using 'recreate'."
+
+for version in "${versionsToInstall[@]}"; do
+
+  if [ "$recreate" = true ]; then
+
+    # Container exists?
+    if docker ps -a --format '{{.Names}}' | grep -q "^jbt-${version}$"; then
+      # Running?
+      if docker ps --format '{{.Names}}' | grep -q "^jbt-${version}$"; then
+        log "jbt-${version} – Stopping Docker Container"
+        docker compose stop "jbt-${version}"
+      fi
+      log "jbt-${version} – Removing Docker container"
+      docker compose rm -f "jbt-${version}" || log "jbt-${version} – Ignoring failure to remove Docker container"
+    fi
+
+    createDockerComposeFile "${version}" "${php_version}" "${network}" "append"
+
+    log "jbt-${version} – Building Docker container"
+    docker compose build "jbt-${version}"
+
+    log "jbt-${version} – Starting Docker container"
+    docker compose up -d "jbt-${version}"
+
+  fi
+
+  # If the copying has not yet been completed, then we have to wait, or we will get e.g.
+  # rm: cannot remove '/var/www/html/libraries/vendor': Directory not empty.
+  max_retries=120
+  for ((i = 1; i < max_retries; i++)); do
+    if docker logs "jbt-${version}" 2>&1 | grep 'This server is now configured to run Joomla!'; then
+      break
+    else
+      log "jbt-${version} – Waiting for original Joomla installation, attempt ${i} of ${max_retries}"
+      sleep 1
+    fi
+  done
+  if [ $i -ge $max_retries ]; then
+    error "jbt-${version} – Failed after $max_retries attempts. Giving up."
+    exit 1
+  fi
+  log "jbt-${version} – Deleting original Joomla installation"
+  docker exec "jbt-${version}" bash -c 'rm -rf /var/www/html/* && rm -rf /var/www/html/.??*'
+
+  JBT_INTERNAL=42 bash scripts/setup.sh "initial" "${version}" "${database_variant}" "${socket}" \
+                                        "${arg_repository}:${arg_branch}" "${patches[@]}"
+
+done
