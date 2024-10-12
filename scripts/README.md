@@ -83,5 +83,5 @@ The following scripts and configuration files are intended for internal usage on
 | [scripts/repos.sh](repos.sh) | Get information about Git repositories. | Used by `scripts/info` and running inside Docker container. |
 | [scripts/servers.json](servers.json) | PostgreSQL server configuration. | Used by `pgAdmin`. |
 | [scripts/setup.sh](setup.sh) | Install and configure Docker web server containers. | Used by `scripts/create` and `scripts/php`. |
-| [scripts/shellsheck.sh](shellsheck.sh) | Developer script for linting all shell scripts. | Needs [ShellSheck](https://www.shellcheck.net/) installed. |
+| [scripts/shellsheck.sh](shellsheck.sh) | Developer script for linting all shell scripts. | Requires [ShellSheck](https://www.shellcheck.net/) installed. |
 | [scripts/smtp_double_relay.py](smtp_double_relay.py) | SMTP relay triplicator source code. | Used by `jbt-relay`. |
