@@ -463,3 +463,8 @@ trap theEnd EXIT
 # No, every end is a new beginning :)
 #
 log ">>>" "'$0 $*' started"
+
+# Check version >= 2.0.0 created?
+if [ -f "docker-compose.yml" ] && [ "$0" != "scripts/clean.sh" ] && grep -q "jbt_cypress" "docker-compose.yml"; then
+    error "Installation < 2.0.0 found. You need first to run 'scripts/create'."
+fi
