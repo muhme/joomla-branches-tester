@@ -53,8 +53,8 @@ fi
 
 # Use of SMTP port 7325 for the smtp-tester, as port 7125 is occupied by the mapping for the Cypress container.
 if $local; then
-  cd "branch_${version}" || {
-    error "OOPS - Unable to move into the 'branch_${version}' directory, giving up."
+  cd "branch-${version}" || {
+    error "OOPS - Unable to move into the 'branch-${version}' directory, giving up."
     exit 1
   }
   # Install the Cypress version used in this branch, if needed
@@ -73,5 +73,5 @@ if $local; then
 else
   log "Open jbt-cypress container Cypress GUI for version ${version}"
   # Open Cypress e.g. on Windows WSL2 Docker container.
-  docker exec jbt-cypress bash -c "cd \"/jbt/branch_${version}\" && DISPLAY=:0 cypress open --env smtp_port=7325 --e2e --project ."
+  docker exec jbt-cypress bash -c "cd \"/jbt/branch-${version}\" && DISPLAY=:0 cypress open --env smtp_port=7325 --e2e --project ."
 fi

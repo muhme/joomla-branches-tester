@@ -60,8 +60,8 @@ fi
 changed=0
 for version in "${versionsToInstall[@]}"; do
 
-  if [ ! -d "branch_${version}" ]; then
-    log "jbt-${version} – There is no directory 'branch_${version}', jumped over"
+  if [ ! -d "branch-${version}" ]; then
+    log "jbt-${version} – There is no directory 'branch-${version}', jumped over"
     continue
   fi
 

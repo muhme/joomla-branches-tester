@@ -79,8 +79,8 @@ fi
 
 for version in "${versionsToChange[@]}"; do
 
-  if [ ! -d "branch_${version}" ]; then
-    log "jbt-${version} – There is no directory 'branch_${version}', jumped over"
+  if [ ! -d "branch-${version}" ]; then
+    log "jbt-${version} – There is no directory 'branch-${version}', jumped over"
     continue
   fi
 
@@ -131,19 +131,19 @@ for version in "${versionsToChange[@]}"; do
 
   # Seen on Ubuntu, 13.10.0 was installed, but 12.13.2 needed for the branch
   log "jbt-${version} – Install Cypress (if needed)"
-  docker exec jbt-cypress sh -c "cd /jbt/branch_${version} && npx cypress install"
+  docker exec jbt-cypress sh -c "cd /jbt/branch-${version} && npx cypress install"
   # Seen on macOS, 13.13.3 was installed, npx cypress install did not install needed 13.13.0
-  docker exec jbt-cypress sh -c "cd /jbt/branch_${version} && npm run cypress:install"
+  docker exec jbt-cypress sh -c "cd /jbt/branch-${version} && npm run cypress:install"
   # Seen on macOS, "The cypress npm package is installed, but the Cypress binary is missing."
-  docker exec jbt-cypress sh -c "cd /jbt/branch_${version} && cypress install"
+  docker exec jbt-cypress sh -c "cd /jbt/branch-${version} && cypress install"
 
   # Using Install Joomla from System Tests
   log "jbt-${version} – Cypress-based Joomla installation"
-  docker exec jbt-cypress sh -c "cd /jbt/branch_${version} && \
+  docker exec jbt-cypress sh -c "cd /jbt/branch-${version} && \
        DISPLAY=jbt-novnc:0 cypress run --headed --spec tests/System/integration/install/Installation.cy.js"
 
   log "jbt-${version} – Disable B/C plugin"
-  if ! docker exec jbt-cypress sh -c "cd /jbt/branch_${version} && \
+  if ! docker exec jbt-cypress sh -c "cd /jbt/branch-${version} && \
         DISPLAY=jbt-novnc:0 CYPRESS_specPattern='/jbt/scripts/disableBC.cy.js' cypress run --headed"; then
     error "jbt-${version} – Ignoring failed step 'Disable B/C plugin'."
   fi

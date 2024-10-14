@@ -89,8 +89,8 @@ overallSuccessful=0
 
 for version in "${versionsToTest[@]}"; do
 
-  if [ ! -d "branch_${version}" ]; then
-    log "jbt-${version} – There is no directory 'branch_${version}', jumped over"
+  if [ ! -d "branch-${version}" ]; then
+    log "jbt-${version} – There is no directory 'branch-${version}', jumped over"
     continue
   fi
 
@@ -105,9 +105,9 @@ for version in "${versionsToTest[@]}"; do
       docker exec "jbt-${version}" bash -c \
         'file="administrator/cache/autoload_psr4.php"; [ -f "${file}" ] && libraries/vendor/bin/php-cs-fixer fix "${file}"' || true
       # 2nd Ignore Joomla Patch Tester
-      insert_file="branch_${version}/.php-cs-fixer.dist.php"
+      insert_file="branch-${version}/.php-cs-fixer.dist.php"
       insert_line="    ->notPath('/com_patchtester/')"
-      if [ -d "branch_${version}/administrator/components/com_patchtester" ] && \
+      if [ -d "branch-${version}/administrator/components/com_patchtester" ] && \
          [ -f "${insert_file}" ] && ! grep -qF "${insert_line}" "${insert_file}"; then
         log "jbt-${version} – Patch Tester installation found, excluding from PHP-CS-Fixer"
         # file is owned by 'www-data' user on Linux
@@ -133,9 +133,9 @@ for version in "${versionsToTest[@]}"; do
     if [ "$actualTest" = "phpcs" ]; then
       log "jbt-${version} – Initiating PHP Coding Sniffer – phpcs"
       # 1st Ignore Joomla Patch Tester
-      insert_file="branch_${version}/ruleset.xml"
+      insert_file="branch-${version}/ruleset.xml"
       insert_line='    <exclude-pattern type="relative">^administrator/components/com_patchtester/*</exclude-pattern>'
-      if [ -d "branch_${version}/administrator/components/com_patchtester" ] && \
+      if [ -d "branch-${version}/administrator/components/com_patchtester" ] && \
          [ -f "${insert_file}" ] && ! grep -qF "${insert_line}" "${insert_file}"; then
         csplit "${insert_file}" "/<exclude-pattern /" && \
           cat xx00 > "${insert_file}" && \
@@ -206,7 +206,7 @@ for version in "${versionsToTest[@]}"; do
       if [ -z "$spec_argument" ] ; then
         # Create spec pattern list without installation spec
         i="tests/System/integration/"
-        all=$(grep  "${i}" "branch_${version}/cypress.config.mjs" | \
+        all=$(grep  "${i}" "branch-${version}/cypress.config.mjs" | \
               grep -v "${i}install/" | \
               tr -d "' " | \
               awk '{printf "%s", $0}' | \
@@ -233,10 +233,10 @@ for version in "${versionsToTest[@]}"; do
         
       if [[ "$novnc" == true ]]; then
         log "jbt-${version} – Initiating System Tests with NoVNC and ${spec}"
-        docker exec jbt-cypress sh -c "cd /jbt/branch_${version} && export DISPLAY=jbt-novnc:0 && ${eel1} cypress run --headed ${browser} ${spec}"
+        docker exec jbt-cypress sh -c "cd /jbt/branch-${version} && export DISPLAY=jbt-novnc:0 && ${eel1} cypress run --headed ${browser} ${spec}"
       else
         log "jbt-${version} – Initiating headless System Tests with ${spec}"
-        docker exec jbt-cypress sh -c "cd /jbt/branch_${version} && unset DISPLAY && ${eel1} cypress run ${browser} ${spec}"
+        docker exec jbt-cypress sh -c "cd /jbt/branch-${version} && unset DISPLAY && ${eel1} cypress run ${browser} ${spec}"
       fi
       # shellcheck disable=SC2181 # Check either Cypress headed or headless status 
       if [ $? -eq 0 ] ; then

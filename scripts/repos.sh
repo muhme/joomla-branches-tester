@@ -6,15 +6,15 @@
 # https://github.com/muhme/joomla-branches-tester
 
 if ! [ -f /.dockerenv ] && ! [ -f /run/.containerenv ]; then
-  echo "*** Error: Please run in Docker container, e.g. docker exec jbt-44 /jbt/scripts/repos.sh branch_44." >&2
+  echo "*** Error: Please run in Docker container, e.g. docker exec jbt-44 /jbt/scripts/repos.sh branch-44." >&2
   exit 1
 fi
 if [ "${JBT_INTERNAL}" != "42" ]; then
   echo "*** Error: This script is intended to be called only from 'scripts/info'." >&2
   exit 1
 fi
-if [[ $# -ne 1 || "$1" != branch_* ]]; then
-  echo "*** Error: Please provide branch directory name, e.g. branch_44." >&2
+if [[ $# -ne 1 || "$1" != branch-* ]]; then
+  echo "*** Error: Please provide branch directory name, e.g. branch-44." >&2
   exit 1
 fi
 branch_dir="$1"

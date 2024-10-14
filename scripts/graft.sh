@@ -73,16 +73,16 @@ if [ ! -f "$package" ]; then
     exit 1
 fi
 
-if [ ! -f "branch_${version}/cypress.config.dist.mjs" ]; then
-  error "Missing file 'branch_${version}/cypress.config.dist.mjs'. Please use 'scripts/create' first."
+if [ ! -f "branch-${version}/cypress.config.dist.mjs" ]; then
+  error "Missing file 'branch-${version}/cypress.config.dist.mjs'. Please use 'scripts/create' first."
   exit 1
 fi
-if [ ! -d "branch_${version}/tests/System" ]; then
-  error "Missing directory 'branch_${version}/tests/System'. Please use 'scripts/create' first."
+if [ ! -d "branch-${version}/tests/System" ]; then
+  error "Missing directory 'branch-${version}/tests/System'. Please use 'scripts/create' first."
   exit 1
 fi
-if [ ! -d "branch_${version}/node_modules" ]; then
-  error "Missing directory 'branch_${version}/node_modules'. Please use 'scripts/create' first."
+if [ ! -d "branch-${version}/node_modules" ]; then
+  error "Missing directory 'branch-${version}/node_modules'. Please use 'scripts/create' first."
   exit 1
 fi
 
@@ -90,18 +90,18 @@ fi
 # As a result, retry any file system operation with sudo if the first attempt fails.
 # And suppress stderr on the first attempt to avoid unnecessary error messages.
 
-log "Creating new directory 'branch_${version}' and copy three files and two directories"
-mv "branch_${version}" "branch_${version}-TMP" 2>/dev/null|| sudo mv "branch_${version}" "branch_${version}-TMP"
-mkdir -p "branch_${version}/tests" 2>/dev/null || (sudo mkdir -p "branch_${version}/tests" && sudo chmod 777 "branch_${version}/tests")
-( cd "branch_${version}-TMP"; \
-  mv cypress.config.dist.mjs package.json package-lock.json node_modules "../branch_${version}" 2>/dev/null || \
-     sudo mv cypress.config.dist.mjs package.json package-lock.json node_modules "../branch_${version}"; \
-  mv tests/System "../branch_${version}/tests" 2>/dev/null || \
-     sudo mv tests/System "../branch_${version}/tests" )
-rm -rf "branch_${version}-TMP" 2>/dev/null || sudo rm -rf "branch_${version}-TMP"
+log "Creating new directory 'branch-${version}' and copy three files and two directories"
+mv "branch-${version}" "branch-${version}-TMP" 2>/dev/null|| sudo mv "branch-${version}" "branch-${version}-TMP"
+mkdir -p "branch-${version}/tests" 2>/dev/null || (sudo mkdir -p "branch-${version}/tests" && sudo chmod 777 "branch-${version}/tests")
+( cd "branch-${version}-TMP"; \
+  mv cypress.config.dist.mjs package.json package-lock.json node_modules "../branch-${version}" 2>/dev/null || \
+     sudo mv cypress.config.dist.mjs package.json package-lock.json node_modules "../branch-${version}"; \
+  mv tests/System "../branch-${version}/tests" 2>/dev/null || \
+     sudo mv tests/System "../branch-${version}/tests" )
+rm -rf "branch-${version}-TMP" 2>/dev/null || sudo rm -rf "branch-${version}-TMP"
 
 log "Extracting package file '${package}'"
-cd "branch_${version}"
+cd "branch-${version}"
 case "$package" in
   *.zip)
     unzip "$package" -d . 2>/dev/null || sudo unzip "$package" -d .
@@ -136,5 +136,5 @@ docker exec "jbt-${version}" bash -c 'chown -R www-data:www-data /var/www/html >
 scripts/database.sh "${version}" "$database_variant"
 
 package_file=$(basename "${package}")
-joomla_version=$(getJoomlaVersion "branch_${version}")
-log "Grafting the package '${package_file}' with Joomla ${joomla_version} onto 'branch_${version}' is complete"
+joomla_version=$(getJoomlaVersion "branch-${version}")
+log "Grafting the package '${package_file}' with Joomla ${joomla_version} onto 'branch-${version}' is complete"

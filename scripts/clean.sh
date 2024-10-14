@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # clean.sh - Stopping and removing JBT Docker containers, associated Docker networks and volumes.
-#            Also deletes directory 'run' and all 'branch_*' directories.
+#            Also deletes directory 'run' and all 'branch-*' directories.
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
@@ -16,7 +16,7 @@ source scripts/helper.sh
 function help {
   echo "
     clean – Stops and removes all JBT Docker containers, associated Docker networks, and volumes.
-            Also deletes JBT directories, such as 'run' and all 'branch_*' directories.
+            Also deletes JBT directories, such as 'run' and all 'branch-*' directories.
 
             $(random_quote)
     "
@@ -73,17 +73,25 @@ done
 
 # Clean up branch directories if existing
 for version in "${allVersions[@]}"; do
-  if [ -d "branch_${version}" ]; then
-    log "Removing directory 'branch_${version}'"
+  if [ -d "branch-${version}" ]; then
+    log "Removing directory 'branch-${version}'"
     # sudo is needed on Windows WSL Ubuntu
-    rm -rf "branch_${version}" >/dev/null 2>&1 || sudo rm -rf "branch_${version}"
+    rm -rf "branch-${version}" >/dev/null 2>&1 || sudo rm -rf "branch-${version}"
   fi
 done
 
-# Branch directories from old version numbers?
-for dir in branch_*; do
+# Branch directories not in the used versions list?
+for dir in branch-*; do
   if [ -d "$dir" ]; then
     log "Removing non-existing version directory '${dir}'"
+    rm -rf "$dir" 2>&1 || sudo rm -rf "$dir"
+  fi
+done
+
+# Branch directories with underscore, before JBT 2.0.5?
+for dir in branch_*; do
+  if [ -d "$dir" ]; then
+    log "Removing old directory '${dir}'"
     rm -rf "$dir" 2>&1 || sudo rm -rf "$dir"
   fi
 done

@@ -51,12 +51,12 @@ fi
 pulled=0
 for version in "${versionsToPull[@]}"; do
   branch=$(branchName "${version}")
-  if [ ! -d "branch_${version}" ]; then
-    log "jbt-${version} – There is no directory 'branch_${version}', jumped over"
+  if [ ! -d "branch-${version}" ]; then
+    log "jbt-${version} – There is no directory 'branch-${version}', jumped over"
     continue
   fi
-  if [ ! -d "branch_${version}/.git" ]; then
-    log "jbt-${version} – There is no directory 'branch_${version}/.git', grafted Joomla package?, jumped over"
+  if [ ! -d "branch-${version}/.git" ]; then
+    log "jbt-${version} – There is no directory 'branch-${version}/.git', grafted Joomla package?, jumped over"
     continue
   fi
   log "jbt-${version} – Running Git fetch origin for ${branch}"
@@ -66,11 +66,11 @@ for version in "${versionsToPull[@]}"; do
     log "jbt-${version} – Local Git clone for branch ${branch} is up to date"
   else
     log "jbt-${version} – Running git pull"
-    cp "branch_${version}/package-lock.json" "${TMP}"
+    cp "branch-${version}/package-lock.json" "${TMP}"
     docker exec "jbt-${version}" sh -c "git pull"
     log "jbt-${version} – Running composer install, just in case"
     docker exec "jbt-${version}" sh -c "composer install"
-    if diff -q "branch_${version}/package-lock.json" "$TMP" >/dev/null; then
+    if diff -q "branch-${version}/package-lock.json" "$TMP" >/dev/null; then
       log "jbt-${version} – No changes in file 'package-lock.json', skipping npm ci"
     else
       log "jbt-${version} – Changes detected in file 'package-lock.json', running npm ci"

@@ -77,13 +77,13 @@ log "Using URL '${PATCHTESTER_URL}'"
 failed=0
 successful=0
 for version in "${versionsToInstall[@]}"; do
-  if [ ! -d "branch_${version}" ]; then
-    log "jbt-${version} – There is no directory 'branch_${version}', jumped over"
+  if [ ! -d "branch-${version}" ]; then
+    log "jbt-${version} – There is no directory 'branch-${version}', jumped over"
     continue
   fi
   log "jbt-${version} – Installing Joomla Patch Tester"
   if docker exec jbt-cypress sh -c " \
-    cd /jbt/branch_${version} && \
+    cd /jbt/branch-${version} && \
     unset DISPLAY && \
     cypress run --env patchtester_url=${PATCHTESTER_URL},token=${token} \
                 --config specPattern=/jbt/scripts/patchtester.cy.js"; then

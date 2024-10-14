@@ -63,8 +63,8 @@ with="/usr/local-with-xdebug/"
 without="/usr/local-without-xdebug/"
 for version in "${versionsToChange[@]}"; do
 
-  if [ ! -d "branch_${version}" ]; then
-    log "jbt-${version} – There is no directory 'branch_${version}', jumped over"
+  if [ ! -d "branch-${version}" ]; then
+    log "jbt-${version} – There is no directory 'branch-${version}', jumped over"
     continue
   fi
 

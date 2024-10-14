@@ -136,7 +136,7 @@ if $initial; then
     git_branch="${arg_branch}"
   fi
   # Starting here with a shallow clone for speed and space; unshallow in 'scripts/patch' if patches are to be applied
-  log "jbt-${version} – Git shallow cloning ${git_repository}:${git_branch} into the 'branch_${version}' directory"
+  log "jbt-${version} – Git shallow cloning ${git_repository}:${git_branch} into the 'branch-${version}' directory"
   docker exec "jbt-${version}" bash -c "git clone -b ${git_branch} --depth 1 ${git_repository} /var/www/html"
 
   log "jbt-${version} – Git configure '/var/www/html' as safe directory"
@@ -150,7 +150,7 @@ if [ "$version" -ge 51 ]; then
 fi
 
 # Running composer install even if we are not initial - just in case.
-if [ -f "branch_${version}/composer.json" ]; then
+if [ -f "branch-${version}/composer.json" ]; then
   log "jbt-${version} – Running composer install"
   docker exec "jbt-${version}" bash -c "cd /var/www/html && \
     php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\" && \
@@ -168,7 +168,7 @@ fi
 
 if $initial; then
   # npm clean install only initial, with switching PHP version nothing changed for JavaScript
-  if [ -f "branch_${version}/package.json" ]; then
+  if [ -f "branch-${version}/package.json" ]; then
     log "jbt-${version} – Running npm clean install"
     docker exec "jbt-${version}" bash -c 'cd /var/www/html && npm ci'
   fi

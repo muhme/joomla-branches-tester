@@ -277,7 +277,7 @@ function dockerImageName() {
 }
 
 # Retrieve the installed Joomla major and minor version from the `libraries/src/Version.php` file in the specified branch directory.
-# e.g. getJoomlaVersion "branch_51" -> "51"
+# e.g. getJoomlaVersion "branch-51" -> "51"
 #
 function getJoomlaVersion() {
   local versions_file="$1/libraries/src/Version.php"

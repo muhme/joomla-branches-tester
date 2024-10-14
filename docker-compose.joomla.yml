@@ -22,7 +22,7 @@
       - relay
     volumes:
       - .:/jbt
-      - ./branch_XX:/var/www/html
+      - ./branch-XX:/var/www/html
       - ./cypress-cache:/root/.cache/Cypress # Cypress and web server containers
       - mysql-socket:/var/run/mysql-socket
       - mariadb-socket:/var/run/mariadb-socket

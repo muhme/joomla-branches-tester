@@ -111,9 +111,9 @@ for todo in "${all_todos[@]}"; do
         echo "  jbt-${version} is NOT running"
       fi
     fi
-    if [ -d "branch_${version}" ]; then
+    if [ -d "branch-${version}" ]; then
 
-      version_file="branch_${version}/libraries/src/Version.php"
+      version_file="branch-${version}/libraries/src/Version.php"
       if [ -f "${version_file}" ]; then
         product=$(grep "public const PRODUCT" "${version_file}" | awk -F"'" '{print $2}')
         major_version=$(grep "public const MAJOR_VERSION" "${version_file}" | awk -F" " '{print $NF}' | tr -d ';')
@@ -140,7 +140,7 @@ for todo in "${all_todos[@]}"; do
         fi
       fi
 
-      config_file="branch_${version}/cypress.config.mjs"
+      config_file="branch-${version}/cypress.config.mjs"
       if [ -f "${config_file}" ]; then
         db_type=$(grep db_type "${config_file}" | sed 's/db_type//' | tr -d " ,'" | sed 's/://')
         db_host=$(grep db_host "${config_file}" | sed 's/db_host//' | tr -d " ,'" | sed 's/://')
@@ -150,11 +150,11 @@ for todo in "${all_todos[@]}"; do
         echo "  OOPS missing '${config_file}' file?"
       fi
 
-      echo "  /branch_${version}: $(du -ms "branch_${version}" | awk '{print $1}')MB"
+      echo "  /branch-${version}: $(du -ms "branch-${version}" | awk '{print $1}')MB"
 
-      docker exec "jbt-${version}" bash -c "JBT_INTERNAL=42 /jbt/scripts/repos.sh \"branch_${version}\""
+      docker exec "jbt-${version}" bash -c "JBT_INTERNAL=42 /jbt/scripts/repos.sh \"branch-${version}\""
     else
-      echo "  /branch_${version} is NOT existing"
+      echo "  /branch-${version} is NOT existing"
     fi
   else
     error "Oh my god, that shouldn't really happen now, what's the todo='${todo}' doing here?"

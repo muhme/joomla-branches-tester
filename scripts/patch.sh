@@ -56,8 +56,8 @@ fi
 
 for version in "${versionsToPatch[@]}"; do
 
-  if [ ! -d "branch_${version}" ]; then
-    log "jbt-${version} – There is no directory 'branch_${version}', jumped over"
+  if [ ! -d "branch-${version}" ]; then
+    log "jbt-${version} – There is no directory 'branch-${version}', jumped over"
     continue
   fi
 
@@ -68,7 +68,7 @@ for version in "${versionsToPatch[@]}"; do
     merge_branch="jbt-merged"
 
     if [ "${repo}" = "joomla-cms" ]; then
-      repo_version=$(grep '"version":' "branch_${version}/package.json" | sed -n 's/.*"version": "\([0-9.]*\)".*/\1/p')
+      repo_version=$(grep '"version":' "branch-${version}/package.json" | sed -n 's/.*"version": "\([0-9.]*\)".*/\1/p')
       dir="."
       current_branch=$(docker exec "jbt-${version}" bash -c "git branch --show-current")
       if [ "${current_branch}" != "${merge_branch}" ]; then
@@ -94,15 +94,15 @@ for version in "${versionsToPatch[@]}"; do
     basedir=$(dirname "${dir}")
 
     # Case 0: Directory doesn't exist (don't check for joomla-cms)
-    if [ "${repo}" != "joomla-cms" ] && [ ! -d "branch_${version}/${basedir}/${repo}" ]; then
-      error "Missing 'branch_${version}/${basedir}/${repo}' directory, '${patch}' patch will be ignored."
+    if [ "${repo}" != "joomla-cms" ] && [ ! -d "branch-${version}/${basedir}/${repo}" ]; then
+      error "Missing 'branch-${version}/${basedir}/${repo}' directory, '${patch}' patch will be ignored."
       continue
     fi
 
     # Case 1: Clone to new Git repository and apply the patch (never for joomla-cms)
-    if [ "${repo}" != "joomla-cms" ] && [ ! -d "branch_${version}/${basedir}/${repo}/.git" ]; then
-      log "jbt-${version} - Delete 'branch_${version}/${basedir}/${repo}' directory"
-      rm -rf "branch_${version}/${basedir}/${repo}" 2>/dev/null || sudo rm -rf "branch_${version}/${basedir}/${repo}"
+    if [ "${repo}" != "joomla-cms" ] && [ ! -d "branch-${version}/${basedir}/${repo}/.git" ]; then
+      log "jbt-${version} - Delete 'branch-${version}/${basedir}/${repo}' directory"
+      rm -rf "branch-${version}/${basedir}/${repo}" 2>/dev/null || sudo rm -rf "branch-${version}/${basedir}/${repo}"
       log "jbt-${version} - Git clone $(basename "${dir}")/${repo}, version ${repo_version}"
       docker exec "jbt-${version}" bash -c "
         cd ${basedir}

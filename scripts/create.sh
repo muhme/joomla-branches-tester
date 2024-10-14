@@ -192,7 +192,7 @@ EOF
           "request": "launch",
           "port": 79${version},
           "pathMappings": {
-              "/var/www/html": "\${workspaceFolder}/branch_${version}"
+              "/var/www/html": "\${workspaceFolder}/branch-${version}"
           }
       },
 EOF
