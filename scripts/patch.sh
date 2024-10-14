@@ -67,6 +67,8 @@ for version in "${versionsToPatch[@]}"; do
     # Don't use "jbt-${repo_version}", use 'jbt-merged' as constant as with Git merge the repository version may change.
     merge_branch="jbt-merged"
 
+    log "jbt-${version} – Starting with PR '${patch}'"
+
     if [ "${repo}" = "joomla-cms" ]; then
       repo_version=$(grep '"version":' "branch-${version}/package.json" | sed -n 's/.*"version": "\([0-9.]*\)".*/\1/p')
       dir="."
