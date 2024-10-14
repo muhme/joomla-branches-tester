@@ -464,7 +464,12 @@ trap theEnd EXIT
 #
 log ">>>" "'$0 $*' started"
 
-# Check version >= 2.0.0 created?
+# Instance is JBT version < 2.0.0 created and we are not running 'scripts/clean'?
 if [ -f "docker-compose.yml" ] && [ "$0" != "scripts/clean.sh" ] && grep -q "jbt_cypress" "docker-compose.yml"; then
-    error "Installation < 2.0.0 found. You need first to run 'scripts/create'."
+    error "Installation < 2.0.0 found, hostnames changed. You need first to run 'scripts/create'."
+    # Give only warning, don't stop as we may running 'scripts/create'
+elif find . -maxdepth 1 -type d -name "branch_*" | grep -q . && [ "$0" != "scripts/clean.sh" ]; then
+    # Instance is JBT version < 2.0.8. created and we are not running 'scripts/clean'
+    error "Installation < 2.0.8 found, branch directory names changed. You need first to run 'scripts/create'."
+    # Give only warning, don't stop as we may running 'scripts/create'
 fi
