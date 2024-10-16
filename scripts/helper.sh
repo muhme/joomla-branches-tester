@@ -204,7 +204,7 @@ function createDockerComposeFile() {
   local working="$4"
 
   # Declare all local variables to prevent SC2155 - Declare and assign separately to avoid masking return values.
-  local version versions=() din doit=true
+  local version versions=() din
   # shellcheck disable=SC2162 # (ignore, for old Bashes, 2nd option -r will mangle backslashes, there are no here)
   read -a versions <<< "$(echo "${1}" | tr ' ' '\n' | sort -n | tr '\n' ' ')"
 
@@ -225,17 +225,17 @@ function createDockerComposeFile() {
   fi
 
   for version in "${versions[@]}"; do
+    local doit=true
     din=$(dockerImageName "$version" "$php_version")
     if [ "${working}" = "append" ]; then
       if grep -q "^  jbt-${version}" docker-compose.yml; then
         log "jbt-${version} – An entry already exists in 'docker-compose.base.yml'; leave it unmodified"
         doit=false
-      else
-        log "jbt-${version} – Adding an entry in 'docker-compose.base.yml'"
       fi
     fi
     if $doit; then
       # Add Joomla web server entry.
+      log "jbt-${version} – Adding an entry to 'docker-compose.base.yml' using the '${din}' image"
       sed -e '/^#/d' \
           -e "s/XX/${version}/" \
           -e "s/Y/${din}/" docker-compose.joomla.yml >>docker-compose.yml
