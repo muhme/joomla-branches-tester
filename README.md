@@ -825,6 +825,18 @@ As of early October 2024, the following pull requests (PRs) have not yet been me
 * :wrench: [database-315](https://github.com/joomla-framework/database/pull/315) Allow IPv6 addresses with brackets for pgsql
   * Working for 5.1-dev, 5.2-dev, 5.3-dev and 6.0-dev
 
+#### The Parallel Universe
+
+It's useful to have the ability to patch with future code updates,
+but sorting out the exact patches needed can be tricky, and some may cause merge conflicts.
+
+To manage this for you, JBT uses a parallel universe for the Cypress steps of Joomla installation and to disable the backward compatibility (B/C) plugin.
+In this parallel installation, a copy of the `Installation.cy.js` file is patched with `joomla-cms-43968` and the very latest `joomla-cypress` main branch clone is used.
+
+This setup works for most scenarios using `scripts/create`, `scripts/database` and `scripts/graft`.
+However, if you’re dealing with advanced configurations, such as Unix sockets or PostgreSQL combined with IPv6,
+you’ll need to apply the necessary [PR from the list](#delorean).
+
 ### Info
 
 You can retrieve some interesting Joomla Branches Tester status information.
