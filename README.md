@@ -808,22 +808,24 @@ While there's no way to remove a patch, you can use the `scripts/create recreate
 You can take a seat and pick up additional code from the future on your own.
 As of early October 2024, the following pull requests (PRs) have not yet been merged, released, or included in certain branches - but they are necessary for specific purposes and tested to be included in the branches:
 
-* :wrench: [joomla-cms-43968](https://github.com/joomla/joomla-cms/pull/43968) [cypress] Add db_port in Installation.cy.js
+* :electron: [joomla-cms-43968](https://github.com/joomla/joomla-cms/pull/43968) [cypress] Add db_port in Installation.cy.js
   * Working for 4.4-dev, 5.2-dev and 5.3-dev
 * :wrench: [joomla-cms-44084](https://github.com/joomla/joomla-cms/pull/44084) [cypress] Using NPM Module 'pg' for 'postgres'
   * Working for 4.4-dev
 * :wrench: [joomla-cms-44092](https://github.com/joomla/joomla-cms/pull/44092) [cypress] Database Unix Sockets for System Tests
   * Working for 4.4-dev
-* :wrench: [joomla-cypress-33](https://github.com/joomla-projects/joomla-cypress/pull/33) Install Joomla with non-standard db_port
+* :electron: [joomla-cypress-33](https://github.com/joomla-projects/joomla-cypress/pull/33) Install Joomla with non-standard db_port
   * Working for 4.4-dev, 5.1-dev (and updates joomla-cypress from 1.0.3 to 1.1.1 -  which is a good idea anyway), 5.2-dev, 5.3-dev and 6.0-dev
-* :wrench: [joomla-cypress-35](https://github.com/joomla-projects/joomla-cypress/pull/35) Install Joomla for Stable Releases
+* :electron: [joomla-cypress-35](https://github.com/joomla-projects/joomla-cypress/pull/35) Install Joomla for Stable Releases
   * Working for 4.4-dev, 5.1-dev (and updates joomla-cypress from 1.0.3 to 1.1.1 -  which is a good idea anyway), 5.2-dev, 5.3-dev and 6.0-dev
-* :wrench: [joomla-cypress-36](https://github.com/joomla-projects/joomla-cypress/pull/36) Wrap IPv6 address in brackets \[ \] if needed
+* :electron: [joomla-cypress-36](https://github.com/joomla-projects/joomla-cypress/pull/36) Wrap IPv6 address in brackets \[ \] if needed
   * Working for 4.4-dev, 5.1-dev (and updates joomla-cypress from 1.0.3 to 1.1.1 -  which is a good idea anyway), 5.2-dev, 5.3-dev and 6.0-dev
 * :wrench: [database-310](https://github.com/joomla-framework/database/pull/310) [3.x] Allow to specify port number or UNIX socket in host option also for MySQL (PDO) and PostgreSQL (PDO)
   * Working for 5.1-dev, 5.2-dev, 5.3-dev and 6.0-dev
 * :wrench: [database-315](https://github.com/joomla-framework/database/pull/315) Allow IPv6 addresses with brackets for pgsql
   * Working for 5.1-dev, 5.2-dev, 5.3-dev and 6.0-dev
+
+:electron: During JBT's Cypress steps for Joomla installation and disabling the backward compatibility (B/C) plugin, these patches are already applied within the parallel universe installation.
 
 #### The Parallel Universe
 
@@ -833,9 +835,12 @@ but sorting out the exact patches needed can be tricky, and some may cause merge
 To manage this for you, JBT uses a parallel universe for the Cypress steps of Joomla installation and to disable the backward compatibility (B/C) plugin.
 In this parallel installation, a copy of the `Installation.cy.js` file is patched with `joomla-cms-43968` and the very latest `joomla-cypress` main branch clone is used.
 
-This setup works for most scenarios using `scripts/create`, `scripts/database` and `scripts/graft`.
+:point_right: These patches exist only within the parallel universe installtion during JBT's Cypress steps for Joomla installation and disabling the backward compatibility (B/C) plugin. If you need these patches for testing, you must apply them manually in the Joomla installation of each branch.
+
+:point_right: This setup works for most scenarios using `scripts/create`, `scripts/database` and `scripts/graft`.
 However, if you’re dealing with advanced configurations, such as Unix sockets or PostgreSQL combined with IPv6,
 you’ll need to apply the necessary [PR from the list](#delorean).
+You can begin with a working configuration using IPv6 and MariaDB, then switch to the required database configuration after patch installation.
 
 ### Info
 
