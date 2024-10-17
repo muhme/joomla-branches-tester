@@ -18,3 +18,6 @@ cypress-cache
 
 # Directory for JBT own logs
 logs
+
+# Parallel Cypress System Tests installation environment
+installation

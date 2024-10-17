@@ -137,16 +137,51 @@ for version in "${versionsToChange[@]}"; do
   # Seen on macOS, "The cypress npm package is installed, but the Cypress binary is missing."
   docker exec jbt-cypress sh -c "cd /jbt/branch-${version} && cypress install"
 
+  # Set up a parallel installation environment
+  #   - Always create a new instance to avoid issues with updates and inconsistencies (cloning takes less than 1 second).
+  #   - Avoid using symbolic links for 'joomla-cypress' as it causes Webpack errors ('Can't resolve').
+  #
+  installation_spec="installation/branch-${version}/Installation.cy.js"
+  orig_dir="node_modules/joomla-cypress"
+  saved_dir="node_modules/joomla-cypress.orig"
+  log "jbt-${version} – Creating parallel installation environment"
+  docker exec jbt-cypress sh -c "mkdir -p '/jbt/installation/branch-${version}' && \
+                                 cp '/jbt/branch-${version}/tests/System/integration/install/Installation.cy.js' '/jbt/${installation_spec}'"
+  # Joomla System Tests 'Hack' until PR https://github.com/joomla/joomla-cms/pull/43968
+  # '[cypress] Add db_port in Installation.cy.js' is merged in all! active Joomla branches.
+  # - Don't use sed inplace editing as not supported by macOS, do it in Docker container as owner is www-data
+  if grep -q "db_port" "${installation_spec}"; then
+    log "jbt-${version} – Patch joomla-cms-43968 has already been applied in '${installation_spec}' file"
+  else
+    log "jbt-${version} – Applying changes from joomla-cms-43968 to the '${installation_spec}' file"
+    docker exec "jbt-${version}" bash -c "
+      cd \"/jbt/installation/branch-${version}/\" && \
+      sed '/db_host: Cypress.env('\"'\"'db_host'\"'\"'),/a\\      db_port: Cypress.env('\"'\"'db_port'\"'\"'), // JBT, \"hack\" waiting for PR https://github.com/joomla/joomla-cms/pull/43968' Installation.cy.js > Installation.cy.js.tmp
+      mv Installation.cy.js.tmp Installation.cy.js"
+  fi
+  if [ -d "branch-${version}/${saved_dir}" ]; then
+    # This is more a warning
+    log "jbt-${version} – Existing '${saved_dir}' directory found, will restore from this one later"
+    docker exec "jbt-${version}" bash -c "rm -rf \"${orig_dir}\""
+  else
+    docker exec "jbt-${version}" bash -c "mv '${orig_dir}' '${saved_dir}'"
+  fi
+  log "jbt-${version} – Cloning newest 'joomla-cypress' from the main branch"
+  docker exec "jbt-${version}" bash -c "cd node_modules && git clone https://github.com/joomla-projects/joomla-cypress"
+
   # Using Install Joomla from System Tests
   log "jbt-${version} – Cypress-based Joomla installation"
   docker exec jbt-cypress sh -c "cd /jbt/branch-${version} && \
-       DISPLAY=jbt-novnc:0 cypress run --headed --spec tests/System/integration/install/Installation.cy.js"
+       DISPLAY=jbt-novnc:0 CYPRESS_specPattern='/jbt/${installation_spec}' cypress run --headed"
 
   log "jbt-${version} – Disable B/C plugin"
   if ! docker exec jbt-cypress sh -c "cd /jbt/branch-${version} && \
         DISPLAY=jbt-novnc:0 CYPRESS_specPattern='/jbt/scripts/disableBC.cy.js' cypress run --headed"; then
     error "jbt-${version} – Ignoring failed step 'Disable B/C plugin'."
   fi
+
+  log "jbt-${version} – Restore original 'joomla-cypress'"
+  docker exec "jbt-${version}" bash -c "rm -rf '${orig_dir}' && mv '${saved_dir}' '${orig_dir}'"
 
   # Cypress is using own SMTP port to read and reset mails by smtp-tester
   log "jbt-${version} – Set the SMTP port used by Cypress to 7125"
