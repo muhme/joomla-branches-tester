@@ -105,7 +105,8 @@ fi
 # Delete all log files, except the actual one :)
 if [ -d "logs" ]; then
   log "Removing all files in the 'logs' directory, except for the most recent one"
-  mkdir -p logs 2>/dev/null || sudo mkdir -p logs
+  # remove log files with underscores before 2.0.12
+  rm -f logs/*_*.txt 2>/dev/null || sudo rm -f logs/*_*.txt
   find logs -type f | sort -r | tail -n +2 >"${TMP}"
   xargs -r rm -- <"${TMP}" 2>/dev/null || sudo bash -c "xargs -r rm -- <\"${TMP}\""
 fi

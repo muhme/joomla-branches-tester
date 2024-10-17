@@ -5,7 +5,7 @@
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
-log_file="logs/$(date '+%y%m%d%H%M%S')_database.txt"
+log_file="logs/$(date '+%Y-%m-%d-%H%M%S')-database.txt"
 mkdir -p logs 2>/dev/null || (sudo mkdir -p logs && sudo chmod 777 logs)
 echo "*** Using log file: ${log_file}"
 scripts/database.sh "$@" 2>&1 | tee -a "${log_file}"
