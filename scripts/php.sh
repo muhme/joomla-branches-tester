@@ -28,13 +28,13 @@ function help {
 # shellcheck disable=SC2207 # There are no spaces in version numbers
 allVersions=($(getVersions))
 
-versionsToInstall=()
+versionsToPatch=()
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
     exit 0
   elif isValidVersion "$1" "${allVersions[*]}"; then
-    versionsToInstall+=("$1")
+    versionsToPatch+=("$1")
     shift # Argument is eaten as one version number.
   elif isValidPHP "$1"; then
     php_version="$1"
@@ -53,12 +53,12 @@ if [ -z "$php_version" ]; then
 fi
 
 # If no version was given, use all.
-if [ ${#versionsToInstall[@]} -eq 0 ]; then
-  versionsToInstall=("${allVersions[*]}")
+if [ ${#versionsToPatch[@]} -eq 0 ]; then
+  versionsToPatch=("${allVersions[@]}")
 fi
 
 changed=0
-for version in "${versionsToInstall[@]}"; do
+for version in "${versionsToPatch[@]}"; do
 
   if [ ! -d "branch-${version}" ]; then
     log "jbt-${version} – There is no directory 'branch-${version}', jumped over"
@@ -102,4 +102,4 @@ for version in "${versionsToInstall[@]}"; do
 
 done
 
-log "Completed ${versionsToInstall[*]} with ${changed} changed"
+log "Completed ${versionsToPatch[*]} with ${changed} changed"
