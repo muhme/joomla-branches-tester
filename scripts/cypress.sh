@@ -16,16 +16,17 @@ source scripts/helper.sh
 
 function help {
     echo "
-    cypress – Running Cypress GUI for one branch, either from a Docker container or using locally installed Cypress.
-              The mandatory Joomla version argument must be one of the following: ${allVersions[*]}.
-              The optional 'local' argument runs Cypress directly on the Docker host (default is to run from the Docker container).
+    cypress – Runs the Cypress GUI for a specified branch, either from Docker container or locally installed Cypress.
+              The mandatory Joomla version argument must be one of: ${allVersions[*]}.
+              The optional 'local' argument runs Cypress on the Docker host (default is the Docker container).
+              The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
 
               $(random_quote)
     "
 }
 
 # shellcheck disable=SC2207 # There are no spaces in version numbers
-allVersions=($(getVersions))
+allVersions=($(getBranches))
 
 local=false
 while [ $# -ge 1 ]; do

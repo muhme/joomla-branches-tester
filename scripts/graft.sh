@@ -17,18 +17,18 @@ source scripts/helper.sh
 
 function help {
     echo "
-    graft – Place Joomla package onto development branch.
-            Just like in plant grafting, where a scion is joined to a rootstock.
-            The mandatory Joomla version argument must be one of the following: ${allVersions[*]}.
-            The Joomla package file argument (e.g. 'Joomla_5.1.2-Stable-Full_Package.zip') is mandatory.
+    graft – Places a Joomla package onto a development branch, similar to plant grafting, where a scion joins a rootstock.
+            The mandatory Joomla version argument must be one of: ${allVersions[*]}.
+            The Joomla package file (e.g. 'Joomla_5.1.2-Stable-Full_Package.zip') is also mandatory.
             Optional database variant can be one of: ${JBT_DB_VARIANTS[*]} (default is mariadbi).
+            The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
 
             $(random_quote)
     "
 }
 
 # shellcheck disable=SC2207 # There are no spaces in version numbers
-allVersions=($(getVersions))
+allVersions=($(getBranches))
 
 database_variant="mariadbi"
 while [ $# -ge 1 ]; do

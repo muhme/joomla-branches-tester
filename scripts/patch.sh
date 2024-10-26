@@ -14,9 +14,10 @@ source scripts/helper.sh
 
 function help {
   echo "
-    patch – Apply Git patches in the repositories 'joomla-cms', 'joomla-cypress' or 'joomla-framework/database'.
-            Optional Joomla version can be one or more of the following: ${allVersions[*]} (default is all).
-            One or multipe patches, e.g. joomla-cms-43968, joomla-cypress-33 or database-310
+    patch – Applies Git patches in the 'joomla-cms', 'joomla-cypress' or 'joomla-framework/database' repositories.
+            The optional Joomla version can be one or more of: ${allVersions[*]} (default is all).
+            Specify one or more patches e.g. 'joomla-cms-43968', 'joomla-cypress-33' or 'database-310'.
+            The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
 
             $(random_quote)
     "
@@ -24,7 +25,7 @@ function help {
 
 patches=()
 # shellcheck disable=SC2207 # There are no spaces in version numbers
-allVersions=($(getVersions))
+allVersions=($(getBranches))
 versionsToPatch=()
 
 while [ $# -ge 1 ]; do
@@ -70,13 +71,15 @@ for version in "${versionsToPatch[@]}"; do
     log "jbt-${version} – Starting with PR '${patch}'"
 
     if [ "${repo}" = "joomla-cms" ]; then
+      if [ -f "branch-${version}/.git/shallow" ]; then
+        # Unshallow 'joomla-cms' as it was cloned with --depth 1 in setup.sh for speed and space
+        log "jbt-${version} - Git unshallow '${repo}' repository"
+        docker exec "jbt-${version}" git fetch --unshallow
+      fi
       repo_version=$(grep '"version":' "branch-${version}/package.json" | sed -n 's/.*"version": "\([0-9.]*\)".*/\1/p')
       dir="."
       current_branch=$(docker exec "jbt-${version}" bash -c "git branch --show-current")
       if [ "${current_branch}" != "${merge_branch}" ]; then
-        # Unshallow 'joomla-cms' as it was cloned with --depth 1 in setup.sh for speed and space
-        log "jbt-${version} - Git unshallow '${repo}' repository"
-        docker exec "jbt-${version}" git fetch --unshallow
         log "jbt-${version} - Create '${merge_branch}' branch on 'joomla-cms' repository and switch to it"
         docker exec "jbt-${version}" git checkout -b "${merge_branch}"
       fi

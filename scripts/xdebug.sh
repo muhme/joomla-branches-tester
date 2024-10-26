@@ -14,16 +14,17 @@ source scripts/helper.sh
 
 function help {
     echo "
-    xdebug – Switches the PHP installation with or without Xdebug in one or more Web Server containers.
-             Mandatory argument 'on' or 'off' is required.
-             Optional Joomla version can be one or more of the following: ${allVersions[*]} (default is all).
+    xdebug – Toggles the PHP installation with or without Xdebug in one or more Joomla web server containers.
+             Mandatory argument must be 'on' or 'off'.
+             The optional Joomla version can be one or more of: ${allVersions[*]} (default is all).
+             The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
 
              $(random_quote)
     "
 }
 
 # shellcheck disable=SC2207 # There are no spaces in version numbers
-allVersions=($(getVersions))
+allVersions=($(getBranches))
 
 versionsToChange=()
 while [ $# -ge 1 ]; do

@@ -17,16 +17,17 @@ source scripts/helper.sh
 
 function help {
     echo "
-    php – Change PHP version on all, one or multiple Docker containers.
-          Mandatory PHP version is one of: ${JBT_PHP_VERSIONS[*]}.
-          Optional Joomla version can be one or more of the following: ${allVersions[*]} (default is all).
+    php – Changes the PHP version on all, one or multiple Joomla web server Docker containers.
+          The mandatory PHP version must be one of: ${JBT_PHP_VERSIONS[*]}.
+          The optional Joomla version can be one or more of: ${allVersions[*]} (default is all).
+          The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
 
           $(random_quote)
     "
 }
 
 # shellcheck disable=SC2207 # There are no spaces in version numbers
-allVersions=($(getVersions))
+allVersions=($(getBranches))
 
 versionsToPatch=()
 while [ $# -ge 1 ]; do
@@ -79,8 +80,8 @@ for version in "${versionsToPatch[@]}"; do
   replace="image: ${din} # jbt-${version} PHP version"
   log "jbt-${version} – Change 'docker-compose.yml' to use '${din}' Docker image for jbt-${version}"
   # Don't use sed inplace editing as it is not supported on macOS's sed.
-  sed -E "s|${search}|${replace}|" "docker-compose.yml" > "${TMP}"
-  cp "${TMP}" "docker-compose.yml" || sudo cp "${TMP}" "docker-compose.yml"
+  sed -E "s|${search}|${replace}|" "docker-compose.yml" > "${JBT_TMP_FILE}"
+  cp "${JBT_TMP_FILE}" "docker-compose.yml" || sudo cp "${JBT_TMP_FILE}" "docker-compose.yml"
   # Check it
   occurrences=$(grep -cF "${replace}" "docker-compose.yml" || true)
   if [ "$occurrences" -ne 1 ]; then

@@ -15,17 +15,18 @@ source scripts/helper.sh
 function help {
   echo "
     info – Retrieves Joomla Branches Tester status information.
-           Optional argument 'instance' to display Joomla Branches Tester instance information.
-           Optional argument 'base' to display information about the base Docker containers.
-           Optional Joomla version can be one or more of the following: ${allVersions[*]}.
-           If no argument is provided, all information will be displayed.
+           The optional 'instance' argument displays Joomla Branches Tester instance details.
+           The optional 'base' argument displays information about the base Docker containers.
+           The optional Joomla version can be one or more of: ${allVersions[*]}.
+           The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
+           If no argument is provided, all information is displayed.
 
            $(random_quote)
   "
 }
 
 # shellcheck disable=SC2207 # There are no spaces in version numbers
-allVersions=($(getVersions))
+allVersions=($(getBranches))
 
 if [ $# -eq 0 ]; then
   all_todos=("instance" "base" "${allVersions[@]}")

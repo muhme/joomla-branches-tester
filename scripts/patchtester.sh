@@ -17,16 +17,17 @@ source scripts/helper.sh
 
 function help {
     echo "
-    patchtester – Install Joomla Patch Tester on all, one or multiple Web Server Docker containers.
-                  Mandatory argument is a valid GitHub personal access token starting with 'ghp_'.
-                  Optional Joomla version can be one or more of the following: ${allVersions[*]} (default is all).
+    patchtester – Installs Joomla Patch Tester on all, one or multiple Joomla web server Docker containers.
+                  Requires a GitHub personal access token as an argument (starting with 'ghp_') if 'JBT_GITHUB_TOKEN' is not set.
+                  The optional Joomla version can be one or more of: ${allVersions[*]} (default is all).
+                  The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
 
                   $(random_quote)
     "
 }
 
 # shellcheck disable=SC2207 # There are no spaces in version numbers
-allVersions=($(getVersions))
+allVersions=($(getBranches))
 
 versionsToInstall=()
 while [ $# -ge 1 ]; do

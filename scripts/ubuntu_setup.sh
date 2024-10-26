@@ -22,7 +22,8 @@
 #   scripts/test
 
 function help {
-    echo "*** ubuntu_setup.sh – Install all prerequisites for Joomla Branches Tester on Ubuntu"
+    echo "*** ubuntu_setup.sh – Installs all prerequisites for Joomla Branches Tester on Ubuntu"
+    echo "*** The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README."
 }
 
 while [ $# -ge 1 ]; do

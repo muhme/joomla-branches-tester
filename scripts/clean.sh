@@ -15,15 +15,16 @@ source scripts/helper.sh
 
 function help {
   echo "
-    clean – Stops and removes all JBT Docker containers, associated Docker networks, and volumes.
+    clean – Stops and removes all JBT Docker containers, associated Docker networks, and Docker volumes.
             Also deletes JBT directories, such as 'run' and all 'branch-*' directories.
+            The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
 
             $(random_quote)
     "
 }
 
 # shellcheck disable=SC2207 # There are no spaces in version numbers
-allVersions=($(getVersions))
+allVersions=($(getBranches))
 
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
@@ -107,8 +108,8 @@ if [ -d "logs" ]; then
   log "Removing all files in the 'logs' directory, except for the most recent one"
   # remove log files with underscores before 2.0.12
   rm -f logs/*_*.txt 2>/dev/null || sudo rm -f logs/*_*.txt
-  find logs -type f | sort -r | tail -n +2 >"${TMP}"
-  xargs -r rm -- <"${TMP}" 2>/dev/null || sudo bash -c "xargs -r rm -- <\"${TMP}\""
+  find logs -type f | sort -r | tail -n +2 >"${JBT_TMP_FILE}"
+  xargs -r rm -- <"${JBT_TMP_FILE}" 2>/dev/null || sudo bash -c "xargs -r rm -- <\"${JBT_TMP_FILE}\""
 fi
 
 # Cypress and web server containers shared Cypress binaries

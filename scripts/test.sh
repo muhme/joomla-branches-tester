@@ -22,19 +22,20 @@ trap - ERR
 
 function help {
     echo "
-    test – Runs tests on one, multiple, or all branches.
-           Optional Joomla version can be one or more of the following: ${allVersions[*]} (default is all).
-           Optional 'novnc' argument sets DISPLAY=jbt-novnc:0 (default is headless).
-           Optional 'chrome', 'edge', or 'firefox' can be specified as the browser (default is 'electron').
-           Optional test name can be on or more of the following: ${ALL_TESTS[*]} (default is all).
-           Optional Cypress spec file pattern for 'system' tests (default is to run all w/o the installation step)
+    test – Runs tests on one, multiple or all installed Joomla instances.
+           The optional Joomla version can be one or more of: ${allVersions[*]} (default is all).
+           The optional 'novnc' argument sets DISPLAY to jbt-novnc:0 (default is headless).
+           Optional browser can be 'chrome', 'edge' or 'firefox' (default is 'electron').
+           Specify an optional test name from: ${ALL_TESTS[*]} (default is all).
+           Optional Cypress spec file pattern for 'system' tests (default runs all without the installation step).
+           The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
 
            $(random_quote)
     "
 }
 
 # shellcheck disable=SC2207 # There are no spaces in version numbers
-allVersions=($(getVersions))
+allVersions=($(getBranches))
 
 ALL_TESTS=("php-cs-fixer" "phpcs" "unit" "lint:css" "lint:js" "lint:testjs" "system")
 testsToRun=()

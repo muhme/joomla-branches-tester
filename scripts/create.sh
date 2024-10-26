@@ -18,23 +18,24 @@ source scripts/helper.sh
 
 function help {
   echo "
-    create – Create base Docker containers and containers based on Joomla Git branches.
-             Optional Joomla version can be one or more of the following: ${allVersions[*]} (default is all).
-             Optional database variant can be one of: ${JBT_DB_VARIANTS[*]} (default is mariadbi).
-             Optional 'socket' for using the database with a Unix socket (default is using TCP host).
-             Optional 'IPv6' can be set (default is to use IPv4).
-             Optional 'no-cache' can be set (default is to use cache).
-             Optional 'recreate' to create or recreate only one or more web server containers.
-             Optional PHP version can be one of: ${JBT_PHP_VERSIONS[*]} (default is php8.1).
-             Optional 'repository:branch', e.g. https://github.com/Elfangor93/joomla-cms:mod_community_info.
-             Optional 'unpatched' or one or multiple patches (default: ${JBT_DEFAULT_PATCHES[*]})
+    create – Creates the base and Joomla web server Docker containers.
+             Optional Joomla version can be one or more of: ${allVersions[*]} (default is all).
+             The optional database variant can be one of: ${JBT_DB_VARIANTS[*]} (default is mariadbi).
+             The optional 'socket' argument configures database access via Unix socket (default is TCP host).
+             The optional 'IPv6' argument enables support for IPv6 (default is IPv4).
+             The optional 'no-cache' argument disables Docker build caching (default is enabled).
+             The optional 'recreate' argument creates or recreates specified web server containers.
+             The optional PHP version can be set to one of: ${JBT_PHP_VERSIONS[*]} (default is php8.1).
+             The optional 'repository:branch' argument (default repository is https://github.com/joomla/joomla-cms).
+             Optionally specify one or more patches (e.g., 'joomla-cypress-36'; default is unpatched).
+             The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
 
              $(random_quote)
     "
 }
 
 # shellcheck disable=SC2207 # There are no spaces in version numbers
-allVersions=($(getVersions))
+allVersions=($(getBranches))
 
 # Defaults to use MariaDB with MySQLi database driver, to use cache and PHP 8.1.
 database_variant="mariadbi"

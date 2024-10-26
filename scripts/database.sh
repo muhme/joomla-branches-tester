@@ -17,10 +17,11 @@ source scripts/helper.sh
 
 function help {
     echo "
-    database – Change the database and database driver for all, one or multiple Joomla containers.
+    database – Changes the database and driver for all, one or multiple Joomla web server containers.
                The mandatory database variant must be one of: ${JBT_DB_VARIANTS[*]}.
+               The optional 'socket' argument configures database access via Unix socket (default is TCP host).
                Optional Joomla version can be one or more of the following: ${allVersions[*]} (default is all).
-               Optional 'socket' for using the database with a Unix socket (default is using TCP host).
+               The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
 
                $(random_quote)
     "
@@ -29,7 +30,7 @@ function help {
 socket=false
 versionsToChange=()
 # shellcheck disable=SC2207 # There are no spaces in version numbers
-allVersions=($(getVersions))
+allVersions=($(getBranches))
 
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then

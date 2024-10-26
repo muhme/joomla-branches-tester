@@ -17,16 +17,17 @@ source scripts/helper.sh
 
 function help {
     echo "
-    pull – Running 'git pull' on one or multiple branches.
-           Running composer install if changes are detected and npm clean install if needed.
-           Optional Joomla version can be one or more of the following: ${allVersions[*]} (default is all).
+    pull – Executes 'git pull' on one or multiple Joomla web server containers.
+           Runs 'composer install' if changes are detected and 'npm clean install' if needed.
+           Optional Joomla version can be one or more of: ${allVersions[*]} (default is all).
+           The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
 
            $(random_quote)
     "
 }
 
 # shellcheck disable=SC2207 # There are no spaces in version numbers
-allVersions=($(getVersions))
+allVersions=($(getBranches))
 
 versionsToPull=()
 while [ $# -ge 1 ]; do
@@ -66,11 +67,11 @@ for version in "${versionsToPull[@]}"; do
     log "jbt-${version} – Local Git clone for branch ${branch} is up to date"
   else
     log "jbt-${version} – Running git pull"
-    cp "branch-${version}/package-lock.json" "${TMP}"
+    cp "branch-${version}/package-lock.json" "${JBT_TMP_FILE}"
     docker exec "jbt-${version}" sh -c "git pull"
     log "jbt-${version} – Running composer install, just in case"
     docker exec "jbt-${version}" sh -c "composer install"
-    if diff -q "branch-${version}/package-lock.json" "$TMP" >/dev/null; then
+    if diff -q "branch-${version}/package-lock.json" "$JBT_TMP_FILE" >/dev/null; then
       log "jbt-${version} – No changes in file 'package-lock.json', skipping npm ci"
     else
       log "jbt-${version} – Changes detected in file 'package-lock.json', running npm ci"

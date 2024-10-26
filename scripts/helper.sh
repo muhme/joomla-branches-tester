@@ -13,9 +13,9 @@ fi
 # Record the start time in seconds since 1.1.1970
 start_time=$(date +%s)
 
-# ${TMP} file can be used in the scripts without any worries
-TMP=/tmp/$(basename "$0").$$
-trap 'rm -rf $TMP' 0
+# ${JBT_TMP_FILE} file can be used in the scripts without any worries
+JBT_TMP_FILE=/tmp/$(basename "$0").$$
+trap 'rm -rf $JBT_TMP_FILE' 0
 
 # The following four arrays are positionally mapped, avoiding associative arrays
 # to ensure compatibility with macOS default Bash 3.2.
@@ -50,13 +50,22 @@ done < <(grep 'container_name:' docker-compose.base.yml | awk '{print $2}')
 # shellcheck disable=SC2034 # It is used by other scripts after sourcing
 JBT_DEFAULT_PATCHES=("unpatched")
 
+# Determine Joomla valid version tags.
+# Returns an array, e.g. ("1.7.3" "2.5.0" ... "5.2.0" "5.2.0-rc1" ...)
+# They are at least 4 chars (e.g. '1.7.3'), not using 'deprecate_eval', '11.2' etc.
+#
+# get tags | remove dereferenced annotated tag '^{}' lines | \
+#            remove commit hash and 'refs/tags/' in the lines | only 1-9.* | version sort | replace new line with space
+read -a JBT_JOOMLA_CMS_TAGS <<< "$(git ls-remote --tags https://github.com/joomla/joomla-cms | grep -v '\^{}' | \
+                                   sed 's/.*\///' | grep '^[1-9]\.' | sort -V | tr '\n' ' ')"
+
 # Determine the currently used Joomla branches.
-# Returns an array, e.g. getVersions -> "44" "52" "53" "60"
+# Returns an array, e.g. getBranches -> "44" "52" "53" "60"
 #
 # We are using default, active and stale branches.
 # With ugly screen-scraping, because no git command found and GitHub API with token looks too oversized.
 #
-function getVersions() {
+function getBranches() {
 
   # Declare all local variables to prevent SC2155 - Declare and assign separately to avoid masking return values.
   local json_data stale_json_data branches sorted_branches=()
@@ -80,6 +89,15 @@ function getVersions() {
     echo "${sorted_branches[@]}"
   fi
 }
+
+# Determine Joomla branches and tags.
+# Returns an array, e.g. "52" "53" "60" "1.7.3" "2.5.0" ...
+# 
+getBranchesAndTags() {
+  local result=( "$(getBranches)" "${JBT_JOOMLA_CMS_TAGS[*]}" )
+  echo "${result[@]}"
+}
+
 
 # Check if the given argument is a valid Joomla version.
 # e.g. isValidVersion "44" "44 51 52 60" -> 0

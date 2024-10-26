@@ -16,20 +16,21 @@ source scripts/helper.sh
 
 function help {
   echo "
-    setup.sh – Internal setup the web server Docker container. Used by 'scripts/create' and 'scripts/php'.
-               Mandatory Joomla version must be one of the following: ${allVersions[*]}.
-               Optional 'initial' for first time installation.
-               Optional initial database variant can be one of: ${JBT_DB_VARIANTS[*]} (default is mariadbi).
+    setup.sh – Sets up the web server Docker container internally, used by 'scripts/create' and 'scripts/php'.
+               The mandatory Joomla version must be one of: ${allVersions[*]}.
+               Optional 'initial' argument for first-time installation.
+               Optional initial database variant: ${JBT_DB_VARIANTS[*]} (default is mariadbi).
                Optional initial 'repository:branch', e.g. https://github.com/Elfangor93/joomla-cms:mod_community_info.
-               Optional initial 'socket' for using the database with a Unix socket (default is using TCP host).
-               Optional 'unpatched' or one or multiple patches (default: ${JBT_DEFAULT_PATCHES[*]})
+               Optional initial 'socket' enables database access via Unix socket (default is TCP host).
+               Optional 'unpatched' or one or multiple patches (default: ${JBT_DEFAULT_PATCHES[*]}).
+               The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
 
                $(random_quote)
     "
 }
 
 # shellcheck disable=SC2207 # There are no spaces in version numbers
-allVersions=($(getVersions))
+allVersions=($(getBranches))
 
 # Defaults to use MariaDB with MySQLi database driver, to use cache and PHP 8.1.
 database_variant="mariadbi"
