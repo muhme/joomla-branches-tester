@@ -16,7 +16,7 @@ function help {
     echo "
     xdebug – Toggles the PHP installation with or without Xdebug in one or more Joomla web server containers.
              Mandatory argument must be 'on' or 'off'.
-             The optional Joomla version can be one or more of: ${allVersions[*]} (default is all).
+             The optional Joomla instance can include one or more of installed: ${allInstalledInstances[*]} (default is all).
              The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
 
              $(random_quote)
@@ -24,16 +24,16 @@ function help {
 }
 
 # shellcheck disable=SC2207 # There are no spaces in version numbers
-allVersions=($(getBranches))
+allInstalledInstances=($(getAllInstalledInstances))
 
-versionsToChange=()
+instancesToChange=()
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
     exit 0
-  elif isValidVersion "$1" "${allVersions[*]}"; then
-    versionsToChange+=("$1")
-    shift # Argument is eaten as the version number.
+  elif [ -d "joomla-$1" ]; then
+    instancesToChange+=("$1")
+    shift # Argument is eaten as one version number.
   elif [ "$1" = "on" ]; then
     todo="$1"
     shift # Argument is eaten as enable Xdebug.
@@ -54,37 +54,74 @@ if [ -z "${todo}" ]; then
 fi
 
 # If no version was given, use all.
-if [ ${#versionsToChange[@]} -eq 0 ]; then
+if [ ${#instancesToChange[@]} -eq 0 ]; then
   # shellcheck disable=SC2207 # There are no spaces in version numbers
-  versionsToChange=("${allVersions[@]}")
+  instancesToChange=("${allInstalledInstances[@]}")
 fi
 
 # Clean up branch directories if existing
 with="/usr/local-with-xdebug/"
 without="/usr/local-without-xdebug/"
-for version in "${versionsToChange[@]}"; do
+for instance in "${instancesToChange[@]}"; do
 
-  if [ ! -d "branch-${version}" ]; then
-    log "jbt-${version} – There is no directory 'branch-${version}', jumped over"
+  if (( instance <= 39 )); then
+    log "jbt-${instance} – No Xdebug available <= Joomla 3.9, jumped over"
     continue
   fi
 
-  link=$(docker exec "jbt-${version}" readlink "/usr/local")
+  link=$(docker exec "jbt-${instance}" readlink "/usr/local")
   if [ "$todo" = "on" ]; then
     if [ "$link" = "$with" ]; then
-      log "jbt-${version} – Xdebug is already enabled"
+      log "jbt-${instance} – Xdebug is already enabled"
     else
-      log "jbt-${version} – Switching to Xdebug-enabled PHP installation and restarting container"
-      docker exec "jbt-${version}" bash -c "rm -f /usr/local && ln -s $with /usr/local"
-      docker restart "jbt-${version}"
+      log "jbt-${instance} – Switching to Xdebug-enabled PHP installation and restarting container"
+      docker exec "jbt-${instance}" bash -c "rm -f /usr/local && ln -s $with /usr/local"
+      docker restart "jbt-${instance}"
     fi
   else
     if [ "$link" = "$without" ]; then
-      log "jbt-${version} – Xdebug is not currently enabled"
+      log "jbt-${instance} – Xdebug is not currently enabled"
     else
-      log "jbt-${version} – Switching to PHP installation without Xdebug and restarting container"
-      docker exec "jbt-${version}" bash -c "rm -f /usr/local && ln -s $without /usr/local"
-      docker restart "jbt-${version}"
+      log "jbt-${instance} – Switching to PHP installation without Xdebug and restarting container"
+      docker exec "jbt-${instance}" bash -c "rm -f /usr/local && ln -s $without /usr/local"
+      docker restart "jbt-${instance}"
     fi
   fi
 done
+
+if [ "$todo" = "on" ]; then
+  log "Creating File '.vscode/launch.json'"
+  launch_json=".vscode/launch.json"
+  dir=$(dirname "${launch_json}")
+  mkdir -p "${dir}" 2>/dev/null || (sudo mkdir -p "${dir}" && sudo 777 "${dir}")
+  cat >"${launch_json}" <<EOF
+{
+    "version": "0.2.0",
+    "configurations": [
+EOF
+  for instance in "${allInstalledInstances[@]}"; do
+    if (( instance <= 39 )); then
+      continue
+    fi
+    link=$(docker exec "jbt-${instance}" readlink "/usr/local")
+    if [ "$link" = "$with" ]; then
+      log "jbt-${instance} – Adding entry 'Listen jbt-${instance}'"
+      # As port number for 3.10 use 7910
+      cat >>"${launch_json}" <<EOF
+        {
+            "name": "Listen jbt-${instance}",
+            "type": "php",
+            "request": "launch",
+            "port": 79${instance: -2},
+            "pathMappings": {
+                "/var/www/html": "\${workspaceFolder}/joomla-${instance}"
+            }
+        },
+EOF
+    fi
+  done
+  cat >>"${launch_json}" <<EOF
+    ]
+}
+EOF
+fi

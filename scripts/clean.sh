@@ -1,7 +1,8 @@
 #!/bin/bash
 #
 # clean.sh - Stopping and removing JBT Docker containers, associated Docker networks and volumes.
-#            Also deletes directory 'run' and all 'branch-*' directories.
+#            Also deletes 'run', 'cypress-cache', 'installation/*' and 'joomla-*' directories.
+#            Works offline and for earlier JBT version created directories and containers.
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
@@ -16,15 +17,12 @@ source scripts/helper.sh
 function help {
   echo "
     clean – Stops and removes all JBT Docker containers, associated Docker networks, and Docker volumes.
-            Also deletes JBT directories, such as 'run' and all 'branch-*' directories.
+            Also deletes JBT directories, such as 'run' and all 'joomla-*' directories.
             The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
 
             $(random_quote)
     "
 }
-
-# shellcheck disable=SC2207 # There are no spaces in version numbers
-allVersions=($(getBranches))
 
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
@@ -38,8 +36,10 @@ while [ $# -ge 1 ]; do
 done
 
 # Delete all docker containers. The PHP version and network do not affect the deletion process.
-log "Create 'docker-compose.yml' file with all branch versions to remove Joomla Branches Tester overall"
-createDockerComposeFile "${allVersions[*]}" "php8.2" "IPv4"
+if [[ ! -f "docker-compose.yml" ]]; then
+  log "Missing 'docker-compose.yml' file, create one with all branch versions to remove Joomla Branches Tester overall"
+  createDockerComposeFile "$(getAllUsedBranches)" "php8.2" "IPv4"
+fi
 
 log 'Stopping and removing JBT Docker containers, associated Docker networks and volumes'
 docker compose down -v
@@ -72,19 +72,11 @@ docker network ls --format '{{.Name}}' | grep "^jbt_network$" | while read -r ne
   docker network rm "${network}"
 done
 
-# Clean up branch directories if existing
-for version in "${allVersions[@]}"; do
-  if [ -d "branch-${version}" ]; then
-    log "Removing directory 'branch-${version}'"
-    # sudo is needed on Windows WSL Ubuntu
-    rm -rf "branch-${version}" >/dev/null 2>&1 || sudo rm -rf "branch-${version}"
-  fi
-done
-
-# Branch directories not in the used versions list?
-for dir in branch-*; do
+# Clean up joomla directories if existing
+for dir in joomla-*; do
   if [ -d "$dir" ]; then
-    log "Removing non-existing version directory '${dir}'"
+    log "Removing directory '${dir}'"
+    # sudo is needed on Windows WSL Ubuntu
     rm -rf "$dir" 2>&1 || sudo rm -rf "$dir"
   fi
 done
@@ -97,11 +89,7 @@ for dir in branch_*; do
   fi
 done
 
-# Database sockets must be deleted; otherwise, they will be mapped to the new instances.
-if [ -d "run" ]; then
-  log "Removing 'run' directory containing Unix socket subdirectories for databases"
-  rm -rf run 2>/dev/null || sudo rm -rf run
-fi
+
 
 # Delete all log files, except the actual one :)
 if [ -d "logs" ]; then
@@ -112,25 +100,28 @@ if [ -d "logs" ]; then
   xargs -r rm -- <"${JBT_TMP_FILE}" 2>/dev/null || sudo bash -c "xargs -r rm -- <\"${JBT_TMP_FILE}\""
 fi
 
-# Cypress and web server containers shared Cypress binaries
-if [ -d "cypress-cache" ]; then
-  log "Removing shared Cypress binaries directory 'cypress-cache'"
-  rm -rf cypress-cache 2>/dev/null || sudo rm -rf cypress-cache
-fi
-
 # Checking Cypress global binary cache for macOS and Linux
 for dir in "${HOME}/Library/Caches/Cypress" "${HOME}/.cache/Cypress"; do
-  if [ -d "${dir}" ]; then
+  # $dir exists and contains at least one directory
+  if [[ -d "${dir}" && "$(find "$dir" -mindepth 1 -type d | head -n 1)" ]]; then
     log "Cache for local Cypress runs has been found in the '${dir}' directory with the following sizes (in MB):"
     du -ms "${dir}"/* || true
-    log "You can delete the oldest and outdated versions from your local Cypress cache using the list above"
+    log "You can delete all outdated versions from your local Cypress cache using the list above"
   fi
 done
 
 # Deleting files listed in .gitignore, even though it's not required, to ensure cleanup.
-for file in ".vscode" "docker-compose.yml"; do
+for file in ".vscode" "docker-compose.yml" "docker-compose.new"; do
   if [ -f "${file}" ]; then
     log "Deleting file '${file}' to ensure complete cleanup"
-    rm "${file}"
+    rm "${file}" 2>/dev/null || sudo bash -c "rm \"${file}\""
+  fi
+done
+
+# Deleting directories in .gitignore, even though it's not required, to ensure cleanup.
+for directory in "run" "cypress-cache" installation/*; do
+  if [ -d "${directory}" ]; then
+    log "Deleting directory '${directory}' to ensure complete cleanup"
+    rm -r "${directory}" 2>/dev/null || sudo bash -c "rm -r \"${directory}\""
   fi
 done

@@ -28,7 +28,7 @@ The goal is to have all used Joomla development branches (such as 4.4-dev, 5.1-d
 This setup is achieved using 13 Docker containers.
 Everything is fully scripted and can be easily parameterized for maximum flexibility.
 You'll notice the four orange Web Server containers, each running a different Joomla version.
-These containers are based on the `branch-*` folders, which are also available on the Docker host.
+These containers are based on the `joomla-*` folders, which are also available on the Docker host.
 
 :point_right: The version numbers referenced are current as of early August 2024.
               Since used branches are subject to frequent changes,
@@ -72,11 +72,11 @@ The abbreviation `jbt` stands for Joomla Branches Tester.
 |jbt-mysql| 10.0.0.11<br />fd00::11 :eight_pointed_black_star: | **7011**:3306 | | Database Server MySQL version 8.1 |
 |jbt-madb| 10.0.0.12<br />fd00::12 | **7012**:3306 | | Database Server MariaDB version 10.4 |
 |jbt-pg| 10.0.0.13<br />fd00::13 | **7013**:5432 | | Database Server PostgreSQL version 12.20 |
-|jbt-44| 10.0.0.44<br />fd00::44 | **[7044](http://host.docker.internal:7044/administrator)** | /branch-44 | Web Server Joomla branch 4.4-dev<br />user ci-admin / joomla-17082005 |
-|jbt-51| 10.0.0.51<br />fd00::51 | **[7051](http://host.docker.internal:7051/administrator)** | /branch-51 | Web Server Joomla branch 5.1-dev<br />user ci-admin / joomla-17082005 |
-|jbt-52| 10.0.0.52<br />fd00::52 | **[7052](http://host.docker.internal:7052/administrator)** | /branch-52 | Web Server Joomla branch 5.2-dev<br />user ci-admin / joomla-17082005 |
-|jbt-53| 10.0.0.52<br />fd00::52 | **[7053](http://host.docker.internal:7053/administrator)** | /branch-53 | Web Server Joomla branch 5.3-dev<br />user ci-admin / joomla-17082005 |
-|jbt-60| 10.0.0.60<br />fd00::60 | **[7060](http://host.docker.internal:7060/administrator)** | /branch-60 | Web Server Joomla branch 6.0-dev<br />user ci-admin / joomla-17082005 |
+|jbt-44| 10.0.0.44<br />fd00::44 | **[7044](http://host.docker.internal:7044/administrator)** | /joomla-44 | Web Server Joomla branch 4.4-dev<br />user ci-admin / joomla-17082005 |
+|jbt-51| 10.0.0.51<br />fd00::51 | **[7051](http://host.docker.internal:7051/administrator)** | /joomla-51 | Web Server Joomla branch 5.1-dev<br />user ci-admin / joomla-17082005 |
+|jbt-52| 10.0.0.52<br />fd00::52 | **[7052](http://host.docker.internal:7052/administrator)** | /joomla-52 | Web Server Joomla branch 5.2-dev<br />user ci-admin / joomla-17082005 |
+|jbt-53| 10.0.0.52<br />fd00::52 | **[7053](http://host.docker.internal:7053/administrator)** | /joomla-53 | Web Server Joomla branch 5.3-dev<br />user ci-admin / joomla-17082005 |
+|jbt-60| 10.0.0.60<br />fd00::60 | **[7060](http://host.docker.internal:7060/administrator)** | /joomla-60 | Web Server Joomla branch 6.0-dev<br />user ci-admin / joomla-17082005 |
 
 :eight_spoked_asterisk: The directories are available on the Docker host inside `/jbt` to:
 * Inspect and change the configuration files (`configuration.php` or `cypress.config.mjs`),
@@ -383,7 +383,7 @@ In parallel you can inspect MariaDB and MySQL database with [phpMyAdmin](https:/
 [MailDev](https://github.com/maildev/maildev/blob/master/docs/docker.md) on
 [http://host.docker.internal:7004](http://host.docker.internal:7004).
 
-If you need to inspect files, they are available in the directory `branch-52` for this Joomla release 5.2 sample.
+If you need to inspect files, they are available in the directory `joomla-52` for this Joomla release 5.2 sample.
 
 ### Drone-like Tests
 
@@ -872,24 +872,24 @@ Branch 4.4-dev:
   Version: Joomla! 4.4.9 Development
   PHP 8.1.29 with Xdebug
   PostgreSQL(PDO), jbt-pg, ''
-  /branch-44: 438MB
-  Repository branch-44: https://github.com/joomla/joomla-cms,  Branch: 4.4-dev,  Status: 0 changes
+  /joomla-44: 438MB
+  Repository joomla-44: https://github.com/joomla/joomla-cms,  Branch: 4.4-dev,  Status: 0 changes
 Branch 5.1-dev:
   jbt-51 is running, ports: 80/tcp -> 0.0.0.0:7051; 80/tcp -> [::]:7051
   Version: Joomla! 5.1.3 Stable
   PHP 8.2.23
   MySQLi, jbt-madb, ''
-  /branch-51: 386MB
+  /joomla-51: 386MB
 Branch 5.2-dev:
   jbt-52 is running, ports: 80/tcp -> 0.0.0.0:7052; 80/tcp -> [::]:7052
   Version: Joomla! 5.2.0 Development
   PHP 8.3.11
   MySQL(PDO), jbt-mysql, ''
-  /branch-52: 481MB
-  Repository branch-52: https://github.com/joomla/joomla-cms,  Branch: 5.2-dev,  Status: 2 changes
+  /joomla-52: 481MB
+  Repository joomla-52: https://github.com/joomla/joomla-cms,  Branch: 5.2-dev,  Status: 2 changes
 Branch 5.3-dev:
   jbt-53 is NOT running
-  /branch-53 is NOT existing
+  /joomla-53 is NOT existing
 ```
 
 :blossom: If you see '42' (the answer to all questions) as one of the release numbers,
@@ -925,7 +925,7 @@ scripts/check jbt
 
 ### Cleaning Up
 
-If you want to rid of all Docker containers and free up multiple gigabytes of disk space from the `branch-*` and other directories, simply run:
+If you want to rid of all Docker containers and free up multiple gigabytes of disk space from the `joomla-*` and other directories, simply run:
 
 ```
 scripts/clean

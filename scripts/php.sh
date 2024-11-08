@@ -19,7 +19,7 @@ function help {
     echo "
     php – Changes the PHP version on all, one or multiple Joomla web server Docker containers.
           The mandatory PHP version must be one of: ${JBT_PHP_VERSIONS[*]}.
-          The optional Joomla version can be one or more of: ${allVersions[*]} (default is all).
+          The optional Joomla version can include one or more of installed: ${allInstalledInstances[*]} (default is all).
           The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
 
           $(random_quote)
@@ -27,15 +27,15 @@ function help {
 }
 
 # shellcheck disable=SC2207 # There are no spaces in version numbers
-allVersions=($(getBranches))
+allInstalledInstances=($(getAllInstalledInstances))
 
-versionsToPatch=()
+instancesToPatch=()
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
     exit 0
-  elif isValidVersion "$1" "${allVersions[*]}"; then
-    versionsToPatch+=("$1")
+  elif [ -d "joomla-$1" ]; then
+    instancesToPatch+=("$1")
     shift # Argument is eaten as one version number.
   elif isValidPHP "$1"; then
     php_version="$1"
@@ -53,32 +53,34 @@ if [ -z "$php_version" ]; then
   exit 1
 fi
 
-# If no version was given, use all.
-if [ ${#versionsToPatch[@]} -eq 0 ]; then
-  versionsToPatch=("${allVersions[@]}")
+# If no version was given, use all installed.
+if [ ${#instancesToPatch[@]} -eq 0 ]; then
+  instancesToPatch=("${allInstalledInstances[@]}")
 fi
 
 changed=0
-for version in "${versionsToPatch[@]}"; do
+for instance in "${instancesToPatch[@]}"; do
 
-  if [ ! -d "branch-${version}" ]; then
-    log "jbt-${version} – There is no directory 'branch-${version}', jumped over"
+  din=$(dockerImageName "$instance" "$php_version")
+  checkDockerImageName "${instance}" "${din:7}" # e.g. 'joomla:5.0-php8.2-apache' as '5.0-php8.2-apache'
+
+  if [ ! -d "joomla-${instance}" ]; then
+    log "jbt-${instance} – There is no directory 'joomla-${instance}', jumped over"
     continue
   fi
 
-  log "jbt-${version} – Stopping Docker container"
-  docker compose stop "jbt-${version}"
+  log "jbt-${instance} – Stopping Docker container"
+  docker compose stop "jbt-${instance}"
 
-  log "jbt-${version} – Removing Docker container"
-  docker compose rm -f "jbt-${version}" || log "jbt-${version} – Ignoring failure to remove Docker container"
+  log "jbt-${instance} – Removing Docker container"
+  docker compose rm -f "jbt-${instance}" || log "jbt-${instance} – Ignoring failure to remove Docker container"
 
   # Change (simplified by comment marker) e.g.
-  # > image: joomla:4.4-php8.1-apache # jbt-44 PHP version
-  # < image: joomla:4.4-php8.3-apache # jbt-44 PHP version
-  din=$(dockerImageName "$version" "$php_version")
-  search="image: joomla:[0-9].[0-9]-php[0-9].[0-9]-apache # jbt-${version} PHP version"
-  replace="image: ${din} # jbt-${version} PHP version"
-  log "jbt-${version} – Change 'docker-compose.yml' to use '${din}' Docker image for jbt-${version}"
+  # > image: joomla:4.4-php8.1-apache # jbt-44 image
+  # < image: joomla:4.4-php8.3-apache # jbt-44 image
+  search="image: joomla:[0-9].[0-9]-php[0-9].[0-9]-apache # jbt-${instance} image"
+  replace="image: ${din} # jbt-${instance} image"
+  log "jbt-${instance} – Change 'docker-compose.yml' to use '${din}' Docker image for jbt-${instance}"
   # Don't use sed inplace editing as it is not supported on macOS's sed.
   sed -E "s|${search}|${replace}|" "docker-compose.yml" > "${JBT_TMP_FILE}"
   cp "${JBT_TMP_FILE}" "docker-compose.yml" || sudo cp "${JBT_TMP_FILE}" "docker-compose.yml"
@@ -89,18 +91,18 @@ for version in "${versionsToPatch[@]}"; do
       exit 1
   fi
 
-  log "jbt-${version} – Building Docker container"
-  docker compose build "jbt-${version}"
+  log "jbt-${instance} – Building Docker container"
+  docker compose build "jbt-${instance}"
 
-  log "jbt-${version} – Starting Docker container"
-  docker compose up -d "jbt-${version}"
+  log "jbt-${instance} – Starting Docker container"
+  docker compose up -d "jbt-${instance}"
 
-  JBT_INTERNAL=42 scripts/setup.sh "${version}"
+  JBT_INTERNAL=42 scripts/setup.sh "${instance}"
 
   changed=$((changed + 1))
 
-  log "jbt-${version} – Changed to use $din"
+  log "jbt-${instance} – Changed to use $din"
 
 done
 
-log "Completed ${versionsToPatch[*]} with ${changed} changed"
+log "Completed ${instancesToPatch[*]} with ${changed} changed"

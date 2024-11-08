@@ -7,6 +7,9 @@
  * https://github.com/muhme/joomla-branches-tester
  */
 
+import { registerCommands } from "joomla-cypress";
+registerCommands();
+
 describe("Install 'Joomla! Patch Tester' with", () => {
 
   // Install extension

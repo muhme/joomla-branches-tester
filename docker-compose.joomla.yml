@@ -1,15 +1,16 @@
 # docker-compose.joomla.yml - Joomla Web Server entry, to be customized with the version number
-#                             e.g. 52 for XX and 5 for Y
+#                             e.g. 5.2.9   -> 52 for VVV, 0 for WWW,  52 for XXX, 052 for ZZZ and joomla:5.2-php8.3-apache for YYY
+#                             e.g. 3.10.12 -> 10 for VVV, 3 for WWW, 310 for XXX, 310 for ZZZ and joomla:3.10-php8.0-apache for YYY
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
-  jbt-XX:
-    container_name: jbt-XX
-    image: Y # jbt-XX PHP version
+  jbt-XXX:
+    container_name: jbt-XXX
+    image: YYY # jbt-XXX image
     restart: unless-stopped
     ports:
-      - 70XX:80
+      - 7ZZZ:80
     environment:
       JOOMLA_DB_HOST: mysql
       JOOMLA_DB_PASSWORD: root
@@ -22,12 +23,12 @@
       - relay
     volumes:
       - .:/jbt
-      - ./branch-XX:/var/www/html
+      - ./joomla-XXX:/var/www/html
       - ./cypress-cache:/root/.cache/Cypress # Cypress and web server containers
       - mysql-socket:/var/run/mysql-socket
       - mariadb-socket:/var/run/mariadb-socket
       - postgresql-socket:/var/run/postgresql-socket
     networks:
       jbt-network:
-        ipv4_address: 10.0.0.XX
-        ipv6_address: fd00::XX
+        ipv4_address: 10.0.WWW.VVV
+        ipv6_address: fd00::XXX

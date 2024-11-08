@@ -19,23 +19,23 @@ function help {
     echo "
     pull – Executes 'git pull' on one or multiple Joomla web server containers.
            Runs 'composer install' if changes are detected and 'npm clean install' if needed.
-           Optional Joomla version can be one or more of: ${allVersions[*]} (default is all).
+           Optional Joomla instance can include one or more of installed: ${allInstalledInstances[*]} (default is all).
            The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
 
            $(random_quote)
     "
 }
 
-# shellcheck disable=SC2207 # There are no spaces in version numbers
-allVersions=($(getBranches))
+# shellcheck disable=SC2207 # There are no spaces in instance numbers
+allInstalledInstances=($(getAllInstalledInstances))
 
-versionsToPull=()
+instancesToPull=()
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
     exit 0
-  elif isValidVersion "$1" "${allVersions[*]}"; then
-    versionsToPull+=("$1")
+  elif [ -d "joomla-$1" ]; then
+    instancesToPull+=("$1")
     shift # Argument is eaten as one version number.
   else
     help
@@ -44,44 +44,44 @@ while [ $# -ge 1 ]; do
   fi
 done
 
-# If no version was given, use all.
-if [ ${#versionsToPull[@]} -eq 0 ]; then
-  versionsToPull=("${allVersions[@]}")
+# If no instance was given, use all.
+if [ ${#instancesToPull[@]} -eq 0 ]; then
+  instancesToPull=("${allInstalledInstances[@]}")
 fi
 
 pulled=0
-for version in "${versionsToPull[@]}"; do
-  branch=$(branchName "${version}")
-  if [ ! -d "branch-${version}" ]; then
-    log "jbt-${version} – There is no directory 'branch-${version}', jumped over"
+for instance in "${instancesToPull[@]}"; do
+  if [ ! -d "joomla-${instance}/.git" ]; then
+    log "jbt-${instance} – There is no directory 'joomla-${instance}/.git', grafted Joomla package?, jumped over"
     continue
   fi
-  if [ ! -d "branch-${version}/.git" ]; then
-    log "jbt-${version} – There is no directory 'branch-${version}/.git', grafted Joomla package?, jumped over"
+  branch=$(cd "joomla-${instance}" && git branch -r --contains HEAD | head -1 | sed 's|[ ]*origin/||')
+  if [ -z "${branch}" ]; then
+    log "jbt-${instance} – Not a Git branch, jumped over"
     continue
   fi
-  log "jbt-${version} – Running Git fetch origin for ${branch}"
+  log "jbt-${instance} – Running Git fetch origin for ${branch}"
   # Prevent dubious ownership in repository
-  docker exec "jbt-${version}" sh -c "git config --global --add safe.directory /var/www/html"
-  if docker exec "jbt-${version}" sh -c 'git fetch origin && [ "$(git rev-parse HEAD)" = "$(git rev-parse origin/$(git rev-parse --abbrev-ref HEAD))" ]' ; then
-    log "jbt-${version} – Local Git clone for branch ${branch} is up to date"
+  docker exec "jbt-${instance}" sh -c "git config --global --add safe.directory /var/www/html"
+  if docker exec "jbt-${instance}" sh -c 'git fetch origin && [ "$(git rev-parse HEAD)" = "$(git rev-parse origin/$(git rev-parse --abbrev-ref HEAD))" ]' ; then
+    log "jbt-${instance} – Local Git clone for branch ${branch} is up to date"
   else
-    log "jbt-${version} – Running git pull"
-    cp "branch-${version}/package-lock.json" "${JBT_TMP_FILE}"
-    docker exec "jbt-${version}" sh -c "git pull"
-    log "jbt-${version} – Running composer install, just in case"
-    docker exec "jbt-${version}" sh -c "composer install"
-    if diff -q "branch-${version}/package-lock.json" "$JBT_TMP_FILE" >/dev/null; then
-      log "jbt-${version} – No changes in file 'package-lock.json', skipping npm ci"
+    log "jbt-${instance} – Running git pull"
+    cp "joomla-${instance}/package-lock.json" "${JBT_TMP_FILE}"
+    docker exec "jbt-${instance}" sh -c "git pull"
+    log "jbt-${instance} – Running composer install, just in case"
+    docker exec "jbt-${instance}" sh -c "composer install"
+    if diff -q "joomla-${instance}/package-lock.json" "$JBT_TMP_FILE" >/dev/null; then
+      log "jbt-${instance} – No changes in file 'package-lock.json', skipping npm ci"
     else
-      log "jbt-${version} – Changes detected in file 'package-lock.json', running npm ci"
-      docker exec "jbt-${version}" sh -c "npm ci"
+      log "jbt-${instance} – Changes detected in file 'package-lock.json', running npm ci"
+      docker exec "jbt-${instance}" sh -c "npm ci"
     fi
     # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
     pulled=$((pulled + 1))
   fi
-  log "jbt-${version} – Showing Git status for branch ${branch}"
-  docker exec "jbt-${version}" sh -c "git status"
+  log "jbt-${instance} – Showing Git status for branch ${branch}"
+  docker exec "jbt-${instance}" sh -c "git status"
 done
 
-log "Completed ${versionsToPull[*]} with ${pulled} pull's"
+log "Completed ${instancesToPull[*]} with ${pulled} pull's"

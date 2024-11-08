@@ -1,0 +1,91 @@
+#!/bin/bash
+#
+# versions - Displays available Joomla versions from branches and tags,
+#            or lists compatible PHP versions for the specified Joomla version.
+
+#
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+# https://github.com/muhme/joomla-branches-tester
+
+if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
+  echo "Please run me as 'scripts/versions'. Thank you for your cooperation! :)"
+  exit 1
+fi
+
+source scripts/helper.sh
+
+function help {
+  echo "
+    versions – Displays available Joomla versions from branches and tags,
+               or lists compatible PHP versions for the specified Joomla version.
+               The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
+
+               $(random_quote)
+  "
+}
+
+while [ $# -ge 1 ]; do
+  if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
+    help
+    exit 0
+  elif isValidVersion "$1"; then
+    joomla_version="$1"
+    shift # Argument is eaten as the version number.
+  else
+    help
+    error "Argument '$1' is not valid."
+    exit 1
+  fi
+done
+
+if [ -z "${joomla_version}" ]; then
+
+  # Joomla versions
+
+  # shellcheck disable=SC2207 # There are no spaces in branches
+  branches=($(getAllUsedBranches))
+  header "${#branches[@]} Usable Branches from the 'joomla-cms' Repository"
+  for ((i = 0; i < ${#branches[@]}; i++)); do
+      fullBranchName=$(fullName "${branches[i]}")
+      # Pad each entry to 14 chars
+      line+=$(printf "%-14s" "${fullBranchName}")
+  done
+  echo "    $line"
+
+  # shellcheck disable=SC2207 # There are no spaces in tags
+  tags=($(getAllUsedTags))
+  header "${#tags[@]} Usable Tags from the 'joomla-cms' Repository"
+  line=""
+  for ((i = 0; i < ${#tags[@]}; i++)); do
+      # Pad each entry to 14 chars
+      line+=$(printf "%-14s" "${tags[i]}")
+      
+      # Print 8 entries per line
+      if (( (i + 1) % 8 == 0 )); then
+          echo "    $line"
+          line=""
+      fi
+  done
+
+  # Print remaining entries if any
+  if [[ -n "$line" ]]; then
+      echo "    $line"
+  fi
+
+else 
+
+  # PHP versions
+
+  mm=$(getMajorMinor "${joomla_version}")
+  searching="${mm:0:1}.${mm:1}"
+
+  echo "Searching for Joomla '${searching}-*-apache' Docker images:"
+  for php_version in "${JBT_VALID_PHP_VERSIONS[@]}"; do
+    tag="${searching}-${php_version}-apache"
+    status=$(curl -s -o /dev/null -w "%{http_code}" "https://hub.docker.com/v2/repositories/library/joomla/tags/${tag}")
+    if [ "${status}" = "200" ]; then
+      echo "  ${tag}"
+    fi
+  done
+
+fi

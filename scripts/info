@@ -17,7 +17,7 @@ function help {
     info – Retrieves Joomla Branches Tester status information.
            The optional 'instance' argument displays Joomla Branches Tester instance details.
            The optional 'base' argument displays information about the base Docker containers.
-           The optional Joomla version can be one or more of: ${allVersions[*]}.
+           Optional Joomla instance arguments can be one or more of installed: ${allInstalledInstances[*]}.
            The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
            If no argument is provided, all information is displayed.
 
@@ -25,11 +25,12 @@ function help {
   "
 }
 
-# shellcheck disable=SC2207 # There are no spaces in version numbers
-allVersions=($(getBranches))
+# shellcheck disable=SC2207 # There are no spaces in instance numbers
+allInstalledInstances=($(getAllInstalledInstances))
 
 if [ $# -eq 0 ]; then
-  all_todos=("instance" "base" "${allVersions[@]}")
+  # shellcheck disable=SC2207 # There are no spaces in instance numbers
+  all_todos=("instance" "base" $(getAllInstalledInstances))
 else
   all_todos=()
 fi
@@ -44,9 +45,9 @@ while [ $# -ge 1 ]; do
   elif [ "$1" = "base" ]; then
     all_todos+=("$1")
     shift # Argument is eaten as to show base containers.
-  elif isValidVersion "$1" "${allVersions[*]}"; then
+  elif [ -d "joomla-$1" ]; then
     all_todos+=("$1")
-    shift # Argument is eaten as to show web server with given version number.
+    shift # Argument is eaten as one instance.
   else
     help
     error "Argument '$1' is not valid."
@@ -71,11 +72,9 @@ for todo in "${all_todos[@]}"; do
     version_gt() {
         [ "$(printf '%s\n' "$@" | sort -V | tail -n 1)" != "$1" ]
     }
-    version_message="Joomla Branches Tester (JBT) version ${local_version}"
+    header "Joomla Branches Tester (JBT) version ${local_version}"
     if version_gt "${local_version}" "${git_version}"; then
-        echo "${version_message}. There is a newer version ${git_version} available. Please run 'git pull' to stay current."
-    else
-      echo "${version_message}"
+        red "There is a newer version ${git_version} available. Please run 'git pull' to stay current."
     fi
 
     if ${docker_running}; then
@@ -87,7 +86,7 @@ for todo in "${all_todos[@]}"; do
   elif [ "$todo" = "base" ]; then
 
     if ${docker_running}; then
-      echo "Standard Containers:"
+      header "Base Containers"
       for container in "${JBT_BASE_CONTAINERS[@]}"; do
         if [ "$(docker ps -q -f "name=${container}")" ]; then
           padded_container=$(printf "%-11s" "$container")
@@ -99,30 +98,40 @@ for todo in "${all_todos[@]}"; do
       done
     fi
 
-  elif isValidVersion "$todo" "${allVersions[*]}"; then
+  else # Installed Joomla instance
 
-    version="$todo"
-    branch_name=$(branchName "${version}")
-    echo "Branch ${branch_name}:"
-    if ${docker_running}; then
-      if [ "$(docker ps -q -f "name=jbt-${version}")" ]; then
-        ports=$(docker port "jbt-${version}" | awk '{printf "%s; ", $0} END {print ""}' | sed 's/; $/\n/')
-        echo "  jbt-${version} is running, ports: $ports"
+    instance="$todo"
+    branch_name=$(cd "joomla-${instance}" && git branch -r --contains HEAD | head -1 | sed 's|[ ]*origin/||')
+    if [ -n "${branch_name}" ]; then
+      header "jbt-${instance} Branch ${branch_name}"
+    else
+      tag_name=$(cd "joomla-${instance}" && git describe --tags)
+      if [ -n "${tag_name}" ]; then
+        header "jbt-${instance} Tag ${tag_name}"
       else
-        echo "  jbt-${version} is NOT running"
+        header "jbt-${instance} Unknown Branch/Tag"
       fi
     fi
-    if [ -d "branch-${version}" ]; then
 
-      version_file="branch-${version}/libraries/src/Version.php"
+    if ${docker_running}; then
+      if [ "$(docker ps -q -f "name=jbt-${instance}")" ]; then
+        ports=$(docker port "jbt-${instance}" | awk '{printf "%s; ", $0} END {print ""}' | sed 's/; $/\n/')
+        echo "  Container jbt-${instance} is running, ports: $ports"
+      else
+        echo "  Container jbt-${instance} is NOT running."
+      fi
+    fi
+    if [ -d "joomla-${instance}" ]; then
+
+      version_file="joomla-${instance}/libraries/src/Version.php"
       if [ -f "${version_file}" ]; then
-        product=$(grep "public const PRODUCT" "${version_file}" | awk -F"'" '{print $2}')
-        major_version=$(grep "public const MAJOR_VERSION" "${version_file}" | awk -F" " '{print $NF}' | tr -d ';')
-        minor_version=$(grep "public const MINOR_VERSION" "${version_file}" | awk -F" " '{print $NF}' | tr -d ';')
-        patch_version=$(grep "public const PATCH_VERSION" "${version_file}" | awk -F" " '{print $NF}' | tr -d ';')
-        extra_version=$(grep "public const EXTRA_VERSION" "${version_file}" | awk -F"'" '{print $NF}' | tr -d ';')
-        dev_status=$(grep "public const DEV_STATUS" "${version_file}" | awk -F"'" '{print $2}')
-        echo -n "  Version: $product $major_version.$minor_version.$patch_version"
+        product=$(grep "const PRODUCT" "${version_file}" | awk -F"'" '{print $2}')
+        major_version=$(grep "const MAJOR_VERSION" "${version_file}" | awk -F" " '{print $NF}' | tr -d ';')
+        minor_version=$(grep "const MINOR_VERSION" "${version_file}" | awk -F" " '{print $NF}' | tr -d ';')
+        patch_version=$(grep "const PATCH_VERSION" "${version_file}" | awk -F" " '{print $NF}' | tr -d ';')
+        extra_version=$(grep "const EXTRA_VERSION" "${version_file}" | awk -F"'" '{print $NF}' | tr -d ';')
+        dev_status=$(grep "const DEV_STATUS" "${version_file}" | awk -F"'" '{print $2}')
+        echo -n "  Joomla Version: $product $major_version.$minor_version.$patch_version"
         if [ -n "${extra_version}" ]; then
           echo "-$extra_version"
         fi
@@ -130,7 +139,7 @@ for todo in "${all_todos[@]}"; do
       fi
 
       if ${docker_running}; then
-        php_version=$(docker exec "jbt-${version}" bash -c "php --version")
+        php_version=$(docker exec "jbt-${instance}" bash -c "php --version")
         # Extract the PHP version (first line) using sed
         php_version_number=$(echo "$php_version" | sed -n 's/^PHP \([0-9\.]*\).*/PHP \1/p')
         # Check if Xdebug is included in the PHP version info
@@ -141,24 +150,26 @@ for todo in "${all_todos[@]}"; do
         fi
       fi
 
-      config_file="branch-${version}/cypress.config.mjs"
+      # Handle .js or .mjs from PR https://github.com/joomla/joomla-cms/pull/43676 – [4.4] Move the Cypress Tests to ESM
+      if [ -f "joomla-${instance}/cypress.config.mjs" ]; then
+        config_file="joomla-${instance}/cypress.config.mjs"
+      elif [ -f "joomla-${instance}/cypress.config.js" ]; then
+        config_file="joomla-${instance}/cypress.config.js"
+      fi
       if [ -f "${config_file}" ]; then
         db_type=$(grep db_type "${config_file}" | sed 's/db_type//' | tr -d " ,'" | sed 's/://')
         db_host=$(grep db_host "${config_file}" | sed 's/db_host//' | tr -d " ,'" | sed 's/://')
         db_port=$(grep db_port "${config_file}" | sed 's/db_port//' | tr -d " ,'" | sed 's/://')
         echo "  ${db_type}, ${db_host}, ${db_port}"
       else
-        echo "  OOPS missing '${config_file}' file?"
+        echo "  Without Cypress configuration file"
       fi
 
-      echo "  /branch-${version}: $(du -ms "branch-${version}" | awk '{print $1}')MB"
+      echo "  /joomla-${instance}: $(du -ms "joomla-${instance}" | awk '{print $1}')MB"
 
-      docker exec "jbt-${version}" bash -c "JBT_INTERNAL=42 /jbt/scripts/repos.sh \"branch-${version}\""
+      docker exec "jbt-${instance}" bash -c "JBT_INTERNAL=42 /jbt/scripts/repos.sh \"joomla-${instance}\""
     else
-      echo "  /branch-${version} is NOT existing"
+      echo "  /joomla-${instance} is NOT existing"
     fi
-  else
-    error "Oh my god, that shouldn't really happen now, what's the todo='${todo}' doing here?"
-    # We won't stop here, as it is just an info script.
   fi
 done
