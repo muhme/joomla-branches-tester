@@ -191,7 +191,7 @@ if [ "$recreate" = false ]; then
 
   # pgpass file must me only pgadmin user read & writable
   log "Create pgAdmin password file with owner pgadmin and file mask 600"
-  docker cp scripts/pgpass jbt-pga:/pgadmin4/pgpass
+  docker cp configs/pgpass jbt-pga:/pgadmin4/pgpass
   docker exec -u 0 jbt-pga bash -c "chmod 600 /pgadmin4/pgpass && chown pgadmin /pgadmin4/pgpass"
 
   log "Base installation is completed. If there should be an issue with any of the upcoming version-dependent installations,"

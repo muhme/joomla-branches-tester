@@ -1,7 +1,7 @@
 /*
- * patchtester.cy.js - Cypress script to install Joomla Patch Tester component and fetch data
+ * installPatchtester.cy.js - Cypress script to install Joomla Patch Tester component and fetch data
  *
- * cypress run --env token=ghp_4711...42 --config specPattern=/jbt/scripts/patchtester.cy.js
+ * Used by 'scripts/patchtester'.
  * 
  * Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
  * https://github.com/muhme/joomla-branches-tester

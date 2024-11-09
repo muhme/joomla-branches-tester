@@ -1,0 +1,17 @@
+{
+  "name": "jbt",
+  "description": "Joomla Branches Teser",
+  "author": "Heiko Lübbe",
+  "license": "GPL-2.0-or-later",
+  "version": "2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/muhme/joomla-branches-tester.git"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "cypress": "*"
+  }
+}

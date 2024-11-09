@@ -91,7 +91,7 @@ fi
 instance=$(getMajorMinor "${version}")
 
 log "jbt-${instance} – Configure to catch all PHP errors, including notices and deprecated warnings"
-docker cp scripts/error-logging.ini "jbt-${instance}:/usr/local/etc/php/conf.d/error-logging.ini"
+docker cp 'configs/error-logging.ini' "jbt-${instance}:/usr/local/etc/php/conf.d/error-logging.ini"
 
 # Needs PHP >= 8.0, therefore not possible for Joomla 3.9 with PHP 7.4, but possible for 3.10 with PHP 8.0
 if (( instance == 310 || instance >= 40 )); then

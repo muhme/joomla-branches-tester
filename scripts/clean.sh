@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # clean.sh - Stopping and removing JBT Docker containers, associated Docker networks and volumes.
-#            Also deletes 'run', 'cypress-cache', 'installation/*' and 'joomla-*' directories.
+#            Also deletes files and directories created by JBT.
 #            Works offline and for earlier JBT version created directories and containers.
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
@@ -111,7 +111,7 @@ for dir in "${HOME}/Library/Caches/Cypress" "${HOME}/.cache/Cypress"; do
 done
 
 # Deleting files listed in .gitignore, even though it's not required, to ensure cleanup.
-for file in ".vscode" "docker-compose.yml" "docker-compose.new"; do
+for file in "docker-compose.yml" "docker-compose.new"; do
   if [ -f "${file}" ]; then
     log "Deleting file '${file}' to ensure complete cleanup"
     rm "${file}" 2>/dev/null || sudo bash -c "rm \"${file}\""
@@ -119,7 +119,7 @@ for file in ".vscode" "docker-compose.yml" "docker-compose.new"; do
 done
 
 # Deleting directories in .gitignore, even though it's not required, to ensure cleanup.
-for directory in "run" "cypress-cache" installation/*; do
+for directory in ".vscode" "run" "cypress-cache" installation/*; do
   if [ -d "${directory}" ]; then
     log "Deleting directory '${directory}' to ensure complete cleanup"
     rm -r "${directory}" 2>/dev/null || sudo bash -c "rm -r \"${directory}\""

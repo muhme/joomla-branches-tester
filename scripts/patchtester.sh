@@ -87,7 +87,7 @@ for instance in "${instancesToInstall[@]}"; do
   log "jbt-${instance} – Installing Joomla Patch Tester"
   if docker exec jbt-cypress sh -c "cd /jbt/installation/joomla-${instance} && \
       DISPLAY=jbt-novnc:0 \
-      CYPRESS_specPattern='/jbt/installation/patchtester.cy.js' \
+      CYPRESS_specPattern='/jbt/installation/installPatchtester.cy.js' \
       cypress run --headed --env patchtester_url=${PATCHTESTER_URL},token=${token}"; then
     # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
     successful=$((successful + 1))

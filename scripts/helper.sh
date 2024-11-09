@@ -47,7 +47,7 @@ JBT_PHP_VERSIONS=("php7.4" "php8.0" "php8.0" "php8.0" "php8.1" "php8.2" "php8.2"
 JBT_BASE_CONTAINERS=()
 while read -r line; do
   JBT_BASE_CONTAINERS+=("$line")
-done < <(grep 'container_name:' docker-compose.base.yml | awk '{print $2}')
+done < <(grep 'container_name:' 'configs/docker-compose.base.yml' | awk '{print $2}')
 
 # If the 'unpatched' option is not set and no patch is provided, use the following list:
 # As of early October 2024, the main functionality is working without the need for patches.
@@ -347,16 +347,16 @@ function createDockerComposeFile() {
 
   if [ "${working}" = "append" ]; then
     # Cut named volumes, they are added always in the end.
-    csplit "docker-compose.yml" "/^volumes:/" && \
-      cat xx00 >"docker-compose.new" && \
+    csplit 'docker-compose.yml' '/^volumes:/' && \
+      cat xx00 > 'docker-compose.new' && \
       rm xx00 xx01
   else
     if [ "${network}" = "IPv4" ]; then
-      cp docker-compose.base.yml docker-compose.new
+      cp 'configs/docker-compose.base.yml' 'docker-compose.new'
     else
       sed -e 's/enable_ipv6: false/enable_ipv6: true/' \
         -e 's/subnet: "192.168.150.0\/24"/subnet: "fd00::\/8"/' \
-        docker-compose.base.yml >docker-compose.new
+        'configs/docker-compose.base.yml' > 'docker-compose.new'
 
     fi
   fi
@@ -368,7 +368,7 @@ function createDockerComposeFile() {
     checkDockerImageName "${instance}" "${din:7}" # e.g. 'joomla:5.0-php8.2-apache' as '5.0-php8.2-apache'
     padded=$(getMajorMinor "${version}" "pad")
     if [ "${working}" = "append" ]; then
-      if grep -q "^  jbt-${instance}" docker-compose.new; then
+      if grep -q "^  jbt-${instance}" 'docker-compose.new'; then
         log "jbt-${instance} – An entry already exists in 'docker-compose.yml'; leave it unmodified"
         doit=false
       fi
@@ -383,15 +383,15 @@ function createDockerComposeFile() {
           -e "s/WWW/${padded:0:1}/" \
           -e "s/XXX/${instance}/" \
           -e "s/YYY/${din}/" \
-          -e "s/ZZZ/${padded}/" docker-compose.joomla.yml >>docker-compose.new
+          -e "s/ZZZ/${padded}/" 'configs/docker-compose.joomla.yml' >> 'docker-compose.new'
     fi
   done
 
   # Add named volumes definition.
-  sed -e '/^#/d' docker-compose.end.yml >>docker-compose.new
+  sed -e '/^#/d' 'configs/docker-compose.end.yml' >> 'docker-compose.new'
 
   # Finally rename it
-  mv docker-compose.new docker-compose.yml
+  mv 'docker-compose.new' 'docker-compose.yml'
 }
 
 # Check if Joomla Docker exist.

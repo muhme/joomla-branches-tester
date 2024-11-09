@@ -20,4 +20,5 @@ cypress-cache
 logs
 
 # Parallel Cypress System Tests installation environment
-installation
+installation/joomla-*
+installation/node_modules

@@ -112,7 +112,7 @@ services:
       - postgres
     volumes:
       # Make a server entry for 'jbt-pg'
-      - ./scripts/servers.json:/pgadmin4/servers.json
+      - ./configs/servers.json:/pgadmin4/servers.json
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:

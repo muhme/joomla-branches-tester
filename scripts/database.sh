@@ -115,15 +115,7 @@ if [ ${#instancesToChange[@]} -eq 0 ]; then
   instancesToChange=("${allInstalledInstances[@]}")
 fi
 
-# JBT-own environment for Cypress-based Joomla installation
-# (Needed for early Joomla Releases w/o Cypress and to be able to continue work w/ Cypress scripts after graft)
-# For all instances:
-#   - NPM module 'cypress' and dependecies from installation/node_modules
-#   - Plus main branch clone 'joomla-cypress'
-# For each instance in directory 'joomla-${instance}'
-# - cypress.config.js
-# - cypress.config.local.js
-# - installJoomla.cy.js
+# JBT Cypress Installation Environment
 
 if [ ! -d "installation/node_modules" ]; then
   log "Performing a clean install of 'cypress' in 'installation/node_modules' directory"
@@ -143,14 +135,14 @@ fi
 for instance in "${instancesToChange[@]}"; do
 
   docker exec "jbt-${instance}" bash -c "mkdir -p '/jbt/installation/joomla-${instance}' && \
-                                         cp /jbt/scripts/installJoomla.cy.js '/jbt/installation/joomla-${instance}' && \
+                                         cp /jbt/installation/installJoomla.cy.js '/jbt/installation/joomla-${instance}' && \
                                          rm -f '/jbt/joomla-${instance}/configuration.php'"
 
   log "jbt-${instance} – Configure Cypress for variant ${dbvariant} (driver '${dbtype}' host '${dbhost}')"
   log "jbt-${instance} – Create 'installation/joomla-${instance}/cypress.config.js' file"
 
   # Cypress config for JBT installation environment
-  configureCypressConfig "/jbt/scripts/cypress.config.js" \
+  configureCypressConfig "/jbt/configs/cypress.config.js" \
                          "/jbt/installation/joomla-${instance}/cypress.config.js" \
                          "${instance}" \
                          "http://host.docker.internal:7$(printf "%03d" "${instance}")/" \
@@ -206,7 +198,7 @@ for instance in "${instancesToChange[@]}"; do
   log "jbt-${instance} – Cypress-based Joomla installation"
   docker exec jbt-cypress sh -c "cd '/jbt/installation/joomla-${instance}' && \
        DISPLAY=jbt-novnc:0 \
-       CYPRESS_specPattern='/jbt/installation/joomla-${instance}/installJoomla.cy.js' \
+       CYPRESS_specPattern='/jbt/installation/installJoomla.cy.js' \
        cypress run --headed"
 
   # Adopt 'configuration.php' as in 'tests/System/integration/install/Installation.cy.js'
