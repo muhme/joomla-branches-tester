@@ -1,7 +1,7 @@
 # JBT Scripts
 
-The `scripts` directory is the source of [Joomla Branches Tester](../README.md) (JBT) functionality.
-You can run all scripts multiple times. The order of the arguments is like a shuffle playlist — anything goes.
+The `scripts` directory serves as the source of [Joomla Branches Tester](../README.md) (JBT) functionality.
+All scripts can be run multiple times, with the order of arguments being flexible, similar to a shuffled playlist.
 For a quick overview of all mandatory and optional arguments, run each script with the `help` argument. For example:
 
 ```
@@ -32,20 +32,20 @@ The following scripts are available and the use is described in [../README.md](.
 
 | Script | Description | Additional Info |
 | --- | --- | --- |
-| [check](check) | Searching a JBT log file for critical issues or selected information. | Optional argument(s): `logfile`, `jbt` and `scripts`. |
+| [check](check) | Searching a JBT log file for critical issues or selected information. | Optional argumenta are `logfile`, `jbt` and `scripts`. |
 | [clean](clean.sh) | Delete all `jbt-*`-Docker containers and the `joomla-branches-tester_default` Docker network and `joomla-*` folders. | Used by `scripts/create` or for you to get rid of all the stuff. |
-| [create](create.sh) | (Re-)Build all docker containers. | Optional arguments are version number(s), database variant, `socket`, PHP version, `IPv6` and `no-cache`. |
-| [cypress](cypress.sh) | Running interactive Cypress GUI. | Mandatory argument is the Joomla version number. Optional argument is `local` to use a locally installed Cypress. |
-| [database](database.sh) | Changes database and database driver. | :warning: The overall database content is lost.<br />Mandatory argument is the database variant. Optional argument(s): `socket` and Joomla version number(s). |
+| [create](create.sh) | (Re-)Build all docker containers. | Optional arguments are database variant, `socket`, PHP version, `IPv6`, `no-cache` and the Joomla instances. |
+| [cypress](cypress.sh) | Running interactive Cypress GUI. | Mandatory argument is the Joomla instance. Optional argument is `local` to use a locally installed Cypress. |
+| [database](database.sh) | Changes database and database driver. | :warning: The overall database content is lost.<br />Mandatory argument is the database variant. Optional arguments are`socket` and Joomla instances. |
 | [graft](graft.sh) | Grafting a Joomla package onto a branch. | :warning: The overall database content is lost.<br />Mandatory argument is the Joomla package. Optional argument is the database variant.|
-| [info](info) | Retrieves Joomla Branches Tester status information. |  |
-| [patch](patch.sh) | Apply Git patches in 'joomla-cms', 'joomla-cypress' or 'joomla-framework/database'. | Arguments are one or multipe patches and optional version number(s). |
-| [patchtester](patchtester.sh) | Installs and configures Joomla patch tester component in one or all Joomla instances. | The GitHub token comes from environment variable `JBT_GITHUB_TOKEN` or as mandatory argument. Optional argument(s): Joomla version number(s). |
-| [php](php.sh) | Change used PHP version. | Mandatory is the PHP version, e.g. `php8.3`. Optional argument(s): Joomla version number(s). |
-| [pull](pull.sh) | Running `git pull` and more. | Optional argument(s): Joomla version number(s). |
-| [test](test.sh) | Running Cypress headless System Tests on one or all branches. | Optional argument(s): Joomla version number(s), browser and test spec pattern. |
-| [ubuntu_setup.sh](ubuntu_setup.sh) | Helper script in an installation on Ubuntu Linux (native or in Windows WSL 2). | |
-| [xdebug](xdebug.sh) | Switching PHP in web container to installation with or without Xdebug. | Mandatory argument is `on` or `off`. Optional arguments are the version number(s). |
+| [info](info) | Retrieves Joomla Branches Tester status information. | Optional arguments are `instance`, `base` and Joomla instances. |
+| [patch](patch.sh) | Apply Git patches in 'joomla-cms', 'joomla-cypress' or 'joomla-framework/database'. | Arguments are one or multipe patches and optional Joomla instances. |
+| [patchtester](patchtester.sh) | Installs and configures Joomla patch tester component in one or all Joomla instances. | The GitHub token comes from environment variable `JBT_GITHUB_TOKEN` or as mandatory argument. Optional argumenta are the Joomla instances. |
+| [php](php.sh) | Change used PHP version. | Mandatory is the PHP version, e.g. `php8.3`. Optional arguments are the Joomla instances. |
+| [pull](pull.sh) | Running `git pull` and more. | Optional arguments are the Joomla instances. |
+| [test](test.sh) | Running Cypress headless System Tests on one or all branches. | Optional arguments are browser, test specification pattern and the Joomla instances. |
+| [ubuntu_setup.sh](ubuntu_setup.sh) | Helper script for Ubuntu Linux (native or in Windows WSL 2) based installation. | |
+| [xdebug](xdebug.sh) | Switching PHP in web container to installation with or without Xdebug. | Mandatory argument is `on` or `off`. Optional arguments are the the Joomla instances. |
 
 The wrapper scripts (without the `.sh` extension) are used to duplicate log messages and
 are not separately named in the list.
@@ -67,7 +67,7 @@ Colouring can be avoided by setting the environment variable [NO_COLOR=1](https:
 
 ## Engine Room Scripts
 
-The following scripts are for internal usage only.
+The following scripts are for internal usage only:
 
 | File | Description | Additional Info |
 | --- | --- | --- |
