@@ -22,7 +22,7 @@ Use one, multiple, or all branches for:
 * Using Xdebug for PHP debugging.
 * Using IPv6 network.
 
-![Joomla Branches Software Architecture](images/joomla-branches-tester.svg)
+![Joomla Branches Software Architecture](images/joomla-branches-tester-52.svg)
 
 The goal is to have all used Joomla development branches (such as 4.4-dev, 5.1-dev, 5.2-dev, and 6.0-dev) available for parallel testing.
 This setup is achieved using 13 Docker containers.
@@ -169,11 +169,10 @@ you will need to download approximately 4 GB of data over the network.
 
 ---
 
-<img align="right" src="images/joomla-branches-tester-52.svg" width="400">
+<img align="right" src="images/joomla-branches-tester.svg" width="400">
 
-1. Install for a single version number, e.g. `52` only
-   (your system architecture will look like the picture on the right), default setting is for all branches.
-   You can also give multiple Joomla versions like `53 60`.
+1. Install can use multiple Joomla versions, e.g. two tags and two dev branches `3.9.28 3.10.12 52 60`
+   (your system architecture will look like the picture on the right), default setting is for all dev branches.
 2. The used database and database driver, e.g. `pgsql`, defaults to use MariaDB with MySQLi driver.
 3. The used PHP version. You can choose between `php8.1`, `php8.2`, and `php8.3`. Defaults to `php8.1`.
    See more details in [Switch PHP Version](#switch-php-version).
