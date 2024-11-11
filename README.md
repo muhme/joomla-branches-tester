@@ -634,10 +634,10 @@ docker exec -it jbt-mysql bash -c "mysql --socket=/var/run/mysqld/mysqld.sock -u
 
 ### Switch PHP Version
 
-The Joomla Docker images are available in different PHP versions (see 
+The Joomla Docker images are available in various PHP versions, from PHP 5.6 to PHP 8.3.
+To check which PHP versions are available, use [scripts/versions](#versions) first.
 
-You can switch between the available Images for PHP 8.1, PHP 8.2, and PHP 8.3
-across all installed Joomla instances:
+You can switch the PHP version for all installed Joomla instances:
 ```
 scripts/php php8.3
 ```
@@ -684,7 +684,7 @@ A JBT grafted Joomla contains additional files and two directories from the deve
 
 ### Syncing from GitHub Repository
 
-To avoid recreating Joomla instances the next day, you can simply fetch and merge the latest changes from the
+To avoid recreating Joomla dev-branch instances the next day, you can simply fetch and merge the latest changes from the
 Joomla GitHub repository into your local dev-branch based instances.
 This can be done for all installed Joomla instances without any arguments or for specific versions:
 ```
@@ -739,7 +739,7 @@ Finally, it may be reset again to improve performance:
 scripts/xdebug off
 ```
 
-Enabling Xdebug requires at least PHP 8.0. Used ports are 79xx, for the given example 7953 (with 3.10 exception using 7910).
+Enabling Xdebug requires at least PHP 8.0. Used ports are 79xx, for the given example 7953 and for Joomla version 3.10 using port 7910.
 
 ### IPv6
 
@@ -791,7 +791,7 @@ scripts/patchtester 53 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
 
 As Doc Brown said: *"Roads? Where we're going, we don't need roads."*
 
-JBT can install patches on its own using Git merge from pull requests (PRs) with `scripts/patch` (or even with `scripts/create`),
+JBT can install patches using Git merge from pull requests (PRs) with `scripts/patch` (or even with `scripts/create`),
 applicable to the following repositories:
 * joomla-cms - [joomla/joomla-cms](https://github.com/joomla/joomla-cms)
 * joomla-cypress - [joomla-projects/joomla-cypress](https://github.com/joomla-projects/joomla-cypress)
@@ -880,15 +880,15 @@ If no argument is provided, all information will be displayed:
 ```
 scripts/info
 ```
-The following example illustrates an IPv6 installation with three branches:
-* `4.4-dev`: A development clone based on version 4.4.9, PHP 8.1 is running with Xdebug, using PostgreSQL with driver PDO
-* `5.1-dev`: Grafted with the Joomla 5.1.3 Stable package, PHP 8.2, using MariaDB with driver MySQLi
-* `5.2-dev`: A development clone of version 5.2.0 with additional patches applied, using MySQL with driver PDO
+The following example illustrates an IPv6 installation with three Joomla instances:
+* `jbt-310` – Cloned from Joomla 3.10.12 tag and PHP 8.0 running with Xdebug
+* `jbt-51` – Grafted from Joomla 5.1.3 Stable Joomla package, running PHP 8.1 and using MariaDB with driver MySQLi
+* `jbt-53` – Cloned from 5.3-dev branch of version 5.2.0 with additional patches applied, running PHP 8.3scripts/info and using PostgreSQL
 ```
-Joomla Branches Tester (JBT) version 1.0.39
+Joomla Branches Tester (JBT) version 2.0.19
   Docker version 27.2.0 is running with 12 containers and 14 images
   EnableIPv6: true
-Standard Containers:
+Base Containers:
   jbt-mysql   is running, ports: 3306/tcp -> 0.0.0.0:7011; 3306/tcp -> [::]:7011
   jbt-madb    is running, ports: 3306/tcp -> 0.0.0.0:7012; 3306/tcp -> [::]:7012
   jbt-pg      is running, ports: 5432/tcp -> 0.0.0.0:7013; 5432/tcp -> [::]:7013
@@ -898,40 +898,44 @@ Standard Containers:
   jbt-novnc   is running, ports: 8080/tcp -> 0.0.0.0:7005; 8080/tcp -> [::]:7005
   jbt-relay   is running, ports: 7025/tcp -> 0.0.0.0:7025; 7025/tcp -> [::]:7025
   jbt-mail    is running, ports: 1025/tcp -> 0.0.0.0:7225; 1025/tcp -> [::]:7225; 1080/tcp -> 0.0.0.0:7004; 1080/tcp -> [::]:7004
-Branch 4.4-dev:
-  jbt-44 is running, ports: 80/tcp -> 0.0.0.0:7044; 80/tcp -> [::]:7044
-  Version: Joomla! 4.4.9 Development
-  PHP 8.1.29 with Xdebug
-  PostgreSQL(PDO), jbt-pg, ''
-  /joomla-44: 438MB
-  Repository joomla-44: https://github.com/joomla/joomla-cms,  Branch: 4.4-dev,  Status: 0 changes
-Branch 5.1-dev:
-  jbt-51 is running, ports: 80/tcp -> 0.0.0.0:7051; 80/tcp -> [::]:7051
-  Version: Joomla! 5.1.3 Stable
-  PHP 8.2.23
-  MySQLi, jbt-madb, ''
-  /joomla-51: 386MB
-Branch 5.2-dev:
-  jbt-52 is running, ports: 80/tcp -> 0.0.0.0:7052; 80/tcp -> [::]:7052
-  Version: Joomla! 5.2.0 Development
+jbt-310 Tag 3.10.12
+  Container jbt-310 is running, ports: 80/tcp -> 0.0.0.0:7310
+  Joomla Version: Joomla! 3.10.12 Stable
+  PHP 8.0.30 with Xdebug
+  Without Cypress configuration file
+  /joomla-310: 86MB
+  Git Repository joomla-310/
+    Remote Origin: https://github.com/joomla/joomla-cms
+    Tag: 3.10.12
+    Status: 277 changes
+jbt-51 Branch development
+  Container jbt-51 is running, ports: 80/tcp -> 0.0.0.0:7051
+  Joomla Version: Joomla! 5.1.0 Stable
+  PHP 8.1.29
+  MySQLi, jbt-madb, 
+  /joomla-51: 393MB
+jbt-53 Branch 5.3-dev
+  Container jbt-53 is running, ports: 80/tcp -> 0.0.0.0:7053
+  Joomla Version: Joomla! 5.3.0 Development
   PHP 8.3.11
-  MySQL(PDO), jbt-mysql, ''
-  /joomla-52: 481MB
-  Repository joomla-52: https://github.com/joomla/joomla-cms,  Branch: 5.2-dev,  Status: 2 changes
-Branch 5.3-dev:
-  jbt-53 is NOT running
-  /joomla-53 is NOT existing
+  PostgreSQL(PDO), jbt-pg, 
+  /joomla-53: 525MB
+  Git Repository joomla-53/libraries/vendor/joomla/database/
+    Remote Origin: https://github.com/joomla-framework/database
+    Branch: jbt-merged database-317
+    Status: 0 changes
+  Git Repository joomla-53/
+    Remote Origin: https://github.com/joomla/joomla-cms
+    Branch: 5.3-dev
+    Status: 0 changes
 ```
-
-:blossom: If you see '42' (the answer to all questions) as one of the release numbers,
-          it indicates that the system is offline and a default set of version numbers is being used.
 
 Optional arguments that can be combined as desired are:
 * `instance` to display Joomla Branches Tester instance information,
 * `base` to display information about all base containers,
 * version number to display information about this version number web server container.
 
-For example, to check only instance and Joomla 4.4 information:
+For example, to check only JBT instance and `jbt-44` container information:
 ```
 scripts/info instance 44
 ```
@@ -970,8 +974,8 @@ The following operations will break that consistency, as the Joomla database wil
 * `scripts/create` and `scripts/create recreate`
 * `scripts/test system install/Installation.cy.js`
 
-While grafting a Joomla package with `scripts/graft` doesn't break consistency,
-you will lose all additionally installed extensions.
+While grafting a Joomla package with `scripts/graft` doesn't break database consistency,
+you will lose all additionally installed extensions as the files are installed from package.
 
 Switching between PHP versions using `scripts/php` or
 enabling/disabling Xdebug with `scripts/xdebug` does not affect consistency.
@@ -1018,8 +1022,7 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
    ```
    bash -x scripts/pull.sh 53
    ```
-6. If you encounter problems after running `scripts/create` multiple times,
-   try using the `no-cache` option to force a fresh build of the containers.
+6. It is generally recommended to use the latest patch level of a Joomla version and the highest compatible PHP version possible.
 7. Always use the latest version of Docker software. And I mean it – do it, I’m not joking here!
 8. And always keep JBT up to date. You’ll get a reminder when you run `scripts/info`, and you should run `git pull` to stay current.
 9. If you need to cancel a running script, send an interrupt by pressing **\<Ctrl\> + \<C\>** together.
