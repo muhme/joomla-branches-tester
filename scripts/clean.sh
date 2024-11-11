@@ -97,7 +97,7 @@ if [ -d "logs" ]; then
   # remove log files with underscores before 2.0.12
   rm -f logs/*_*.txt 2>/dev/null || sudo rm -f logs/*_*.txt
   find logs -type f | sort -r | tail -n +2 >"${JBT_TMP_FILE}"
-  xargs -r rm -- <"${JBT_TMP_FILE}" 2>/dev/null || sudo bash -c "xargs -r rm -- <\"${JBT_TMP_FILE}\""
+  xargs -r rm -f -- <"${JBT_TMP_FILE}" 2>/dev/null || sudo bash -c "xargs -r rm -f -- <\"${JBT_TMP_FILE}\""
 fi
 
 # Checking Cypress global binary cache for macOS and Linux
@@ -114,7 +114,7 @@ done
 for file in "docker-compose.yml" "docker-compose.new"; do
   if [ -f "${file}" ]; then
     log "Deleting file '${file}' to ensure complete cleanup"
-    rm "${file}" 2>/dev/null || sudo bash -c "rm \"${file}\""
+    rm -f "${file}" 2>/dev/null || sudo bash -c "rm -f \"${file}\""
   fi
 done
 
@@ -122,6 +122,6 @@ done
 for directory in ".vscode" "run" "cypress-cache" installation/*; do
   if [ -d "${directory}" ]; then
     log "Deleting directory '${directory}' to ensure complete cleanup"
-    rm -r "${directory}" 2>/dev/null || sudo bash -c "rm -r \"${directory}\""
+    rm -rf "${directory}" 2>/dev/null || sudo bash -c "rm -rf \"${directory}\""
   fi
 done
