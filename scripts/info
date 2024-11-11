@@ -101,11 +101,11 @@ for todo in "${all_todos[@]}"; do
   else # Installed Joomla instance
 
     instance="$todo"
-    branch_name=$(cd "joomla-${instance}" && git branch -r --contains HEAD | head -1 | sed 's|[ ]*origin/||')
+    branch_name=$(docker exec "jbt-${instance}" bash -c "git branch -r --contains HEAD | head -1 | sed 's|[ ]*origin/||'")
     if [ -n "${branch_name}" ]; then
       header "jbt-${instance} Branch ${branch_name}"
     else
-      tag_name=$(cd "joomla-${instance}" && git describe --tags)
+      tag_name=$(docker exec "jbt-${instance}" bash -c "git describe --tags")
       if [ -n "${tag_name}" ]; then
         header "jbt-${instance} Tag ${tag_name}"
       else
