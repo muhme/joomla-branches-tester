@@ -626,12 +626,6 @@ docker exec -it jbt-madb bash -c "mariadb --socket=/var/run/mysqld/mysqld.sock -
 docker exec -it jbt-mysql bash -c "mysql --socket=/var/run/mysqld/mysqld.sock -u root -proot"
 ```
 
-:point_right: Be aware that for the Joomla System Tests,
-              Unix sockets currently work (as of early November 2024) only for the JBT-based installation step,
-              but not for System Tests' custom database commands that are JavaScript-based,
-              you need to install PR [44092](https://github.com/joomla/joomla-cms/pull/44092).
-              See [Back to the Future - Patch](#back-to-the-future---patch).
-
 ### Switch PHP Version
 
 The Joomla Docker images are available in various PHP versions, from PHP 5.6 to PHP 8.3.
@@ -806,8 +800,8 @@ scripts/patch 44 52 joomla-cypress-33 joomla-cms-43968
 scripts/patch 53 database-310
 ```
 
-:warning: Be cautious when applying patches, as we perform a full merge, which could introduce additional changes to the original pull request.
-          Always pay attention to the number of changed lines.
+:warning: Be cautious when applying patches, as we perform a full merge, which could introduce additional changes beyond the original pull request.
+          Always pay attention to the number of changed lines. If you encounter merge conflicts, you will need to resolve them or recreate the instance.
 
 While there's no way to remove a patch, you can use the `scripts/create recreate` to *go back in time* and restore the instance to the original state.
 
@@ -823,12 +817,6 @@ For instance, [database-317](https://github.com/joomla-framework/database/pull/3
 [joomla-cypress-33](https://github.com/joomla-projects/joomla-cypress/pull/33) and
 [joomla-cypress-36](https://github.com/joomla-projects/joomla-cypress/pull/36) to facilitate comprehensive testing.
 
-* :wrench: [joomla-cms-43968](https://github.com/joomla/joomla-cms/pull/43968) [cypress] Add db_port in Installation.cy.js
-  * Already merged in 5.2-dev, working for 4.4-dev and 5.3-dev
-* :wrench: [joomla-cms-44084](https://github.com/joomla/joomla-cms/pull/44084) [cypress] Using NPM Module 'pg' for 'postgres'
-  * Already merged in 5.2-dev, working for 4.4-dev
-* :wrench: [joomla-cms-44092](https://github.com/joomla/joomla-cms/pull/44092) [cypress] Database Unix Sockets for System Tests
-  * Working for 4.4-dev
 * :wrench: [joomla-cypress-33](https://github.com/joomla-projects/joomla-cypress/pull/33) Install Joomla with non-standard db_port
   * Working for 4.4-dev, 5.1-dev (and updates joomla-cypress from 1.0.3 to 1.1.1 -  which is a good idea anyway), 5.2-dev, 5.3-dev and 6.0-dev
 * :wrench: [joomla-cypress-35](https://github.com/joomla-projects/joomla-cypress/pull/35) Install Joomla for Stable Releases
