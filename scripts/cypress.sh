@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# cypress.sh - Running Cypress GUI for one branch, either from a Docker container or using locally installed Cypress.
-#   scripts/cypress 51
-#   scripts/cypress 51 local
+# cypress.sh - Running Cypress GUI, either from a Docker container or using locally installed Cypress.
+#   scripts/cypress 51         # macOS and Ubuntu native
+#   scripts/cypress 51 local   # Windows WSL2 Ubuntu
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
@@ -16,7 +16,7 @@ source scripts/helper.sh
 
 function help {
     echo "
-    cypress – Runs the Cypress GUI for a specified branch, either from Docker container or locally installed Cypress.
+    cypress – Runs the Cypress GUI, either from Docker container or locally installed Cypress.
               The mandatory Joomla instance must be one of installed: ${allInstalledInstances[*]}.
               The optional 'local' argument runs Cypress on the Docker host (default is the Docker container).
               The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
@@ -58,7 +58,7 @@ if $local; then
     error "OOPS - Unable to move into the 'joomla-${instance}' directory, giving up."
     exit 1
   }
-  # Install the Cypress version used in this branch, if needed
+  # Install the Cypress version used in this Joomla instance, if needed
   log "Installing Cypress if needed"
 
   # If it fails, try again with sudo, but specify the user's cache directory and chown afterwards.
