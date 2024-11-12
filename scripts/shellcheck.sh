@@ -1,6 +1,10 @@
 #!/bin/bash
 #
-# scripts/shellcheck.sh - Linting all all bash scripts. Needs ShellCheck installed, see https://www.shellcheck.net.
+# scripts/shellcheck.sh - Linting all all bash scripts, see https://www.shellcheck.net.
+#
+# Needs ShellCheck installed:
+#   sudo apt-get install shellcheck   # Ubuntu
+#   brew install shellcheck           # macOS
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
