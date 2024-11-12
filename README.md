@@ -17,7 +17,7 @@ Within [Docker](https://www.docker.com/) container environment you are able to:
 * Apply pull requests (PR) from Git repositories `joomla-cms`, `joomla-cypress` and `joomla-framework/database`.
 * Switching between 8 database variants (MySQL, MariaDB, or PostgreSQL and the two database drivers:
   MySQLi or PHP Data Objects and the option to use Unix sockets, instead of TCP host).
-* Switching between PHP versions (PHP 5.6 ... 8.3).
+* Switching between PHP versions (PHP 7.4 ... 8.3).
 * Installing Joomla from a cloned 'joomla-cms' Git repository.
 * Grafting a Joomla package.
 * Using Xdebug for PHP debugging.
@@ -628,7 +628,7 @@ docker exec -it jbt-mysql bash -c "mysql --socket=/var/run/mysqld/mysqld.sock -u
 
 ### Switch PHP Version
 
-The Joomla Docker images are available in various PHP versions, from PHP 5.6 to PHP 8.3.
+The Joomla Docker images are available in various PHP versions, from PHP 7.4 to PHP 8.3.
 To check which PHP versions are available, use [scripts/versions](#versions) first.
 
 You can switch the PHP version for all installed Joomla instances:

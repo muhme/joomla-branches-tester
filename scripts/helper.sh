@@ -37,7 +37,8 @@ JBT_DB_PORTS=("7011" "7011" "7012" "7012" "7013")
 JBT_DB_SOCKETS=("${JBT_S_MY}" "${JBT_S_MY}" "${JBT_S_MA}" "${JBT_S_MA}" "${JBT_S_PG}")
 
 # Valid PHP versions to choose from for available Joomla Docker images
-JBT_VALID_PHP_VERSIONS=("php5.6" "php7.0" "php7.1" "php7.2" "php7.3" "php7.4" "php8.0" "php8.1" "php8.2" "php8.3" "highest")
+# (not 5.6 - 7.3 as there are problems and for lowest supported Joomla 3.9.0 there is PHP 7.4 available and working)
+JBT_VALID_PHP_VERSIONS=("php7.4" "php8.0" "php8.1" "php8.2" "php8.3" "highest")
 
 # Highest PHP versions for Joomla versions (6 November 2024: There are no images 5.3 and higher)
 JBT_JOOMLA_VERSIONS=("39" "310" "40" "41" "42" "43" "44" "50" "51" "52")
@@ -198,7 +199,7 @@ function isValidVersion() {
 }
 
 # Check if the given argument is a valid PHP version.
-# e.g. isValidPHP "php7.2" -> 1
+# e.g. isValidPHP "php7.4" -> 1
 #
 function isValidPHP() {
   local php_version="$1"

@@ -18,7 +18,7 @@ source scripts/helper.sh
 function help {
     echo "
     php – Changes the PHP version on all, one or multiple Joomla web server Docker containers.
-          The mandatory PHP version must be one of: ${JBT_PHP_VERSIONS[*]}.
+          The mandatory PHP version must be one of: ${JBT_VALID_PHP_VERSIONS[*]}.
           The optional Joomla version can include one or more of installed: ${allInstalledInstances[*]} (default is all).
           The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
 
@@ -49,7 +49,7 @@ done
 
 if [ -z "$php_version" ]; then
   help
-  error "Mandatory PHP version is missing. Please use one of: ${JBT_PHP_VERSIONS[*]}."
+  error "Mandatory PHP version is missing. Please use one of: ${JBT_VALID_PHP_VERSIONS[*]}."
   exit 1
 fi
 
