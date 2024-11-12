@@ -11,15 +11,16 @@ if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
 fi
 
 function help {
-  echo "
-    info – Displaying critical issues or selected information from a JBT log file.
-           The optional 'jbt' argument displays the JBT log messages.
-           The optional 'scripts' argument displays start and stop messages for JBT scripts.
-           The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
-           If no filename is specified, the latest log file is used.
+echo "
+    check – Displays critical issues or selected information from a JBT log file without an optional argument.
+            With the optional 'jbt' argument, displays all JBT log messages.
+            With the optional 'scripts' argument, displays only start and stop messages for JBT scripts.
+            With the optional 'help' argument, displays this page. For full details, see https://bit.ly/JBT-README.
 
-           $(random_quote)
-  "
+            If no filename is specified, the latest log file is used.
+
+            $(random_quote)
+"
 }
 
 file=""
