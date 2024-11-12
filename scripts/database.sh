@@ -57,7 +57,7 @@ function help {
     database – Changes the database and driver for all, one or multiple Joomla web server containers.
                The mandatory database variant must be one of: ${JBT_DB_VARIANTS[*]}.
                The optional 'socket' argument configures database access via Unix socket (default is TCP host).
-               Optional Joomla instances can include one or more of the following installed: ${allInstalledInstances[*]} (default is all).
+               Optional Joomla instances can include one or more of the installed: ${allInstalledInstances[*]} (default is all).
                The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
 
                $(random_quote)
@@ -123,7 +123,7 @@ if [ ! -d "installation/node_modules" ]; then
   log "Adding 'joomla-cypress' module as a Git shallow clone of the main branch"
   docker exec "jbt-cypress" bash -c "cd /jbt/installation/node_modules && \
                                      git clone --depth 1 https://github.com/joomla-projects/joomla-cypress"
-   # Seen on Ubuntu, 13.10.0 was installed, but 12.13.2 needed for the branch
+   # Seen on Ubuntu, 13.10.0 was installed, but 12.13.2 needed for the Joomla instance
   log "Install Cypress (if needed)"
   # docker exec jbt-cypress sh -c "cd /jbt/installation && npx cypress install"
   # Seen on macOS, 13.13.3 was installed, npx cypress install did not install needed 13.13.0
