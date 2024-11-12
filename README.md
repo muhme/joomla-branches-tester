@@ -982,7 +982,8 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
 ## Trouble-Shooting
 
 1. To fully grasp the process, it's helpful to both see the diagrams and read the explanations provided.
-2. Simply try running it a second time. All scripts are designed to be run multiple times without issues.
+2. Simply try running it a second time. All scripts are designed to be run multiple times without issues.<br />
+   On `scripts/create`, if you see the log message `Base installation is completed`, you can use the `recreate` option if one Joomla instance fails during installation.
 3. One advantage of Docker and scripting: you can easily start fresh.
    As Roy from The IT Crowd says, *"Have you tried turning it off and on again?"*
    It takes just 2.5 minutes on a 2024 entry-level MacBook Air to delete everything and
