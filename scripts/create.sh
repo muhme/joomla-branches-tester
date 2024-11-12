@@ -235,7 +235,7 @@ for version in "${versionsToInstall[@]}"; do
       sleep 1
     fi
   done
-  if [ $i -ge $max_retries ]; then
+  if (( i >= max_retries )); then
     error "jbt-${instance} – Failed after $max_retries attempts. Giving up."
     exit 1
   fi
