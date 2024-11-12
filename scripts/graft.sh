@@ -1,6 +1,6 @@
 #!/bin/bash -e
 #
-# graft.sh - Place Joomla package onto development branch.
+# graft.sh - Places a Joomla package onto an existing instance.
 #            Just like in plant grafting, where a scion is joined to a rootstock.
 #   scripts/graft 52 ~/Downloads/Joomla_5.2.0-alpha4-dev-Development-Full_Package.zip
 #   scripts/graft /tmp/Joomla_5.1.2-Stable-Full_Package.zip 51 pgsql
@@ -17,7 +17,7 @@ source scripts/helper.sh
 
 function help {
     echo "
-    graft – Places a Joomla package onto a development branch, similar to plant grafting, where a scion joins a rootstock.
+    graft – Places a Joomla package onto an existing instance, similar to plant grafting, where a scion joins a rootstock.
             The mandatory Joomla instance must be one of installed: ${allInstalledInstances[*]}.
             The Joomla package file (e.g. 'Joomla_5.1.2-Stable-Full_Package.zip') is also mandatory.
             Optional database variant can be one of: ${JBT_DB_VARIANTS[*]} (default is mariadbi).
