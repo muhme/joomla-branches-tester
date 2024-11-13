@@ -564,9 +564,9 @@ function random_quote() {
   if [ "${quote}" != "" ]; then
     # Print the author only if it's not "Unknown" with authorID 0
     if [ "$authorID" != "0" ]; then
-      printf "\\n    \"${quote}\", ${author}\\n \\n"
+      printf "\\n    \"%s\", %s\\n \\n" "${quote}" "${author}"
     else
-      printf "\\n    \"${quote}\"\\n \\n"
+      printf "\\n    \"%s\"\\n \\n" "${quote}"
     fi
   fi
 }
