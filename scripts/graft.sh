@@ -22,9 +22,7 @@ function help {
             The Joomla package file (e.g. 'Joomla_5.1.2-Stable-Full_Package.zip') is also mandatory.
             Optional database variant can be one of: ${JBT_DB_VARIANTS[*]} (default is mariadbi).
             The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
-
-            $(random_quote)
-    "
+    $(random_quote)"
 }
 
 # shellcheck disable=SC2207 # There are no spaces in instance numbers

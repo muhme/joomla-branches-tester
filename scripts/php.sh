@@ -21,9 +21,7 @@ function help {
           The mandatory PHP version must be one of: ${JBT_VALID_PHP_VERSIONS[*]}.
           The optional Joomla version can include one or more of installed: ${allInstalledInstances[*]} (default is all).
           The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
-
-          $(random_quote)
-    "
+    $(random_quote)"
 }
 
 # shellcheck disable=SC2207 # There are no spaces in version numbers

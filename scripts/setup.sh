@@ -24,9 +24,7 @@ function help {
                Optional initial 'socket' enables database access via Unix socket (default is TCP host).
                Optional 'unpatched' or one or multiple patches (default: ${JBT_DEFAULT_PATCHES[*]}).
                The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
-
-               $(random_quote)
-    "
+    $(random_quote)"
 }
 
 # Defaults to use MariaDB with MySQLi database driver, to use cache and PHP 8.1.

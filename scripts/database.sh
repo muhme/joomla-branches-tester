@@ -59,9 +59,7 @@ function help {
                The optional 'socket' argument configures database access via Unix socket (default is TCP host).
                Optional Joomla instances can include one or more of the installed: ${allInstalledInstances[*]} (default is all).
                The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
-
-               $(random_quote)
-    "
+    $(random_quote)"
 }
 
 socket=false

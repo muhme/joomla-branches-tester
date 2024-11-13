@@ -29,9 +29,7 @@ function help {
              The optional 'repository:branch' argument (default repository is https://github.com/joomla/joomla-cms).
              Optionally specify one or more patches (e.g., 'joomla-cypress-36'; default is unpatched).
              The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
-
-             $(random_quote)
-    "
+    $(random_quote)"
 }
 
 # shellcheck disable=SC2207 # There are no spaces in version numbers

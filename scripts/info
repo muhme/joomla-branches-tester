@@ -20,9 +20,7 @@ function help {
            Optional Joomla instance arguments can be one or more of installed: ${allInstalledInstances[*]}.
            The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
            If no argument is provided, all information is displayed.
-
-           $(random_quote)
-  "
+    $(random_quote)"
 }
 
 # shellcheck disable=SC2207 # There are no spaces in instance numbers

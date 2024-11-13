@@ -21,9 +21,7 @@ function help {
                   Requires a GitHub personal access token as an argument (starting with 'ghp_') if 'JBT_GITHUB_TOKEN' is not set.
                   The optional Joomla version can be one or more of: ${allInstalledInstances[*]} (default is all).
                   The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
-
-                  $(random_quote)
-    "
+    $(random_quote)"
 }
 
 # shellcheck disable=SC2207 # There are no spaces in version numbers

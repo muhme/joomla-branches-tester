@@ -18,9 +18,7 @@ function help {
             The optional Joomla version can be one or more of: ${allInstalledInstances[*]} (default is all).
             Specify one or more patches e.g. 'joomla-cms-43968', 'joomla-cypress-33' or 'database-310'.
             The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
-
-            $(random_quote)
-    "
+    $(random_quote)"
 }
 
 patches=()

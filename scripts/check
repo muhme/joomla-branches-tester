@@ -18,9 +18,7 @@ echo "
             With the optional 'help' argument, displays this page. For full details, see https://bit.ly/JBT-README.
 
             If no filename is specified, the latest log file is used.
-
-            $(random_quote)
-"
+    $(random_quote)"
 }
 
 file=""

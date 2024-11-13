@@ -18,9 +18,7 @@ function help {
              Mandatory argument must be 'on' or 'off'.
              The optional Joomla instance can include one or more of installed: ${allInstalledInstances[*]} (default is all).
              The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
-
-             $(random_quote)
-    "
+    $(random_quote)"
 }
 
 # shellcheck disable=SC2207 # There are no spaces in version numbers

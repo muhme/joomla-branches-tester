@@ -528,7 +528,13 @@ runningTime() {
 # A day without a smile is a wasted day. Charlie Chaplin
 # Shoot for the moon. Even if you miss, you'll land among the stars.
 #
+# Can be disable by env var JBT_SHOW_QUOTE=false
+#
 function random_quote() {
+
+  if [ "${JBT_SHOW_QUOTE}" = "false" ] || [ "${JBT_SHOW_QUOTE}" = "0" ]; then
+    return 0
+  fi
 
   # Check the LANG environment variable
   lang_code=$(echo "$LANG" | cut -c1-2 | tr '[:upper:]' '[:lower:]')
@@ -558,9 +564,9 @@ function random_quote() {
   if [ "${quote}" != "" ]; then
     # Print the author only if it's not "Unknown" with authorID 0
     if [ "$authorID" != "0" ]; then
-      echo "\"${quote}\", ${author}"
+      printf "\\n    \"${quote}\", ${author}\\n \\n"
     else
-      echo "\"${quote}\""
+      printf "\\n    \"${quote}\"\\n \\n"
     fi
   fi
 }

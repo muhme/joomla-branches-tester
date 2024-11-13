@@ -20,9 +20,7 @@ function help {
               The mandatory Joomla instance must be one of installed: ${allInstalledInstances[*]}.
               The optional 'local' argument runs Cypress on the Docker host (default is the Docker container).
               The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
-
-              $(random_quote)
-    "
+    $(random_quote)"
 }
 
 # shellcheck disable=SC2207 # There are no spaces in instance numbers

@@ -19,9 +19,7 @@ function help {
     versions – Displays available Joomla versions from branches and tags,
                or lists compatible PHP versions for the specified Joomla version.
                The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
-
-               $(random_quote)
-  "
+    $(random_quote)"
 }
 
 while [ $# -ge 1 ]; do

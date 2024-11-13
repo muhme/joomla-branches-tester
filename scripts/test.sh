@@ -29,9 +29,7 @@ function help {
            Specify an optional test name from: ${ALL_TESTS[*]} (default is all).
            Optional Cypress spec file pattern for 'system' tests (default runs all without the installation step).
            The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
-
-           $(random_quote)
-    "
+    $(random_quote)"
 }
 
 # shellcheck disable=SC2207 # There are no spaces in version numbers

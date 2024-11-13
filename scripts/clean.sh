@@ -19,9 +19,7 @@ function help {
     clean – Stops and removes all JBT Docker containers, associated Docker networks, and Docker volumes.
             Also deletes JBT directories, such as 'run' and all 'joomla-*' directories.
             The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
-
-            $(random_quote)
-    "
+    $(random_quote)"
 }
 
 while [ $# -ge 1 ]; do
