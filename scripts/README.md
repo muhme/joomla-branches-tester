@@ -16,7 +16,7 @@ LANG=ja scripts/database help
                Optional 'socket' for using the database with a Unix socket (default is using TCP host).
                Optional Joomla version can be one or more of the following: 44 51 52 53 60 (default is all).
 
-               "惚れた病に薬なし。", 不明
+    "惚れた病に薬なし。", 不明
 
 *** 240909 16:00:11 <<< 'scripts/database' finished in 1 second.
 ```
@@ -24,7 +24,8 @@ LANG=ja scripts/database help
 :fairy: The random quote supports five languages, just like the
         [zitat-service.de](https://extensions.joomla.org/extension/news-display/quotes/zitat-service-de/)
         Joomla module. Set `LANG` to `de` for Deutsch, `en` for English, `es` for Español, `ja` for 日本語,
-        or `uk` for Українська. The gnome can't stop playing with it.
+        or `uk` for Українська. The gnome can't resist playing with it!
+        However, you can disable the random quote by setting the environment variable `JBT_SHOW_QUOTE=false`.
 
 ## Your Scripts
 
