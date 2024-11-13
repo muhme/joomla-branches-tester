@@ -20,3 +20,8 @@
   - go through all Usage use cases
     - in Cypress GUI run test administrator/components/com_users/User.cy.js and check email
     - after each database change: scripts/test system administrator/components/com_users/User.cy.js
+
+We can have a whole dozen Joomla containers:
+```
+scripts/create 3.9.28 3.10.12 4.0.4 4.1.5 4.2.9 4.3.4 44 5.0.2 51 52 53 60
+```

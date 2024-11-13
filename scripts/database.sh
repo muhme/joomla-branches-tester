@@ -5,6 +5,11 @@
 #   scripts/database 44 mariadb
 #   scripts/database 53 60 pgsql
 #
+# Creates three Cypress configuration files:
+#   installation/joomla-${instance}/cypress.config.js
+#   joomla-${instance}/cypress.config.[m]js
+#   joomla-${instance}/cypress.config.local.[m]js
+#
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
@@ -15,48 +20,79 @@ fi
 
 source scripts/helper.sh
 
+# Configure cypress.config.*js
+#
+# adopt e.g.:
+#   db_type: 'PostgreSQL (PDO)',
+#   db_name: 'test_joomla_44'
+#   db_prefix: 'jos44_',
+#   db_host: 'jbt-pg',
+#   db_port: '',
+#   baseUrl: 'http://host.docker.internal:7044',
+#   db_password: 'root',
+#   smtp_host: 'host.docker.internal',
+#   smtp_port: '7025',
+#
+# Using database host and default port Docker-inside as performance issues are seen in using host.docker.internal
+#
+function configureCypressConfig {
+  local from="$1" to="$2" instance="$3" baseurl="$4" dbtype="$5" dbhost="$6" dbport="$7" smtphost="$8" smtpport="$9"
+
+  docker exec "jbt-${instance}" bash -c "sed \
+    -e \"s|instance: .*|instance: '${instance}',|\" \
+    -e \"s|db_type: .*|db_type: '${dbtype}',|\" \
+    -e \"s|db_name: .*|db_name: 'test_joomla_${instance}',|\" \
+    -e \"s|db_prefix: .*|db_prefix: 'jos${instance}_',|\" \
+    -e \"s|db_host: .*|db_host: '${dbhost}',|\" \
+    -e \"s|db_port: .*|db_port: '${dbport}',|\" \
+    -e \"s|baseUrl: .*|baseUrl: '${baseurl}',|\" \
+    -e \"s|db_password: .*|db_password: 'root',|\" \
+    -e \"s|smtp_host: .*|smtp_host: '${smtphost}',|\" \
+    -e \"s|smtp_port: .*|smtp_port: '${smtpport}',|\" \
+    '${from}' > '${to}'"
+}
+
 function help {
     echo "
-    database – Change the database and database driver for all, one or multiple Joomla containers.
-               The mandatory database variant must be one of: ${JBT_DB_VARIANTS[@]}.
-               Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
-               Optional 'socket' for using the database with a Unix socket (default is using TCP host).
-
-               $(random_quote)
-    "
+    database – Changes the database and driver for all, one or multiple Joomla web server containers.
+               The mandatory database variant must be one of: ${JBT_DB_VARIANTS[*]}.
+               The optional 'socket' argument configures database access via Unix socket (default is TCP host).
+               Optional Joomla instances can include one or more of the installed: ${allInstalledInstances[*]} (default is all).
+               The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
+    $(random_quote)"
 }
 
 socket=false
-versionsToChange=()
-versions=$(getVersions)
-IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
+instancesToChange=()
+# shellcheck disable=SC2207 # There are no spaces in version numbers
+allInstalledInstances=($(getAllInstalledInstances))
 
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
     exit 0
-  elif isValidVersion "$1" "$versions"; then
-    versionsToChange+=("$1")
-    shift # Argument is eaten as version number.
+  elif [ -d "joomla-$1" ]; then
+    instancesToChange+=("$1")
+    shift # Argument is eaten as one version number.
   elif [ "$1" = "socket" ]; then
     socket=true
-    if [ ! -z "$dbvariant" ] ; then
+    if [ -n "${dbvariant}" ] ; then
       # Database variant was already given, overwrite with Unix socket
-      dbhost=$(dbSocketForVariant "$dbvariant")
+      dbhost=$(dbSocketForVariant "${dbvariant}")
       dbport=""
     fi
     shift # Argument is eaten as use database vwith socket.
   elif isValidVariant "$1"; then
     dbvariant="$1"
-    dbtype=$(dbTypeForVariant "$dbvariant")
+    dbtype=$(dbTypeForVariant "${dbvariant}")
     if $socket; then
       # Use Unix socket
-      dbhost=$(dbSocketForVariant "$dbvariant")
+      dbhost=$(dbSocketForVariant "${dbvariant}")
       dbport=""
     else
       # Use TCP host
-      dbhost=$(dbHostForVariant "$dbvariant")
-      dbport=$(dbPortForVariant "$dbvariant")
+      dbhost=$(dbHostForVariant "${dbvariant}")
+      dbport=$(dbPortForVariant "${dbvariant}")
     fi
     shift # Argument is eaten as database variant.
   else
@@ -68,106 +104,135 @@ done
 
 if [ -z "$dbvariant" ] ; then
   help
-  error "Mandatory database variant is missing. Please use one of: ${JBT_DB_VARIANTS[@]}."
+  error "Mandatory database variant is missing. Please use one of: ${JBT_DB_VARIANTS[*]}."
   exit 1
 fi
 
 # If no version was given, use all.
-if [ ${#versionsToChange[@]} -eq 0 ]; then
-  versionsToChange=(${allVersions[@]})
+if [ ${#instancesToChange[@]} -eq 0 ]; then
+  instancesToChange=("${allInstalledInstances[@]}")
 fi
 
-for version in "${versionsToChange[@]}"; do
+# JBT Cypress Installation Environment
 
-  if [ ! -d "branch_${version}" ]; then
-    log "jbt_${version} – There is no directory 'branch_${version}', jumped over"
-    continue
+if [ ! -d "installation/node_modules" ]; then
+  log "Performing a clean install of 'cypress' in 'installation/node_modules' directory"
+  docker exec "jbt-cypress" bash -c "cd /jbt/installation && npm ci"
+  log "Adding 'joomla-cypress' module as a Git shallow clone of the main branch"
+  docker exec "jbt-cypress" bash -c "cd /jbt/installation/node_modules && \
+                                     git clone --depth 1 https://github.com/joomla-projects/joomla-cypress"
+   # Seen on Ubuntu, 13.10.0 was installed, but 12.13.2 needed for the Joomla instance
+  log "Install Cypress (if needed)"
+  # docker exec jbt-cypress sh -c "cd /jbt/installation && npx cypress install"
+  # Seen on macOS, 13.13.3 was installed, npx cypress install did not install needed 13.13.0
+  # docker exec jbt-cypress sh -c "cd /jbt/installation && npm run cypress:install"
+  # Seen on macOS, "The cypress npm package is installed, but the Cypress binary is missing."
+  docker exec jbt-cypress sh -c "cd /jbt/installation && cypress install"
+fi
+
+for instance in "${instancesToChange[@]}"; do
+
+  docker exec "jbt-${instance}" bash -c "mkdir -p '/jbt/installation/joomla-${instance}' && \
+                                         cp /jbt/installation/installJoomla.cy.js '/jbt/installation/joomla-${instance}' && \
+                                         rm -f '/jbt/joomla-${instance}/configuration.php'"
+
+  log "jbt-${instance} – Configure Cypress for variant ${dbvariant} (driver '${dbtype}' host '${dbhost}')"
+  log "jbt-${instance} – Create 'installation/joomla-${instance}/cypress.config.js' file"
+
+  # Cypress config for JBT installation environment
+  configureCypressConfig "/jbt/configs/cypress.config.js" \
+                         "/jbt/installation/joomla-${instance}/cypress.config.js" \
+                         "${instance}" \
+                         "http://host.docker.internal:7$(printf "%03d" "${instance}")/" \
+                         "${dbtype}" \
+                         "${dbhost}" \
+                         "" \
+                         "host.docker.internal" \
+                         "7025"
+
+  # Cypress config files for Joomla instance (if needed)
+  if [[ -f "joomla-${instance}/cypress.config.dist.js" || -f "joomla-${instance}/cypress.config.dist.mjs" ]]; then
+    if [ -f "joomla-${instance}/cypress.config.dist.mjs" ]; then
+      extension="mjs"
+    else
+      extension="js"
+    fi
+    log "jbt-${instance} – Create 'joomla-${instance}/cypress.config[.local].${extension}' files"
+    configureCypressConfig "cypress.config.dist.${extension}" \
+                           "cypress.config.${extension}" \
+                           "${instance}" \
+                           "http://host.docker.internal:7$(printf "%03d" "${instance}")/" \
+                           "${dbtype}" \
+                           "${dbhost}" \
+                           "" \
+                           "host.docker.internal" \
+                           "7125"
+    # Create second Cypress config file for running local
+    # Using host.docker.internal to have it reachable from outside for Cypress and inside web server container
+    configureCypressConfig "cypress.config.dist.${extension}" \
+                           "cypress.config.local.${extension}" \
+                           "${instance}" \
+                           "http://localhost:7$(printf "%03d" "${instance}")/" \
+                           "${dbtype}" \
+                           "host.docker.internal" \
+                           "${dbport}" \
+                           "localhost" \
+                           "7325"
   fi
-
-  log "jbt_${version} – Create 'cypress.config.mjs' file for variant ${dbvariant} (driver '${dbtype}' host '${dbhost}')"
-
-  # adopt e.g.:
-  #   db_type: 'PostgreSQL (PDO)',
-  #   db_name: 'test_joomla_44'
-  #   db_prefix: 'jos44_',
-  #   db_host: 'jbt_pd',
-  #   db_port: '',
-  #   baseUrl: 'http://host.docker.internal:7044',
-  #   db_password: 'root',
-  #   smtp_host: 'host.docker.internal',
-  #   smtp_port: '7025',
-  #
-  # Using database host and default port Docker-inside as performance issues are seen in using host.docker.internal
-  docker exec "jbt_${version}" bash -c "cd /var/www/html && sed \
-    -e \"s|db_type: .*|db_type: '${dbtype}',|\" \
-    -e \"s|db_name: .*|db_name: 'test_joomla_${version}',|\" \
-    -e \"s|db_prefix: .*|db_prefix: 'jos${version}_',|\" \
-    -e \"s|db_host: .*|db_host: '${dbhost}',|\" \
-    -e \"s|db_port: .*|db_port: '',|\" \
-    -e \"s|baseUrl: .*|baseUrl: 'http:\/\/host.docker.internal:70${version}\/',|\" \
-    -e \"s|db_password: .*|db_password: 'root',|\" \
-    -e \"s|smtp_host: .*|smtp_host: 'host.docker.internal',|\" \
-    -e \"s|smtp_port: .*|smtp_port: '7025',|\" \
-    cypress.config.dist.mjs > cypress.config.mjs"
-
-  # Create second Cypress config file for running local
-  # Using host.docker.internal to have it reachable from outside for Cypress and inside web server container
-  log "jbt_${version} – Create additional 'cypress.config.local.mjs' file with using localhost and database port ${dbport}"
-  docker exec "jbt_${version}" bash -c "cd /var/www/html && sed \
-    -e \"s|db_host: .*|db_host: 'host.docker.internal',|\" \
-    -e \"s|db_port: .*|db_port: '$dbport',|\" \
-    -e \"s|baseUrl: .*|baseUrl: 'http:\/\/localhost:70${version}\/',|\" \
-    -e \"s|smtp_host: .*|smtp_host: 'localhost',|\" \
-    -e \"s|smtp_port: .*|smtp_port: '7325',|\" \
-    cypress.config.mjs > cypress.config.local.mjs"
 
   # Since the database will be new, we clean up autoload classes cache file and
   # all com_patchtester directories to prevent the next installation to be fail.
   # Again in Docker container as www-data user.
-  docker exec "jbt_${version}" bash -c "
+  docker exec "jbt-${instance}" bash -c "
     cd /var/www/html
     rm -rf administrator/components/com_patchtester api/components/com_patchtester
     rm -rf media/com_patchtester administrator/cache/autoload_psr4.php"
 
-  # Seen on Ubuntu, 13.10.0 was installed, but 12.13.2 needed for the branch
-  log "jbt_${version} – Install Cypress (if needed)"
-  docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && npx cypress install"
-  # Seen on macOS, 13.13.3 was installed, npx cypress install did not install needed 13.13.0
-  docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && npm run cypress:install"
-  # Seen on macOS, "The cypress npm package is installed, but the Cypress binary is missing."
-  docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && cypress install"
+  if [ ! -d "joomla-${instance}/installation" ]; then
+    log "jbt-${instance} – Missing 'installation' directory, doing Git checkout"
+    docker exec "jbt-${instance}" bash -c "git checkout installation"
+  fi
 
-  # Using Install Joomla from System Tests
-  log "jbt_${version} – Cypress-based Joomla installation"
-  docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && export DISPLAY=jbt_novnc:0 && cypress run --headed --spec tests/System/integration/install/Installation.cy.js"
+  log "jbt-${instance} – Cypress-based Joomla installation"
+  docker exec jbt-cypress sh -c "cd '/jbt/installation/joomla-${instance}' && \
+       DISPLAY=jbt-novnc:0 \
+       CYPRESS_specPattern='/jbt/installation/installJoomla.cy.js' \
+       cypress run --headed"
 
-  log "jbt_${version} – Disable B/C plugin"
-  docker exec jbt_cypress sh -c \
-    "cd /jbt/branch_${version} && export DISPLAY=jbt_novnc:0 && CYPRESS_specPattern="/jbt/scripts/disableBC.cy.js" cypress run --headed" || \
-    ( error "jbt_${version} – Ignoring step 'Disable B/C plugin' as it failed." ; true )
+  # Adopt 'configuration.php' as in 'tests/System/integration/install/Installation.cy.js'
+  docker exec "jbt-${instance}" bash -c "sed -i \
+    -e \"s|\(public .secret =\).*|\1 'tEstValue';|\" \
+    -e \"s|\(public .mailonline =\).*|\1 true;|\" \
+    -e \"s|\(public .mailer =\).*|\1 'smtp';|\" \
+    -e \"s|\(public .smtphost =\).*|\1 'host.docker.internal';|\" \
+    -e \"s|\(public .smtpport =\).*|\1 7025;|\" \
+    configuration.php"
 
-  # Cypress is using own SMTP port to read and reset mails by smtp-tester
-  log "jbt_${version} – Set the SMTP port used by Cypress to 7125"
-  docker exec "jbt_${version}" bash -c "cd /var/www/html && sed \
-    -e \"s/smtp_port: .*/smtp_port: '7125',/\" \
-    cypress.config.mjs > cypress.config.mjs.tmp && \
-    mv cypress.config.mjs.tmp cypress.config.mjs"
+  if (( instance != 310 && instance >= 41 )); then
+    log "jbt-${instance} – Disable B/C plugin(s)"
+    if ! docker exec jbt-cypress sh -c "cd /jbt/installation/joomla-${instance} && \
+          DISPLAY=jbt-novnc:0 \
+          CYPRESS_specPattern='/jbt/installation/disableBC.cy.js' \
+          cypress run --headed"; then
+      error "jbt-${instance} – Ignoring failed step 'Disable B/C plugin'."
+    fi
+  fi
 
+  # Not configure Joomla logging as we deprecated and System Tests will fail
+  #
   # Enable Joomla logging
-  log "jbt_${version} – CONFIGURE JOOMLA NOT FOR LOGGING AS WE HAVE DEPRECATED"
-  # log "jbt_${version} – Configure Joomla with 'Debug System', 'Log Almost Everything' and 'Log Deprecated API'"
-  # docker exec "jbt_${version}" bash -c "cd /var/www/html && sed \
+  # log "jbt-${instance} – Configure Joomla with 'Debug System', 'Log Almost Everything' and 'Log Deprecated API'"
+  # docker exec "jbt-${instance}" bash -c "cd /var/www/html && sed \
   #   -e 's/\$debug = .*/\$debug = true;/' \
   #   -e 's/\$log_everything = .*/\$log_everything = 1;/' \
   #   -e 's/\$log_deprecated = .*/\$log_deprecated = 1;/' \
   #   configuration.php > configuration.php.tmp && \
   #   mv configuration.php.tmp configuration.php"
 
-  log "jbt_${version} – Changing ownership to www-data for all files and directories"
+  log "jbt-${instance} – Changing ownership to www-data for all files and directories (in background)"
   # Following error seen on macOS, we ignore it as it does not matter, these files are 444
   # chmod: changing permissions of '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
-  docker exec "jbt_${version}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true'
+  docker exec "jbt-${instance}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true &' &
 
-  log "jbt_${version} – Joomla based on the $(branchName ${dbvariant}) database variant is installed"
-
+  log "jbt-${instance} – Joomla has been new installed using the '${dbvariant}' database variant."
 done

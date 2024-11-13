@@ -18,24 +18,22 @@ source scripts/helper.sh
 
 function help {
   echo "
-    create – Create base Docker containers and containers based on Joomla Git branches.
-             Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
-             Optional database variant can be one of: ${JBT_DB_VARIANTS[@]} (default is mariadbi).
-             Optional 'socket' for using the database with a Unix socket (default is using TCP host).
-             Optional 'IPv6' can be set (default is to use IPv4).
-             Optional 'no-cache' can be set (default is to use cache).
-             Optional 'recreate' to create or recreate only one or more web server containers.
-             Optional PHP version can be one of: ${JBT_PHP_VERSIONS[@]} (default is php8.1).
-             Optional 'repository:branch', e.g. https://github.com/Elfangor93/joomla-cms:mod_community_info.
-             Optional 'unpatched' or one or multiple patches (default: ${JBT_DEFAULT_PATCHES[@]})
-
-             $(random_quote)
-    "
+    create – Creates the base and Joomla web server Docker containers.
+             One or more optional Joomla versions, see 'scripts/versions' (default is ${allUsedBranches[*]}).
+             The optional database variant can be one of: ${JBT_DB_VARIANTS[*]} (default is mariadbi).
+             The optional 'socket' argument configures database access via Unix socket (default is TCP host).
+             The optional 'IPv6' argument enables support for IPv6 (default is IPv4).
+             The optional 'no-cache' argument disables Docker build caching (default is enabled).
+             The optional 'recreate' argument creates or recreates specified web server containers.
+             The optional PHP version can be set to one of: ${JBT_VALID_PHP_VERSIONS[0]} ... ${JBT_VALID_PHP_VERSIONS[${#JBT_VALID_PHP_VERSIONS[@]}-2]} (default is highest).
+             The optional 'repository:branch' argument (default repository is https://github.com/joomla/joomla-cms).
+             Optionally specify one or more patches (e.g., 'joomla-cypress-36'; default is unpatched).
+             The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
+    $(random_quote)"
 }
 
-versions=$(getVersions)
-IFS=' ' allVersions=($(sort <<<"${versions}"))
-unset IFS # map to array
+# shellcheck disable=SC2207 # There are no spaces in version numbers
+allUsedBranches=($(getAllUsedBranches))
 
 # Defaults to use MariaDB with MySQLi database driver, to use cache and PHP 8.1.
 database_variant="mariadbi"
@@ -43,7 +41,7 @@ socket=""
 network="IPv4"
 no_cache=false
 recreate=false
-php_version="php8.1"
+php_version="highest"
 versionsToInstall=()
 unpatched=false
 patches=()
@@ -51,8 +49,8 @@ while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
     exit 0
-  elif isValidVersion "$1" "$versions"; then
-    versionsToInstall+=("$1")
+  elif isValidVersion "$1"; then
+    versionsToInstall+=("$(fullName "$1" | awk '{print $1}')")
     shift # Argument is eaten as one version number.
   elif [ "$1" = "socket" ]; then
     socket="socket"
@@ -103,8 +101,8 @@ else
   fi
 fi
 
-if [ ! -z "${git_repository}" ] && [ ${#versionsToInstall[@]} -ne 1 ]; then
-  error "If you use repository:branch, please specify one version as one of the following: ${allVersions[@]}."
+if [ -n "${git_repository}" ] && [ ${#versionsToInstall[@]} -ne 1 ]; then
+  error "If you use repository:branch, please specify one Joomla version."
   exit 1
 fi
 
@@ -115,13 +113,13 @@ fi
 
 # If no version was given, use all.
 if [ ${#versionsToInstall[@]} -eq 0 ]; then
-  versionsToInstall=(${allVersions[@]})
+  versionsToInstall=("${allUsedBranches[@]}")
 fi
 
 if [ "$unpatched" = true ]; then
   patches=("unpatched")
 elif [ ${#patches[@]} -eq 0 ]; then
-  patches=(${JBT_DEFAULT_PATCHES[@]})
+  patches=("${JBT_DEFAULT_PATCHES[@]}")
 fi
 # else: patches are already filled in the array
 
@@ -131,7 +129,7 @@ if [ "$recreate" = false ]; then
   scripts/clean.sh
 
   # Create Docker Compose setup with Joomla web servers for all versions to be installed.
-  log "Create 'docker-compose.yml' file for version(s) ${versionsToInstall[*]}, based on ${php_version} and ${network}"
+  log "Create 'docker-compose.yml' file for version(s) ${versionsToInstall[*]}, based on ${php_version} PHP version and ${network}"
   createDockerComposeFile "${versionsToInstall[*]}" "${php_version}" "${network}"
 
   if $no_cache; then
@@ -147,7 +145,7 @@ fi
 # (This isn't accurate when using MariaDB or PostgreSQL, but so far it's working with the delay from MySQL.)
 MAX_ATTEMPTS=60
 attempt=1
-until docker exec jbt_mysql mysqladmin ping -h"127.0.0.1" --silent || [ $attempt -eq $MAX_ATTEMPTS ]; do
+until docker exec jbt-mysql mysqladmin ping -h"127.0.0.1" --silent || [ $attempt -eq $MAX_ATTEMPTS ]; do
   log "Waiting for MySQL to be ready, attempt $attempt of $MAX_ATTEMPTS"
   attempt=$((attempt + 1))
   sleep 1
@@ -157,102 +155,29 @@ done
 if [ "$recreate" = false ]; then
 
   # For the tests we need old-school user/password login, once over TCP and once for localhost with Unix sockets
-  log "jbt_${version} – Enable MySQL user root login with password"
-  docker exec jbt_mysql mysql -uroot -proot \
+  log "Enable MySQL user root login with password"
+  docker exec jbt-mysql mysql -uroot -proot \
     -e "ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'root';" \
     -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';"
   # And for MariaDB too
-  log "jbt_${version} – Enable MariaDB user root login with password"
-  docker exec jbt_madb mysql -uroot -proot \
+  log "Enable MariaDB user root login with password"
+  docker exec jbt-madb mysql -uroot -proot \
     -e "ALTER USER 'root'@'%' IDENTIFIED BY 'root';" \
     -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';"
   # And Postgres (which have already user postgres with SUPERUSER, but to simplify we will use same user root on postgres)
-  log "jbt_${version} – Create PostgreSQL user root with password root and SUPERUSER role"
-  docker exec jbt_pg sh -c "\
+  log "Create PostgreSQL user root with password root and SUPERUSER role"
+  docker exec jbt-pg sh -c "\
   psql -U postgres -c \"CREATE USER root WITH PASSWORD 'root';\" && \
   psql -U postgres -c \"ALTER USER root WITH SUPERUSER;\""
 fi
 
-for version in "${versionsToInstall[@]}"; do
-
-  if [ "$recreate" = true ]; then
-
-    # Container exists?
-    if docker ps -a --format '{{.Names}}' | grep -q "^jbt_${version}$"; then
-      # Running?
-      if docker ps --format '{{.Names}}' | grep -q "^jbt_${version}$"; then
-        log "jbt_${version} – Stopping Docker Container"
-        docker compose stop "jbt_${version}"
-      fi
-      log "jbt_${version} – Removing Docker container"
-      docker compose rm -f "jbt_${version}" || log "jbt_${version} – Ignoring failure to remove Docker container"
-    fi
-
-    createDockerComposeFile "${version}" "${php_version}" "${network}" "append"
-
-    log "jbt_${version} – Building Docker container"
-    docker compose build "jbt_${version}"
-
-    log "jbt_${version} – Starting Docker container"
-    docker compose up -d "jbt_${version}"
-
-  fi
-
-  # If the copying has not yet been completed, then we have to wait, or we will get e.g.
-  # rm: cannot remove '/var/www/html/libraries/vendor': Directory not empty.
-  max_retries=120
-  for ((i = 1; i < $max_retries; i++)); do
-    docker logs "jbt_${version}" 2>&1 | grep 'This server is now configured to run Joomla!' && break || {
-      log "Waiting for original Joomla installation, attempt ${i} of ${max_retries}"
-      sleep 1
-    }
-  done
-  if [ $i -ge $max_retries ]; then
-    error "Failed after $max_retries attempts. Giving up."
-    exit 1
-  fi
-  log "jbt_${version} – Deleting original Joomla installation"
-  docker exec "jbt_${version}" bash -c 'rm -rf /var/www/html/* && rm -rf /var/www/html/.??*'
-
-  JBT_INTERNAL=42 bash scripts/setup.sh "initial" "${version}" "${database_variant}" "${socket}" \
-                                        "${arg_repository}:${arg_branch}" ${patches[@]}
-
-done
-
-# Final actions if performing a base installation.
+# Performing additional version-independent configurations to complete the base installation.
 if [ "$recreate" = false ]; then
-  log "Creating File '.vscode/launch.json' for all versions ${allVersions[*]}"
-  launch_json=".vscode/launch.json"
-  dir=$(dirname "${launch_json}")
-  mkdir -p "${dir}" 2>/dev/null || (sudo mkdir -p "${dir}" && sudo 777 "${dir}")
-  cat >"${launch_json}" <<EOF
-{
-    "version": "0.2.0",
-    "configurations": [
-EOF
-  for version in "${allVersions[@]}"; do
-    cat >>"${launch_json}" <<EOF
-      {
-          "name": "Listen jbt_${version}",
-          "type": "php",
-          "request": "launch",
-          "port": 79${version},
-          "pathMappings": {
-              "/var/www/html": "\${workspaceFolder}/branch_${version}"
-          }
-      },
-EOF
-  done
-  cat >>"${launch_json}" <<EOF
-    ]
-}
-EOF
-
-  log "Installing vim, ping, ip, telnet and netstat in the 'jbt_cypress' container"
-  docker exec jbt_cypress sh -c "apt-get update && apt-get install -y git vim iputils-ping iproute2 telnet net-tools"
+  log "Installing vim, ping, ip, telnet and netstat in the 'jbt-cypress' container"
+  docker exec jbt-cypress sh -c "apt-get update && apt-get install -y git vim iputils-ping iproute2 telnet net-tools"
 
   log "Add bash for Alpine containers"
-  for container in "jbt_pga" "jbt_mail"; do
+  for container in "jbt-pga" "jbt-mail"; do
     docker exec -u root ${container} apk add bash || true # Who cares?
   done
 
@@ -264,6 +189,58 @@ EOF
 
   # pgpass file must me only pgadmin user read & writable
   log "Create pgAdmin password file with owner pgadmin and file mask 600"
-  docker cp scripts/pgpass jbt_pga:/pgadmin4/pgpass
-  docker exec -u 0 jbt_pga bash -c "chmod 600 /pgadmin4/pgpass && chown pgadmin /pgadmin4/pgpass"
+  docker cp configs/pgpass jbt-pga:/pgadmin4/pgpass
+  docker exec -u 0 jbt-pga bash -c "chmod 600 /pgadmin4/pgpass && chown pgadmin /pgadmin4/pgpass"
+
+  log "Base installation is completed. If there should be an issue with any of the upcoming version-dependent installations,"
+  log "the failed version-dependent installation could be repeated using 'recreate'."
 fi
+
+for version in "${versionsToInstall[@]}"; do
+  instance=$(getMajorMinor "${version}")
+
+  if [ "$recreate" = true ]; then
+
+    # Container exists?
+    if docker ps -a --format '{{.Names}}' | grep -q "^jbt-${instance}$"; then
+      # Running?
+      if docker ps --format '{{.Names}}' | grep -q "^jbt-${instance}$"; then
+        log "jbt-${instance} – Stopping Docker Container"
+        docker compose stop "jbt-${instance}"
+      fi
+      log "jbt-${instance} – Removing Docker container"
+      docker compose rm -f "jbt-${instance}" || log "jbt-${instance} – Ignoring failure to remove Docker container"
+    fi
+
+    createDockerComposeFile "${instance}" "${php_version}" "${network}" "append"
+
+    log "jbt-${instance} – Building Docker container"
+    docker compose build "jbt-${instance}"
+
+    log "jbt-${instance} – Starting Docker container"
+    docker compose up -d "jbt-${instance}"
+
+  fi
+
+  # If the copying has not yet been completed, then we have to wait, or we will get e.g.
+  # rm: cannot remove '/var/www/html/libraries/vendor': Directory not empty.
+  max_retries=120
+  for ((i = 1; i < max_retries; i++)); do
+    if docker logs "jbt-${instance}" 2>&1 | grep 'This server is now configured to run Joomla!'; then
+      break
+    else
+      log "jbt-${instance} – Waiting for original Joomla installation, attempt ${i} of ${max_retries}"
+      sleep 1
+    fi
+  done
+  if (( i >= max_retries )); then
+    error "jbt-${instance} – Failed after $max_retries attempts. Giving up."
+    exit 1
+  fi
+  log "jbt-${instance} – Deleting original Joomla installation"
+  docker exec "jbt-${instance}" bash -c 'rm -rf /var/www/html/* && rm -rf /var/www/html/.??*'
+
+  JBT_INTERNAL=42 bash scripts/setup.sh "initial" "${version}" "${database_variant}" "${socket}" \
+                                        "${arg_repository}:${arg_branch}" "${patches[@]}"
+
+done

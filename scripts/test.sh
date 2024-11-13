@@ -22,32 +22,31 @@ trap - ERR
 
 function help {
     echo "
-    test – Runs tests on one, multiple, or all branches.
-           Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
-           Optional 'novnc' argument sets DISPLAY=jbt_novnc:0 (default is headless).
-           Optional 'chrome', 'edge', or 'firefox' can be specified as the browser (default is 'electron').
-           Optional test name can be on or more of the following: ${ALL_TESTS[@]} (default is all).
-           Optional Cypress spec file pattern for 'system' tests (default is to run all w/o the installation step)
-
-           $(random_quote)
-    "
+    test – Runs tests on one, multiple or all installed Joomla instances.
+           The optional Joomla version can be one or more of: ${allInstalledInstances[*]} (default is all).
+           The optional 'novnc' argument sets DISPLAY to jbt-novnc:0 (default is headless).
+           Optional browser can be 'chrome', 'edge' or 'firefox' (default is 'electron').
+           Specify an optional test name from: ${ALL_TESTS[*]} (default is all).
+           Optional Cypress spec file pattern for 'system' tests (default runs all without the installation step).
+           The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
+    $(random_quote)"
 }
 
-versions=$(getVersions)
-IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
+# shellcheck disable=SC2207 # There are no spaces in version numbers
+allInstalledInstances=($(getAllInstalledInstances))
 
 ALL_TESTS=("php-cs-fixer" "phpcs" "unit" "lint:css" "lint:js" "lint:testjs" "system")
 testsToRun=()
 novnc=false
 browser=""
-versionsToTest=()
+instancesToTest=()
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
     exit 0
-  elif isValidVersion "$1" "$versions"; then
-    versionsToTest+=("$1")
-    shift # Argument is eaten as the Joomla version number.
+  elif [ -d "joomla-$1" ]; then
+    instancesToTest+=("$1")
+    shift # Argument is eaten as one version number.
   elif [ "$1" = "novnc" ]; then
     novnc=true
     shift # Argument is eaten as using NoVNC.
@@ -69,13 +68,13 @@ while [ $# -ge 1 ]; do
 done
 
 # If no version was given, use all.
-if [ ${#versionsToTest[@]} -eq 0 ]; then
-  versionsToTest=(${allVersions[@]})
+if [ ${#instancesToTest[@]} -eq 0 ]; then
+  instancesToTest=("${allInstalledInstances[@]}")
 fi
 
 # If no test name was given, use all.
 if [ ${#testsToRun[@]} -eq 0 ]; then
-  testsToRun=(${ALL_TESTS[@]})
+  testsToRun=("${ALL_TESTS[@]}")
 fi
 
 # Pass through the environment variable to show 'console.log()' messages
@@ -85,31 +84,35 @@ if [ "$ELECTRON_ENABLE_LOGGING" == "1" ]; then
 fi
 
 overallFailed=0
+overallSkipped=0
 overallSuccessful=0
 
-for version in "${versionsToTest[@]}"; do
-
-  if [ ! -d "branch_${version}" ]; then
-    log "jbt_${version} – There is no directory 'branch_${version}', jumped over"
-    continue
-  fi
+for instance in "${instancesToTest[@]}"; do
 
   failed=0
+  skipped=0
   successful=0
 
   for actualTest in "${testsToRun[@]}"; do
 
     if [ "$actualTest" = "php-cs-fixer" ]; then
-      log "jbt_${version} – Initiating PHP Coding Standards Fixer – php-cs-fixer"
+      if (( instance == 310 || instance < 44 )); then
+        # In Finder.php line 592: The "/var/www/html/installation" directory does not exist.  
+        log "jbt-${instance} – Skipping PHP Coding Standards Fixer – php-cs-fixer"
+        skipped=$((skipped + 1))
+        overallSkipped=$((overallSkipped + 1))
+        continue
+      fi
+      log "jbt-${instance} – Initiating PHP Coding Standards Fixer – php-cs-fixer"
       # 1st To prevent failure, we fix the auto-generated file before
-      docker exec "jbt_${version}" bash -c \
+      docker exec "jbt-${instance}" bash -c \
         'file="administrator/cache/autoload_psr4.php"; [ -f "${file}" ] && libraries/vendor/bin/php-cs-fixer fix "${file}"' || true
       # 2nd Ignore Joomla Patch Tester
-      insert_file="branch_${version}/.php-cs-fixer.dist.php"
+      insert_file="joomla-${instance}/.php-cs-fixer.dist.php"
       insert_line="    ->notPath('/com_patchtester/')"
-      if [ -d "branch_${version}/administrator/components/com_patchtester" ] && \
+      if [ -d "joomla-${instance}/administrator/components/com_patchtester" ] && \
          [ -f "${insert_file}" ] && ! grep -qF "${insert_line}" "${insert_file}"; then
-        log "jbt_${version} – Patch Tester installation found, excluding from PHP-CS-Fixer"
+        log "jbt-${instance} – Patch Tester installation found, excluding from PHP-CS-Fixer"
         # file is owned by 'www-data' user on Linux
         chmod 666 "${insert_file}" 2>/dev/null || sudo chmod 666 "${insert_file}"
         csplit "${insert_file}" "/->notPath('/" && \
@@ -118,25 +121,31 @@ for version in "${versionsToTest[@]}"; do
           cat xx01 >> "${insert_file}" && \
           rm xx00 xx01
       fi
-      docker exec "jbt_${version}" bash -c "libraries/vendor/bin/php-cs-fixer fix -vvv --dry-run --diff"
-      if [ $? -eq 0 ]; then
+      if docker exec "jbt-${instance}" bash -c "libraries/vendor/bin/php-cs-fixer fix -vvv --dry-run --diff"; then
         # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
         successful=$((successful + 1))
         overallSuccessful=$((overallSuccessful + 1))
-        log "jbt_${version} – php-cs-fixer passed successfully"
+        log "jbt-${instance} – php-cs-fixer passed successfully"
       else
         failed=$((failed + 1))
-        overallFailed=$((failed + 1))
-        error "jbt_${version} – php-cs-fixer failed."
+        overallFailed=$((overallFailed + 1))
+        error "jbt-${instance} – php-cs-fixer failed."
       fi
     fi
 
     if [ "$actualTest" = "phpcs" ]; then
-      log "jbt_${version} – Initiating PHP Coding Sniffer – phpcs"
+      if (( instance == 310 || instance < 42 )); then
+        # ERROR: the "ruleset.xml" coding standard is not installed.
+        log "jbt-${instance} – Skipping PHP Coding Sniffer – phpcs"
+        skipped=$((skipped + 1))
+        overallSkipped=$((overallSkipped + 1))
+        continue
+      fi
+      log "jbt-${instance} – Initiating PHP Coding Sniffer – phpcs"
       # 1st Ignore Joomla Patch Tester
-      insert_file="branch_${version}/ruleset.xml"
+      insert_file="joomla-${instance}/ruleset.xml"
       insert_line='    <exclude-pattern type="relative">^administrator/components/com_patchtester/*</exclude-pattern>'
-      if [ -d "branch_${version}/administrator/components/com_patchtester" ] && \
+      if [ -d "joomla-${instance}/administrator/components/com_patchtester" ] && \
          [ -f "${insert_file}" ] && ! grep -qF "${insert_line}" "${insert_file}"; then
         csplit "${insert_file}" "/<exclude-pattern /" && \
           cat xx00 > "${insert_file}" && \
@@ -144,46 +153,51 @@ for version in "${versionsToTest[@]}"; do
           cat xx01 >> "${insert_file}" && \
           rm xx00 xx01
       fi
-      docker exec "jbt_${version}" bash -c "libraries/vendor/bin/phpcs --extensions=php -p --standard=ruleset.xml ."
-      if [ $? -eq 0 ]; then
+      if docker exec "jbt-${instance}" bash -c "libraries/vendor/bin/phpcs --extensions=php -p --standard=ruleset.xml ."; then
         successful=$((successful + 1))
         overallSuccessful=$((overallSuccessful + 1))
-        log "jbt_${version} – phpcs passed successfully"
+        log "jbt-${instance} – phpcs passed successfully"
       else
         failed=$((failed + 1))
-        overallFailed=$((failed + 1))
-        error "jbt_${version} – phpcs failed."
+        overallFailed=$((overallFailed + 1))
+        error "jbt-${instance} – phpcs failed."
       fi
     fi
 
     # TODO phan
 
     if [ "$actualTest" = "unit" ]; then
-      log "jbt_${version} – Initiating PHP Testsuite Unit – unit"
-      docker exec "jbt_${version}" bash -c "libraries/vendor/bin/phpunit --testsuite Unit"
-      if [ $? -eq 0 ]; then
+      if (( instance == 310 || instance < 42 )); then
+        # No tests executed! /  PHP Fatal error:  Uncaught Error: Call to undefined functio
+        log "jbt-${instance} – Skipping PHP Testsuite Unit – unit"
+        skipped=$((skipped + 1))
+        overallSkipped=$((overallSkipped + 1))
+        continue
+      fi
+      log "jbt-${instance} – Initiating PHP Testsuite Unit – unit"
+      if docker exec "jbt-${instance}" bash -c "libraries/vendor/bin/phpunit --testsuite Unit"; then
         successful=$((successful + 1))
         overallSuccessful=$((overallSuccessful + 1))
-        log "jbt_${version} – unit passed successfully"
+        log "jbt-${instance} – unit passed successfully"
       else
         failed=$((failed + 1))
-        overallFailed=$((failed + 1))
-        error "jbt_${version} – unit failed."
+        overallFailed=$((overallFailed + 1))
+        error "jbt-${instance} – unit failed."
       fi
     fi
 
     # TODO ?needs? LDAP
     # if [ "$actualTest" = "integration" ]; then
-    #   log "jbt_${version} – Initiating PHP Unit Testsuite Integration – integration"
-    #   docker exec "jbt_${version}" bash -c "libraries/vendor/bin/phpunit --testsuite Integration"
+    #   log "jbt-${instance} – Initiating PHP Unit Testsuite Integration – integration"
+    #   docker exec "jbt-${instance}" bash -c "libraries/vendor/bin/phpunit --testsuite Integration"
     #   if [ $? -eq 0 ]; then
     #     successful=$((successful + 1))
     #     overallSuccessful=$((overallSuccessful + 1))
-    #     log "jbt_${version} – integration passed successfully"
+    #     log "jbt-${instance} – integration passed successfully"
     #   else
     #     failed=$((failed + 1))
-    #     overallFailed=$((failed + 1))
-    #     error "jbt_${version} – integration failed."
+    #     overallFailed=$((overallFailed + 1))
+    #     error "jbt-${instance} – integration failed."
     #   fi
     # fi
 
@@ -191,44 +205,67 @@ for version in "${versionsToTest[@]}"; do
 
     for lint in "css" "js" "testjs" ; do
       if [ "$actualTest" = "lint:${lint}" ]; then
-        log "jbt_${version} – Initiating ${lint} Linter – lint:${lint}"
-        docker exec "jbt_${version}" bash -c "npm run lint:${lint}"
-        if [ $? -eq 0 ]; then
+        if [[ "${instance}" -eq 310 || "${instance}" -lt 40 || 
+              ( "${actualTest}" == "lint:testjs" && "${instance}" -lt 44 ) ]]; then
+          # No such file '/var/www/html/package.json' / Missing script: "lint:testjs"
+          log "jbt-${instance} – Skipping ${lint} Linter – lint:${lint}"
+          skipped=$((skipped + 1))
+          overallSkipped=$((overallSkipped + 1))
+          continue
+        fi
+        log "jbt-${instance} – Initiating ${lint} Linter – lint:${lint}"
+        if docker exec "jbt-${instance}" bash -c "npm run lint:${lint}"; then
           successful=$((successful + 1))
           overallSuccessful=$((overallSuccessful + 1))
-          log "jbt_${version} – lint:${lint} passed successfully"
+          log "jbt-${instance} – lint:${lint} passed successfully"
         else
           failed=$((failed + 1))
-          overallFailed=$((failed + 1))
-          error "jbt_${version} – lint:${lint} failed."
+          overallFailed=$((overallFailed + 1))
+          error "jbt-${instance} – lint:${lint} failed."
         fi
     fi
     done
 
     if [ "$actualTest" = "system" ]; then
+      # No Cypress System Tests and in 4.3 rudimentary tests fail
+      if (( instance == 310 || instance < 44 )); then
+        # No tests executed! /  PHP Fatal error:  Uncaught Error: Call to undefined functio
+        log "jbt-${instance} – Skipping Cypress System Tests"
+        skipped=$((skipped + 1))
+        overallSkipped=$((overallSkipped + 1))
+        continue
+      fi
       # Is there one more argument with a test spec pattern?
       if [ -z "$spec_argument" ] ; then
+        # Handle .js or .mjs from PR https://github.com/joomla/joomla-cms/pull/43676 – [4.4] Move the Cypress Tests to ESM
+        if [ -f "joomla-${instance}/cypress.config.dist.js" ]; then
+          extension="js"
+        elif [ -f "joomla-${instance}/cypress.config.dist.mjs" ]; then
+          extension="mjs"
+        else
+          error "No 'cypress.config.dist.*js' file found in 'joomla-${instance}' directory, please have a look."
+          exit 1
+        fi
         # Create spec pattern list without installation spec
-        i="tests/System/integration/"
-        all=$(grep  "${i}" "branch_${version}/cypress.config.mjs" | \
-              grep -v "${i}install/" | \
+        all=$(grep  "tests/System/integration/" "joomla-${instance}/cypress.config.${extension}" | \
+              grep -v "tests/System/integration/install/" | \
               tr -d "' " | \
               awk '{printf "%s", $0}' | \
               sed 's/,$//')
         spec="--spec '${all}'"
       else
         # Use the given test spec pattern and check if we can (no pattern) and must (missing path) insert path
-        if [[ "$spec_argument" != *","* && "$spec_argument" != tests/System/integration/* ]]; then
-          spec="--spec 'tests/System/integration/$spec_argument'"
+        if [[ "${spec_argument}" != *","* && "${spec_argument}" != tests/System/integration/* ]]; then
+          spec="--spec 'tests/System/integration/${spec_argument}'"
         else
-          spec="--spec '$spec_argument'"
+          spec="--spec '${spec_argument}'"
         fi
       fi
 
       # 16 September 2024 disabled, because Error: Unwanted PHP Deprecated
       # # Temporarily disable Joomla logging as System Tests are failing.
-      # log "jbt_${version} – Temporarily disable Joomla logging"
-      # docker exec "jbt_${version}" bash -c "cd /var/www/html && sed \
+      # log "jbt-${instance} – Temporarily disable Joomla logging"
+      # docker exec "jbt-${instance}" bash -c "cd /var/www/html && sed \
       #   -e 's/\$debug = .*/\$debug = false;/' \
       #   -e 's/\$log_everything = .*/\$log_everything = 0;/' \
       #   -e 's/\$log_deprecated = .*/\$log_deprecated = 0;/' \
@@ -236,27 +273,28 @@ for version in "${versionsToTest[@]}"; do
       #   mv configuration.php.tmp configuration.php"
         
       if [[ "$novnc" == true ]]; then
-        log "jbt_${version} – Initiating System Tests with NoVNC and ${spec}"
-        docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && export DISPLAY=jbt_novnc:0 && ${eel1} cypress run --headed ${browser} ${spec}"
+        log "jbt-${instance} – Initiating System Tests with NoVNC and ${spec}"
+        docker exec jbt-cypress sh -c "cd /jbt/joomla-${instance} && export DISPLAY=jbt-novnc:0 && ${eel1} cypress run --headed ${browser} ${spec}"
       else
-        log "jbt_${version} – Initiating headless System Tests with ${spec}"
-        docker exec jbt_cypress sh -c "cd /jbt/branch_${version} && unset DISPLAY && ${eel1} cypress run ${browser} ${spec}"
+        log "jbt-${instance} – Initiating headless System Tests with ${spec}"
+        docker exec jbt-cypress sh -c "cd /jbt/joomla-${instance} && unset DISPLAY && ${eel1} cypress run ${browser} ${spec}"
       fi
+      # shellcheck disable=SC2181 # Check either Cypress headed or headless status 
       if [ $? -eq 0 ] ; then
         # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
         successful=$((successful + 1))
         overallSuccessful=$((overallSuccessful + 1))
-        log "jbt_${version} – System Tests passed successfully"
+        log "jbt-${instance} – System Tests passed successfully"
       else
         failed=$((failed + 1))
-        overallFailed=$((failed + 1))
-        error "jbt_${version} – System Tests failed."
+        overallFailed=$((overallFailed + 1))
+        error "jbt-${instance} – System Tests failed."
       fi
 
       # 16 September 2024 disabled, because Error: Unwanted PHP Deprecated
       # Enable Joomla logging
-      # log "jbt_${version} – Re-enabling Joomla logging"
-      # docker exec "jbt_${version}" bash -c "cd /var/www/html && sed \
+      # log "jbt-${instance} – Re-enabling Joomla logging"
+      # docker exec "jbt-${instance}" bash -c "cd /var/www/html && sed \
       #   -e 's/\$debug = .*/\$debug = true;/' \
       #   -e 's/\$log_everything = .*/\$log_everything = 1;/' \
       #   -e 's/\$log_deprecated = .*/\$log_deprecated = 1;/' \
@@ -266,19 +304,19 @@ for version in "${versionsToTest[@]}"; do
   done
 
   if [ ${failed} -eq 0 ] ; then
-    log "jbt_${version} – Test run completed: ${successful} test(s) passed ${spec}"
+    log "jbt-${instance} – Test run completed: ${successful} test(s) passed ${spec} (${skipped} skipped)"
   else
-    error "jbt_${version} – Test run completed: ${failed} test(s) failed, ${successful} test(s) passed ${spec}."
+    error "jbt-${instance} – Test run completed: ${failed} test(s) failed, ${successful} test(s) passed ${spec} (${skipped} skipped)."
   fi
 
 done
 
-if [ ${#versionsToTest[@]} -gt 1 ]; then
+if [ ${#instancesToTest[@]} -gt 1 ]; then
   if [ ${overallFailed} -eq 0 ] ; then
-    log "${versionsToTest[@]} – All tests completed: ${overallSuccessful} test(s) successful ${spec}"
+    log "${instancesToTest[*]} – All tests completed: ${overallSuccessful} test(s) successful ${spec} (${overallSkipped} skipped)"
     exit 0
   else
-    error "${versionsToTest[@]} – All tests completed: ${overallFailed} test(s) failed, ${overallSuccessful} test(s) passed ${spec}."
+    error "${instancesToTest[*]} – All tests completed: ${overallFailed} test(s) failed, ${overallSuccessful} test(s) passed ${spec} (${overallSkipped} skipped)."
     exit 1
   fi
 fi

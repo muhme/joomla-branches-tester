@@ -7,8 +7,8 @@
 # Used by Cypress, Joomla web servers and databases.
 volumes:
   mysql-socket:
-    name: jbt_mysql-socket
+    name: jbt-mysql-socket
   mariadb-socket:
-    name: jbt_mariadb-socket
+    name: jbt-mariadb-socket
   postgresql-socket:
-    name: jbt_postgresql-socket
+    name: jbt-postgresql-socket

@@ -15,26 +15,25 @@ fi
 
 source scripts/helper.sh
 
-versions=$(getVersions)
-IFS=' ' allVersions=($(sort <<<"${versions}")); unset IFS # map to array
-
 function help {
     echo "
-    patchtester – Install Joomla Patch Tester on all, one or multiple Web Server Docker containers.
-                  Mandatory argument is a valid GitHub personal access token starting with 'ghp_'.
-                  Optional Joomla version can be one or more of the following: ${allVersions[@]} (default is all).
-
-                  $(random_quote)
-    "
+    patchtester – Installs Joomla Patch Tester on all, one or multiple Joomla web server Docker containers.
+                  Requires a GitHub personal access token as an argument (starting with 'ghp_') if 'JBT_GITHUB_TOKEN' is not set.
+                  The optional Joomla version can be one or more of: ${allInstalledInstances[*]} (default is all).
+                  The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
+    $(random_quote)"
 }
 
-versionsToInstall=()
+# shellcheck disable=SC2207 # There are no spaces in version numbers
+allInstalledInstances=($(getAllInstalledInstances))
+
+instancesToInstall=()
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
     exit 0
-  elif isValidVersion "$1" "$versions"; then
-    versionsToInstall+=("$1")
+  elif [ -d "joomla-$1" ]; then
+    instancesToInstall+=("$1")
     shift # Argument is eaten as one version number.
   elif [[ $1 = ghp_* ]]; then
     token="$1"
@@ -47,8 +46,8 @@ while [ $# -ge 1 ]; do
 done
 
 # If no version was given, use all.
-if [ ${#versionsToInstall[@]} -eq 0 ]; then
-  versionsToInstall=(${allVersions[@]})
+if [ ${#instancesToInstall[@]} -eq 0 ]; then
+  instancesToInstall=("${allInstalledInstances[@]}")
 fi
 
 # Check if the given token looks like a GitHub personal access token
@@ -75,21 +74,19 @@ PATCHTESTER_URL="https://github.com/${REPO}/releases/download/${LATEST_TAG}/com_
 log "Using URL '${PATCHTESTER_URL}'"
 
 failed=0
+skipped=0
 successful=0
-for version in "${versionsToInstall[@]}"
-do
-  branch=$(branchName "${version}")
-  if [ ! -d "branch_${version}" ]; then
-    log "jbt_${version} – There is no directory 'branch_${version}', jumped over"
+for instance in "${instancesToInstall[@]}"; do
+  if (( instance == 310 || instance <= 41 )); then
+    log "jbt-${instance} – Joomla <= 4.1, jumped over"
+    skipped=$((skipped + 1))
     continue
   fi
-  log "jbt_${version} – Installing Joomla Patch Tester"
-  docker exec jbt_cypress sh -c " \
-    cd /jbt/branch_${version} && \
-    unset DISPLAY && \
-    cypress run --env patchtester_url=${PATCHTESTER_URL},token=${token} \
-                --config specPattern=/jbt/scripts/patchtester.cy.js"
-  if [ $? -eq 0 ] ; then
+  log "jbt-${instance} – Installing Joomla Patch Tester"
+  if docker exec jbt-cypress sh -c "cd /jbt/installation/joomla-${instance} && \
+      DISPLAY=jbt-novnc:0 \
+      CYPRESS_specPattern='/jbt/installation/installPatchtester.cy.js' \
+      cypress run --headed --env patchtester_url=${PATCHTESTER_URL},token=${token}"; then
     # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
     successful=$((successful + 1))
   else
@@ -98,7 +95,7 @@ do
 done
 
 if [ ${failed} -eq 0 ] ; then
-  log "Completed ${versionsToInstall[@]} with ${successful} successful"
+  log "Completed ${instancesToInstall[*]} with ${successful} successful (${skipped} skipped)"
 else
-  error "Completed ${versionsToInstall[@]} with ${failed} failed and ${successful} successful."
+  error "Completed ${instancesToInstall[*]} with ${failed} failed and ${successful} successful (${skipped} skipped)."
 fi

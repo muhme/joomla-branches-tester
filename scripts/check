@@ -11,21 +11,15 @@ if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
 fi
 
 function help {
-  echo "
-    info – Searching a JBT log file for critical issues or selected information.
-           Optional argument 'jbt' to show JBT log messages only.
-           Optional argument 'scripts' to display only the start and stop messages for all JBT scripts.
-           If no file is provided, the newest log file is used.
+echo "
+    check – Displays critical issues or selected information from a JBT log file without an optional argument.
+            With the optional 'jbt' argument, displays all JBT log messages.
+            With the optional 'scripts' argument, displays only start and stop messages for JBT scripts.
+            With the optional 'help' argument, displays this page. For full details, see https://bit.ly/JBT-README.
 
-           $(random_quote)
-  "
+            If no filename is specified, the latest log file is used.
+    $(random_quote)"
 }
-
-if [ $# -eq 0 ]; then
-  all_todos=("instance" "base" ${allVersions[@]})
-else
-  all_todo=()
-fi
 
 file=""
 jbt=false
@@ -42,7 +36,9 @@ while [ $# -ge 1 ]; do
     scripts=true
     shift # Argument is eaten as to show only the start and stop messages.
   elif [ -f "logs/$1" ] || [ -f "$1" ]; then
-    file="logs/$(basename $1)"
+    # Ensure file name only, relative and absolute file names are working.
+    file=$(basename "$1")
+    file="logs/${file}"
     shift # Argument is eaten as log file name.
   else
     source scripts/helper.sh
@@ -53,6 +49,7 @@ while [ $# -ge 1 ]; do
 done
 
 if [[ ! -f "${file}" ]]; then
+  # shellcheck disable=SC2012 # find newest file, as ordered by file name
   file="logs/$(ls logs | tail -1)"
   if [[ ! -f "${file}" ]]; then
     source scripts/helper.sh

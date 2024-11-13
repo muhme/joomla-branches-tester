@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# cypress.sh - Running Cypress GUI for one branch, either from a Docker container or using locally installed Cypress.
-#   scripts/cypress 51
-#   scripts/cypress 51 local
+# cypress.sh - Running Cypress GUI, either from a Docker container or using locally installed Cypress.
+#   scripts/cypress 51         # macOS and Ubuntu native
+#   scripts/cypress 51 local   # Windows WSL2 Ubuntu
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
@@ -16,25 +16,25 @@ source scripts/helper.sh
 
 function help {
     echo "
-    cypress – Running Cypress GUI for one branch, either from a Docker container or using locally installed Cypress.
-              The mandatory Joomla version argument must be one of the following: ${versions}.
-              The optional 'local' argument runs Cypress directly on the Docker host (default is to run from the Docker container).
-
-              $(random_quote)
-    "
+    cypress – Runs the Cypress GUI, either from Docker container or locally installed Cypress.
+              The mandatory Joomla instance must be one of installed: ${allInstalledInstances[*]}.
+              The optional 'local' argument runs Cypress on the Docker host (default is the Docker container).
+              The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
+    $(random_quote)"
 }
 
-versions=$(getVersions)
+# shellcheck disable=SC2207 # There are no spaces in instance numbers
+allInstalledInstances=($(getAllInstalledInstances))
 
 local=false
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
     exit 0
-  elif isValidVersion "$1" "$versions"; then
-    version="$1"
-    shift # Argument is eaten as the version number.
-  elif [ $1 = "local" ]; then
+  elif [ -d "joomla-$1" ]; then
+    instance="$1"
+    shift # Argument is eaten as the instance number.
+  elif [ "$1" = "local" ]; then
     local=true
     shift # Argument is eaten to run Cypress directly on the Docker host.
   else
@@ -44,16 +44,19 @@ while [ $# -ge 1 ]; do
   fi
 done
 
-if [ -z "${version}" ]; then
+if [ -z "${instance}" ]; then
   help
-  error "Please provide a Joomla version number from the following: ${versions}."
+  error "Please provide a Joomla instance number from the following: ${allInstalledInstances[*]}."
   exit 1
 fi
 
 # Use of SMTP port 7325 for the smtp-tester, as port 7125 is occupied by the mapping for the Cypress container.
 if $local; then
-  cd "branch_${version}"
-  # Install the Cypress version used in this branch, if needed
+  cd "joomla-${instance}" || {
+    error "OOPS - Unable to move into the 'joomla-${instance}' directory, giving up."
+    exit 1
+  }
+  # Install the Cypress version used in this Joomla instance, if needed
   log "Installing Cypress if needed"
 
   # If it fails, try again with sudo, but specify the user's cache directory and chown afterwards.
@@ -63,11 +66,19 @@ if $local; then
   npx cypress install 2>/dev/null || \
     sudo bash -c "CYPRESS_CACHE_FOLDER=~$USER/.cache/Cypress npx cypress install && chown -R $USER ~$USER/.cache/Cypress"
 
-  log "Open locally installed Cypress GUI for version ${version}"
-  npx cypress open --e2e --project . --config-file cypress.config.local.mjs
+  if [ -f "cypress.config.local.mjs" ]; then
+    config_file="cypress.config.local.mjs"
+  elif [ -f "cypress.config.local.js" ]; then
+    config_file="cypress.config.local.js"
+  else
+    error "There is no file 'joomla-${instance}/cypress.config.local.*js'."
+    exit 1
+  fi
+  log "jbt-${instance} – Open locally installed Cypress GUI"
+  npx cypress open --e2e --project . --config-file "${config_file}"
   # By the way, the same way it is possible to run Cypress headless from Docker host.
 else
-  log "Open jbt_cypress container Cypress GUI for version ${version}"
+  log "jbt-${instance} – Open jbt-cypress container Cypress GUI"
   # Open Cypress e.g. on Windows WSL2 Docker container.
-  docker exec jbt_cypress bash -c "cd \"/jbt/branch_${version}\" && DISPLAY=:0 cypress open --env smtp_port=7325 --e2e --project ."
+  docker exec jbt-cypress bash -c "cd \"/jbt/joomla-${instance}\" && DISPLAY=:0 cypress open --env smtp_port=7325 --e2e --project ."
 fi
