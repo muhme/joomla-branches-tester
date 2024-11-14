@@ -691,11 +691,11 @@ If changes are pulled then:
 
 Finally, the Git status is displayed.
 
-<img align="right" src="images/phpMyAdmin.png">
-<img align="right" src="images/pgAdmin.png" width="240px">
-
 👉 This works only for dev-branch based Joomla instances.
    If the instance was installed from a tag or is a grafted one, then `scripts/pull` skips over the instance.
+   
+<img align="right" src="images/phpMyAdmin.png">
+<img align="right" src="images/pgAdmin.png" width="240px">
 
 ### :fairy: Gaze Into the Spellbook
 
