@@ -53,7 +53,7 @@ for instance in "${instancesToPull[@]}"; do
     log "jbt-${instance} – There is no directory 'joomla-${instance}/.git', grafted Joomla package?, jumped over"
     continue
   fi
-  branch=$(cd "joomla-${instance}" && git branch -r --contains HEAD | head -1 | sed 's|[ ]*origin/||')
+  branch=$(docker exec "jbt-${instance}" sh -c "git branch -r --contains HEAD | head -1 | sed 's|[ ]*origin/||'")
   if [ -z "${branch}" ]; then
     log "jbt-${instance} – Not a Git branch, jumped over"
     continue
