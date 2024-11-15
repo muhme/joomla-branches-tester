@@ -60,6 +60,32 @@ At the beginning of November 2024, these are `4.4-dev`, `5.1-dev`, `5.2-dev`, `5
 :point_right: Since **used** branches are subject to frequent changes,
               the latest version numbers are always be retrieved directly from the `joomla-cms` repository.
 
+For the web server containers, the official Docker Joomla images (e.g., `5.2-php8.3-apache`) are used as a starting point to simplify life.
+Within the container, the source code from the corresponding Joomla Git development branch or tag is copied and a second Joomla installation is run.
+Refer to the [Versions](#versions) section for a list of all usable Joomla versions and Docker images available for each Joomla version.
+
+### JBT Parallel Installation Environment
+
+JBT has its own Cypress installation environment located in the `installation` folder.
+This environment includes Cypress, the latest main branch version of `joomla-cypress` and three Cypress scripts:
+* Install Joomla
+* Disable Joomla B/C plugins
+* Install and configure Joomla Patch Tester
+
+The scripts capture Joomla web application JavaScript errors to prevent Cypress from stopping unexpectedly.
+The JavaScript errors are displayed, logged and can be verified using `scripts/check`.
+
+Furthermore, the installation environment saves each Joomla release's `installation` folder
+to preserve it and restore it if needed for the next Joomla installation,
+e.g. when switching databases after grafting.
+
+### Version Naming
+
+With `scripts/create`, Joomla versions need to be specified as a Git branch (e.g., `5.2-dev`) or a Git tag (e.g., `5.1.1-rc1`).  
+When creating an instance from a Git branch, either the full branch name or just the major and minor version numbers can be used (e.g., `52` instead of `5.2-dev`).  
+Once the Joomla instances are created, all other scripts use only the major and minor version numbers.  
+For example, an instance created from the Git tag `3.10.12` runs as `jbt-310`, and you can use `310` throughout to specify the instance.
+
 <details>
   <summary>See the detailed list of Docker containers.</summary>
 
@@ -167,30 +193,12 @@ If you are installing for the first time and downloading all necessary Docker im
 you will need to download approximately 4 GB of data over the network.
 
 <details>
-  <summary>Background and optional arguments.</summary>
+  <summary>Optional <code>scripts/create</code> Parameters</summary>
 
 ---
 
-For the web server containers, the official Docker Joomla images (e.g., `5.2-php8.3-apache`) are used as a starting point to simplify life.
-Within the container, the source code from the corresponding Joomla Git development branch or tag is copied and a second Joomla installation is run.
-Refer to the [Versions](#versions) section for a list of all usable Joomla versions and Docker images available for each Joomla version.
-
-JBT has its own Cypress installation environment located in the `installation` folder.
-This environment includes Cypress, the latest main branch version of `joomla-cypress` and three Cypress scripts:
-* Install Joomla
-* Disable Joomla B/C plugins
-* Install and configure Joomla Patch Tester
-
-The scripts capture Joomla web application JavaScript errors to prevent Cypress from stopping unexpectedly.
-The JavaScript errors are displayed, logged and can be verified using `scripts/check`.
-
-Furthermore, the installation environment saves each Joomla release's `installation` folder
-to preserve it and restore it if needed for the next Joomla installation,
-e.g. when switching databases after grafting.
-
 <img align="right" src="images/joomla-branches-tester.svg" width="400">
 
-**Optional `scripts/create` Parameters are:**
 *  Install can use multiple Joomla versions, e.g. two tags and two dev-branches `3.9.28 3.10.12 52 60`
    (your system architecture will look like the picture on the right), defaults to all dev-branches.
 *  The used database and database driver, e.g. `pgsql`, defaults to use MariaDB with MySQLi driver.
@@ -988,7 +996,7 @@ you will lose all additionally installed extensions as the files are installed f
 
 Switching between PHP versions using `scripts/php` or
 enabling/disabling Xdebug with `scripts/xdebug` does not affect consistency.
-Both the file system and the database remain unchanged.
+The Joomla files and the database remain unchanged.
 
 If you've used `scripts/patchtester` to install the Joomla Patch Tester,
 remember that it’s a Joomla extension.
