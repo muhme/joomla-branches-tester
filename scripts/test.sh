@@ -97,7 +97,7 @@ for instance in "${instancesToTest[@]}"; do
 
     if [ "$actualTest" = "php-cs-fixer" ]; then
       if (( instance == 310 || instance < 44 )); then
-        # In Finder.php line 592: The "/var/www/html/installation" directory does not exist.  
+        # In Finder.php line 592: The "/var/www/html/installation" directory does not exist.
         log "jbt-${instance} – Skipping PHP Coding Standards Fixer – php-cs-fixer"
         skipped=$((skipped + 1))
         overallSkipped=$((overallSkipped + 1))
@@ -168,7 +168,7 @@ for instance in "${instancesToTest[@]}"; do
 
     if [ "$actualTest" = "unit" ]; then
       if (( instance == 310 || instance < 42 )); then
-        # No tests executed! /  PHP Fatal error:  Uncaught Error: Call to undefined functio
+        # No tests executed! /  PHP Fatal error:  Uncaught Error: Call to undefined function
         log "jbt-${instance} – Skipping PHP Testsuite Unit – unit"
         skipped=$((skipped + 1))
         overallSkipped=$((overallSkipped + 1))
@@ -205,7 +205,7 @@ for instance in "${instancesToTest[@]}"; do
 
     for lint in "css" "js" "testjs" ; do
       if [ "$actualTest" = "lint:${lint}" ]; then
-        if [[ "${instance}" -eq 310 || "${instance}" -lt 40 || 
+        if [[ "${instance}" -eq 310 || "${instance}" -lt 40 ||
               ( "${actualTest}" == "lint:testjs" && "${instance}" -lt 44 ) ]]; then
           # No such file '/var/www/html/package.json' / Missing script: "lint:testjs"
           log "jbt-${instance} – Skipping ${lint} Linter – lint:${lint}"
@@ -229,7 +229,7 @@ for instance in "${instancesToTest[@]}"; do
     if [ "$actualTest" = "system" ]; then
       # No Cypress System Tests and in 4.3 rudimentary tests fail
       if (( instance == 310 || instance < 44 )); then
-        # No tests executed! /  PHP Fatal error:  Uncaught Error: Call to undefined functio
+        # No tests executed! /  PHP Fatal error:  Uncaught Error: Call to undefined function
         log "jbt-${instance} – Skipping Cypress System Tests"
         skipped=$((skipped + 1))
         overallSkipped=$((overallSkipped + 1))
@@ -271,7 +271,7 @@ for instance in "${instancesToTest[@]}"; do
       #   -e 's/\$log_deprecated = .*/\$log_deprecated = 0;/' \
       #   configuration.php > configuration.php.tmp && \
       #   mv configuration.php.tmp configuration.php"
-        
+
       if [[ "$novnc" == true ]]; then
         log "jbt-${instance} – Initiating System Tests with NoVNC and ${spec}"
         docker exec jbt-cypress sh -c "cd /jbt/joomla-${instance} && export DISPLAY=jbt-novnc:0 && ${eel1} cypress run --headed ${browser} ${spec}"
@@ -279,7 +279,7 @@ for instance in "${instancesToTest[@]}"; do
         log "jbt-${instance} – Initiating headless System Tests with ${spec}"
         docker exec jbt-cypress sh -c "cd /jbt/joomla-${instance} && unset DISPLAY && ${eel1} cypress run ${browser} ${spec}"
       fi
-      # shellcheck disable=SC2181 # Check either Cypress headed or headless status 
+      # shellcheck disable=SC2181 # Check either Cypress headed or headless status
       if [ $? -eq 0 ] ; then
         # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
         successful=$((successful + 1))
