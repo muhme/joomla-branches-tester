@@ -181,6 +181,9 @@ This environment includes Cypress, the latest main branch version of `joomla-cyp
 * Disable Joomla B/C plugins
 * Install and configure Joomla Patch Tester
 
+The scripts capture Joomla web application JavaScript errors to prevent Cypress from stopping unexpectedly.
+The JavaScript errors are displayed, logged and can be verified using `scripts/check`.
+
 <img align="right" src="images/joomla-branches-tester.svg" width="400">
 
 Optional Parameters are:
@@ -374,7 +377,8 @@ The Joomla development version installed in the web server container is configur
 - Joomla Super User: `ci-admin` with the password `joomla-17082005` (used from CI System Tests).
 - Used language Pack is English (United Kingdom) (`en-GB`).
 - The `/installation` folder remains intact after the installation.
-  - Earlier Joomla versions delete the `/installation` folder after setup. If the folder is missing, it is checked out from Git during the next installation.
+  - Earlier Joomla versions delete the `/installation` folder after setup.
+    If the folder is missing, it is checked out from Git during the next installation.
 - Error Reporting is set to `Maximum` in `Global Configuration | Server`.
 - A cron job is configured to run the Joomla Task Scheduler every minute.
 - The 'System - Joomla! Statistics' plugin is disabled to prevent prompting users on the backend Home Dashboard.
@@ -942,9 +946,21 @@ Optional Arguments:
 
 If no argument is provided, the log file will be checked for errors and critical messages by default.
 
-Example:
+Example to see last file JBT log messages only:
 ```
 scripts/check jbt
+```
+
+Sometimes everything appears to be working fine, but errors may still occur.
+For example, Joomla JavaScript exceptions might be caught during installation.
+As there are numerous log messages, you might overlook them.
+However, you can run `scripts/check` after running `scripts/create`,
+`scripts/database`, `scripts/patchtester` or `scripts/graft` and you will see the error.
+You can then investigate the JavaScript exception in the log file. For example:
+
+```
+[6927:1114/174511.623420:INFO:CONSOLE(1230)] "ERROR uncaught:exception err :TypeError: The following error originated from your application code, not from Cypress.
+  > Cannot read properties of null (reading 'getAttribute')
 ```
 
 ### Cleaning Up

@@ -18,9 +18,20 @@ const plugins = [
 
 describe('Disable Behaviour Plugins', () => {
   beforeEach(() => {
-    // Log in once before the tests run.
-    // Using hardcoded creds here or in the bash script — it makes no difference.
-    cy.doAdministratorLogin('ci-admin', 'joomla-17082005');
+
+    // Admin log in before disabling a plugin.
+    cy.doAdministratorLogin(Cypress.env('username'), Cypress.env('password'));
+
+    /*
+     * Catch Joomla JavaScript exceptions; otherwise, Cypress will fail.
+     * Use 'scripts/check' to view these exceptions after 'scripts/create|database|graft'.
+     */
+    Cypress.on('uncaught:exception', (err, runnable) => {
+      console.log(`ERROR uncaught:exception err :${err}`);
+      console.log(`ERROR uncaught:exception runnable :${runnable}`);
+      return false;
+    });
+
   });
 
   plugins.forEach(plugin => {

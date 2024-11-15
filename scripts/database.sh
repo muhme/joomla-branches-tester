@@ -195,9 +195,11 @@ for instance in "${instancesToChange[@]}"; do
 
   log "jbt-${instance} – Cypress-based Joomla installation"
   docker exec jbt-cypress sh -c "cd '/jbt/installation/joomla-${instance}' && \
+       CYPRESS_CACHE_FOLDER=/jbt/cypress-cache \
        DISPLAY=jbt-novnc:0 \
+       ELECTRON_ENABLE_LOGGING=1 \
        CYPRESS_specPattern='/jbt/installation/installJoomla.cy.js' \
-       cypress run --headed"
+       npx cypress run --headed"
 
   # Adopt 'configuration.php' as in 'tests/System/integration/install/Installation.cy.js'
   docker exec "jbt-${instance}" bash -c "sed -i \
@@ -211,9 +213,11 @@ for instance in "${instancesToChange[@]}"; do
   if (( instance != 310 && instance >= 41 )); then
     log "jbt-${instance} – Disable B/C plugin(s)"
     if ! docker exec jbt-cypress sh -c "cd /jbt/installation/joomla-${instance} && \
+          CYPRESS_CACHE_FOLDER=/jbt/cypress-cache \
           DISPLAY=jbt-novnc:0 \
+          ELECTRON_ENABLE_LOGGING=1 \
           CYPRESS_specPattern='/jbt/installation/disableBC.cy.js' \
-          cypress run --headed"; then
+          npx cypress run --headed"; then
       error "jbt-${instance} – Ignoring failed step 'Disable B/C plugin'."
     fi
   fi
