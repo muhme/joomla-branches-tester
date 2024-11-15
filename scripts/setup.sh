@@ -199,12 +199,14 @@ log "jbt-${instance} – Changing ownership to 'www-data' for all files and dire
 #   '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
 docker exec "jbt-${instance}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true'
 
-# Save the Joomla 'installation' directory to preserve it for the next Joomla installation,
-# e.g. switching the database after grafting.
-log "jbt-${instance} – Creating a backup of the Joomla 'installation' directory into 'installation/joomla-${instance}'"
-docker exec "jbt-${instance}" bash -c "\
-  mkdir -p '/jbt/installation/joomla-${instance}' && \
-  cp -r installation /jbt/installation/joomla-${instance}"
+if [[ -d "joomla-${instance}/installation" && ! -d "installation/joomla-${instance}/installation" ]]; then
+  # Save the Joomla 'installation' directory to preserve it for the next Joomla installation,
+  # e.g. switching the database after grafting.
+  log "jbt-${instance} – Creating a backup of the Joomla 'installation' directory into 'installation/joomla-${instance}'"
+  docker exec "jbt-${instance}" bash -c "\
+    mkdir -p '/jbt/installation/joomla-${instance}' && \
+    cp -r installation /jbt/installation/joomla-${instance}"
+fi
 
 # Joomla container needs to be restarted
 log "jbt-${instance} – Restarting container"
