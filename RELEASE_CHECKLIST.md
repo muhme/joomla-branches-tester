@@ -20,6 +20,7 @@
   - go through all Usage use cases
     - in Cypress GUI run test administrator/components/com_users/User.cy.js and check email
     - after each database change: scripts/test system administrator/components/com_users/User.cy.js
+- Test database, php and info after grafting
 
 We can have a whole dozen Joomla containers:
 ```

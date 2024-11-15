@@ -184,11 +184,15 @@ This environment includes Cypress, the latest main branch version of `joomla-cyp
 The scripts capture Joomla web application JavaScript errors to prevent Cypress from stopping unexpectedly.
 The JavaScript errors are displayed, logged and can be verified using `scripts/check`.
 
+Furthermore, the installation environment saves each Joomla release's `installation` folder
+to preserve it and restore it if needed for the next Joomla installation,
+e.g. when switching databases after grafting.
+
 <img align="right" src="images/joomla-branches-tester.svg" width="400">
 
-Optional Parameters are:
+**Optional `scripts/create` Parameters are:**
 *  Install can use multiple Joomla versions, e.g. two tags and two dev-branches `3.9.28 3.10.12 52 60`
-   (your system architecture will look like the picture on the right), default setting is for all dev-branches.
+   (your system architecture will look like the picture on the right), defaults to all dev-branches.
 *  The used database and database driver, e.g. `pgsql`, defaults to use MariaDB with MySQLi driver.
 *  The used PHP version. For available PHP versions see [Versions](#versions) section. Defaults to `highest`.
    See more details in [Switch PHP Version](#switch-php-version).

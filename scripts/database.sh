@@ -189,8 +189,8 @@ for instance in "${instancesToChange[@]}"; do
     rm -rf media/com_patchtester administrator/cache/autoload_psr4.php"
 
   if [ ! -d "joomla-${instance}/installation" ]; then
-    log "jbt-${instance} – Missing 'installation' directory, doing Git checkout"
-    docker exec "jbt-${instance}" bash -c "git checkout installation"
+    log "jbt-${instance} – Missing 'installation' directory, restore it from 'installation/joomla-${instance}'"
+    docker exec "jbt-${instance}" bash -c "cd '/jbt/installation/joomla-${instance}' && cp -r installation /var/www/html"
   fi
 
   log "jbt-${instance} – Cypress-based Joomla installation"
