@@ -125,7 +125,8 @@ The abbreviation `jbt` stands for Joomla Branches Tester.
     database port are used to avoid performance issues.
 2. **Running Cypress GUI on the Docker host**: `localhost` and the mapped database port are used instead,
     as Docker container hostnames aren't accessible outside Docker,
-    and no performance issues have been observed in this configuration.<br /><br />
+    and no performance issues have been observed in this configuration.
+   
     Therefore, there is a separate Cypress configuration file `cypress.config.local.mjs`
     for the local execution of Cypress GUI on the Docker host.
 
@@ -187,8 +188,8 @@ but depending on the platform, it may ask you to enter your user password for in
 The initial `scripts/create` runs some time,
 especially the very first time when the Docker images still need to be downloaded.
 For this installation with five Joomla web server containers the
-`joomla-branches-tester` folder requires about of 2 GB of disc space.
-Docker needs additional about of 20 GB for images and volumes.
+`joomla-branches-tester` folder requires about 2 GB of disc space.
+Docker needs additionally about 20 GB for images and volumes.
 If you are installing for the first time and downloading all necessary Docker images,
 you will need to download approximately 4 GB of data over the network.
 
@@ -448,7 +449,7 @@ And the configurations for `php-cs-fixer` and `phpcs` has been extended to exclu
 
 ### Cypress Automated System Tests
 
-To simple run the Joomla System Tests with all specs - except for the installation step -
+To simply run the Joomla System Tests with all specs - except for the installation step -
 from the [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System) in all Joomla instances with headless Cypress:
 ```
 scripts/test system
@@ -501,7 +502,7 @@ scripts/test 44 system administrator/components/com_actionlogs/Actionlogs.cy.js
 
 ### Cypress Interactive System Tests
 
-If a test spec fails, the screenshot is helpful. More enlightening is it to execute the single failed test spec
+If a test spec fails, the screenshot is helpful. More enlightening is to execute the single failed test spec
 with the Cypress GUI in interactive mode. You can see all the Cypress log messages, use the time-traveling debugger and
 observe how the browser runs in parallel.
 
@@ -511,7 +512,7 @@ Cypress GUI can be started from Docker container `jbt-cypress` with X11 forwardi
 scripts/cypress 51
 ```
 
-Or from local installed Cypress (recommended for macOS and native Ubuntu) with additional argument `local`:
+Or from locally installed Cypress (recommended for macOS and native Ubuntu) with additional argument `local`:
 ```
 scripts/cypress 51 local
 ```
@@ -528,7 +529,7 @@ If you run Cypress locally, only the browsers installed on your Docker host syst
 ### Check Email
 
 To check the emails sent by Joomla,
-the [MailDev](https://hub.docker.com/r/maildev/maildev) container offers you
+the [MailDev](https://hub.docker.com/r/maildev/maildev) container 
 provides you with a web interface at [http://host.docker.internal:7004](http://host.docker.internal:7004).
 The Cypress based Joomla System Tests is using an own SMTP server `smtp-tester` to receive, check and delete emails.
 Since we run Cypress locally or in a container, it is necessary to triple emails.
@@ -774,7 +775,7 @@ docker exec -it jbt-pg bash -c "PGPASSWORD=root psql -h fd00::13 -U root -d post
 For your convenience, the latest version of the
 [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester)
 can be installed on the Joomla instances from version 4.2 onwards.
-The script also sets the GitHub token and fetch the data.
+The script also sets the GitHub token and fetches the data.
 This can be done without version number for all Joomla instances or for e.g. Joomla 5.3:
 
 ```
@@ -977,7 +978,7 @@ You can then investigate the JavaScript exception in the log file. For example:
 
 ### Cleaning Up
 
-If you want to rid of all Docker containers and free up multiple gigabytes of disk space from the `joomla-*` and other directories, simply run:
+If you want to be rid of all Docker containers and free up multiple gigabytes of disk space from the `joomla-*` and other directories, simply run:
 
 ```
 scripts/clean
