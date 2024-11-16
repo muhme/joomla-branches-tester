@@ -13,4 +13,4 @@ The Joomla installation itself, the installation of the [Joomla Patch Tester](ht
 The `installation/node_modules` directory is created initially using `npm ci` for Cypress.
 Then, it is extended with the [joomla-cypress](https://github.com/joomla-projects/joomla-cypress) support package as a clone of the `main` branch to ensure the latest improvements are always included.
 
-The `joomla-*` directories contain the customised `cypress.config.js` files.
+The `joomla-*` directories contain the JBT installation environment's `cypress.config.js` file and a copy of the Joomla `installation` folder.
