@@ -32,6 +32,19 @@ function help {
     $(random_quote)"
 }
 
+# Wait until MySQL database is up and running
+#
+function waitForMySQL {
+  MAX_ATTEMPTS=60
+  attempt=1
+  until docker exec jbt-mysql mysqladmin ping -h"127.0.0.1" --silent || [ $attempt -eq $MAX_ATTEMPTS ]; do
+    log "Waiting for MySQL to be ready, attempt $attempt of $MAX_ATTEMPTS"
+    attempt=$((attempt + 1))
+    sleep 1
+  done
+  # If the MAX_ATTEMPTS are exceeded, simply try to continue.
+}
+
 # shellcheck disable=SC2207 # There are no spaces in version numbers
 allUsedBranches=($(getAllUsedBranches))
 
@@ -143,16 +156,16 @@ fi
 
 # Wait until MySQL database is up and running
 # (This isn't accurate when using MariaDB or PostgreSQL, but so far it's working with the delay from MySQL.)
-MAX_ATTEMPTS=60
-attempt=1
-until docker exec jbt-mysql mysqladmin ping -h"127.0.0.1" --silent || [ $attempt -eq $MAX_ATTEMPTS ]; do
-  log "Waiting for MySQL to be ready, attempt $attempt of $MAX_ATTEMPTS"
-  attempt=$((attempt + 1))
-  sleep 1
-done
-# If the MAX_ATTEMPTS are exceeded, simply try to continue.
+waitForMySQL
 
 if [ "$recreate" = false ]; then
+
+  # Disable MySQL binary logging to prevent waste of space
+  # see https://github.com/joomla-docker/docker-joomla/issues/197
+  log "Disable MySQL binary logging"
+  docker exec jbt-mysql bash -c "sed -i '/^\[mysqld\]/a skip-log-bin' '/etc/my.cnf'"
+  docker restart jbt-mysql
+  waitForMySQL
 
   # For the tests we need old-school user/password login, once over TCP and once for localhost with Unix sockets
   log "Enable MySQL user root login with password"
