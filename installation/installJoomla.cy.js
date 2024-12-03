@@ -10,6 +10,19 @@ import { registerCommands } from "./node_modules/joomla-cypress";
 registerCommands();
 
 describe('Install Joomla', () => {
+
+  beforeEach(() => {
+    /*
+     * Catch Joomla JavaScript exceptions; otherwise, Cypress will fail.
+     * Use 'scripts/check' to view these exceptions after 'scripts/create|database|graft'.
+     */
+    Cypress.on('uncaught:exception', (err, runnable) => {
+      console.log(`ERROR uncaught:exception err :${err}`);
+      console.log(`ERROR uncaught:exception runnable :${runnable}`);
+      return false;
+    });
+  });
+
   it('Install Joomla', () => {
     const config = {
       sitename: Cypress.env('sitename'),

@@ -12,6 +12,18 @@ registerCommands();
 
 describe("Install 'Joomla! Patch Tester' with", () => {
 
+  beforeEach(() => {
+    /*
+     * Catch Joomla JavaScript exceptions; otherwise, Cypress will fail.
+     * Use 'scripts/check' to view these exceptions after 'scripts/patchtester'.
+     */
+    Cypress.on('uncaught:exception', (err, runnable) => {
+      console.log(`ERROR uncaught:exception err :${err}`);
+      console.log(`ERROR uncaught:exception runnable :${runnable}`);
+      return false;
+    });
+  });
+
   // Install extension
   it("install component", () => {
     const patchtester_url = Cypress.env("patchtester_url");

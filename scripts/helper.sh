@@ -55,7 +55,7 @@ done < <(grep 'container_name:' 'configs/docker-compose.base.yml' | awk '{print 
 # shellcheck disable=SC2034 # It is used by other scripts after sourcing
 JBT_DEFAULT_PATCHES=("unpatched")
 
-# Variables that are used by helper.sh only and retrived on first usage
+# Variables that are used by helper.sh only and retrieved on first usage
 # All used tags
 JBT_HELPER_TAGS=()
 # All used branches
@@ -101,7 +101,7 @@ function getAllUsedBranches() {
     # Use sed with -E flag to enable extended regular expressions, which is also working with macOS sed.
     branches=$(echo "$json_data" "$stale_json_data" | grep -o '"name":"[0-9]\+\.[0-9]\+-dev"' |
                sed -E 's/"name":"([0-9]+)\.([0-9]+)-dev"/\1\2/')
-    
+
     # shellcheck disable=SC2162 # Not set -r as 2nd option as it will not work for old Bashes and there are no backslashes here
     read -a JBT_HELPER_BRANCHES <<< "$(echo "${branches}" | tr ' ' '\n' | sort -n | tr '\n' ' ')"
   fi
@@ -110,7 +110,7 @@ function getAllUsedBranches() {
 
 # List installed Joomla versions from 'joomla-*' directories.
 # Returns space separated sorted string, e.g. "39 310 40 41 42 43 44 51 52 53 60"
-# 
+#
 getAllInstalledInstances() {
   local instance instances=() sorted_instances=() final_instances=()
   # Loop over directories that match the pattern joomla-*
@@ -231,7 +231,7 @@ function fullName() {
       # Two digits branch? e.g. "44" -> "4.4-dev"
       branches+=("$(echo "$version" | sed -E 's/([0-9])([0-9])/\1.\2-dev/')")
     elif [[ "$version" =~ ^([0-9])([0-9])([0-9])(.*)$ ]]; then
-      # Three digits tag? e.g. "520-aplha4" to "5.2.0-alpha4"
+      # Three digits tag? e.g. "520-alpha4" to "5.2.0-alpha4"
       branches+=("${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}${BASH_REMATCH[4]}")
     else
       # Keep the original
@@ -661,7 +661,7 @@ trap theEnd EXIT
 
 # No, every end is a new beginning :)
 #
-log ">>> '$0${*:+ $*}' started"
+log ">>>" "'$0${*:+ $*}' started"
 
 # Instance is JBT version < 2.0.0 created and we are not running 'scripts/clean'?
 if [ -f "docker-compose.yml" ] && [ "$0" != "scripts/clean.sh" ] && grep -q "jbt_cypress" "docker-compose.yml"; then

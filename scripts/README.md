@@ -16,7 +16,7 @@ LANG=ja scripts/database help
                Optional Joomla instances can include one or more of the following installed: 39 44 52 53 (default is all).
                The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
 
-               "惚れた病に薬なし。", 不明
+    "惚れた病に薬なし。", 不明
 
 *** 241109 16:00:11 <<< 'scripts/database.sh' finished in 1 second.
 ```
@@ -24,7 +24,8 @@ LANG=ja scripts/database help
 :fairy: The random quote supports five languages, just like the
         [zitat-service.de](https://extensions.joomla.org/extension/news-display/quotes/zitat-service-de/)
         Joomla module. Set `LANG` to `de` for Deutsch, `en` for English, `es` for Español, `ja` for 日本語,
-        or `uk` for Українська. The gnome can't stop playing with it.
+        or `uk` for Українська. The gnome can't resist playing with it!
+        However, you can disable the random quote by setting the environment variable `JBT_SHOW_QUOTE=false`.
 
 ## Your Scripts
 
@@ -39,7 +40,7 @@ The following scripts are available and the use is described in [../README.md](.
 | [database](database.sh) | Changes database and database driver. | :warning: The overall database content is lost.<br />Mandatory argument is the database variant. Optional arguments are`socket` and Joomla instances. |
 | [graft](graft.sh) | Grafting a Joomla package onto a branch. | :warning: The overall database content is lost.<br />Mandatory argument is the Joomla package. Optional argument is the database variant.|
 | [info](info) | Retrieves Joomla Branches Tester status information. | Optional arguments are `instance`, `base` and Joomla instances. |
-| [patch](patch.sh) | Apply Git patches in 'joomla-cms', 'joomla-cypress' or 'joomla-framework/database'. | Arguments are one or multipe patches and optional Joomla instances. |
+| [patch](patch.sh) | Apply Git patches in 'joomla-cms', 'joomla-cypress' or 'joomla-framework/database'. | Arguments are one or multiple patches and optional Joomla instances. |
 | [patchtester](patchtester.sh) | Installs and configures Joomla patch tester component in one or all Joomla instances. | The GitHub token comes from environment variable `JBT_GITHUB_TOKEN` or as mandatory argument. Optional argumenta are the Joomla instances. |
 | [php](php.sh) | Change used PHP version. | Mandatory is the PHP version, e.g. `php8.3`. Optional arguments are the Joomla instances. |
 | [pull](pull.sh) | Running `git pull` and more. | Optional arguments are the Joomla instances. |

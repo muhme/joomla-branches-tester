@@ -60,6 +60,32 @@ At the beginning of November 2024, these are `4.4-dev`, `5.1-dev`, `5.2-dev`, `5
 :point_right: Since **used** branches are subject to frequent changes,
               the latest version numbers are always be retrieved directly from the `joomla-cms` repository.
 
+For the web server containers, the official Docker Joomla images (e.g., `5.2-php8.3-apache`) are used as a starting point to simplify life.
+Within the container, the source code from the corresponding Joomla Git development branch or tag is copied and a second Joomla installation is run.
+Refer to the [Versions](#versions) section for a list of all usable Joomla versions and Docker images available for each Joomla version.
+
+### JBT Parallel Installation Environment
+
+JBT has its own Cypress installation environment located in the `installation` folder.
+This environment includes Cypress, the latest main branch version of `joomla-cypress` and three Cypress scripts:
+* Install Joomla
+* Disable Joomla B/C plugins
+* Install and configure Joomla Patch Tester
+
+The scripts capture Joomla web application JavaScript errors to prevent Cypress from stopping unexpectedly.
+The JavaScript errors are displayed, logged and can be verified using `scripts/check`.
+
+Furthermore, the installation environment saves each Joomla release's `installation` folder
+to preserve it and restore it if needed for the next Joomla installation,
+e.g. when switching databases after grafting.
+
+### Version Naming
+
+With `scripts/create`, Joomla versions need to be specified as a Git branch (e.g., `5.2-dev`) or a Git tag (e.g., `5.1.1-rc1`).  
+When creating an instance from a Git branch, either the full branch name or just the major and minor version numbers can be used (e.g., `52` instead of `5.2-dev`).  
+Once the Joomla instances are created, all other scripts use only the major and minor version numbers.  
+For example, an instance created from the Git tag `3.10.12` runs as `jbt-310`, and you can use `310` throughout to specify the instance.
+
 <details>
   <summary>See the detailed list of Docker containers.</summary>
 
@@ -99,7 +125,8 @@ The abbreviation `jbt` stands for Joomla Branches Tester.
     database port are used to avoid performance issues.
 2. **Running Cypress GUI on the Docker host**: `localhost` and the mapped database port are used instead,
     as Docker container hostnames aren't accessible outside Docker,
-    and no performance issues have been observed in this configuration.<br /><br />
+    and no performance issues have been observed in this configuration.
+   
     Therefore, there is a separate Cypress configuration file `cypress.config.local.mjs`
     for the local execution of Cypress GUI on the Docker host.
 
@@ -161,31 +188,20 @@ but depending on the platform, it may ask you to enter your user password for in
 The initial `scripts/create` runs some time,
 especially the very first time when the Docker images still need to be downloaded.
 For this installation with five Joomla web server containers the
-`joomla-branches-tester` folder requires about of 2 GB of disc space.
-Docker needs additional about of 20 GB for images and volumes.
+`joomla-branches-tester` folder requires about 2 GB of disc space.
+Docker needs additionally about 20 GB for images and volumes.
 If you are installing for the first time and downloading all necessary Docker images,
 you will need to download approximately 4 GB of data over the network.
 
 <details>
-  <summary>Background and optional arguments.</summary>
+  <summary>Optional <code>scripts/create</code> Parameters</summary>
 
 ---
 
-For the web server containers, the official Docker Joomla images (e.g., `5.2-php8.3-apache`) are used as a starting point to simplify life.
-Within the container, the source code from the corresponding Joomla Git development branch or tag is copied and a second Joomla installation is run.
-Refer to the [Versions](#versions) section for a list of all usable Joomla versions and Docker images available for each Joomla version.
-
-JBT has its own Cypress installation environment located in the `installation` folder.
-This environment includes Cypress, the latest main branch version of `joomla-cypress` and three Cypress scripts:
-* Install Joomla
-* Disable Joomla B/C plugins
-* Install and configure Joomla Patch Tester
-
 <img align="right" src="images/joomla-branches-tester.svg" width="400">
 
-Optional Parameters are:
 *  Install can use multiple Joomla versions, e.g. two tags and two dev-branches `3.9.28 3.10.12 52 60`
-   (your system architecture will look like the picture on the right), default setting is for all dev-branches.
+   (your system architecture will look like the picture on the right), defaults to all dev-branches.
 *  The used database and database driver, e.g. `pgsql`, defaults to use MariaDB with MySQLi driver.
 *  The used PHP version. For available PHP versions see [Versions](#versions) section. Defaults to `highest`.
    See more details in [Switch PHP Version](#switch-php-version).
@@ -374,7 +390,8 @@ The Joomla development version installed in the web server container is configur
 - Joomla Super User: `ci-admin` with the password `joomla-17082005` (used from CI System Tests).
 - Used language Pack is English (United Kingdom) (`en-GB`).
 - The `/installation` folder remains intact after the installation.
-  - Earlier Joomla versions delete the `/installation` folder after setup. If the folder is missing, it is checked out from Git during the next installation.
+  - Earlier Joomla versions delete the `/installation` folder after setup.
+    If the folder is missing, it is checked out from Git during the next installation.
 - Error Reporting is set to `Maximum` in `Global Configuration | Server`.
 - A cron job is configured to run the Joomla Task Scheduler every minute.
 - The 'System - Joomla! Statistics' plugin is disabled to prevent prompting users on the backend Home Dashboard.
@@ -432,7 +449,7 @@ And the configurations for `php-cs-fixer` and `phpcs` has been extended to exclu
 
 ### Cypress Automated System Tests
 
-To simple run the Joomla System Tests with all specs - except for the installation step -
+To simply run the Joomla System Tests with all specs - except for the installation step -
 from the [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System) in all Joomla instances with headless Cypress:
 ```
 scripts/test system
@@ -485,7 +502,7 @@ scripts/test 44 system administrator/components/com_actionlogs/Actionlogs.cy.js
 
 ### Cypress Interactive System Tests
 
-If a test spec fails, the screenshot is helpful. More enlightening is it to execute the single failed test spec
+If a test spec fails, the screenshot is helpful. More enlightening is to execute the single failed test spec
 with the Cypress GUI in interactive mode. You can see all the Cypress log messages, use the time-traveling debugger and
 observe how the browser runs in parallel.
 
@@ -495,7 +512,7 @@ Cypress GUI can be started from Docker container `jbt-cypress` with X11 forwardi
 scripts/cypress 51
 ```
 
-Or from local installed Cypress (recommended for macOS and native Ubuntu) with additional argument `local`:
+Or from locally installed Cypress (recommended for macOS and native Ubuntu) with additional argument `local`:
 ```
 scripts/cypress 51 local
 ```
@@ -512,7 +529,7 @@ If you run Cypress locally, only the browsers installed on your Docker host syst
 ### Check Email
 
 To check the emails sent by Joomla,
-the [MailDev](https://hub.docker.com/r/maildev/maildev) container offers you
+the [MailDev](https://hub.docker.com/r/maildev/maildev) container 
 provides you with a web interface at [http://host.docker.internal:7004](http://host.docker.internal:7004).
 The Cypress based Joomla System Tests is using an own SMTP server `smtp-tester` to receive, check and delete emails.
 Since we run Cypress locally or in a container, it is necessary to triple emails.
@@ -691,11 +708,11 @@ If changes are pulled then:
 
 Finally, the Git status is displayed.
 
-<img align="right" src="images/phpMyAdmin.png">
-<img align="right" src="images/pgAdmin.png" width="240px">
-
 👉 This works only for dev-branch based Joomla instances.
    If the instance was installed from a tag or is a grafted one, then `scripts/pull` skips over the instance.
+   
+<img align="right" src="images/phpMyAdmin.png">
+<img align="right" src="images/pgAdmin.png" width="240px">
 
 ### :fairy: Gaze Into the Spellbook
 
@@ -758,7 +775,7 @@ docker exec -it jbt-pg bash -c "PGPASSWORD=root psql -h fd00::13 -U root -d post
 For your convenience, the latest version of the
 [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester)
 can be installed on the Joomla instances from version 4.2 onwards.
-The script also sets the GitHub token and fetch the data.
+The script also sets the GitHub token and fetches the data.
 This can be done without version number for all Joomla instances or for e.g. Joomla 5.3:
 
 ```
@@ -942,14 +959,26 @@ Optional Arguments:
 
 If no argument is provided, the log file will be checked for errors and critical messages by default.
 
-Example:
+Example to see last file JBT log messages only:
 ```
 scripts/check jbt
 ```
 
+Sometimes everything appears to be working fine, but errors may still occur.
+For example, Joomla JavaScript exceptions might be caught during installation.
+As there are numerous log messages, you might overlook them.
+However, you can run `scripts/check` after running `scripts/create`,
+`scripts/database`, `scripts/patchtester` or `scripts/graft` and you will see the error.
+You can then investigate the JavaScript exception in the log file. For example:
+
+```
+[6927:1114/174511.623420:INFO:CONSOLE(1230)] "ERROR uncaught:exception err :TypeError: The following error originated from your application code, not from Cypress.
+  > Cannot read properties of null (reading 'getAttribute')
+```
+
 ### Cleaning Up
 
-If you want to rid of all Docker containers and free up multiple gigabytes of disk space from the `joomla-*` and other directories, simply run:
+If you want to be rid of all Docker containers and free up multiple gigabytes of disk space from the `joomla-*` and other directories, simply run:
 
 ```
 scripts/clean
@@ -968,7 +997,7 @@ you will lose all additionally installed extensions as the files are installed f
 
 Switching between PHP versions using `scripts/php` or
 enabling/disabling Xdebug with `scripts/xdebug` does not affect consistency.
-Both the file system and the database remain unchanged.
+The Joomla files and the database remain unchanged.
 
 If you've used `scripts/patchtester` to install the Joomla Patch Tester,
 remember that it’s a Joomla extension.
