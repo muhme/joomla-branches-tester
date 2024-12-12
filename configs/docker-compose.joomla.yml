@@ -24,7 +24,6 @@
     volumes:
       - .:/jbt
       - ./joomla-XXX:/var/www/html
-      - ./cypress-cache:/root/.cache/Cypress # Cypress and web server containers
       - mysql-socket:/var/run/mysql-socket
       - mariadb-socket:/var/run/mariadb-socket
       - postgresql-socket:/var/run/postgresql-socket

@@ -22,6 +22,7 @@ Within [Docker](https://www.docker.com/) container environment you are able to:
 * Grafting a Joomla package.
 * Using Xdebug for PHP debugging.
 * Using IPv6 network.
+* Allows patching and testing of the `joomla-cypress` NPM module.
 
 ![Joomla Branches Software Architecture](images/joomla-branches-tester-52.svg)
 
@@ -75,15 +76,17 @@ This environment includes Cypress, the latest main branch version of `joomla-cyp
 The scripts capture Joomla web application JavaScript errors to prevent Cypress from stopping unexpectedly.
 The JavaScript errors are displayed, logged and can be verified using `scripts/check`.
 
-Furthermore, the installation environment saves each Joomla release's `installation` folder
-to preserve it and restore it if needed for the next Joomla installation,
-e.g. when switching databases after grafting.
+The installation environment retains each Joomla release's `installation` folder
+to preserve it for future use, allowing restoration when needed, such as switching databases after grafting.
+
+The `installation/joomla-cypress` folder is also used to test the `joomla.cypress` module itself.
+For more details, see the [Testing NPM Module joomla-cypress](#testing-npm-module-joomla-cypress) section.
 
 ### Version Naming
 
-With `scripts/create`, Joomla versions need to be specified as a Git branch (e.g., `5.2-dev`) or a Git tag (e.g., `5.1.1-rc1`).  
-When creating an instance from a Git branch, either the full branch name or just the major and minor version numbers can be used (e.g., `52` instead of `5.2-dev`).  
-Once the Joomla instances are created, all other scripts use only the major and minor version numbers.  
+With `scripts/create`, Joomla versions need to be specified as a Git branch (e.g., `5.2-dev`) or a Git tag (e.g., `5.1.1-rc1`).
+When creating an instance from a Git branch, either the full branch name or just the major and minor version numbers can be used (e.g., `52` instead of `5.2-dev`).
+Once the Joomla instances are created, all other scripts use only the major and minor version numbers.
 For example, an instance created from the Git tag `3.10.12` runs as `jbt-310`, and you can use `310` throughout to specify the instance.
 
 <details>
@@ -119,14 +122,14 @@ The abbreviation `jbt` stands for Joomla Branches Tester.
 :eight_pointed_black_star: Gnome: *"Yes, yes, I know that `11` in decimal is `B` in hex, but can you instantly recall that `44` is `2C`? That's why, for easier visual recognition, we're sticking with `11` — it just needs to be unique!"*
 
 :point_right: Using `host.docker.internal` ensures consistent hostnames and URLs between containers and the Docker host machine.
-              However, there are exceptions to note:
+              However, there are exclusions to note:
 
 1. **Database Performance**: For database connections, the Docker container name and the default
     database port are used to avoid performance issues.
 2. **Running Cypress GUI on the Docker host**: `localhost` and the mapped database port are used instead,
     as Docker container hostnames aren't accessible outside Docker,
     and no performance issues have been observed in this configuration.
-   
+
     Therefore, there is a separate Cypress configuration file `cypress.config.local.mjs`
     for the local execution of Cypress GUI on the Docker host.
 
@@ -494,7 +497,7 @@ execution of the automated tests with the URL:
 scripts/test 53 system novnc administrator/components/com_users/Users.cy.js
 ```
 
-To additional show `console.log` messages from Electron browser by setting environment variable: 
+To additional show `console.log` messages from Electron browser by setting environment variable:
 ```
 export ELECTRON_ENABLE_LOGGING=1
 scripts/test 44 system administrator/components/com_actionlogs/Actionlogs.cy.js
@@ -529,7 +532,7 @@ If you run Cypress locally, only the browsers installed on your Docker host syst
 ### Check Email
 
 To check the emails sent by Joomla,
-the [MailDev](https://hub.docker.com/r/maildev/maildev) container 
+the [MailDev](https://hub.docker.com/r/maildev/maildev) container
 provides you with a web interface at [http://host.docker.internal:7004](http://host.docker.internal:7004).
 The Cypress based Joomla System Tests is using an own SMTP server `smtp-tester` to receive, check and delete emails.
 Since we run Cypress locally or in a container, it is necessary to triple emails.
@@ -710,7 +713,7 @@ Finally, the Git status is displayed.
 
 👉 This works only for dev-branch based Joomla instances.
    If the instance was installed from a tag or is a grafted one, then `scripts/pull` skips over the instance.
-   
+
 <img align="right" src="images/phpMyAdmin.png">
 <img align="right" src="images/pgAdmin.png" width="240px">
 
@@ -848,6 +851,61 @@ For instance, [database-317](https://github.com/joomla-framework/database/pull/3
 👉 All these patches are for the web server Docker containers running the Joomla instances.
   JBT uses its own Cypress installation environment with the latest `joomla-cypress` main branch clone.
 
+
+### Testing NPM module joomla-cypress
+
+The NPM module [joomla-cypress](https://github.com/joomla-projects/joomla-cypress)
+has its own Cypress-based test suite. For more information
+see [joomla-cypress/cypress](https://github.com/joomla-projects/joomla-cypress/cypress).
+
+The JBT `installation/joomla-cypress` directory contains the latest version of the `main` branch
+for Cypress-based Joomla-installation. And this can also be used to test the NPM module itself.
+
+👉 There are different installations of `installation/joomla-cypress` used for JBT installation and
+  testing the module itself, and `node_modules/joomla-cypress`,
+  which is installed in each Joomla instance for Joomla System Tests.
+
+Patching `installation/joomla-cypress`:
+```bash
+scripts/patch installation joomla-cypress-37
+```
+
+Running `joomla-cypress` Cypress tests headlessly with Joomla version 5.2:
+```bash
+scripts/test 52 joomla-cypress
+```
+
+Running `joomla-cypress` Cypress tests without `installLanguage` and `installJoomlaMultiLanguage`
+on Joomla version 6.0 (if language packages are not yet available and tests would fail with error
+`Unable to detect manifest file.`):
+```bash
+CYPRESS_SKIP_INSTALL_LANGUAGES=1 scripts/test 60 joomla-cypress
+```
+
+Running only the `user.cy.js` test spec file and watching the progress with NoVNC:
+```bash
+scripts/test 52 joomla-cypress tests/user.cy.js novnc
+```
+
+Running the tests with local Cypress GUI:
+```bash
+scripts/cypress 60 joomla-cypress local
+```
+
+JBT automatically restores the `installation` folder if it is missing and
+runs `npm ci` if you use either `scripts/test` or `scripts/cypress`.
+
+The environment variable `CYPRESS_SERVER_UPLOAD_FOLDER`, required for the `installExtensionFromFolder` test,
+is set for you.
+
+👉 Restoring the `installation` folder only works once per test run.
+  You cannot open the GUI and run `joomla.cy.js` test spec twice.
+
+👉 JBT's Joomla installation (using `scripts/create` or `scripts/database`) disables
+  the Backward Compatibility (B/C) plugin.
+  However, when running `joomla-cypress` tests, Joomla is reinstalled and the B/C plugin is not disabled.
+  To have the B/C plugin disabled again, you will need to recreate the Joomla instance.
+
 ### Versions
 
 Running `scripts/versions` without any arguments will display all available branches and tags with Joomla versions.
@@ -918,13 +976,13 @@ jbt-51 Branch development
   Container jbt-51 is running, ports: 80/tcp -> 0.0.0.0:7051
   Joomla Version: Joomla! 5.1.0 Stable
   PHP 8.1.29
-  MySQLi, jbt-madb, 
+  MySQLi, jbt-madb,
   /joomla-51: 393MB
 jbt-53 Branch 5.3-dev
   Container jbt-53 is running, ports: 80/tcp -> 0.0.0.0:7053
   Joomla Version: Joomla! 5.3.0 Development
   PHP 8.3.11
-  PostgreSQL(PDO), jbt-pg, 
+  PostgreSQL(PDO), jbt-pg,
   /joomla-53: 525MB
   Git Repository joomla-53/libraries/vendor/joomla/database/
     Remote Origin: https://github.com/joomla-framework/database
@@ -1056,7 +1114,7 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
 ## Limitations
 
 * The different Joomla versions exist in parallel, but the test runs sequentially, as there is the one Cypress container used.
-* Database server versions cannot be changed. 
+* Database server versions cannot be changed.
 * The setup does not support HTTPS, secure connections issues are not testable. → [#7](https://github.com/muhme/joomla-branches-tester/issues/7)
 * If IPv6 networking is chosen, it is used only within Docker.
 * The predefined port range run from 7000 to 7900. If another service is already using this range, it may cause a conflict. → [#3](https://github.com/muhme/joomla-branches-tester/issues/3)

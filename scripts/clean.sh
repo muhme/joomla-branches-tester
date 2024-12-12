@@ -87,8 +87,6 @@ for dir in branch_*; do
   fi
 done
 
-
-
 # Delete all log files, except the actual one :)
 if [ -d "logs" ]; then
   log "Removing all files in the 'logs' directory, except for the most recent one"
@@ -109,7 +107,7 @@ for dir in "${HOME}/Library/Caches/Cypress" "${HOME}/.cache/Cypress"; do
 done
 
 # Deleting files listed in .gitignore, even though it's not required, to ensure cleanup.
-for file in "docker-compose.yml" "docker-compose.new"; do
+for file in "docker-compose.yml" "docker-compose.new" "installation/package.json" "installation/package-lock.json"; do
   if [ -f "${file}" ]; then
     log "Deleting file '${file}' to ensure complete cleanup"
     rm -f "${file}" 2>/dev/null || sudo bash -c "rm -f \"${file}\""

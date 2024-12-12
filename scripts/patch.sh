@@ -14,7 +14,9 @@ source scripts/helper.sh
 
 function help {
   echo "
-    patch – Applies Git patches in the 'joomla-cms', 'joomla-cypress' or 'joomla-framework/database' repositories.
+    patch – Applies Git patches in the 'joomla-cms', 'joomla-cypress' and 'joomla-framework/database'
+            Joomla repositories or in 'installation/joomla-cypress' repository.
+            If 'installation' option is given 'installation/joomla-cypress' is patched.
             The optional Joomla version can be one or more of: ${allInstalledInstances[*]} (default is all).
             Specify one or more patches e.g. 'joomla-cms-43968', 'joomla-cypress-33' or 'database-310'.
             The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
@@ -25,11 +27,17 @@ patches=()
 # shellcheck disable=SC2207 # There are no spaces in version numbers
 allInstalledInstances=($(getAllInstalledInstances))
 instancesToPatch=()
+installation=false
+# Don't use "jbt-${repo_version}", use 'jbt-merged' as constant as with Git merge the repository version may change.
+merge_branch="jbt-merged"
 
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
     exit 0
+  elif [ "$1" = "installation" ]; then
+    installation=true
+    shift # Argument is eaten as patching installation/joomla-cypress.
   elif [ -d "joomla-$1" ]; then
     instancesToPatch+=("$1")
     shift # Argument is eaten as one version number.
@@ -43,23 +51,71 @@ while [ $# -ge 1 ]; do
   fi
 done
 
-# If no instance was given, use all.
-if [ ${#instancesToPatch[@]} -eq 0 ]; then
-  instancesToPatch=("${allInstalledInstances[@]}")
-fi
 if [ ${#patches[@]} -eq 0 ]; then
   help
   error "Please provide at least one patch, e.g. 'joomla-cypress-33'."
   exit 1
 fi
 
-for instance in "${instancesToPatch[@]}"; do
+# Patching 'installation/joomla-cypress'
+if [[ "$installation" == true ]]; then
+  # Without instance number
+  if [ ${#instancesToPatch[@]} -ne 0 ]; then
+    help
+    error "Patching 'installation/joomla-cypress' don't need Joomla version."
+    exit 1
+  fi
+  # Without other patches
+  for patch in "${patches[@]}"; do
+    repo="${patch%-*}" # 'joomla-cms', 'database' or 'joomla-cypress'
+    if [[ "$repo" = "joomla-cms" || "$repo" = "database" ]]; then
+      help
+      error "Patching 'installation/joomla-cypress' cannot be combined with '${patch}'."
+      exit 1
+    fi
+  done
 
+  # Use the first Joomla docker instance for working with Git
+  instance=${allInstalledInstances[0]}
+
+  for patch in "${patches[@]}"; do
+    log "installation/joomla-cypress – Starting with PR '${patch}'"
+    patch_number="${patch##*-}" # e.g. 31
+    current_branch=$(docker exec "jbt-${instance}" bash -c "cd /jbt/installation/joomla-cypress && git branch --show-current")
+    # Case 1: joomla-cypress is already Git cloned, only to create merge branch first time
+    if [ "${current_branch}" != "${merge_branch}" ]; then
+      log "installation/joomla-cypress – Create '${merge_branch}' branch and switch to it"
+      docker exec "jbt-${instance}" bash -c "cd /jbt/installation/joomla-cypress && git checkout -b ${merge_branch}"
+    fi
+    # Case 2: Check if the patch has already been applied in existing Git repository.
+    # TODO: ?Needed? check PR is already included in the release
+    if docker exec "jbt-${instance}" bash -c "
+        cd /jbt/installation/joomla-cypress
+        git fetch origin \"pull/${patch_number}/head:jbt-pr-${patch_number}\"
+        git merge-base --is-ancestor \"jbt-pr-${patch_number}\" \"${merge_branch}\""; then
+          log "installation/joomla-cypress  – PR '${patch}' has already been applied"
+      continue
+    else 
+      # Case 3: Apply the patch to the existing Git repository
+      # Using a simple Git merge (instead of a three-way diff) to apply the specific PR differences between
+      # the two branches. This may introduce additional changes, but ensures the merge is possible.
+      log "installation/joomla-cypress – Apply PR ${patch}"
+      docker exec "jbt-${instance}" bash -c "cd /jbt/installation/joomla-cypress && git merge \"jbt-pr-${patch_number}\""
+    fi
+  done
+  exit 0
+fi
+
+# If no instance was given, use all.
+if [ ${#instancesToPatch[@]} -eq 0 ]; then
+  instancesToPatch=("${allInstalledInstances[@]}")
+fi
+
+# Patching Joomla instance
+for instance in "${instancesToPatch[@]}"; do
   for patch in "${patches[@]}"; do
     repo="${patch%-*}" # 'joomla-cms', 'database' or 'joomla-cypress'
     patch_number="${patch##*-}" # e.g. 43968, 31 or 33
-    # Don't use "jbt-${repo_version}", use 'jbt-merged' as constant as with Git merge the repository version may change.
-    merge_branch="jbt-merged"
 
     log "jbt-${instance} – Starting with PR '${patch}'"
 

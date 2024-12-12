@@ -1,4 +1,4 @@
-/*
+/**
  * installJoomla.cy.js - Cypress script to install Joomla 3 ... Joomla 6
  * 
  * Used by 'scripts/database'.
@@ -6,7 +6,8 @@
  * Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
  * https://github.com/muhme/joomla-branches-tester
  */
-import { registerCommands } from "./node_modules/joomla-cypress";
+
+import { registerCommands } from "./registerCommands";
 registerCommands();
 
 describe('Install Joomla', () => {

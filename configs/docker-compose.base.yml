@@ -188,7 +188,6 @@ services:
       - .:/jbt
       - ~/.Xauthority:/root/.Xauthority:rw
       - /tmp/.X11-unix:/tmp/.X11-unix
-      - ./cypress-cache:/root/.cache/Cypress # Cypress and web server containers
       - mysql-socket:/var/run/mysql-socket
       - mariadb-socket:/var/run/mariadb-socket
       - postgresql-socket:/var/run/postgresql-socket

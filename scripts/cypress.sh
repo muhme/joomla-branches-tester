@@ -1,8 +1,9 @@
 #!/bin/bash
 #
 # cypress.sh - Running Cypress GUI, either from a Docker container or using locally installed Cypress.
-#   scripts/cypress 51         # macOS and Ubuntu native
-#   scripts/cypress 51 local   # Windows WSL2 Ubuntu
+#   scripts/cypress 51                  # Joomla System Tests on Windows WSL 2 Ubuntu
+#   scripts/cypress 51 local            # Joomla System Tests on macOS and Ubuntu native
+#   scripts/cypress 52 joomla-cypress   # joomla-cypress tests
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
@@ -15,10 +16,11 @@ fi
 source scripts/helper.sh
 
 function help {
-    echo "
+  echo "
     cypress – Runs the Cypress GUI, either from Docker container or locally installed Cypress.
               The mandatory Joomla instance must be one of installed: ${allInstalledInstances[*]}.
-              The optional 'local' argument runs Cypress on the Docker host (default is the Docker container).
+              The optional 'local' argument runs Cypress on the Docker host (default: Docker container).
+              The optional 'joomla-cypress' argument tests 'joomla-cypress' (default: Joomla System Tests).
               The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
     $(random_quote)"
 }
@@ -27,6 +29,7 @@ function help {
 allInstalledInstances=($(getAllInstalledInstances))
 
 local=false
+joomla_cypress=false
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
     help
@@ -37,6 +40,9 @@ while [ $# -ge 1 ]; do
   elif [ "$1" = "local" ]; then
     local=true
     shift # Argument is eaten to run Cypress directly on the Docker host.
+  elif [ "$1" = "joomla-cypress" ]; then
+    joomla_cypress=true
+    shift # Argument is eaten to run Cypress for joomla-cypress
   else
     help
     error "Argument '$1' is not valid."
@@ -50,35 +56,78 @@ if [ -z "${instance}" ]; then
   exit 1
 fi
 
+if ${joomla_cypress}; then
+  cypress_dir="installation/joomla-cypress"
+  # joomla-cypress' installJoomlaMultilingualSite() test deletes installation directory – restore it
+  if [ ! -d "joomla-${instance}/installation" ]; then
+    if [ -d "installation/joomla-${instance}/installation" ]; then
+      log "jbt-${instance} – Restoring 'joomla-${instance}/installation' directory"
+      cp -r "installation/joomla-${instance}/installation" "joomla-${instance}/installation" 2>/dev/null ||
+        sudo cp -r "installation/joomla-${instance}/installation" "joomla-${instance}/installation"
+      if [ -f "joomla-${instance}/package.json" ]; then
+        log "jbt-${instance} – Running npm clean install"
+        docker exec "jbt-${instance}" bash -c 'cd /var/www/html && npm ci'
+      fi
+    else
+      error "jbt-${instance} – Missing 'joomla-${instance}/installation' directory"
+      # Proceed in the hope that it will not be needed
+    fi
+  fi
+else
+  cypress_dir="joomla-${instance}"
+fi
+
 # Use of SMTP port 7325 for the smtp-tester, as port 7125 is occupied by the mapping for the Cypress container.
-if $local; then
-  cd "joomla-${instance}" || {
-    error "OOPS - Unable to move into the 'joomla-${instance}' directory, giving up."
+if ${local}; then
+  # Don't use 'cypress-cache' for local running Cypress GUI, as e.g. macOS reinstalls with Cypress.app and
+  # Linux is later missing Cypress. Users' Cypress default cache is used.
+  export CYPRESS_CACHE_FOLDER="${HOME}/.cache/Cypress"
+  cd "${cypress_dir}" || {
+    error "OOPS - Unable to move into the '${cypress_dir}' directory, giving up."
     exit 1
   }
-  # Install the Cypress version used in this Joomla instance, if needed
-  log "Installing Cypress if needed"
+  # Install the Cypress version used in this Joomla instance or installation/joomla-cypress, if needed
+  log "Installing required Cypress binary version locally (if needed)"
+  npx cypress install 2>/dev/null ||
+    sudo bash -c "CYPRESS_CACHE_FOLDER=$CYPRESS_CACHE_FOLDER npx cypress install && chown -R $USER $CYPRESS_CACHE_FOLDER"
 
-  # If it fails, try again with sudo, but specify the user's cache directory and chown afterwards.
-  npm install cypress 2>/dev/null || \
-    sudo bash -c "CYPRESS_CACHE_FOLDER=~$USER/.cache/Cypress npm install cypress && chown -R $USER ~$USER/.cache/Cypress"
-  # Install Cypress binary.
-  npx cypress install 2>/dev/null || \
-    sudo bash -c "CYPRESS_CACHE_FOLDER=~$USER/.cache/Cypress npx cypress install && chown -R $USER ~$USER/.cache/Cypress"
-
-  if [ -f "cypress.config.local.mjs" ]; then
-    config_file="cypress.config.local.mjs"
-  elif [ -f "cypress.config.local.js" ]; then
-    config_file="cypress.config.local.js"
+  if ${joomla_cypress}; then
+    prefix="../joomla-${instance}/"
   else
-    error "There is no file 'joomla-${instance}/cypress.config.local.*js'."
+    prefix=""
+  fi
+  if [ -f "${prefix}cypress.config.local.mjs" ]; then
+    config_file="${prefix}cypress.config.local.mjs"
+  elif [ -f "${prefix}cypress.config.local.js" ]; then
+    config_file="${prefix}cypress.config.local.js"
+  else
+    error "There is no file '${prefix}cypress.config.local.*js'."
     exit 1
   fi
+
+  # For installExtensionFromFolder() in joomla-cypress/cypress/extensions.cy.js needed
+  # to find 'mod_hello_world' folder. And we can not use 'fixturesFolder' as this is
+  # needed for installExtensionFromFileUpload() with default 'cypress/fixtures'.
+  export CYPRESS_SERVER_UPLOAD_FOLDER='/jbt/installation/joomla-cypress/cypress/fixtures/mod_hello_world'
+
+  # For joomla-cypress you can set CYPRESS_SKIP_INSTALL_LANGUAGES=1
+  # to skip installLanguage() and installJoomlaMultilingual() tests. Default here to run the test.
+  export CYPRESS_SKIP_INSTALL_LANGUAGES=${CYPRESS_SKIP_INSTALL_LANGUAGES:-0}
+
   log "jbt-${instance} – Open locally installed Cypress GUI"
   npx cypress open --e2e --project . --config-file "${config_file}"
   # By the way, the same way it is possible to run Cypress headless from Docker host.
 else
   log "jbt-${instance} – Open jbt-cypress container Cypress GUI"
+  # Install the Cypress version used in this Joomla instance or installation/joomla-cypress, if needed
+  log "Installing Cypress (if needed)"
+  # # If it fails, try again with sudo, but specify the user's cache directory and chown afterwards.
+  # docker exec jbt-cypress bash -c "cd \"/jbt/${cypress_dir}\" &&
+  #                                  CYPRESS_CACHE_FOLDER=/jbt/cypress-cache \
+  #                                  npm install cypress"
   # Open Cypress e.g. on Windows WSL2 Docker container.
-  docker exec jbt-cypress bash -c "cd \"/jbt/joomla-${instance}\" && DISPLAY=:0 cypress open --env smtp_port=7325 --e2e --project ."
+  docker exec jbt-cypress bash -c "cd \"/jbt/${cypress_dir}\" && \
+                                   CYPRESS_CACHE_FOLDER=/jbt/cypress-cache \
+                                   CYPRESS_SKIP_INSTALL_LANGUAGES=$CYPRESS_SKIP_INSTALL_LANGUAGES \
+                                   DISPLAY=:0 cypress open --env smtp_port=7325 --e2e --project ."
 fi

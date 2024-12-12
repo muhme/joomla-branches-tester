@@ -32,14 +32,16 @@ source scripts/helper.sh
 #   db_password: 'root',
 #   smtp_host: 'host.docker.internal',
 #   smtp_port: '7025',
+#   instance: 44,
+#   installationPath: '/jbt/joomla-44',
 #
 # Using database host and default port Docker-inside as performance issues are seen in using host.docker.internal
 #
 function configureCypressConfig {
-  local from="$1" to="$2" instance="$3" baseurl="$4" dbtype="$5" dbhost="$6" dbport="$7" smtphost="$8" smtpport="$9"
+  local from="${1}" to="${2}" instance="${3}" baseurl="${4}" dbtype="${5}" dbhost="${6}" dbport="${7}" 
+  local smtphost="${8}" smtpport="${9}"
 
   docker exec "jbt-${instance}" bash -c "sed \
-    -e \"s|instance: .*|instance: '${instance}',|\" \
     -e \"s|db_type: .*|db_type: '${dbtype}',|\" \
     -e \"s|db_name: .*|db_name: 'test_joomla_${instance}',|\" \
     -e \"s|db_prefix: .*|db_prefix: 'jos${instance}_',|\" \
@@ -49,6 +51,8 @@ function configureCypressConfig {
     -e \"s|db_password: .*|db_password: 'root',|\" \
     -e \"s|smtp_host: .*|smtp_host: '${smtphost}',|\" \
     -e \"s|smtp_port: .*|smtp_port: '${smtpport}',|\" \
+    -e \"s|instance: .*|instance: '${instance}',|\" \
+    -e \"s|installationPath: .*|installationPath: '/jbt/joomla-${instance}',|\" \
     '${from}' > '${to}'"
 }
 
@@ -113,33 +117,15 @@ if [ ${#instancesToChange[@]} -eq 0 ]; then
   instancesToChange=("${allInstalledInstances[@]}")
 fi
 
-# JBT Cypress Installation Environment
-
-if [ ! -d "installation/node_modules" ]; then
-  log "Performing a clean install of 'cypress' in 'installation/node_modules' directory"
-  docker exec "jbt-cypress" bash -c "cd /jbt/installation && npm ci"
-  log "Adding 'joomla-cypress' module as a Git shallow clone of the main branch"
-  docker exec "jbt-cypress" bash -c "cd /jbt/installation/node_modules && \
-                                     git clone --depth 1 https://github.com/joomla-projects/joomla-cypress"
-   # Seen on Ubuntu, 13.10.0 was installed, but 12.13.2 needed for the Joomla instance
-  log "Install Cypress (if needed)"
-  # docker exec jbt-cypress sh -c "cd /jbt/installation && npx cypress install"
-  # Seen on macOS, 13.13.3 was installed, npx cypress install did not install needed 13.13.0
-  # docker exec jbt-cypress sh -c "cd /jbt/installation && npm run cypress:install"
-  # Seen on macOS, "The cypress npm package is installed, but the Cypress binary is missing."
-  docker exec jbt-cypress sh -c "cd /jbt/installation && cypress install"
-fi
-
 for instance in "${instancesToChange[@]}"; do
 
   docker exec "jbt-${instance}" bash -c "mkdir -p '/jbt/installation/joomla-${instance}' && \
-                                         cp /jbt/installation/installJoomla.cy.js '/jbt/installation/joomla-${instance}' && \
                                          rm -f '/jbt/joomla-${instance}/configuration.php'"
 
   log "jbt-${instance} – Configure Cypress for variant ${dbvariant} (driver '${dbtype}' host '${dbhost}')"
-  log "jbt-${instance} – Create 'installation/joomla-${instance}/cypress.config.js' file"
+  log "jbt-${instance} – Create 'installation/joomla-${instance}/cypress.config[.local].js' files"
 
-  # Cypress config for JBT installation environment
+  # Cypress configs for JBT installation environment
   configureCypressConfig "/jbt/configs/cypress.config.js" \
                          "/jbt/installation/joomla-${instance}/cypress.config.js" \
                          "${instance}" \
@@ -149,6 +135,15 @@ for instance in "${instancesToChange[@]}"; do
                          "" \
                          "host.docker.internal" \
                          "7025"
+  configureCypressConfig "/jbt/configs/cypress.config.js" \
+                         "/jbt/installation/joomla-${instance}/cypress.config.local.js" \
+                         "${instance}" \
+                         "http://localhost:7$(printf "%03d" "${instance}")/" \
+                         "${dbtype}" \
+                         "host.docker.internal" \
+                         "${dbport}" \
+                         "localhost" \
+                         "7325"
 
   # Cypress config files for Joomla instance (if needed)
   if [[ -f "joomla-${instance}/cypress.config.dist.js" || -f "joomla-${instance}/cypress.config.dist.mjs" ]]; then
@@ -194,12 +189,13 @@ for instance in "${instancesToChange[@]}"; do
   fi
 
   log "jbt-${instance} – Cypress-based Joomla installation"
-  docker exec jbt-cypress sh -c "cd '/jbt/installation/joomla-${instance}' && \
+  docker exec jbt-cypress sh -c "cd /jbt/installation && \
        CYPRESS_CACHE_FOLDER=/jbt/cypress-cache \
        DISPLAY=jbt-novnc:0 \
        ELECTRON_ENABLE_LOGGING=1 \
        CYPRESS_specPattern='/jbt/installation/installJoomla.cy.js' \
-       npx cypress run --headed"
+       npx cypress run --headed \
+                       --config-file '/jbt/installation/joomla-${instance}/cypress.config.js'"
 
   # Adopt 'configuration.php' as in 'tests/System/integration/install/Installation.cy.js'
   docker exec "jbt-${instance}" bash -c "sed -i \
@@ -212,12 +208,13 @@ for instance in "${instancesToChange[@]}"; do
 
   if (( instance != 310 && instance >= 41 )); then
     log "jbt-${instance} – Disable B/C plugin(s)"
-    if ! docker exec jbt-cypress sh -c "cd /jbt/installation/joomla-${instance} && \
+    if ! docker exec jbt-cypress sh -c "cd /jbt/installation && \
           CYPRESS_CACHE_FOLDER=/jbt/cypress-cache \
           DISPLAY=jbt-novnc:0 \
           ELECTRON_ENABLE_LOGGING=1 \
           CYPRESS_specPattern='/jbt/installation/disableBC.cy.js' \
-          npx cypress run --headed"; then
+          npx cypress run --headed \
+                          --config-file '/jbt/installation/joomla-${instance}/cypress.config.js'"; then
       error "jbt-${instance} – Ignoring failed step 'Disable B/C plugin'."
     fi
   fi

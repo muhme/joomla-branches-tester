@@ -21,13 +21,14 @@ source scripts/helper.sh
 trap - ERR
 
 function help {
-    echo "
+  echo "
     test – Runs tests on one, multiple or all installed Joomla instances.
            The optional Joomla version can be one or more of: ${allInstalledInstances[*]} (default is all).
            The optional 'novnc' argument sets DISPLAY to jbt-novnc:0 (default is headless).
            Optional browser can be 'chrome', 'edge' or 'firefox' (default is 'electron').
-           Specify an optional test name from: ${ALL_TESTS[*]} (default is all).
-           Optional Cypress spec file pattern for 'system' tests (default runs all without the installation step).
+           Specify an optional kind of test from: ${ALL_TESTS[*]}
+           (defaults to ${ALL_JOOMLA_TESTS[*]}).
+           Optional test spec file pattern for Cypress tests (defaults to all, but for 'system' without the installation step).
            The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
     $(random_quote)"
 }
@@ -35,7 +36,8 @@ function help {
 # shellcheck disable=SC2207 # There are no spaces in version numbers
 allInstalledInstances=($(getAllInstalledInstances))
 
-ALL_TESTS=("php-cs-fixer" "phpcs" "unit" "lint:css" "lint:js" "lint:testjs" "system")
+ALL_JOOMLA_TESTS=("php-cs-fixer" "phpcs" "unit" "lint:css" "lint:js" "lint:testjs" "system")
+ALL_TESTS=("${ALL_JOOMLA_TESTS[@]}" "joomla-cypress")
 testsToRun=()
 novnc=false
 browser=""
@@ -72,9 +74,18 @@ if [ ${#instancesToTest[@]} -eq 0 ]; then
   instancesToTest=("${allInstalledInstances[@]}")
 fi
 
+if [ ${#testsToRun[@]} -gt 1 ]; then
+  for test in "${testsToRun[@]}"; do
+    if [ "${test}" = "joomla-cypress" ]; then
+      error "The 'joomla-cypress' test cannot be combined with other tests."
+      exit 1
+    fi
+  done
+fi
+
 # If no test name was given, use all.
 if [ ${#testsToRun[@]} -eq 0 ]; then
-  testsToRun=("${ALL_TESTS[@]}")
+  testsToRun=("${ALL_JOOMLA_TESTS[@]}")
 fi
 
 # Pass through the environment variable to show 'console.log()' messages
@@ -96,9 +107,9 @@ for instance in "${instancesToTest[@]}"; do
   for actualTest in "${testsToRun[@]}"; do
 
     if [ "$actualTest" = "php-cs-fixer" ]; then
-      if (( instance == 310 || instance < 44 )); then
+      if ((instance == 310 || instance < 44)); then
         # In Finder.php line 592: The "/var/www/html/installation" directory does not exist.
-        log "jbt-${instance} – Skipping PHP Coding Standards Fixer – php-cs-fixer"
+        log "jbt-${instance} < 44 Skipping PHP Coding Standards Fixer – php-cs-fixer"
         skipped=$((skipped + 1))
         overallSkipped=$((overallSkipped + 1))
         continue
@@ -110,15 +121,15 @@ for instance in "${instancesToTest[@]}"; do
       # 2nd Ignore Joomla Patch Tester
       insert_file="joomla-${instance}/.php-cs-fixer.dist.php"
       insert_line="    ->notPath('/com_patchtester/')"
-      if [ -d "joomla-${instance}/administrator/components/com_patchtester" ] && \
-         [ -f "${insert_file}" ] && ! grep -qF "${insert_line}" "${insert_file}"; then
+      if [ -d "joomla-${instance}/administrator/components/com_patchtester" ] &&
+        [ -f "${insert_file}" ] && ! grep -qF "${insert_line}" "${insert_file}"; then
         log "jbt-${instance} – Patch Tester installation found, excluding from PHP-CS-Fixer"
         # file is owned by 'www-data' user on Linux
         chmod 666 "${insert_file}" 2>/dev/null || sudo chmod 666 "${insert_file}"
-        csplit "${insert_file}" "/->notPath('/" && \
-          cat xx00 > "${insert_file}" && \
-          echo "${insert_line}" >> "${insert_file}" && \
-          cat xx01 >> "${insert_file}" && \
+        csplit "${insert_file}" "/->notPath('/" &&
+          cat xx00 >"${insert_file}" &&
+          echo "${insert_line}" >>"${insert_file}" &&
+          cat xx01 >>"${insert_file}" &&
           rm xx00 xx01
       fi
       if docker exec "jbt-${instance}" bash -c "libraries/vendor/bin/php-cs-fixer fix -vvv --dry-run --diff"; then
@@ -134,9 +145,9 @@ for instance in "${instancesToTest[@]}"; do
     fi
 
     if [ "$actualTest" = "phpcs" ]; then
-      if (( instance == 310 || instance < 42 )); then
+      if ((instance == 310 || instance < 42)); then
         # ERROR: the "ruleset.xml" coding standard is not installed.
-        log "jbt-${instance} – Skipping PHP Coding Sniffer – phpcs"
+        log "jbt-${instance} < 42 Skipping PHP Coding Sniffer – phpcs"
         skipped=$((skipped + 1))
         overallSkipped=$((overallSkipped + 1))
         continue
@@ -145,12 +156,12 @@ for instance in "${instancesToTest[@]}"; do
       # 1st Ignore Joomla Patch Tester
       insert_file="joomla-${instance}/ruleset.xml"
       insert_line='    <exclude-pattern type="relative">^administrator/components/com_patchtester/*</exclude-pattern>'
-      if [ -d "joomla-${instance}/administrator/components/com_patchtester" ] && \
+      if [ -d "joomla-${instance}/administrator/components/com_patchtester" ] &&
          [ -f "${insert_file}" ] && ! grep -qF "${insert_line}" "${insert_file}"; then
-        csplit "${insert_file}" "/<exclude-pattern /" && \
-          cat xx00 > "${insert_file}" && \
-          echo "${insert_line}" >> "${insert_file}" && \
-          cat xx01 >> "${insert_file}" && \
+        csplit "${insert_file}" "/<exclude-pattern /" &&
+          cat xx00 >"${insert_file}" &&
+          echo "${insert_line}" >>"${insert_file}" &&
+          cat xx01 >>"${insert_file}" &&
           rm xx00 xx01
       fi
       if docker exec "jbt-${instance}" bash -c "libraries/vendor/bin/phpcs --extensions=php -p --standard=ruleset.xml ."; then
@@ -167,9 +178,9 @@ for instance in "${instancesToTest[@]}"; do
     # TODO phan
 
     if [ "$actualTest" = "unit" ]; then
-      if (( instance == 310 || instance < 42 )); then
+      if ((instance == 310 || instance < 42)); then
         # No tests executed! /  PHP Fatal error:  Uncaught Error: Call to undefined function
-        log "jbt-${instance} – Skipping PHP Testsuite Unit – unit"
+        log "jbt-${instance} < 42 Skipping PHP Testsuite Unit – unit"
         skipped=$((skipped + 1))
         overallSkipped=$((overallSkipped + 1))
         continue
@@ -203,12 +214,12 @@ for instance in "${instancesToTest[@]}"; do
 
     # TODO integration-pg
 
-    for lint in "css" "js" "testjs" ; do
+    for lint in "css" "js" "testjs"; do
       if [ "$actualTest" = "lint:${lint}" ]; then
         if [[ "${instance}" -eq 310 || "${instance}" -lt 40 ||
-              ( "${actualTest}" == "lint:testjs" && "${instance}" -lt 44 ) ]]; then
+              ("${actualTest}" == "lint:testjs" && "${instance}" -lt 44) ]]; then
           # No such file '/var/www/html/package.json' / Missing script: "lint:testjs"
-          log "jbt-${instance} – Skipping ${lint} Linter – lint:${lint}"
+          log "jbt-${instance} < 40 Skipping ${lint} Linter – lint:${lint}"
           skipped=$((skipped + 1))
           overallSkipped=$((overallSkipped + 1))
           continue
@@ -223,44 +234,85 @@ for instance in "${instancesToTest[@]}"; do
           overallFailed=$((overallFailed + 1))
           error "jbt-${instance} – lint:${lint} failed."
         fi
-    fi
+      fi
     done
 
-    if [ "$actualTest" = "system" ]; then
-      # No Cypress System Tests and in 4.3 rudimentary tests fail
-      if (( instance == 310 || instance < 44 )); then
-        # No tests executed! /  PHP Fatal error:  Uncaught Error: Call to undefined function
-        log "jbt-${instance} – Skipping Cypress System Tests"
-        skipped=$((skipped + 1))
-        overallSkipped=$((overallSkipped + 1))
+    # Cypress tests?
+    if [[ "${actualTest}" =~ ^(system|joomla-cypress)$ ]]; then
+      spec="${spec_argument}"
+
+      # joomla-cypress' installJoomlaMultilingualSite() test deletes installation directory – restore it
+      if [ ! -d "joomla-${instance}/installation" ]; then
+        if [ -d "installation/joomla-${instance}/installation" ]; then
+          log "jbt-${instance} – Restoring 'joomla-${instance}/installation' directory"
+          cp -r "installation/joomla-${instance}/installation" "joomla-${instance}/installation" 2>/dev/null ||
+            sudo cp -r "installation/joomla-${instance}/installation" "joomla-${instance}/installation"
+          if [ -f "joomla-${instance}/package.json" ]; then
+            log "jbt-${instance} – Running npm clean install"
+            docker exec "jbt-${instance}" bash -c 'cd /var/www/html && npm ci'
+          fi
+        else
+          error "jbt-${instance} – Missing 'joomla-${instance}/installation' directory"
+          # Continue in the hope that it is not needed
+        fi
+      fi
+
+      # Handle .js or .mjs from PR https://github.com/joomla/joomla-cms/pull/43676 – [4.4] Move the Cypress Tests to ESM
+      if [ -f "joomla-${instance}/cypress.config.dist.js" ]; then
+        extension="js"
+      elif [ -f "joomla-${instance}/cypress.config.dist.mjs" ]; then
+        extension="mjs"
+      else
+        error "No 'cypress.config.dist.*js' file found in 'joomla-${instance}' directory, please have a look."
+        failed=$((failed + 1))
+        overallFailed=$((overallFailed + 1))
         continue
       fi
-      # Is there one more argument with a test spec pattern?
-      if [ -z "$spec_argument" ] ; then
-        # Handle .js or .mjs from PR https://github.com/joomla/joomla-cms/pull/43676 – [4.4] Move the Cypress Tests to ESM
-        if [ -f "joomla-${instance}/cypress.config.dist.js" ]; then
-          extension="js"
-        elif [ -f "joomla-${instance}/cypress.config.dist.mjs" ]; then
-          extension="mjs"
-        else
-          error "No 'cypress.config.dist.*js' file found in 'joomla-${instance}' directory, please have a look."
-          exit 1
+      if [ "${actualTest}" = "system" ]; then
+        # No Cypress System Tests and in 4.3 rudimentary tests fail
+        if ((instance == 310 || instance < 44)); then
+          # No tests executed! /  PHP Fatal error:  Uncaught Error: Call to undefined function
+          log "jbt-${instance} < 44 Skipping Cypress ${actualTest} tests"
+          skipped=$((skipped + 1))
+          overallSkipped=$((overallSkipped + 1))
+          continue
         fi
-        # Create spec pattern list without installation spec
-        all=$(grep  "tests/System/integration/" "joomla-${instance}/cypress.config.${extension}" | \
-              grep -v "tests/System/integration/install/" | \
-              tr -d "' " | \
-              awk '{printf "%s", $0}' | \
-              sed 's/,$//')
-        spec="--spec '${all}'"
-      else
-        # Use the given test spec pattern and check if we can (no pattern) and must (missing path) insert path
-        if [[ "${spec_argument}" != *","* && "${spec_argument}" != tests/System/integration/* ]]; then
-          spec="--spec 'tests/System/integration/${spec_argument}'"
+        # Is there one more argument with a test spec pattern?
+        if [ -z "${spec_argument}" ]; then
+          # Create spec pattern list without installation spec
+          all=$(grep "tests/System/integration/" "joomla-${instance}/cypress.config.${extension}" |
+            grep -v "tests/System/integration/install/" |
+            tr -d "' " |
+            awk '{printf "%s", $0}' |
+            sed 's/,$//')
+          spec="${all}"
         else
-          spec="--spec '${spec_argument}'"
+          # Use the given test spec pattern and check if we can (no pattern) and must (missing path) insert path
+          if [[ "${spec_argument}" != *","* && "${spec_argument}" != tests/System/integration/* ]]; then
+            spec="tests/System/integration/${spec_argument}"
+          fi
         fi
       fi
+
+      if [ "${actualTest}" = "joomla-cypress" ]; then
+        if [ -z "${spec_argument}" ]; then
+          spec="[cypress/joomla.cy.js,cypress/*.cy.js]"
+        fi
+      fi
+
+      if [[ "${actualTest}" = "system" ]]; then
+        # Run relative path tests into Joomla instance /jbt/joomla-*
+        config_file="/jbt/joomla-${instance}/cypress.config.${extension}"
+        cypress_dir="/jbt/joomla-${instance}"
+      else
+        # 'joomla-cypress'
+        config_file="/jbt/installation/joomla-${instance}/cypress.config.js"
+        cypress_dir="/jbt/installation/joomla-cypress"
+      fi
+
+      # For joomla-cypress you can set CYPRESS_SKIP_INSTALL_LANGUAGES=1
+      # to skip installLanguage() and installJoomlaMultilingual() tests. Default here to run the tests.
+      CYPRESS_SKIP_INSTALL_LANGUAGES=${CYPRESS_SKIP_INSTALL_LANGUAGES:-0}
 
       # 16 September 2024 disabled, because Error: Unwanted PHP Deprecated
       # # Temporarily disable Joomla logging as System Tests are failing.
@@ -273,22 +325,29 @@ for instance in "${instancesToTest[@]}"; do
       #   mv configuration.php.tmp configuration.php"
 
       if [[ "$novnc" == true ]]; then
-        log "jbt-${instance} – Initiating System Tests with NoVNC and ${spec}"
-        docker exec jbt-cypress sh -c "cd /jbt/joomla-${instance} && export DISPLAY=jbt-novnc:0 && ${eel1} cypress run --headed ${browser} ${spec}"
+        log "jbt-${instance} – Initiating ${actualTest} tests with NoVNC and ${spec}"
+        # Using 'CYPRESS_specPattern' and not '--spec' to have absolute paths work correctly.
+        docker exec jbt-cypress sh -c "cd '${cypress_dir}' && export DISPLAY=jbt-novnc:0 && \
+          CYPRESS_SKIP_INSTALL_LANGUAGES=$CYPRESS_SKIP_INSTALL_LANGUAGES \
+          CYPRESS_CACHE_FOLDER=/jbt/cypress-cache CYPRESS_specPattern='${spec}' ${eel1} \
+          npx cypress run --headed ${browser} --config-file '${config_file}'"
       else
-        log "jbt-${instance} – Initiating headless System Tests with ${spec}"
-        docker exec jbt-cypress sh -c "cd /jbt/joomla-${instance} && unset DISPLAY && ${eel1} cypress run ${browser} ${spec}"
+        log "jbt-${instance} – Initiating headless ${actualTest} tests with ${spec}"
+        docker exec jbt-cypress sh -c "cd '${cypress_dir}' && unset DISPLAY && \
+          CYPRESS_SKIP_INSTALL_LANGUAGES=$CYPRESS_SKIP_INSTALL_LANGUAGES \
+          CYPRESS_CACHE_FOLDER=/jbt/cypress-cache CYPRESS_specPattern='${spec}' ${eel1} \
+          npx cypress run ${browser} --config-file '${config_file}'"
       fi
       # shellcheck disable=SC2181 # Check either Cypress headed or headless status
-      if [ $? -eq 0 ] ; then
+      if [ $? -eq 0 ]; then
         # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
         successful=$((successful + 1))
         overallSuccessful=$((overallSuccessful + 1))
-        log "jbt-${instance} – System Tests passed successfully"
+        log "jbt-${instance} – ${actualTest} tests passed successfully"
       else
         failed=$((failed + 1))
         overallFailed=$((overallFailed + 1))
-        error "jbt-${instance} – System Tests failed."
+        error "jbt-${instance} – ${actualTest} tests failed."
       fi
 
       # 16 September 2024 disabled, because Error: Unwanted PHP Deprecated
@@ -303,7 +362,7 @@ for instance in "${instancesToTest[@]}"; do
     fi
   done
 
-  if [ ${failed} -eq 0 ] ; then
+  if [ ${failed} -eq 0 ]; then
     log "jbt-${instance} – Test run completed: ${successful} test(s) passed ${spec} (${skipped} skipped)"
   else
     error "jbt-${instance} – Test run completed: ${failed} test(s) failed, ${successful} test(s) passed ${spec} (${skipped} skipped)."
@@ -312,7 +371,7 @@ for instance in "${instancesToTest[@]}"; do
 done
 
 if [ ${#instancesToTest[@]} -gt 1 ]; then
-  if [ ${overallFailed} -eq 0 ] ; then
+  if [ ${overallFailed} -eq 0 ]; then
     log "${instancesToTest[*]} – All tests completed: ${overallSuccessful} test(s) successful ${spec} (${overallSkipped} skipped)"
     exit 0
   else

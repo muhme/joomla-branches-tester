@@ -186,8 +186,18 @@ fi
 
 # Performing additional version-independent configurations to complete the base installation.
 if [ "$recreate" = false ]; then
-  log "Installing vim, ping, ip, telnet and netstat in the 'jbt-cypress' container"
+  log "jbt-cypress – Installing git, vim, ping, ip, telnet and netstat"
   docker exec jbt-cypress sh -c "apt-get update && apt-get install -y git vim iputils-ping iproute2 telnet net-tools"
+
+  log "jbt-cypress – JBT 'installation' environment – installing cypress@latest"
+  docker exec "jbt-cypress" bash -c "cd /jbt/installation && \
+                                     npm install cypress-file-upload cypress@latest && \
+                                     CYPRESS_CACHE_FOLDER=/jbt/cypress-cache npx cypress@latest install"
+
+  # JBT Cypress Installation Environment
+  log "jbt-cypress – Adding 'installation/joomla-cypress' module as a Git shallow clone of the main branch"
+  docker exec "jbt-cypress" bash -c "cd /jbt/installation && \
+                                     git clone --depth 1 https://github.com/joomla-projects/joomla-cypress"
 
   log "Add bash for Alpine containers"
   for container in "jbt-pga" "jbt-mail"; do
@@ -205,8 +215,10 @@ if [ "$recreate" = false ]; then
   docker cp configs/pgpass jbt-pga:/pgadmin4/pgpass
   docker exec -u 0 jbt-pga bash -c "chmod 600 /pgadmin4/pgpass && chown pgadmin /pgadmin4/pgpass"
 
+  log "*********************************************************************************************************************"
   log "Base installation is completed. If there should be an issue with any of the upcoming version-dependent installations,"
   log "the failed version-dependent installation could be repeated using 'recreate'."
+  log "*********************************************************************************************************************"
 fi
 
 for version in "${versionsToInstall[@]}"; do
@@ -255,5 +267,9 @@ for version in "${versionsToInstall[@]}"; do
 
   JBT_INTERNAL=42 bash scripts/setup.sh "initial" "${version}" "${database_variant}" "${socket}" \
                                         "${arg_repository}:${arg_branch}" "${patches[@]}"
+
+  log "jbt-${instance} – Installing Joomla required Cypress binary version (if needed)"
+  docker exec "jbt-cypress" bash -c "cd '/jbt/joomla-${instance}' && \
+                                     CYPRESS_CACHE_FOLDER=/jbt/cypress-cache npx cypress install"
 
 done

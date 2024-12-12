@@ -1,4 +1,4 @@
-/*
+/**
  * installPatchtester.cy.js - Cypress script to install Joomla Patch Tester component and fetch data
  *
  * Used by 'scripts/patchtester'.
@@ -7,7 +7,7 @@
  * https://github.com/muhme/joomla-branches-tester
  */
 
-import { registerCommands } from "joomla-cypress";
+import { registerCommands } from "./registerCommands";
 registerCommands();
 
 describe("Install 'Joomla! Patch Tester' with", () => {
