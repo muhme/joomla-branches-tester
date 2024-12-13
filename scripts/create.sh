@@ -199,6 +199,13 @@ if [ "$recreate" = false ]; then
   docker exec "jbt-cypress" bash -c "cd /jbt/installation && \
                                      git clone --depth 1 https://github.com/joomla-projects/joomla-cypress"
 
+  # Browsers are not preinstalled for ARM images with cypress/included – install Firefox
+  log "jbt-cypress – Installing Firefox (if needed)"
+  docker exec "jbt-cypress" bash -c "apt-get update && \
+                                     apt-get install -y --no-install-recommends firefox-esr && \
+                                     apt-get clean && \
+                                     rm -rf /var/lib/apt/lists/*"
+
   log "Add bash for Alpine containers"
   for container in "jbt-pga" "jbt-mail"; do
     docker exec -u root ${container} apk add bash || true # Who cares?
