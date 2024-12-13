@@ -285,7 +285,7 @@ for instance in "${instancesToTest[@]}"; do
             tr -d "' " |
             awk '{printf "%s", $0}' |
             sed 's/,$//')
-          spec="${all}"
+          spec="{${all}}"
         else
           # Use the given test spec pattern and check if we can (no pattern) and must (missing path) insert path
           if [[ "${spec_argument}" != *","* && "${spec_argument}" != tests/System/integration/* ]]; then
