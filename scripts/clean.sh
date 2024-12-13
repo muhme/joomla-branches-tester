@@ -89,7 +89,7 @@ done
 
 # Delete all log files, except the actual one :)
 if [ -d "logs" ]; then
-  log "Removing all files in the 'logs' directory, except for the most recent one"
+  log "Removing all files in the 'logs' directory, except the most recent one"
   # remove log files with underscores before 2.0.12
   rm -f logs/*_*.txt 2>/dev/null || sudo rm -f logs/*_*.txt
   find logs -type f | sort -r | tail -n +2 >"${JBT_TMP_FILE}"

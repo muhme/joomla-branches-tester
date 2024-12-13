@@ -206,6 +206,12 @@ if [ "$recreate" = false ]; then
                                      apt-get clean && \
                                      rm -rf /var/lib/apt/lists/*"
 
+  # With https://github.com/joomla/joomla-cms/pull/44253 Joomla command line client usage has been added
+  # to the System Tests. Hopefully, this is only temporary and can be replaced to reduce complexity and dependency.
+  log "jbt-cypress – Adding PHP for cli/joomla.php (hopefully only temporary)"
+  docker exec "jbt-cypress" bash -c "apt-get update && \
+                                     apt-get install -y php php-simplexml php-mysql php-pgsql php-mysqli"
+
   log "Add bash for Alpine containers"
   for container in "jbt-pga" "jbt-mail"; do
     docker exec -u root ${container} apk add bash || true # Who cares?
