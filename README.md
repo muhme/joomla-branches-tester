@@ -460,8 +460,8 @@ scripts/test system
 
 :fairy: <i>"To protect you, the first step `Installation.cy.js` of the Joomla System Tests
   is excluded in the automated tests if you run all test specs.
-  If you run the installation, this can lead to inconsistencies
-  between the file system and the database, as the Joomla database will be recreated.</i>
+  If you run `Installation.cy.js` the entire database content of the Joomla instance will be lost.
+  See [Database and File System Consistency](#database-and-file-system-consistency) for more details."</i>
 
 Some more optional arguments for System Tests are:
 
@@ -603,6 +603,14 @@ Five variants are available:
 * mysqli – MySQL with MySQLi (improved)
 * mysql – MySQL with MySQL PDO (PHP Data Objects)
 
+:warning: The entire database content of the Joomla instance will be lost.
+          See [Database and File System Consistency](#database-and-file-system-consistency) for more details.
+          
+:fairy: The good fairy waves her magic wand and says:
+  *"When in doubt, it's wiser to use `scripts/create` to ensure a clean installation.
+  With a sprinkle of stardust, you can specify the desired database variant,
+  and with `recreate` option you're only installing one Joomla version, it will be done in the blink of an eye."*
+          
 Use MariaDB with driver MySQLi for Joomla 5.1 and Joomla 5.2:
 ```
 scripts/database 51 52 mariadbi
@@ -612,15 +620,6 @@ Change all Joomla instances to use PostgreSQL:
 ```
 scripts/database pgsql
 ```
-
-:warning: The overall database content is lost.
-          If you have installed the Joomla Patch Tester, you need to reinstall it now.
-          For more details, see [Database and File System Consistency](#database-and-file-system-consistency).
-
-:fairy: The good fairy waves her magic wand and says:
-  *"When in doubt, it's wiser to use `scripts/create` to ensure a clean installation.
-  With a sprinkle of stardust, you can specify the desired database variant,
-  and if you're only installing one Joomla version, it will be done in the blink of an eye."*
 
 #### Database Unix Sockets
 
@@ -676,15 +675,15 @@ and graft the package for a seamless experience:
 scripts/graft 52 ~/Downloads/Joomla_5.2.0-alpha4-dev-Development-Full_Package.zip
 ```
 
+:warning: The content of the file system of the Joomla instance is overwritten.
+          See [Database and File System Consistency](#database-and-file-system-consistency) for more details.
+
 Mandatory arguments are the Joomla instance version and the local package file.
 Supported file formats are .zip, .tar, .tar.zst, .tar.gz and .tar.bz2.
 An optional argument is the database variant, such as PostgreSQL in the following example:
 ```
 scripts/graft 51 pgsql ~/Downloads/Joomla_5.1.3-Stable-Full_Package.zip
 ```
-:warning: The overall database content is lost.
-          If you have installed the Joomla Patch Tester, you need to reinstall it now.
-          For more details, see [Database and File System Consistency](#database-and-file-system-consistency).
 
 After grafting, you can still switch the database variant, change the PHP version,
 install the Joomla Patch Tester, or run Joomla System Tests.
@@ -796,7 +795,7 @@ scripts/patchtester 53 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
 :point_right: The GitHub token can also be given by environment variable `JBT_GITHUB_TOKEN`.
               And of course the sample token does not work.
 
-:fairy: *"You need to reinstall the Joomla Patch Tester if, for example you switch the database.
+:fairy: *"You will need to reinstall the Joomla Patch Tester if, for example, you switch the database.
         For more details, see [Database and File System Consistency](#database-and-file-system-consistency)."*
 
 :point_right: Alternatively, to apply patches, you can use `scripts/patch`, see [Back to the Future - Patch](#back-to-the-future---patch).
@@ -851,7 +850,6 @@ For instance, [database-317](https://github.com/joomla-framework/database/pull/3
 👉 All these patches are for the web server Docker containers running the Joomla instances.
   JBT uses its own Cypress installation environment with the latest `joomla-cypress` main branch clone.
 
-
 ### Testing NPM module joomla-cypress
 
 The NPM module [joomla-cypress](https://github.com/joomla-projects/joomla-cypress)
@@ -866,29 +864,33 @@ for Cypress-based Joomla-installation. And this can also be used to test the NPM
   which is installed in each Joomla instance for Joomla System Tests.
 
 Patching `installation/joomla-cypress`:
-```bash
+```
 scripts/patch installation joomla-cypress-37
 ```
 
 Running `joomla-cypress` Cypress tests headlessly with Joomla version 5.2:
-```bash
+```
 scripts/test 52 joomla-cypress
 ```
+
+:warning: Using the `cypress/joomla.cy.js` test spec results in Joomla being installed multiple times and
+          the entire database content of the Joomla instance will be lost.
+          See [Database and File System Consistency](#database-and-file-system-consistency) for more details.
 
 Running `joomla-cypress` Cypress tests without `installLanguage` and `installJoomlaMultiLanguage`
 on Joomla version 6.0 (if language packages are not yet available and tests would fail with error
 `Unable to detect manifest file.`):
-```bash
+```
 CYPRESS_SKIP_INSTALL_LANGUAGES=1 scripts/test 60 joomla-cypress
 ```
 
 Running only the `user.cy.js` test spec file and watching the progress with NoVNC:
-```bash
-scripts/test 52 joomla-cypress tests/user.cy.js novnc
+```
+scripts/test 52 joomla-cypress cypress/user.cy.js novnc
 ```
 
 Running the tests with local Cypress GUI:
-```bash
+```
 scripts/cypress 60 joomla-cypress local
 ```
 
@@ -1044,14 +1046,21 @@ scripts/clean
 
 ## Database and File System Consistency
 
-When installing extensions, it's important to be aware of database and file system consistency.
-The following operations will break that consistency, as the Joomla database will be recreated:
+The entire database content of the Joomla instance will be lost during the Joomla installation,
+including any customisations or extensions installed.
+For example, if you have installed the Joomla Patch Tester or made specific configuration changes,
+these will need to be reinstalled or reapplied afterwards.
+
+The following operations will break database and file system consistency,
+as the Joomla database will be recreated:
 * `scripts/database`
 * `scripts/create` and `scripts/create recreate`
-* `scripts/test system install/Installation.cy.js`
+* `scripts/test` running `Installation.cy.js` from Joomla System tests or `joomla-cypress`
+* `scripts/cypress` running `Installation.cy.js` from Joomla System tests or `joomla-cypress`
 
-While grafting a Joomla package with `scripts/graft` doesn't break database consistency,
-you will lose all additionally installed extensions as the files are installed from package.
+Grafting a Joomla package with `scripts/graft` will break database consistency with the file system.
+You will lose all additionally installed extensions, as the files will be overwritten by those from the package.
+This means that, in this case, consistency is broken from the file system.
 
 Switching between PHP versions using `scripts/php` or
 enabling/disabling Xdebug with `scripts/xdebug` does not affect consistency.
