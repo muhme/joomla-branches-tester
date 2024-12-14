@@ -327,6 +327,7 @@ for instance in "${instancesToTest[@]}"; do
       # With https://github.com/joomla/joomla-cms/pull/44253 Joomla command line client usage has been added
       # to the System Tests. Hopefully, this is only temporary and can be replaced to reduce complexity and dependency.
       # Joomla command line client inside Docker container needs to wrote 'configuration.php' file.
+      # shellcheck disable=SC2012 # We need explict the ls command to get the file mode 
       current_permissions=$(ls -l "joomla-${instance}/configuration.php" | awk '{print $1}' | sed 's/[@+]$//')
       if [ "${current_permissions}" != "-rw-r--r--" ]; then
         log "Chmod 644 'joomla-${instance}/configuration.php' for cli/joomla.php"

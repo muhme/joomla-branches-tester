@@ -190,7 +190,9 @@ if [ "$recreate" = false ]; then
   docker exec jbt-cypress sh -c "apt-get update && apt-get install -y git vim iputils-ping iproute2 telnet net-tools"
 
   log "jbt-cypress – JBT 'installation' environment – installing cypress@latest"
-  docker exec "jbt-cypress" bash -c "cd /jbt/installation && \
+  # First free 652 MB for pre-installed Cypress 13.14.2
+  docker exec "jbt-cypress" bash -c "rm -rf /root/.cache/Cypress && \
+                                     cd /jbt/installation && \
                                      npm install cypress-file-upload cypress@latest && \
                                      CYPRESS_CACHE_FOLDER=/jbt/cypress-cache npx cypress@latest install"
 

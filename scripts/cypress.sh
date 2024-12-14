@@ -28,7 +28,7 @@ function help {
 # shellcheck disable=SC2207 # There are no spaces in instance numbers
 allInstalledInstances=($(getAllInstalledInstances))
 
-local=false
+local="" # defaults to false
 joomla_cypress=false
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
@@ -38,7 +38,7 @@ while [ $# -ge 1 ]; do
     instance="$1"
     shift # Argument is eaten as the instance number.
   elif [ "$1" = "local" ]; then
-    local=true
+    local=".local" # set true and use it as part for config file path
     shift # Argument is eaten to run Cypress directly on the Docker host.
   elif [ "$1" = "joomla-cypress" ]; then
     joomla_cypress=true
@@ -83,8 +83,24 @@ else
     sudo chmod 644 "joomla-${instance}/configuration.php"
 fi
 
+# Determine Cypress config file
+# e.g. joomla-52/cypress.config.local.mjs or installation/joomla-52/cypress.config.local.js
+if ${joomla_cypress}; then
+  prefix="../joomla-${instance}/"
+else
+  prefix=""
+fi
+if [ -f "${cypress_dir}/${prefix}cypress.config${local}.mjs" ]; then
+  config_file="${prefix}cypress.config${local}.mjs"
+elif [ -f "${cypress_dir}/${prefix}cypress.config${local}.js" ]; then
+  config_file="${prefix}cypress.config${local}.js"
+else
+  error "There is no file '${prefix}cypress.config${local}.[m]js'."
+  exit 1
+fi
+
 # Use of SMTP port 7325 for the smtp-tester, as port 7125 is occupied by the mapping for the Cypress container.
-if ${local}; then
+if [ -n "${local}" ]; then
   # Don't use 'cypress-cache' for local running Cypress GUI, as e.g. macOS reinstalls with Cypress.app and
   # Linux is later missing Cypress. Users' Cypress default cache is used.
   export CYPRESS_CACHE_FOLDER="${HOME}/.cache/Cypress"
@@ -97,20 +113,6 @@ if ${local}; then
   npx cypress install 2>/dev/null ||
     sudo bash -c "CYPRESS_CACHE_FOLDER=$CYPRESS_CACHE_FOLDER npx cypress install && chown -R $USER $CYPRESS_CACHE_FOLDER"
 
-  if ${joomla_cypress}; then
-    prefix="../joomla-${instance}/"
-  else
-    prefix=""
-  fi
-  if [ -f "${prefix}cypress.config.local.mjs" ]; then
-    config_file="${prefix}cypress.config.local.mjs"
-  elif [ -f "${prefix}cypress.config.local.js" ]; then
-    config_file="${prefix}cypress.config.local.js"
-  else
-    error "There is no file '${prefix}cypress.config.local.*js'."
-    exit 1
-  fi
-
   # For installExtensionFromFolder() in joomla-cypress/cypress/extensions.cy.js needed
   # to find 'mod_hello_world' folder. And we can not use 'fixturesFolder' as this is
   # needed for installExtensionFromFileUpload() with default 'cypress/fixtures'.
@@ -118,22 +120,17 @@ if ${local}; then
 
   # For joomla-cypress you can set CYPRESS_SKIP_INSTALL_LANGUAGES=1
   # to skip installLanguage() and installJoomlaMultilingual() tests. Default here to run the test.
-  export CYPRESS_SKIP_INSTALL_LANGUAGES=${CYPRESS_SKIP_INSTALL_LANGUAGES:-0}
+  export CYPRESS_SKIP_INSTALL_LANGUAGES="${CYPRESS_SKIP_INSTALL_LANGUAGES:-0}"
 
   log "jbt-${instance} – Open locally installed Cypress GUI"
   npx cypress open --e2e --project . --config-file "${config_file}"
   # By the way, the same way it is possible to run Cypress headless from Docker host.
 else
   log "jbt-${instance} – Open jbt-cypress container Cypress GUI"
-  # Install the Cypress version used in this Joomla instance or installation/joomla-cypress, if needed
-  log "Installing Cypress (if needed)"
-  # # If it fails, try again with sudo, but specify the user's cache directory and chown afterwards.
-  # docker exec jbt-cypress bash -c "cd \"/jbt/${cypress_dir}\" &&
-  #                                  CYPRESS_CACHE_FOLDER=/jbt/cypress-cache \
-  #                                  npm install cypress"
-  # Open Cypress e.g. on Windows WSL2 Docker container.
-  docker exec jbt-cypress bash -c "cd \"/jbt/${cypress_dir}\" && \
+  # Open Cypress e.g. on Windows WSL 2 Docker container.
+  docker exec jbt-cypress bash -c "cd '/jbt/${cypress_dir}' && \
                                    CYPRESS_CACHE_FOLDER=/jbt/cypress-cache \
-                                   CYPRESS_SKIP_INSTALL_LANGUAGES=$CYPRESS_SKIP_INSTALL_LANGUAGES \
-                                   DISPLAY=:0 cypress open --env smtp_port=7325 --e2e --project ."
+                                   CYPRESS_SKIP_INSTALL_LANGUAGES='${CYPRESS_SKIP_INSTALL_LANGUAGES}' \
+                                   DISPLAY=:0 \
+                                   npx cypress open --env smtp_port=7325 --e2e --project . --config-file '${config_file}'"
 fi
