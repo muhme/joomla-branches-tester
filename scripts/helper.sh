@@ -495,6 +495,30 @@ isValidTestName() {
   return 1 # No
 }
 
+# The Cypress custom command installJoomlaMultilingualSite() deletes the Joomla installation folder.
+# Restore the saved installation folder and set ownership to www-data:www-data.
+#
+restoreInstallationFolder() {
+  local instance="$1"
+
+  if [ ! -d "joomla-${instance}/installation" ]; then
+    if [ -d "installation/joomla-${instance}/installation" ]; then
+      log "jbt-${instance} – Restoring 'joomla-${instance}/installation' directory"
+      cp -r "installation/joomla-${instance}/installation" "joomla-${instance}/installation" 2>/dev/null ||
+        sudo cp -r "installation/joomla-${instance}/installation" "joomla-${instance}/installation"
+      if [ -f "joomla-${instance}/package.json" ]; then
+        log "jbt-${instance} – Running npm clean install"
+        docker exec "jbt-${instance}" bash -c 'cd /var/www/html && npm ci'
+      fi
+      # Restored files are owned by root and next time installJoomlaMultilingualSite() will fail deleting them.
+      docker exec "jbt-${instance}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true &' &
+    else
+      error "jbt-${instance} – Missing 'joomla-${instance}/installation' directory"
+      # Proceed in the hope that it will not be needed
+    fi
+  fi
+}
+
 # Return script running time e.g. as "17 seconds" or as "3:18".
 #
 runningTime() {

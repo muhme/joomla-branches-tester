@@ -240,23 +240,8 @@ for instance in "${instancesToTest[@]}"; do
     # Cypress tests?
     if [[ "${actualTest}" =~ ^(system|joomla-cypress)$ ]]; then
       spec="${spec_argument}"
-
       # joomla-cypress' installJoomlaMultilingualSite() test deletes installation directory – restore it
-      if [ ! -d "joomla-${instance}/installation" ]; then
-        if [ -d "installation/joomla-${instance}/installation" ]; then
-          log "jbt-${instance} – Restoring 'joomla-${instance}/installation' directory"
-          cp -r "installation/joomla-${instance}/installation" "joomla-${instance}/installation" 2>/dev/null ||
-            sudo cp -r "installation/joomla-${instance}/installation" "joomla-${instance}/installation"
-          if [ -f "joomla-${instance}/package.json" ]; then
-            log "jbt-${instance} – Running npm clean install"
-            docker exec "jbt-${instance}" bash -c 'cd /var/www/html && npm ci'
-          fi
-        else
-          error "jbt-${instance} – Missing 'joomla-${instance}/installation' directory"
-          # Continue in the hope that it is not needed
-        fi
-      fi
-
+      restoreInstallationFolder "${instance}"
       # Handle .js or .mjs from PR https://github.com/joomla/joomla-cms/pull/43676 – [4.4] Move the Cypress Tests to ESM
       if [ -f "joomla-${instance}/cypress.config.dist.js" ]; then
         extension="js"
@@ -327,7 +312,7 @@ for instance in "${instancesToTest[@]}"; do
       # With https://github.com/joomla/joomla-cms/pull/44253 Joomla command line client usage has been added
       # to the System Tests. Hopefully, this is only temporary and can be replaced to reduce complexity and dependency.
       # Joomla command line client inside Docker container needs to wrote 'configuration.php' file.
-      # shellcheck disable=SC2012 # We need explict the ls command to get the file mode 
+      # shellcheck disable=SC2012 # We need explict the ls command to get the file mode
       current_permissions=$(ls -l "joomla-${instance}/configuration.php" | awk '{print $1}' | sed 's/[@+]$//')
       if [ "${current_permissions}" != "-rw-r--r--" ]; then
         log "Chmod 644 'joomla-${instance}/configuration.php' for cli/joomla.php"

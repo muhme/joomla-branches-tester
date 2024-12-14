@@ -59,20 +59,7 @@ fi
 if ${joomla_cypress}; then
   cypress_dir="installation/joomla-cypress"
   # joomla-cypress' installJoomlaMultilingualSite() test deletes installation directory – restore it
-  if [ ! -d "joomla-${instance}/installation" ]; then
-    if [ -d "installation/joomla-${instance}/installation" ]; then
-      log "jbt-${instance} – Restoring 'joomla-${instance}/installation' directory"
-      cp -r "installation/joomla-${instance}/installation" "joomla-${instance}/installation" 2>/dev/null ||
-        sudo cp -r "installation/joomla-${instance}/installation" "joomla-${instance}/installation"
-      if [ -f "joomla-${instance}/package.json" ]; then
-        log "jbt-${instance} – Running npm clean install"
-        docker exec "jbt-${instance}" bash -c 'cd /var/www/html && npm ci'
-      fi
-    else
-      error "jbt-${instance} – Missing 'joomla-${instance}/installation' directory"
-      # Proceed in the hope that it will not be needed
-    fi
-  fi
+  restoreInstallationFolder "${instance}"
 else
   cypress_dir="joomla-${instance}"
   # With https://github.com/joomla/joomla-cms/pull/44253 Joomla command line client usage has been added
