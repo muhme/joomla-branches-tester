@@ -330,7 +330,8 @@ for instance in "${instancesToTest[@]}"; do
       current_permissions=$(ls -l "joomla-${instance}/configuration.php" | awk '{print $1}' | sed 's/[@+]$//')
       if [ "${current_permissions}" != "-rw-r--r--" ]; then
         log "Chmod 644 'joomla-${instance}/configuration.php' for cli/joomla.php"
-        chmod 644 "joomla-${instance}/configuration.php"
+        chmod 644 "joomla-${instance}/configuration.php" 2>/dev/null ||
+          sudo chmod 644 "joomla-${instance}/configuration.php"
       fi
 
       if [[ "$novnc" == true ]]; then

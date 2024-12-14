@@ -79,7 +79,8 @@ else
   # to the System Tests. Hopefully, this is only temporary and can be replaced to reduce complexity and dependency.
   # Joomla command line client inside Docker container needs to wrote 'configuration.php' file.
   log "Chmod 644 'joomla-${instance}/configuration.php' for cli/joomla.php"
-  chmod 644 "joomla-${instance}/configuration.php"
+  chmod 644 "joomla-${instance}/configuration.php" 2>/dev/null ||
+    sudo chmod 644 "joomla-${instance}/configuration.php"
 fi
 
 # Use of SMTP port 7325 for the smtp-tester, as port 7125 is occupied by the mapping for the Cypress container.
