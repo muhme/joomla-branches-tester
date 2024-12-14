@@ -25,3 +25,5 @@ installation/node_modules
 # Created by npm install cypress-file-upload cypress@latest
 installation/package.json
 installation/package-lock.json
+# Cypress screenshots
+installation/cypress
