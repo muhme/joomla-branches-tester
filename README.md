@@ -15,7 +15,7 @@ Within [Docker](https://www.docker.com/) container environment you are able to:
 * Executing unit tests, verifying coding standards and checking CSS styles and JavaScript standards, just like Drone.
 * Automated [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester) installation.
 * Apply pull requests (PR) from Git repositories `joomla-cms`, `joomla-cypress` and `joomla-framework/database`.
-* Switching between 8 database variants (MySQL, MariaDB, or PostgreSQL and the two database drivers:
+* Switching between 10 database variants (MySQL, MariaDB, or PostgreSQL and the two database drivers:
   MySQLi or PHP Data Objects and the option to use Unix sockets, instead of TCP host).
 * Switching between PHP versions (PHP 7.4 ... 8.3).
 * Installing Joomla from a cloned 'joomla-cms' Git repository.
