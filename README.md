@@ -79,7 +79,7 @@ The JavaScript errors are displayed, logged and can be verified using `scripts/c
 The installation environment retains each Joomla release's `installation` folder
 to preserve it for future use, allowing restoration when needed, such as switching databases after grafting.
 
-The `installation/joomla-cypress` folder is also used to test the `joomla.cypress` module itself.
+The `installation/joomla-cypress` folder is also used to test the `joomla-cypress` NPM module itself.
 For more details, see the [Testing NPM Module joomla-cypress](#testing-npm-module-joomla-cypress) section.
 
 ### Version Naming
@@ -854,7 +854,7 @@ For instance, [database-317](https://github.com/joomla-framework/database/pull/3
 
 The NPM module [joomla-cypress](https://github.com/joomla-projects/joomla-cypress)
 has its own Cypress-based test suite. For more information
-see [joomla-cypress/cypress](https://github.com/joomla-projects/joomla-cypress/cypress).
+see [PR 39](https://github.com/joomla-projects/joomla-cypress/pull/39) and once it is merged [joomla-cypress/cypress](https://github.com/joomla-projects/joomla-cypress/cypress).
 
 The JBT `installation/joomla-cypress` directory contains the latest version of the `main` branch
 for Cypress-based Joomla-installation. And this can also be used to test the NPM module itself.
