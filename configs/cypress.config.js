@@ -33,8 +33,11 @@ module.exports = defineConfig({
   e2e: {
     baseUrl: 'set by scripts/database.sh',
     supportFile: false,
+    // Set for NPM module joomla-cypress tests or use defaults for Joomla System Tests
+    fixturesFolder: process.env.JBT_FIXTURES_FOLDER || 'cypress/fixtures',
+    screenshotsFolder: process.env.JBT_SCREENSHOTS_FOLDER || 'cypress/screenshots',
     // Just in case we are coming from a failed installation test, start with the Joomla installation
-    specPattern: ['cypress/joomla.cy.js', 'cypress/*.cy.js'],
+    specPattern: ['tests/cypress/joomla.cy.js', 'tests/cypress/*.cy.js'],
     defaultBrowser: 'firefox',
     setupNodeEvents(on, config) {
       // For example, in a German environment, force the use of Firefox with British English.

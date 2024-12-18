@@ -197,14 +197,8 @@ for instance in "${instancesToChange[@]}"; do
        npx cypress run --headed \
                        --config-file '/jbt/installation/joomla-${instance}/cypress.config.js'"
 
-  # Adopt 'configuration.php' as in 'tests/System/integration/install/Installation.cy.js'
-  docker exec "jbt-${instance}" bash -c "sed -i \
-    -e \"s|\(public .secret =\).*|\1 'tEstValue';|\" \
-    -e \"s|\(public .mailonline =\).*|\1 true;|\" \
-    -e \"s|\(public .mailer =\).*|\1 'smtp';|\" \
-    -e \"s|\(public .smtphost =\).*|\1 'host.docker.internal';|\" \
-    -e \"s|\(public .smtpport =\).*|\1 7025;|\" \
-    configuration.php"
+  # Set 'tEstValue' as secret etc.
+  adjustJoomlaConfigurationForJBT "${instance}"
 
   if (( instance != 310 && instance >= 41 )); then
     log "jbt-${instance} – Disable B/C plugin(s)"

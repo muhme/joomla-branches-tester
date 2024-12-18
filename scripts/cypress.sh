@@ -56,18 +56,25 @@ if [ -z "${instance}" ]; then
   exit 1
 fi
 
+# Set the secret etc. if needed
+adjustJoomlaConfigurationForJBT "${instance}"
+
 if ${joomla_cypress}; then
   cypress_dir="installation/joomla-cypress"
   # joomla-cypress' installJoomlaMultilingualSite() test deletes installation directory – restore it
   restoreInstallationFolder "${instance}"
+  # Adopt Cypress fixturesFolder and screenshotsFolder to use tests/cypress
+  cypress_paths="JBT_FIXTURES_FOLDER='tests/cypress/fixtures' JBT_SCREENSHOTS_FOLDER='tests/cypress/screenshots'"
 else
+  # Joomla System Tests
   cypress_dir="joomla-${instance}"
   # With https://github.com/joomla/joomla-cms/pull/44253 Joomla command line client usage has been added
   # to the System Tests. Hopefully, this is only temporary and can be replaced to reduce complexity and dependency.
   # Joomla command line client inside Docker container needs to wrote 'configuration.php' file.
   log "Chmod 644 'joomla-${instance}/configuration.php' for cli/joomla.php"
-  chmod 644 "joomla-${instance}/configuration.php" 2>/dev/null ||
-    sudo chmod 644 "joomla-${instance}/configuration.php"
+  chmod 644 "joomla-${instance}/configuration.php" 2>/dev/null || sudo chmod 644 "joomla-${instance}/configuration.php"
+  # Use Cypress defaults for fixturesFolder and screenshotsFolder
+  cypress_paths=""
 fi
 
 # Determine Cypress config file
@@ -102,15 +109,15 @@ if [ -n "${local}" ]; then
 
   # For installExtensionFromFolder() in joomla-cypress/cypress/extensions.cy.js needed
   # to find 'mod_hello_world' folder. And we can not use 'fixturesFolder' as this is
-  # needed for installExtensionFromFileUpload() with default 'cypress/fixtures'.
-  export CYPRESS_SERVER_UPLOAD_FOLDER='/jbt/installation/joomla-cypress/cypress/fixtures/mod_hello_world'
+  # needed for installExtensionFromFileUpload() with default 'tests/cypress/fixtures'.
+  export CYPRESS_SERVER_UPLOAD_FOLDER='/jbt/installation/joomla-cypress/tests/cypress/fixtures/mod_hello_world'
 
   # For joomla-cypress you can set CYPRESS_SKIP_INSTALL_LANGUAGES=1
   # to skip installLanguage() and installJoomlaMultilingual() tests. Default here to run the test.
   export CYPRESS_SKIP_INSTALL_LANGUAGES="${CYPRESS_SKIP_INSTALL_LANGUAGES:-0}"
 
   log "jbt-${instance} – Open locally installed Cypress GUI"
-  npx cypress open --e2e --project . --config-file "${config_file}"
+  bash -c "${cypress_paths} npx cypress open --e2e --project . --config-file '${config_file}'"
   # By the way, the same way it is possible to run Cypress headless from Docker host.
 else
   log "jbt-${instance} – Open jbt-cypress container Cypress GUI"
@@ -118,6 +125,7 @@ else
   docker exec jbt-cypress bash -c "cd '/jbt/${cypress_dir}' && \
                                    CYPRESS_CACHE_FOLDER=/jbt/cypress-cache \
                                    CYPRESS_SKIP_INSTALL_LANGUAGES='${CYPRESS_SKIP_INSTALL_LANGUAGES}' \
+                                   ${cypress_paths} \
                                    DISPLAY=:0 \
                                    npx cypress open --env smtp_port=7325 --e2e --project . --config-file '${config_file}'"
 fi

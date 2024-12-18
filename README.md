@@ -854,7 +854,7 @@ For instance, [database-317](https://github.com/joomla-framework/database/pull/3
 
 The NPM module [joomla-cypress](https://github.com/joomla-projects/joomla-cypress)
 has its own Cypress-based test suite. For more information
-see [PR 39](https://github.com/joomla-projects/joomla-cypress/pull/39) and once it is merged [joomla-cypress/cypress](https://github.com/joomla-projects/joomla-cypress/cypress).
+see [PR 39](https://github.com/joomla-projects/joomla-cypress/pull/39) and once it is merged [joomla-cypress/tests](https://github.com/joomla-projects/joomla-cypress/tests).
 
 The JBT `installation/joomla-cypress` directory contains the latest version of the `main` branch
 for Cypress-based Joomla-installation. And this can also be used to test the NPM module itself.
@@ -886,7 +886,7 @@ CYPRESS_SKIP_INSTALL_LANGUAGES=1 scripts/test 60 joomla-cypress
 
 Running only the `user.cy.js` test spec file and watching the progress with NoVNC:
 ```
-scripts/test 52 joomla-cypress cypress/user.cy.js novnc
+scripts/test 52 joomla-cypress tests/cypress/user.cy.js novnc
 ```
 
 Running the tests with local Cypress GUI:

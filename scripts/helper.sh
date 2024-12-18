@@ -330,6 +330,25 @@ function isValidVariant() {
   return 1 # nope
 }
 
+# Adjust 'configuration.php' for JBT, e.g. set 'tEstValue' as the secret.
+# As Joomla System Tests do in 'tests/System/integration/install/Installation.cy.js'.
+# Required after running JBT's Joomla installation and joomla-cypress Joomla installation tests.
+#
+function adjustJoomlaConfigurationForJBT() {
+  local instance="$1"
+
+  if ! grep -q 'tEstValue' "joomla-${instance}/configuration.php"; then
+    log "jbt-${instance} – Adopt configuration.php for JBT"
+    docker exec "jbt-${instance}" bash -c "sed -i \
+      -e \"s|\(public .secret =\).*|\1 'tEstValue';|\" \
+      -e \"s|\(public .mailonline =\).*|\1 true;|\" \
+      -e \"s|\(public .mailer =\).*|\1 'smtp';|\" \
+      -e \"s|\(public .smtphost =\).*|\1 'host.docker.internal';|\" \
+      -e \"s|\(public .smtpport =\).*|\1 7025;|\" \
+      configuration.php"
+  fi
+}
+
 # Create 'docker-compose.yml' file with one or multiple web servers.
 # 1st argument is e.g. "5.2-dev" or "4.4.1-alpha4 5.1.0"
 # 2nd argument e.g. "php8.1" or "highest"

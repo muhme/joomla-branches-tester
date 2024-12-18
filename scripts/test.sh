@@ -89,9 +89,9 @@ if [ ${#testsToRun[@]} -eq 0 ]; then
 fi
 
 # Pass through the environment variable to show 'console.log()' messages
-eel1=""
+electron_enable_logging=""
 if [ "$ELECTRON_ENABLE_LOGGING" == "1" ]; then
-  eel1="ELECTRON_ENABLE_LOGGING=1"
+  electron_enable_logging="ELECTRON_ENABLE_LOGGING=1"
 fi
 
 overallFailed=0
@@ -242,6 +242,8 @@ for instance in "${instancesToTest[@]}"; do
       spec="${spec_argument}"
       # joomla-cypress' installJoomlaMultilingualSite() test deletes installation directory – restore it
       restoreInstallationFolder "${instance}"
+      # Set the secret etc. if needed
+      adjustJoomlaConfigurationForJBT "${instance}"
       # Handle .js or .mjs from PR https://github.com/joomla/joomla-cms/pull/43676 – [4.4] Move the Cypress Tests to ESM
       if [ -f "joomla-${instance}/cypress.config.dist.js" ]; then
         extension="js"
@@ -281,7 +283,7 @@ for instance in "${instancesToTest[@]}"; do
 
       if [ "${actualTest}" = "joomla-cypress" ]; then
         if [ -z "${spec_argument}" ]; then
-          spec="[cypress/joomla.cy.js,cypress/*.cy.js]"
+          spec="[tests/cypress/joomla.cy.js,tests/cypress/*.cy.js]"
         fi
       fi
 
@@ -289,10 +291,14 @@ for instance in "${instancesToTest[@]}"; do
         # Run relative path tests into Joomla instance /jbt/joomla-*
         config_file="/jbt/joomla-${instance}/cypress.config.${extension}"
         cypress_dir="/jbt/joomla-${instance}"
+        # Use Cypress defaults for fixturesFolder and screenshotsFolder
+        cypress_paths=""
       else
         # 'joomla-cypress'
         config_file="/jbt/installation/joomla-${instance}/cypress.config.js"
         cypress_dir="/jbt/installation/joomla-cypress"
+        # Adopt Cypress fixturesFolder and screenshotsFolder to use tests/cypress
+        cypress_paths="JBT_FIXTURES_FOLDER='tests/cypress/fixtures' JBT_SCREENSHOTS_FOLDER='tests/cypress/screenshots'"
       fi
 
       # For joomla-cypress you can set CYPRESS_SKIP_INSTALL_LANGUAGES=1
@@ -325,13 +331,15 @@ for instance in "${instancesToTest[@]}"; do
         # Using 'CYPRESS_specPattern' and not '--spec' to have absolute paths work correctly.
         docker exec jbt-cypress sh -c "cd '${cypress_dir}' && export DISPLAY=jbt-novnc:0 && \
           CYPRESS_SKIP_INSTALL_LANGUAGES=$CYPRESS_SKIP_INSTALL_LANGUAGES \
-          CYPRESS_CACHE_FOLDER=/jbt/cypress-cache CYPRESS_specPattern='${spec}' ${eel1} \
+          CYPRESS_CACHE_FOLDER=/jbt/cypress-cache CYPRESS_specPattern='${spec}' \
+          ${electron_enable_logging} ${cypress_paths} \
           npx cypress run --headed ${browser} --config-file '${config_file}'"
       else
         log "jbt-${instance} – Initiating headless ${actualTest} tests with ${spec}"
         docker exec jbt-cypress sh -c "cd '${cypress_dir}' && unset DISPLAY && \
           CYPRESS_SKIP_INSTALL_LANGUAGES=$CYPRESS_SKIP_INSTALL_LANGUAGES \
-          CYPRESS_CACHE_FOLDER=/jbt/cypress-cache CYPRESS_specPattern='${spec}' ${eel1} \
+          CYPRESS_CACHE_FOLDER=/jbt/cypress-cache CYPRESS_specPattern='${spec}' \
+          ${electron_enable_logging} ${cypress_paths} \
           npx cypress run ${browser} --config-file '${config_file}'"
       fi
       # shellcheck disable=SC2181 # Check either Cypress headed or headless status
