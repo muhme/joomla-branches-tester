@@ -283,7 +283,7 @@ for instance in "${instancesToTest[@]}"; do
 
       if [ "${actualTest}" = "joomla-cypress" ]; then
         if [ -z "${spec_argument}" ]; then
-          spec="[tests/cypress/joomla.cy.js,tests/cypress/*.cy.js]"
+          spec="[tests/joomla.cy.js,tests/*.cy.js]"
         fi
       fi
 
@@ -297,8 +297,8 @@ for instance in "${instancesToTest[@]}"; do
         # 'joomla-cypress'
         config_file="/jbt/installation/joomla-${instance}/cypress.config.js"
         cypress_dir="/jbt/installation/joomla-cypress"
-        # Adopt Cypress fixturesFolder and screenshotsFolder to use tests/cypress
-        cypress_paths="JBT_FIXTURES_FOLDER='tests/cypress/fixtures' JBT_SCREENSHOTS_FOLDER='tests/cypress/screenshots'"
+        # Adopt Cypress fixturesFolder and screenshotsFolder to use tests/
+        cypress_paths="JBT_FIXTURES_FOLDER='tests/fixtures' JBT_SCREENSHOTS_FOLDER='tests/screenshots'"
       fi
 
       # For joomla-cypress you can set CYPRESS_SKIP_INSTALL_LANGUAGES=1

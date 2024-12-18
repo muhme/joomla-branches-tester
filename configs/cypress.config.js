@@ -37,7 +37,7 @@ module.exports = defineConfig({
     fixturesFolder: process.env.JBT_FIXTURES_FOLDER || 'cypress/fixtures',
     screenshotsFolder: process.env.JBT_SCREENSHOTS_FOLDER || 'cypress/screenshots',
     // Just in case we are coming from a failed installation test, start with the Joomla installation
-    specPattern: ['tests/cypress/joomla.cy.js', 'tests/cypress/*.cy.js'],
+    specPattern: ['tests/joomla.cy.js', 'tests/*.cy.js'],
     defaultBrowser: 'firefox',
     setupNodeEvents(on, config) {
       // For example, in a German environment, force the use of Firefox with British English.

@@ -886,7 +886,7 @@ CYPRESS_SKIP_INSTALL_LANGUAGES=1 scripts/test 60 joomla-cypress
 
 Running only the `user.cy.js` test spec file and watching the progress with NoVNC:
 ```
-scripts/test 52 joomla-cypress tests/cypress/user.cy.js novnc
+scripts/test 52 joomla-cypress tests/user.cy.js novnc
 ```
 
 Running the tests with local Cypress GUI:

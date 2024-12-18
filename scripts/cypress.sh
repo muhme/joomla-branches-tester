@@ -63,8 +63,8 @@ if ${joomla_cypress}; then
   cypress_dir="installation/joomla-cypress"
   # joomla-cypress' installJoomlaMultilingualSite() test deletes installation directory – restore it
   restoreInstallationFolder "${instance}"
-  # Adopt Cypress fixturesFolder and screenshotsFolder to use tests/cypress
-  cypress_paths="JBT_FIXTURES_FOLDER='tests/cypress/fixtures' JBT_SCREENSHOTS_FOLDER='tests/cypress/screenshots'"
+  # Adopt Cypress fixturesFolder and screenshotsFolder to use tests/
+  cypress_paths="JBT_FIXTURES_FOLDER='tests/fixtures' JBT_SCREENSHOTS_FOLDER='tests/screenshots'"
 else
   # Joomla System Tests
   cypress_dir="joomla-${instance}"
@@ -109,8 +109,8 @@ if [ -n "${local}" ]; then
 
   # For installExtensionFromFolder() in joomla-cypress/cypress/extensions.cy.js needed
   # to find 'mod_hello_world' folder. And we can not use 'fixturesFolder' as this is
-  # needed for installExtensionFromFileUpload() with default 'tests/cypress/fixtures'.
-  export CYPRESS_SERVER_UPLOAD_FOLDER='/jbt/installation/joomla-cypress/tests/cypress/fixtures/mod_hello_world'
+  # needed for installExtensionFromFileUpload() with default 'tests/fixtures'.
+  export CYPRESS_SERVER_UPLOAD_FOLDER='/jbt/installation/joomla-cypress/tests/fixtures/mod_hello_world'
 
   # For joomla-cypress you can set CYPRESS_SKIP_INSTALL_LANGUAGES=1
   # to skip installLanguage() and installJoomlaMultilingual() tests. Default here to run the test.
