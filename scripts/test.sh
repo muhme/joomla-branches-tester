@@ -283,7 +283,7 @@ for instance in "${instancesToTest[@]}"; do
 
       if [ "${actualTest}" = "joomla-cypress" ]; then
         if [ -z "${spec_argument}" ]; then
-          spec="[tests/joomla.cy.js,tests/*.cy.js]"
+          spec="[tests/e2e/joomla.cy.js,tests/e2e/*.cy.js]"
         fi
       fi
 
