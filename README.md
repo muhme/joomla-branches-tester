@@ -1135,8 +1135,8 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
 
 ## More Information
 
-* Join the discussion on Mattermost: [joomla-branches-tester](https://joomlacommunity.cloud.mattermost.com/main/channels/joomla-branches-tester)
-* Watch the presentation on the architecture and live demo (in German) from JoomlaDay DACH, September 2024: [Video Ticket](https://dach.joomladay.org/de/tickets)
+* **Join the Discussion**: Connect with the community on Mattermost in the [joomla-branches-tester](https://joomlacommunity.cloud.mattermost.com/main/channels/joomla-branches-tester) channel.
+* **Watch the presentation**: Learn about the architecture and see a live demo in the [JoomlaDay DACH, September 2024 presentation](https://www.joomla.de/wissen/joomla-event-videos/joomla-day-deutschland/jd24dach-joomla-branches-tester) (German with optional English subtitles on YouTube).
 
 ## License
 
