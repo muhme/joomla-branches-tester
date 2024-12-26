@@ -15,7 +15,7 @@ Within [Docker](https://www.docker.com/) container environment you are able to:
 * Executing unit tests, verifying coding standards and checking CSS styles and JavaScript standards, just like Drone.
 * Automated [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester) installation.
 * Apply pull requests (PR) from Git repositories `joomla-cms`, `joomla-cypress` and `joomla-framework/database`.
-* Switching between 8 database variants (MySQL, MariaDB, or PostgreSQL and the two database drivers:
+* Switching between 10 database variants (MySQL, MariaDB, or PostgreSQL and the two database drivers:
   MySQLi or PHP Data Objects and the option to use Unix sockets, instead of TCP host).
 * Switching between PHP versions (PHP 7.4 ... 8.3).
 * Installing Joomla from a cloned 'joomla-cms' Git repository.
@@ -79,7 +79,7 @@ The JavaScript errors are displayed, logged and can be verified using `scripts/c
 The installation environment retains each Joomla release's `installation` folder
 to preserve it for future use, allowing restoration when needed, such as switching databases after grafting.
 
-The `installation/joomla-cypress` folder is also used to test the `joomla.cypress` module itself.
+The `installation/joomla-cypress` folder is also used to test the `joomla-cypress` NPM module itself.
 For more details, see the [Testing NPM Module joomla-cypress](#testing-npm-module-joomla-cypress) section.
 
 ### Version Naming
@@ -854,7 +854,7 @@ For instance, [database-317](https://github.com/joomla-framework/database/pull/3
 
 The NPM module [joomla-cypress](https://github.com/joomla-projects/joomla-cypress)
 has its own Cypress-based test suite. For more information
-see [joomla-cypress/cypress](https://github.com/joomla-projects/joomla-cypress/cypress).
+see [PR 39](https://github.com/joomla-projects/joomla-cypress/pull/39) and once it is merged [joomla-cypress/tests](https://github.com/joomla-projects/joomla-cypress/tests).
 
 The JBT `installation/joomla-cypress` directory contains the latest version of the `main` branch
 for Cypress-based Joomla-installation. And this can also be used to test the NPM module itself.
@@ -886,7 +886,7 @@ CYPRESS_SKIP_INSTALL_LANGUAGES=1 scripts/test 60 joomla-cypress
 
 Running only the `user.cy.js` test spec file and watching the progress with NoVNC:
 ```
-scripts/test 52 joomla-cypress cypress/user.cy.js novnc
+scripts/test 52 joomla-cypress tests/e2e/user.cy.js novnc
 ```
 
 Running the tests with local Cypress GUI:
@@ -1135,8 +1135,8 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
 
 ## More Information
 
-* Join the discussion on Mattermost: [joomla-branches-tester](https://joomlacommunity.cloud.mattermost.com/main/channels/joomla-branches-tester)
-* Watch the presentation on the architecture and live demo (in German) from JoomlaDay DACH, September 2024: [Video Ticket](https://dach.joomladay.org/de/tickets)
+* **Join the Discussion**: Connect with the community on Mattermost in the [joomla-branches-tester](https://joomlacommunity.cloud.mattermost.com/main/channels/joomla-branches-tester) channel.
+* **Watch the presentation**: Learn about the architecture and see a live demo in the [JoomlaDay DACH, September 2024 presentation](https://www.joomla.de/wissen/joomla-event-videos/joomla-day-deutschland/jd24dach-joomla-branches-tester) (German with optional English subtitles on YouTube).
 
 ## License
 
