@@ -65,7 +65,7 @@ if [ "${jbt}" = "true" ]; then
 elif [ "${scripts}" = "true" ]; then
   grep -e '<<<' -e '>>>' "${file}"
 else
-  grep -v \
+  grep -iv \
     -e 'Configure to catch all PHP errors' \
     -e 'liberror-perl' \
     -e 'symfony/error-handler' \
@@ -78,8 +78,14 @@ else
     -e 'Container .* Stopping' \
     -e 'Container .* Stopped' \
     -e 'symfony/stopwatch' \
-    -e 'overrid' "${file}" \
-    -e 'pear-build-defaultuser' | \
+    -e 'pear-build-defaultuser' \
+    -e 'libcanberra0' \
+    -e 'Enabling conf localized-error-page' \
+    -e 'info: Executing deferred' \
+    -e 'returns not found return code' \
+    -e 'referrer-policy' \
+    -e 'status-errored' \
+    -e 'overrid' "${file}" | \
   grep -i --color=always \
     -e ERR \
     -e error \
