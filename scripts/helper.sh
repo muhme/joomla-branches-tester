@@ -337,15 +337,20 @@ function isValidVariant() {
 function adjustJoomlaConfigurationForJBT() {
   local instance="$1"
 
-  if ! grep -q 'tEstValue' "joomla-${instance}/configuration.php"; then
-    log "jbt-${instance} – Adopt configuration.php for JBT"
-    docker exec "jbt-${instance}" bash -c "sed -i \
-      -e \"s|\(public .secret =\).*|\1 'tEstValue';|\" \
-      -e \"s|\(public .mailonline =\).*|\1 true;|\" \
-      -e \"s|\(public .mailer =\).*|\1 'smtp';|\" \
-      -e \"s|\(public .smtphost =\).*|\1 'host.docker.internal';|\" \
-      -e \"s|\(public .smtpport =\).*|\1 7025;|\" \
-      configuration.php"
+  if [ -f "joomla-${instance}/configuration.php" ]; then
+    if ! grep -q 'tEstValue' "joomla-${instance}/configuration.php"; then
+      log "jbt-${instance} – Adopt configuration.php for JBT"
+      docker exec "jbt-${instance}" bash -c "sed -i \
+        -e \"s|\(public .secret =\).*|\1 'tEstValue';|\" \
+        -e \"s|\(public .mailonline =\).*|\1 true;|\" \
+        -e \"s|\(public .mailer =\).*|\1 'smtp';|\" \
+        -e \"s|\(public .smtphost =\).*|\1 'host.docker.internal';|\" \
+        -e \"s|\(public .smtpport =\).*|\1 7025;|\" \
+        configuration.php"
+    fi
+  else
+    log "jbt-${instance} – There is no file 'joomla-${instance}/configuration.php'"
+    # Next step should be Joomla installation
   fi
 }
 
