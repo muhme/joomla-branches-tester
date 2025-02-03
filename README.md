@@ -1147,3 +1147,6 @@ If it is used, I would like to pass it on to the Joomla! project.
 ## Contact
 
 Don't hesitate to ask if you have any questions or comments. If you encounter any problems or have suggestions for enhancements, please feel free to [open an issue](../../issues).
+
+"A day without a smile is a wasted day." :smile:<br />
+Charlie Chaplin
