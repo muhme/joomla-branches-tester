@@ -187,7 +187,17 @@ fi
 # Performing additional version-independent configurations to complete the base installation.
 if [ "$recreate" = false ]; then
   log "jbt-cypress – Installing git, vim, ping, ip, telnet and netstat"
-  docker exec jbt-cypress sh -c "apt-get update && apt-get install -y git vim iputils-ping iproute2 telnet net-tools"
+  # 17 February 2025 "apt-get update" Error "Missing Google Chrome GPG Key" with current cypress/included image
+  #   -> Add the missing key manually and update Chrome repo before "apt-get update"
+  #      -> this needs pgp and curl
+  #         -> this needs "apt-get update" before, even if it fails
+  #   -> and the next two "apt-get install" can not be have "apt-get update" before, as the key is then loosed
+  #   -> but the last "apt-get install php ..." needs error-ignored "apt-get update" before :(
+  # to be checked later if this is still needed
+  docker exec jbt-cypress sh -c "apt-get update >/dev/null 2>&1; apt-get install gpg curl -y && \
+    curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor | tee /usr/share/keyrings/google-chrome.gpg > /dev/null && \
+    echo "deb [signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb stable main" | tee /etc/apt/sources.list.d/google-chrome.list && \
+    apt-get install -y git vim iputils-ping iproute2 telnet net-tools"
 
   log "jbt-cypress – JBT 'installation' environment – installing cypress@latest"
   # First free 652 MB for pre-installed Cypress 13.14.2
@@ -203,16 +213,15 @@ if [ "$recreate" = false ]; then
 
   # Browsers are not preinstalled for ARM images with cypress/included – install Firefox
   log "jbt-cypress – Installing Firefox (if needed)"
-  docker exec "jbt-cypress" bash -c "apt-get update && \
-                                     apt-get install -y --no-install-recommends firefox-esr && \
+  docker exec "jbt-cypress" bash -c "apt-get install -y --no-install-recommends firefox-esr && \
                                      apt-get clean && \
                                      rm -rf /var/lib/apt/lists/*"
 
   # With https://github.com/joomla/joomla-cms/pull/44253 Joomla command line client usage has been added
   # to the System Tests. Hopefully, this is only temporary and can be replaced to reduce complexity and dependency.
   log "jbt-cypress – Adding PHP for cli/joomla.php (hopefully only temporary)"
-  docker exec "jbt-cypress" bash -c "apt-get update && \
-                                     apt-get install -y php php-simplexml php-mysql php-pgsql php-mysqli"
+  # 17 February 2025 See Google Chrome GPG Key comment above
+  docker exec "jbt-cypress" bash -c "apt-get update; apt-get install -y php php-simplexml php-mysql php-pgsql php-mysqli"
 
   log "Add bash for Alpine containers"
   for container in "jbt-pga" "jbt-mail"; do
