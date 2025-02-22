@@ -328,6 +328,8 @@ for instance in "${instancesToTest[@]}"; do
         fi
       fi
 
+      time_before_test=$(date '+%Y-%m-%dT%H:%M:%S')
+
       if [[ "$novnc" == true ]]; then
         log "jbt-${instance} – Initiating ${actualTest} tests with NoVNC and ${spec}"
         # Using 'CYPRESS_specPattern' and not '--spec' to have absolute paths work correctly.
@@ -344,8 +346,13 @@ for instance in "${instancesToTest[@]}"; do
           ${electron_enable_logging} ${cypress_paths} \
           npx cypress run ${browser} --config-file '${config_file}'"
       fi
+      npx_status=$?
+      if docker logs "jbt-${instance}" --since "${time_before_test}" 2>&1 | grep "PHP [Notice|Warning|Error]"; then
+        error "jbt-${instance} – PHP Notice|Warning|Error found in Joomla Backend"
+        npx_status=42
+      fi
       # shellcheck disable=SC2181 # Check either Cypress headed or headless status
-      if [ $? -eq 0 ]; then
+      if [ ${npx_status} -eq 0 ]; then
         # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
         successful=$((successful + 1))
         overallSuccessful=$((overallSuccessful + 1))
