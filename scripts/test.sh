@@ -347,8 +347,8 @@ for instance in "${instancesToTest[@]}"; do
           npx cypress run ${browser} --config-file '${config_file}'"
       fi
       npx_status=$?
-      if docker logs "jbt-${instance}" --since "${time_before_test}" 2>&1 | grep "PHP [Notice|Warning|Error]"; then
-        error "jbt-${instance} – PHP Notice|Warning|Error found in Joomla Backend"
+      if docker logs "jbt-${instance}" --since "${time_before_test}" 2>&1 | grep "PHP [Deprecated|Notice|Warning|Error]"; then
+        error "jbt-${instance} – PHP Deprecated|Notice|Warning|Error found in Joomla Backend"
         npx_status=42
       fi
       # shellcheck disable=SC2181 # Check either Cypress headed or headless status
