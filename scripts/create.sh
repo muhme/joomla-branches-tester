@@ -218,10 +218,18 @@ if [ "$recreate" = false ]; then
                                      rm -rf /var/lib/apt/lists/*"
 
   # With https://github.com/joomla/joomla-cms/pull/44253 Joomla command line client usage has been added
-  # to the System Tests. Hopefully, this is only temporary and can be replaced to reduce complexity and dependency.
-  log "jbt-cypress – Adding PHP for cli/joomla.php (hopefully only temporary)"
-  # 17 February 2025 See Google Chrome GPG Key comment above
-  docker exec "jbt-cypress" bash -c "apt-get update; apt-get install -y php php-simplexml php-mysql php-pgsql php-mysqli"
+  # to the System Tests. Since Debian Bullseye’s official repositories only offer PHP 7.4 by default,
+  # we install PHP 8.4 from Ondřej Surý repository in the Cypress container.
+  #
+  log "jbt-cypress – Adding PHP 8.4 to be able to execute cli/joomla.php from Joomla System Tests"
+  # Update and install prerequisites; for ignoring apt-get update error, see Google Chrome GPG Key comment above
+  docker exec "jbt-cypress" bash -c "apt-get update >/dev/null 2>&1; apt-get install -y lsb-release apt-transport-https ca-certificates wget gnupg"
+  # Add Ondřej Surý repository as PHP source
+  docker exec "jbt-cypress" bash -c 'wget -qO - https://packages.sury.org/php/apt.gpg | apt-key add - && echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
+  # Install PHP 8.4; for ignoring apt-get update error, see Google Chrome GPG Key comment above
+  docker exec "jbt-cypress" bash -c "apt-get update >/dev/null 2>&1; apt-get install -y php8.4 php8.4-simplexml php8.4-cli php8.4-common php8.4-curl php8.4-mbstring php8.4-xml php8.4-mysql php8.4-mysqli php8.4-pgsql"
+  # Update the default PHP binary to PHP 8.4
+  docker exec "jbt-cypress" bash -c "update-alternatives --set php /usr/bin/php8.4"
 
   log "Add bash for Alpine containers"
   for container in "jbt-pga" "jbt-mail"; do
