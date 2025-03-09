@@ -196,7 +196,7 @@ if [ "$recreate" = false ]; then
   # to be checked later if this is still needed
   docker exec jbt-cypress sh -c "apt-get update >/dev/null 2>&1; apt-get install gpg curl -y && \
     curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor | tee /usr/share/keyrings/google-chrome.gpg > /dev/null && \
-    echo "deb [signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb stable main" | tee /etc/apt/sources.list.d/google-chrome.list && \
+    echo 'deb [signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb stable main' | tee /etc/apt/sources.list.d/google-chrome.list && \
     apt-get install -y git vim iputils-ping iproute2 telnet net-tools"
 
   log "jbt-cypress – JBT 'installation' environment – installing cypress@latest"

@@ -89,9 +89,9 @@ if [ ${#testsToRun[@]} -eq 0 ]; then
 fi
 
 # Pass through the environment variable to show 'console.log()' messages
-electron_enable_logging=""
-if [ "$ELECTRON_ENABLE_LOGGING" == "1" ]; then
-  electron_enable_logging="ELECTRON_ENABLE_LOGGING=1"
+electron_enable_logging_env=""
+if [ "${ELECTRON_ENABLE_LOGGING}" == "1" ]; then
+  electron_enable_logging_env="ELECTRON_ENABLE_LOGGING=1"
 fi
 
 overallFailed=0
@@ -336,14 +336,14 @@ for instance in "${instancesToTest[@]}"; do
         docker exec jbt-cypress sh -c "cd '${cypress_dir}' && export DISPLAY=jbt-novnc:0 && \
           CYPRESS_SKIP_INSTALL_LANGUAGES=$CYPRESS_SKIP_INSTALL_LANGUAGES \
           CYPRESS_CACHE_FOLDER=/jbt/cypress-cache CYPRESS_specPattern='${spec}' \
-          ${electron_enable_logging} ${cypress_paths} \
+          ${electron_enable_logging_env} ${cypress_paths} \
           npx cypress run --headed ${browser} --config-file '${config_file}'"
       else
         log "jbt-${instance} – Initiating headless ${actualTest} tests with ${spec}"
         docker exec jbt-cypress sh -c "cd '${cypress_dir}' && unset DISPLAY && \
           CYPRESS_SKIP_INSTALL_LANGUAGES=$CYPRESS_SKIP_INSTALL_LANGUAGES \
           CYPRESS_CACHE_FOLDER=/jbt/cypress-cache CYPRESS_specPattern='${spec}' \
-          ${electron_enable_logging} ${cypress_paths} \
+          ${electron_enable_logging_env} ${cypress_paths} \
           npx cypress run ${browser} --config-file '${config_file}'"
       fi
       npx_status=$?
