@@ -535,7 +535,8 @@ To check the emails sent by Joomla,
 the [MailDev](https://hub.docker.com/r/maildev/maildev) container
 provides you with a web interface at [http://host.docker.internal:7004](http://host.docker.internal:7004).
 The Cypress based Joomla System Tests is using an own SMTP server `smtp-tester` to receive, check and delete emails.
-Since we run Cypress locally or in a container, it is necessary to triple emails.
+Since we run Cypress locally or in a container,
+it is necessary to triple the emails for the three potential recipients.
 This is done by the SMTP relay triplicator `jbt-relay`.
 
 :fairy: *"Oh, dear Gnome, now I can really read all the emails from the System Tests, thank you."*
