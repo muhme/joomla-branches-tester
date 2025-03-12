@@ -56,7 +56,7 @@ Ensure that your current working directory is always the `joomla-branches-tester
 
 By default (without specifying a Joomla version number) `scripts/create` takes all **used** Joomla development branches.
 **Used** Joomla development branches refer to the GitHub [joomla-cms](https://github.com/joomla/joomla-cms) repository, including default, active and stale branches.
-At the beginning of November 2024, these are `4.4-dev`, `5.1-dev`, `5.2-dev`, `5.3-dev` and `6.0-dev`.
+At the beginning of March 2025, these are `4.4-dev`, `5.2-dev`, `5.3-dev`, `5.4-dev` and `6.0-dev`.
 
 :point_right: Since **used** branches are subject to frequent changes,
               the latest version numbers are always be retrieved directly from the `joomla-cms` repository.
