@@ -854,7 +854,7 @@ For instance, [database-317](https://github.com/joomla-framework/database/pull/3
 
 The NPM module [joomla-cypress](https://github.com/joomla-projects/joomla-cypress)
 has its own Cypress-based test suite. For more information
-see [PR 39](https://github.com/joomla-projects/joomla-cypress/pull/39) and once it is merged [joomla-cypress/tests](https://github.com/joomla-projects/joomla-cypress/tests).
+see [joomla-cypress/tests](https://github.com/joomla-projects/joomla-cypress/tree/main/tests).
 
 The JBT `installation/joomla-cypress` directory contains the latest version of the `main` branch
 for Cypress-based Joomla-installation. And this can also be used to test the NPM module itself.
