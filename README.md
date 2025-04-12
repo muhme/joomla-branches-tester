@@ -5,6 +5,8 @@ Imagine a little slice of a parallel universe where testing different Joomla ver
 <br /><br />
 Alright, alright, apologies to those who enjoyed the whimsical writing style, but now it's time to dive into the technical depths. Let's transition from the cozy, magical universe into the world of technical documentation, where we'll explore the numerous options, parameters and configurations that power this experience ...
 
+<br />:point_right: See a live demo in the [JoomlaDay DACH, September 2024 presentation](https://www.youtube.com/watch?v=jGi0InmjScM) (German with optional English subtitles).
+
 ## Software Architecture
 Within [Docker](https://www.docker.com/) container environment you are able to:
 * Use almost 300 different Joomla versions, based on the Git development branches or Git tags (Joomla 3.9.0 ... 6.0-dev).
