@@ -340,13 +340,18 @@ function adjustJoomlaConfigurationForJBT() {
   if [ -f "joomla-${instance}/configuration.php" ]; then
     if ! grep -q 'tEstValue' "joomla-${instance}/configuration.php"; then
       log "jbt-${instance} – Adopt configuration.php for JBT"
-      docker exec "jbt-${instance}" bash -c "sed -i \
+      # Since we get an access error when changing the ownership, even as root user,
+      # we create configuration.php.new and rename it.
+      docker exec "jbt-${instance}" bash -c "sed \
         -e \"s|\(public .secret =\).*|\1 'tEstValue';|\" \
         -e \"s|\(public .mailonline =\).*|\1 true;|\" \
         -e \"s|\(public .mailer =\).*|\1 'smtp';|\" \
         -e \"s|\(public .smtphost =\).*|\1 'host.docker.internal';|\" \
         -e \"s|\(public .smtpport =\).*|\1 7025;|\" \
-        configuration.php"
+        configuration.php > configuration.php.new && \
+        mv configuration.php.new configuration.php && \
+        chown www-data:www-data configuration.php && \
+        chmod 0444 configuration.php"
     fi
   else
     log "jbt-${instance} – There is no file 'joomla-${instance}/configuration.php'"
