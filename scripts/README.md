@@ -65,7 +65,7 @@ See the following example:
 ![scripts/test sample screenshot](../images/screen-shot.png)
 
 JBT warnings are marked with " WRN " and colored orange.
-Colouring can be avoided by setting the environment variable [NO_COLOR=1](https://no-color.org/).
+Coloring can be avoided by setting the environment variable [NO_COLOR=1](https://no-color.org/).
 
 ## Engine Room Scripts
 
