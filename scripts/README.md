@@ -55,7 +55,7 @@ are not separately named in the list.
 to color their own log and error messages.
 All messages start with three asterisks, the date and the time.
 Starting a script is marked with `>>>` and ending a script with `<<<`.
-Error messages are displayed in red and directed to the standard error output (stderr) stream:
+Error messages are marked with " ERR ", displayed in red and directed to the standard error output (stderr) stream:
 
 <img alt="cypress error sample screenshot" src="../images/error.png" width="760">
 
@@ -64,6 +64,7 @@ See the following example:
 
 ![scripts/test sample screenshot](../images/screen-shot.png)
 
+JBT warnings are marked with " WRN " and colored orange.
 Colouring can be avoided by setting the environment variable [NO_COLOR=1](https://no-color.org/).
 
 ## Engine Room Scripts

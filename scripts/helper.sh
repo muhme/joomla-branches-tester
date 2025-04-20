@@ -40,8 +40,8 @@ JBT_DB_SOCKETS=("${JBT_S_MY}" "${JBT_S_MY}" "${JBT_S_MA}" "${JBT_S_MA}" "${JBT_S
 # (not 5.6 - 7.3 as there are problems and for lowest supported Joomla 3.9.0 there is PHP 7.4 available and working)
 JBT_VALID_PHP_VERSIONS=("php7.4" "php8.0" "php8.1" "php8.2" "php8.3" "highest")
 
-# Highest PHP versions for Joomla versions (6 November 2024: There are no images 5.3 and higher)
-JBT_JOOMLA_VERSIONS=("39" "310" "40" "41" "42" "43" "44" "50" "51" "52")
+# Highest PHP versions for Joomla versions (20 April 2025: There are no images 5.4 and higher)
+JBT_JOOMLA_VERSIONS=("39" "310" "40" "41" "42" "43" "44" "50" "51" "52" "53")
 JBT_PHP_VERSIONS=("php7.4" "php8.0" "php8.0" "php8.0" "php8.1" "php8.2" "php8.2" "php8.2" "php8.3" "php8.3")
 
 # Base Docker containers, eg ("jbt-pga" "jbt-mya" "jbt-mysql" "jbt-madb" "jbt-pg" "jbt-relay" "jbt-mail" "jbt-cypress" "jbt-novnc")
@@ -473,10 +473,10 @@ function dockerImageName() {
     php_to_use="${php_version}"
   fi
 
-  if (( instance != 310 && instance > 52 )); then
-    # Currently (6 November 2024) there are no Joomla 5.3 and higher Docker images, simple use 5.2 as base.
-    instance_to_use="52"
-    php_to_use="php8.3"
+  if (( instance != 310 && instance > 53 )); then
+    # Currently (20 April 2025) there are no Joomla 5.4 and higher Docker images, simple use 5.3 as base.
+    warning "For Joomla ${instance} an official Docker image may not exist, so Joomla 5.3 image is used (and only as the base) and should work."
+    instance_to_use="53"
   else
     instance_to_use="${instance}"
   fi
@@ -628,6 +628,7 @@ function random_quote() {
 #
 JBT_UNDERLINE="\033[4m"
 JBT_GREEN_BG="\033[42m"
+JBT_ORANGE="\033[38;5;208m"
 JBT_RED="\033[0;31m"
 JBT_BOLD="\033[1m"
 JBT_RESET="\033[0m"
@@ -637,6 +638,7 @@ if [ -n "${NO_COLOR}" ]; then
   # Do not use color for log messages.
   JBT_UNDERLINE=""
   JBT_GREEN_BG=""
+  JBT_ORANGE=""
   JBT_RED=""
   JBT_BOLD=""
   JBT_RESET=""
@@ -658,6 +660,13 @@ log() {
 
   # -e enables backslash escapes
   echo -e "${JBT_GREEN_BG}${JBT_BOLD}*** $(date '+%y%m%d %H:%M:%S') ${marker} $*${JBT_RESET}"
+}
+
+# Warning message with date and time in bold and orange on stderr.
+#
+warning() {
+  # -e enables backslash escapes
+  echo -e "${JBT_ORANGE}${JBT_BOLD}*** $(date '+%y%m%d %H:%M:%S') WRN $*${JBT_RESET}" >&2
 }
 
 # Error message with date and time in bold and dark red on stderr.
