@@ -40,9 +40,9 @@ JBT_DB_SOCKETS=("${JBT_S_MY}" "${JBT_S_MY}" "${JBT_S_MA}" "${JBT_S_MA}" "${JBT_S
 # (not 5.6 - 7.3 as there are problems and for lowest supported Joomla 3.9.0 there is PHP 7.4 available and working)
 JBT_VALID_PHP_VERSIONS=("php7.4" "php8.0" "php8.1" "php8.2" "php8.3" "highest")
 
-# Highest PHP versions for Joomla versions (20 April 2025: There are no images 5.4 and higher)
+# The highest PHP version for existing official Joomla images (the two arrays correspond via the index).
 JBT_JOOMLA_VERSIONS=("39" "310" "40" "41" "42" "43" "44" "50" "51" "52" "53")
-JBT_PHP_VERSIONS=("php7.4" "php8.0" "php8.0" "php8.0" "php8.1" "php8.2" "php8.2" "php8.2" "php8.3" "php8.3")
+JBT_PHP_VERSIONS=("php7.4" "php8.0" "php8.0" "php8.0" "php8.1" "php8.2" "php8.2" "php8.2" "php8.3" "php8.3" "php8.3")
 
 # Base Docker containers, eg ("jbt-pga" "jbt-mya" "jbt-mysql" "jbt-madb" "jbt-pg" "jbt-relay" "jbt-mail" "jbt-cypress" "jbt-novnc")
 JBT_BASE_CONTAINERS=()
@@ -363,12 +363,14 @@ function adjustJoomlaConfigurationForJBT() {
 # 1st argument is e.g. "5.2-dev" or "4.4.1-alpha4 5.1.0"
 # 2nd argument e.g. "php8.1" or "highest"
 # 3rd argument is "IPv4" or "IPv6"
-# 4th optional argument is "append", then the web server is inserted before volumes, if it is not already existing.
+# 4th argument is "no-warnings" (in case create for clean-up only) or "show-warnings"
+# 5th optional argument is "append", then the web server is inserted before volumes, if it is not already existing.
 #
 function createDockerComposeFile() {
   local php_version="$2"
   local network="$3"
-  local working="$4"
+  local warnings="$4"
+  local working="$5"
 
   # Declare all local variables to prevent SC2155 - Declare and assign separately to avoid masking return values.
   local version versions=() din
@@ -394,7 +396,7 @@ function createDockerComposeFile() {
   for version in "${versions[@]}"; do
     local doit=true
     instance=$(getMajorMinor "${version}")
-    din=$(dockerImageName "${version}" "${php_version}")
+    din=$(dockerImageName "${version}" "${php_version}" "${warnings}")
     checkDockerImageName "${instance}" "${din:7}" # e.g. 'joomla:5.0-php8.2-apache' as '5.0-php8.2-apache'
     padded=$(getMajorMinor "${version}" "pad")
     if [ "${working}" = "append" ]; then
@@ -449,20 +451,28 @@ function checkDockerImageName {
 }
 
 # Returns existing Docker image name for given Joomla and PHP version.
-#   e.g. dockerImageName "4.4-dev" "php8.1" -> "4.4-php8.1-apache"
-#   e.g. dockerImageName "3.9" "highest" -> "3.9-php7.4-apache"
+#   e.g. dockerImageName "4.4-dev" "php8.1" "no-warnings" -> "4.4-php8.1-apache"
+#   e.g. dockerImageName "3.9" "highest" "show-warnings" -> "3.9-php7.4-apache"
 #   exceptions/restrictions:
 #   - Docker images starting with Joomla 3.4 (but as with not working npm we start with >= 3.9)
-#   - There are no Joomla 5.3 and 6.0 images fallback to Joomla 5.2
+#   - There are no Joomla 5.4 and 6.0 images -> fallback to Joomla 5.3
 #
 # see https://hub.docker.com/_/joomla/tags and fast testable by e.g.:
 #   curl -s -o /dev/null -w "%{http_code}" https://hub.docker.com/v2/repositories/library/joomla/tags/4.0-php8.0-apache
 #
 function dockerImageName() {
-  local instance php_version="$2" php_to_use instance_to_use
+  local instance php_to_use php_version="$2" show_warning="$3"
   instance=$(getMajorMinor "$1")
 
-  if [ "${php_version}" = "highest" ]; then
+  if (( instance != 310 && instance > 53 )); then
+    # Currently (20 April 2025) there are no Joomla 5.4 and higher Docker images, simple use 5.3 as base.
+    if [ "${show_warning}" = "show-warnings" ]; then
+      warning "For Joomla ${instance} an official Docker image may not exist, so Joomla 5.3 image is used (and only as the base) and should work."
+    fi
+    instance="53"
+  fi
+
+  if [ -z "${php_version}" ] || [ "${php_version}" = "highest" ]; then
     for i in "${!JBT_JOOMLA_VERSIONS[@]}"; do
       if [ "${JBT_JOOMLA_VERSIONS[$i]}" = "${instance}" ]; then
         php_to_use="${JBT_PHP_VERSIONS[$i]}"
@@ -473,15 +483,7 @@ function dockerImageName() {
     php_to_use="${php_version}"
   fi
 
-  if (( instance != 310 && instance > 53 )); then
-    # Currently (20 April 2025) there are no Joomla 5.4 and higher Docker images, simple use 5.3 as base.
-    warning "For Joomla ${instance} an official Docker image may not exist, so Joomla 5.3 image is used (and only as the base) and should work."
-    instance_to_use="53"
-  else
-    instance_to_use="${instance}"
-  fi
-
-  echo "joomla:${instance_to_use:0:1}.${instance_to_use:1}-${php_to_use}-apache"
+  echo "joomla:${instance:0:1}.${instance:1}-${php_to_use}-apache"
 }
 
 # Retrieve the installed Joomla major and minor version from the `libraries/src/Version.php` file in the specified branch directory.

@@ -85,6 +85,7 @@ else
     -e 'returns not found return code' \
     -e 'referrer-policy' \
     -e 'status-errored' \
+    -e "error-logging.ini' to catch all PHP error" \
     -e 'overrid' "${file}" | \
   grep -i --color=always \
     -e ERR \

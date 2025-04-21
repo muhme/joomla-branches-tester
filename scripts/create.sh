@@ -143,7 +143,7 @@ if [ "$recreate" = false ]; then
 
   # Create Docker Compose setup with Joomla web servers for all versions to be installed.
   log "Create 'docker-compose.yml' file for version(s) ${versionsToInstall[*]}, based on ${php_version} PHP version and ${network}"
-  createDockerComposeFile "${versionsToInstall[*]}" "${php_version}" "${network}"
+  createDockerComposeFile "${versionsToInstall[*]}" "${php_version}" "${network}" "show-warnings"
 
   if $no_cache; then
     log "Running 'docker compose build --no-cache'"
@@ -269,7 +269,7 @@ for version in "${versionsToInstall[@]}"; do
       docker compose rm -f "jbt-${instance}" || log "jbt-${instance} – Ignoring failure to remove Docker container"
     fi
 
-    createDockerComposeFile "${instance}" "${php_version}" "${network}" "append"
+    createDockerComposeFile "${instance}" "${php_version}" "${network}" "show-warnings" "append"
 
     log "jbt-${instance} – Building Docker container"
     docker compose build "jbt-${instance}"

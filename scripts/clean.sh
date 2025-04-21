@@ -36,7 +36,7 @@ done
 # Delete all docker containers. The PHP version and network do not affect the deletion process.
 if [[ ! -f "docker-compose.yml" ]]; then
   log "Missing 'docker-compose.yml' file, create one with all branch versions to remove Joomla Branches Tester overall"
-  createDockerComposeFile "$(getAllUsedBranches)" "php8.2" "IPv4"
+  createDockerComposeFile "$(getAllUsedBranches)" "php8.2" "IPv4" "no-warnings"
 fi
 
 log 'Stopping and removing JBT Docker containers, associated Docker networks and volumes'
