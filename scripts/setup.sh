@@ -92,7 +92,7 @@ log "jbt-${instance} – Create 'php/conf.d/error-logging.ini' to catch all PHP 
 docker cp 'configs/error-logging.ini' "jbt-${instance}:/usr/local/etc/php/conf.d/error-logging.ini"
 
 log "jbt-${instance} – Create 'php/conf.d/jbt.ini' to prevent Joomla warnings"
-docker cp 'configs/jbt.ini' "jbt-${instance}:/usr/local/etc/php/conf.d/error-logging.ini"
+docker cp 'configs/jbt.ini' "jbt-${instance}:/usr/local/etc/php/conf.d/jbt.ini"
 
 # Needs PHP >= 8.0, therefore not possible for Joomla 3.9 with PHP 7.4, but possible for 3.10 with PHP 8.0
 if (( instance == 310 || instance >= 40 )); then
