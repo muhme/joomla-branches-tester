@@ -11,9 +11,10 @@ import { registerCommands } from "./registerCommands";
 registerCommands();
 
 const plugins = [
-  'Behaviour - Backward Compatibility', // >= 4.4
-  'Behaviour - Taggable',               // <= 4.3
-  'Behaviour - Versionable'             // <= 4.3
+  'Behaviour - Backward Compatibility 6', // >= 5.4
+  'Behaviour - Backward Compatibility',   // >= 4.4
+  'Behaviour - Taggable',                 // <= 4.3
+  'Behaviour - Versionable'               // <= 4.3
 ];
 
 describe('Disable Behaviour Plugins', () => {

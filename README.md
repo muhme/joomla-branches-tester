@@ -400,7 +400,7 @@ The Joomla development version installed in the web server container is configur
 - Error Reporting is set to `Maximum` in `Global Configuration | Server`.
 - A cron job is configured to run the Joomla Task Scheduler every minute.
 - The 'System - Joomla! Statistics' plugin is disabled to prevent prompting users on the backend Home Dashboard.
-- The 'Behaviour - Backward Compatibility' plugins are disabled to detect backward compatibility issues.
+- All the behaviour plugins, such as 'Behaviour - Backward Compatibility', are disabled to detect backward compatibility issues (see [configs/disableBC.cy.js](configs/disableBC.cy.js)).
 - The automatic run of the 'Welcome to Joomla!' guided tour is canceled from Joomla version 5.1 onwards.
 - Not configured for logging, due to deprecation warnings.
 
@@ -907,9 +907,9 @@ is set for you.
   You cannot open the GUI and run `joomla.cy.js` test spec twice.
 
 👉 JBT's Joomla installation (using `scripts/create` or `scripts/database`) disables
-  the Backward Compatibility (B/C) plugin.
-  However, when running `joomla-cypress` tests, Joomla is reinstalled and the B/C plugin is not disabled.
-  To have the B/C plugin disabled again, you will need to recreate the Joomla instance.
+  all the behaviour plugins (such as Backward Compatibility (B/C); see [configs/disableBC.cy.js](configs/disableBC.cy.js)).
+  However, when running `joomla-cypress` tests, Joomla is reinstalled and the B/C plugins are not disabled.
+  To have the B/C plugins disabled again, you will need to recreate the Joomla instance.
 
 ### Versions
 
