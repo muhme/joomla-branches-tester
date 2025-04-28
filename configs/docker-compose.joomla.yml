@@ -31,3 +31,6 @@
       jbt-network:
         ipv4_address: 10.0.WWW.VVV
         ipv6_address: fd00::XXX
+    cap_add:
+      - SYS_PTRACE # Allow ptrace in the Docker container to be able to use the strace command
+
