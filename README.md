@@ -1,9 +1,17 @@
 # JBT – Joomla Branches Tester
 
 <img align="right" src="images/magic_world.png">
-Imagine a little slice of a parallel universe where testing different Joomla versions becomes a fluffy, cosy and almost magical experience. In this universe, you can effortlessly test with the Patch Tester, glide through the Cypress GUI, or even enjoy the smooth efficiency of Cypress Headless. Picture the warmth of being able to peer into any database table as if through a magical glass, or seamlessly switch between five different database variants with just a small wave of a magic wand. Wouldn't that create a truly fluffy and cosy environment to work in?
+Imagine a little slice of a parallel universe where testing different Joomla versions becomes a fluffy,
+cosy and almost magical experience.
+In this universe, you can effortlessly test with the Patch Tester, glide through the Cypress GUI,
+or even enjoy the smooth efficiency of Cypress Headless.
+Picture the warmth of being able to peer into any database table as if through a magical glass,
+or seamlessly switch between ten different database variants with just a small wave of a magic wand.
+Wouldn't that create a truly fluffy and cosy environment to work in?
 <br /><br />
-Alright, alright, apologies to those who enjoyed the whimsical writing style, but now it's time to dive into the technical depths. Let's transition from the cozy, magical universe into the world of technical documentation, where we'll explore the numerous options, parameters and configurations that power this experience ...
+Alright, alright, apologies to those who enjoyed the whimsical writing style, but now it's time to dive into the technical depths.
+Let's transition from the cozy, magical universe into the world of technical documentation,
+where we'll explore the numerous options, parameters and configurations that power this experience ...
 
 <br />:point_right: See a live demo in the [JoomlaDay DACH, September 2024 presentation](https://www.youtube.com/watch?v=jGi0InmjScM) (German with optional English subtitles).
 
@@ -58,7 +66,7 @@ Ensure that your current working directory is always the `joomla-branches-tester
 
 By default (without specifying a Joomla version number) `scripts/create` takes all **used** Joomla development branches.
 **Used** Joomla development branches refer to the GitHub [joomla-cms](https://github.com/joomla/joomla-cms) repository, including default, active and stale branches.
-At the beginning of March 2025, these are `4.4-dev`, `5.2-dev`, `5.3-dev`, `5.4-dev` and `6.0-dev`.
+At the beginning of May 2025, these are `4.4-dev`, `5.3-dev`, `5.4-dev` and `6.0-dev`.
 
 :point_right: Since **used** branches are subject to frequent changes,
               the latest version numbers are always be retrieved directly from the `joomla-cms` repository.
@@ -86,10 +94,10 @@ For more details, see the [Testing NPM Module joomla-cypress](#testing-npm-modul
 
 ### Version Naming
 
-With `scripts/create`, Joomla versions need to be specified as a Git branch (e.g., `5.2-dev`) or a Git tag (e.g., `5.1.1-rc1`).
-When creating an instance from a Git branch, either the full branch name or just the major and minor version numbers can be used (e.g., `52` instead of `5.2-dev`).
+With `scripts/create`, Joomla versions need to be specified as a Git branch (e.g., `5.4-dev`) or a Git tag (e.g., `5.1.4-rc3`).
+When creating an instance from a Git branch, either the full branch name or just the major and minor version numbers can be used (e.g., `54` instead of `5.4-dev`).
 Once the Joomla instances are created, all other scripts use only the major and minor version numbers.
-For example, an instance created from the Git tag `3.10.12` runs as `jbt-310`, and you can use `310` throughout to specify the instance.
+For example, an instance created from the Git tag `3.10.12` runs as `jbt-310`, and you can specify the instance as `310` throughout.
 
 <details>
   <summary>See the detailed list of Docker containers.</summary>
@@ -112,7 +120,7 @@ The abbreviation `jbt` stands for Joomla Branches Tester.
 |jbt-39| 10.0.0.39<br />fd00::39 | **[7039](http://host.docker.internal:7039/administrator)** | /joomla-39 | Web Server Joomla e.g. tag 3.9.28<br />user ci-admin / joomla-17082005 |
 |jbt-310| 10.0.3.10<br />fd00::310 | **[7310](http://host.docker.internal:7310/administrator)** | /joomla-310 | Web Server Joomla e.g. tag 3.10.12<br />user ci-admin / joomla-17082005 |
 | ... | | | | |
-|jbt-53| 10.0.0.53<br />fd00::53 | **[7053](http://host.docker.internal:7053/administrator)** | /joomla-53 | Web Server Joomla e.g. 5.3-dev<br />user ci-admin / joomla-17082005 |
+|jbt-54| 10.0.0.54<br />fd00::54 | **[7054](http://host.docker.internal:7054/administrator)** | /joomla-54 | Web Server Joomla e.g. 5.4-dev<br />user ci-admin / joomla-17082005 |
 |jbt-60| 10.0.0.60<br />fd00::60 | **[7060](http://host.docker.internal:7060/administrator)** | /joomla-60 | Web Server Joomla e.g. 6.0-dev<br />user ci-admin / joomla-17082005 |
 
 :eight_spoked_asterisk: The directories are available on the Docker host inside `/jbt` to:
@@ -179,8 +187,8 @@ Last tested in early November 2024 with:
 * Windows 11 Pro WSL 2 Ubuntu and
 * Ubuntu 24 Noble Numbat (the absolute minimum, if you also wish to use the Cypress GUI, is a VPS with 2 shared vCPUs and 4 GB RAM).
 
-You can create all base Docker containers and the current (early November 2024)
-five Joomla dev-branch containers using `scripts/create` without any arguments:
+You can create all base Docker containers and the current (early May 2025)
+four Joomla dev-branch containers using `scripts/create` without any arguments:
 
 ```
 git clone https://github.com/muhme/joomla-branches-tester
@@ -584,7 +592,7 @@ for running the Cypress GUI locally.
 
 ### Databases
 
-The Joomla Branches Tester includes one container for each of the three supported databases (version numbers as of the beginning of November 2024):
+The Joomla Branches Tester includes one container for each of the three supported databases (version numbers as of the beginning of May 2025):
 * `jbt-mysql` – MySQL version 8.1.0 Community Server
 * `jbt-madb` – MariaDB version 10.4.34
 * `jbt-pg` – PostgreSQL version 15.8
@@ -599,7 +607,7 @@ Firstly, the settings for the database server with `db_host` and the database dr
 are adjusted in the configuration file `Cypress.config.cy.mjs`.
 Secondly, a Joomla installation is performed with the Joomla System Tests.
 
-Five variants are available:
+Five database and driver combinations are available:
 * mariadbi – MariaDB with MySQLi (improved)
 * mariadb – MariaDB with MySQL PDO (PHP Data Objects)
 * pgsql - PostgreSQL PDO (PHP Data Objects)
@@ -651,7 +659,10 @@ docker exec -it jbt-mysql bash -c "mysql --socket=/var/run/mysqld/mysqld.sock -u
 ### Switch PHP Version
 
 The Joomla Docker images are available in various PHP versions, from PHP 7.4 to PHP 8.3.
-To check which PHP versions are available, use [scripts/versions](#versions) first.
+To check which PHP versions are available, use [scripts/versions](#versions) with the Joomla version as an argument:
+```
+scripts/versions 53
+```
 
 You can switch the PHP version for all installed Joomla instances:
 ```
@@ -662,9 +673,9 @@ Or specify the desired Joomla instances:
 scripts/php 44 51 php8.1
 ```
 
-👉 There are no Docker images for Joomla 5.3 and Joomla 6.0 available (as of early November 2024).
-   Instead, the Joomla 5.2 image is being used.
-   This should not cause any issues, as the source code for 5.3 and 6.0 is pulled from the respective GitHub branches and installed over the existing version.
+👉 There are no Docker images for Joomla 5.4 and Joomla 6.0 available (as of early May 2025).
+   Instead, the Joomla 5.3 image is being used.
+   This should not cause any issues, as the source code for 5.4 and 6.0 is pulled from the respective GitHub branches and installed over the existing version.
 
 ### Grafting a Joomla Package
 
@@ -829,29 +840,8 @@ While there's no way to remove a patch, you can use the `scripts/create recreate
 
 :point_right: Alternatively, to apply `joomla-cms` patches, you can use [Joomla Patch Tester](#install-joomla-patch-tester).
 
-#### DeLorean
-
-You can take a seat and pick up additional code from the future on your own.
-As of early November 2024, several pull requests (PRs) in the Joomla ecosystem remain unmerged, unreleased, or absent from specific branches.
-Testing certain PRs may necessitate the prior integration of others.
-For instance, [database-317](https://github.com/joomla-framework/database/pull/317) required the merging of
-[database-310](https://github.com/joomla-framework/database/pull/310) as well as
-[joomla-cypress-33](https://github.com/joomla-projects/joomla-cypress/pull/33) and
-[joomla-cypress-36](https://github.com/joomla-projects/joomla-cypress/pull/36) to facilitate comprehensive testing.
-
-* :wrench: [joomla-cypress-33](https://github.com/joomla-projects/joomla-cypress/pull/33) Install Joomla with non-standard db_port
-  * Working for 4.4-dev, 5.1-dev (and updates joomla-cypress from 1.0.3 to 1.1.1 -  which is a good idea anyway), 5.2-dev, 5.3-dev and 6.0-dev
-* :wrench: [joomla-cypress-35](https://github.com/joomla-projects/joomla-cypress/pull/35) Install Joomla for Stable Releases
-  * Working for 4.4-dev, 5.1-dev (and updates joomla-cypress from 1.0.3 to 1.1.1 -  which is a good idea anyway), 5.2-dev, 5.3-dev and 6.0-dev
-* :wrench: [joomla-cypress-36](https://github.com/joomla-projects/joomla-cypress/pull/36) Wrap IPv6 address in brackets \[ \] if needed
-  * Working for 4.4-dev, 5.1-dev (and updates joomla-cypress from 1.0.3 to 1.1.1 -  which is a good idea anyway), 5.2-dev, 5.3-dev and 6.0-dev
-* :wrench: [database-310](https://github.com/joomla-framework/database/pull/310) [3.x] Allow to specify port number or UNIX socket in host option also for MySQL (PDO) and PostgreSQL (PDO)
-  * Working for 5.1-dev, 5.2-dev, 5.3-dev and 6.0-dev
-* :wrench: [database-317](https://github.com/joomla-framework/database/pull/317) [3.x] Remove square brackets from ipv6 host on PostgreSQL, refactor changes from PR 310 and move options modifications to constructor
-  * Working for 5.1-dev, 5.2-dev, 5.3-dev and 6.0-dev
-
-👉 All these patches are for the web server Docker containers running the Joomla instances.
-  JBT uses its own Cypress installation environment with the latest `joomla-cypress` main branch clone.
+:point_right: All these patches are for the web server Docker containers running the Joomla instances.
+              JBT uses its own Cypress installation environment with the latest `joomla-cypress` main branch clone.
 
 ### Testing NPM module joomla-cypress
 
@@ -1129,7 +1119,7 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
 * Database server versions cannot be changed.
 * The setup does not support HTTPS, secure connections issues are not testable. → [#7](https://github.com/muhme/joomla-branches-tester/issues/7)
 * If IPv6 networking is chosen, it is used only within Docker.
-* The predefined port range run from 7000 to 7900. If another service is already using this range, it may cause a conflict. → [#3](https://github.com/muhme/joomla-branches-tester/issues/3)
+* The predefined port range run from 7000 to 7960. If another service is already using this range, it may cause a conflict. → [#3](https://github.com/muhme/joomla-branches-tester/issues/3)
 * Usable Joomla Git tags start with `3.9.0` (for earlier versions `apt-get update` does not work so easily).
 * For each Joomla major and minor version (e.g., 5.2, 5.3), only one Docker container is possible.
   This means you can run containers for versions such as 52 (for Joomla 5.2.) and 53 (for Joomla 5.3.),
