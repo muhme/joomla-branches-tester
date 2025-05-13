@@ -1,6 +1,6 @@
 # docker-compose.base.yml - Base with all Docker containers except the Joomla web servers.
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 # Defining 10.0.0.0/8 for IPv4 subnet to keep addresses simple and easy to remember. Same goes for fd00::/8 in IPv6.
@@ -16,6 +16,7 @@ networks:
       driver: default
       config:
         - subnet: "10.0.0.0/8"
+          gateway: "10.0.0.1"
         - subnet: "fd00::/8"
 
 services:
@@ -179,7 +180,7 @@ services:
 
   cypress:
     container_name: jbt-cypress
-    image: cypress/included # actual (August 2024) versions are Cypress 13.7, Electron 114, Chrome 116, Edge 116 and Firefox 117
+    image: cypress/included:14.3.3
     restart: unless-stopped
     entrypoint: ["sleep", "31536000"] # don't use cypress run, instead sleep one year
     ports:

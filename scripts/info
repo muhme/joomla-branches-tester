@@ -2,7 +2,7 @@
 #
 # info - Retrieves Joomla Branches Tester status information.
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -72,7 +72,7 @@ for todo in "${all_todos[@]}"; do
     }
     header "Joomla Branches Tester (JBT) version ${local_version}"
     if version_gt "${local_version}" "${git_version}"; then
-        red "There is a newer version ${git_version} available. Please run 'git pull' to stay current."
+        red "There is a newer JBT version ${git_version} available. Please run 'git pull' to stay current."
     fi
 
     if ${docker_running}; then
