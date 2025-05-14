@@ -468,10 +468,13 @@ from the [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/t
 scripts/test system
 ```
 
-:fairy: <i>"To protect you, the first step `Installation.cy.js` of the Joomla System Tests
-  is excluded in the automated tests if you run all test specs.
-  If you run `Installation.cy.js` the entire database content of the Joomla instance will be lost.
-  See [Database and File System Consistency](#database-and-file-system-consistency) for more details."</i>
+:warning: Currently (May 2025) the Joomla System Tests do not work independently.
+          A Joomla installation is required before running the test suite again.
+          Be aware the entire database content of the Joomla instance will be lost.
+          See [Database and File System Consistency](#database-and-file-system-consistency) for more details.
+```
+scripts/test system install/Installation.cy.js
+```
 
 Some more optional arguments for System Tests are:
 
@@ -534,10 +537,6 @@ The script will automatically install the appropriate Cypress version locally
 for each Joomla instance if it doesn't already exist.
 Using the Cypress container has the advantage of having Chrome, Edge, Electron and Chromium browsers pre-installed.
 If you run Cypress locally, only the browsers installed on your Docker host system will be available.
-
-:imp: <i>Are you see the `Installation.cy.js` test spec? Here you finally have the chance to do it.
-      Who cares about [Database and File System Consistency](#database-and-file-system-consistency)?
-      Go on, click on it. Go on, go on ...</i>
 
 ### Check Email
 
@@ -1066,7 +1065,9 @@ will clear the autoload classes cache file and remove all `com_patchtester`
 directories to prevent issues during the next installation.
 After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patchtester`.
 
-:fairy: *"To protect you, the first step `Installation.cy.js` of the Cypress based Joomla System Tests is excluded if you run all `system` test specs."*
+:fairy: *"The first step `Installation.cy.js` of the Cypress based Joomla System Tests is excluded if you run all `system` test specs.
+          But currently (May 2025) the Joomla System Tests do not work independently.
+          A Joomla installation step is required before running the Joomla System Tests again."*
 
 ## Trouble-Shooting
 
