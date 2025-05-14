@@ -8,7 +8,7 @@
 #   scripts/test system 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
 #   ELECTRON_ENABLE_LOGGING=1 scripts/test system
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -266,13 +266,26 @@ for instance in "${instancesToTest[@]}"; do
         fi
         # Is there one more argument with a test spec pattern?
         if [ -z "${spec_argument}" ]; then
-          # Create spec pattern list without installation spec
-          all=$(grep "tests/System/integration/" "joomla-${instance}/cypress.config.${extension}" |
-            grep -v "tests/System/integration/install/" |
-            tr -d "' " |
-            awk '{printf "%s", $0}' |
-            sed 's/,$//')
-          spec="{${all}}"
+
+          # It is a nice idea to create the test list from the system,
+          # but currently (May 2025) the order of the tests is important as the system tests are not independent.
+          #
+          # # Create spec pattern list without installation spec
+          # all=$(grep "tests/System/integration/" "joomla-${instance}/cypress.config.${extension}" |
+          #   grep -v "tests/System/integration/install/" |
+          #   tr -d "' " |
+          #   awk '{printf "%s", $0}' |
+          #   sed 's/,$//')
+          # spec="{${all}}"
+
+          # Must take the order of the test specs from cypress.config.mjs.
+          # Use .js and not *.cy.{js,jsx,ts,tsx}, as '--spec' option does not support a bracket extension.
+          spec="['tests/System/integration/administrator/**/*.cy.js',\
+'tests/System/integration/site/**/*.cy.js',\
+'tests/System/integration/api/**/*.cy.js',\
+'tests/System/integration/plugins/**/*.cy.js',\
+'tests/System/integration/cli/**/*.cy.js']"
+
         else
           # Use the given test spec pattern and check if we can (no pattern) and must (missing path) insert path
           if [[ "${spec_argument}" != *","* && "${spec_argument}" != tests/System/integration/* ]]; then
@@ -283,7 +296,7 @@ for instance in "${instancesToTest[@]}"; do
 
       if [ "${actualTest}" = "joomla-cypress" ]; then
         if [ -z "${spec_argument}" ]; then
-          spec="[tests/e2e/joomla.cy.js,tests/e2e/*.cy.js]"
+          spec="['tests/e2e/joomla.cy.js','tests/e2e/*.cy.js']"
         fi
       fi
 
@@ -332,19 +345,21 @@ for instance in "${instancesToTest[@]}"; do
 
       if [[ "$novnc" == true ]]; then
         log "jbt-${instance} – Initiating ${actualTest} tests with NoVNC and ${spec}"
-        # Using 'CYPRESS_specPattern' and not '--spec' to have absolute paths work correctly.
+        # Currently (May 2025) the test order is important as the System Tests are not independent.
+        # We can not use 'CYPRESS_specPattern' env var because it sorts the tests alphabetically.
+        # We have to use --spec to execute the tests in the given order.
         docker exec jbt-cypress sh -c "cd '${cypress_dir}' && export DISPLAY=jbt-novnc:0 && \
           CYPRESS_SKIP_INSTALL_LANGUAGES=$CYPRESS_SKIP_INSTALL_LANGUAGES \
-          CYPRESS_CACHE_FOLDER=/jbt/cypress-cache CYPRESS_specPattern='${spec}' \
+          CYPRESS_CACHE_FOLDER=/jbt/cypress-cache \
           ${electron_enable_logging_env} ${cypress_paths} \
-          npx cypress run --headed ${browser} --config-file '${config_file}'"
+          npx cypress run --headed ${browser} --config-file '${config_file}' --spec '${spec}'"
       else
         log "jbt-${instance} – Initiating headless ${actualTest} tests with ${spec}"
         docker exec jbt-cypress sh -c "cd '${cypress_dir}' && unset DISPLAY && \
           CYPRESS_SKIP_INSTALL_LANGUAGES=$CYPRESS_SKIP_INSTALL_LANGUAGES \
-          CYPRESS_CACHE_FOLDER=/jbt/cypress-cache CYPRESS_specPattern='${spec}' \
+          CYPRESS_CACHE_FOLDER=/jbt/cypress-cache \
           ${electron_enable_logging_env} ${cypress_paths} \
-          npx cypress run ${browser} --config-file '${config_file}'"
+          npx cypress run ${browser} --config-file '${config_file}' --spec '${spec}'"
       fi
       npx_status=$?
       if docker logs "jbt-${instance}" --since "${time_before_test}" 2>&1 | grep -Ei "PHP (Notice|Warning|Error|Deprecated)|\[php:(notice|warning|error|deprecated)\]"; then
