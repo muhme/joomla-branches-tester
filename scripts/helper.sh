@@ -36,9 +36,9 @@ JBT_DB_PORTS=("7011" "7011" "7012" "7012" "7013")
 # Database Unix socket paths into the '/jbt/run' directory
 JBT_DB_SOCKETS=("${JBT_S_MY}" "${JBT_S_MY}" "${JBT_S_MA}" "${JBT_S_MA}" "${JBT_S_PG}")
 
-# Valid PHP versions to choose from for available Joomla Docker images
+# Valid PHP versions.
 # (not 5.6 - 7.3 as there are problems and for lowest supported Joomla 3.9.0 there is PHP 7.4 available and working)
-JBT_VALID_PHP_VERSIONS=("php7.4" "php8.0" "php8.1" "php8.2" "php8.3" "highest")
+JBT_VALID_PHP_VERSIONS=("php7.4" "php8.0" "php8.1" "php8.2" "php8.3" "php8.4" "highest")
 
 # The highest PHP version for existing official Joomla images (the two arrays correspond via the index).
 JBT_JOOMLA_VERSIONS=("39" "310" "40" "41" "42" "43" "44" "50" "51" "52" "53" "54" "60")
