@@ -27,7 +27,7 @@ Within [Docker](https://www.docker.com/) container environment you are able to:
 * Apply pull requests (PR) from Git repositories `joomla-cms`, `joomla-cypress` and `joomla-framework/database`.
 * Switching between 10 database variants (MySQL, MariaDB, or PostgreSQL and the two database drivers:
   MySQLi or PHP Data Objects and the option to use Unix sockets, instead of TCP host).
-* Switching between PHP versions (PHP 7.4 ... 8.3).
+* Switching between PHP versions (PHP 7.4 ... 8.4).
 * Installing Joomla from a cloned 'joomla-cms' Git repository.
 * Grafting a Joomla package.
 * Using Xdebug for PHP debugging.
@@ -51,10 +51,6 @@ The second red mail catcher container makes these emails accessible via a web ap
 On the Docker Host system (left side), your red web browser is running.
 On macOS and Ubuntu, the native Cypress GUI is displayed in green.
 
-The Joomla Docker images are from the official images for Joomla
-(see [docker-joomla](https://github.com/joomla-docker/docker-joomla)
-and the [Docker Hub page](https://registry.hub.docker.com/_/joomla/)). Thank you! :pray:
-
 Everything is fully scripted and can be easily parameterised for maximum flexibility.
 The `/scripts` folder serves as the source of JBT functionality.
 Ensure that your current working directory is always the `joomla-branches-tester` directory.
@@ -71,9 +67,9 @@ At the beginning of May 2025, these are `4.4-dev`, `5.3-dev`, `5.4-dev` and `6.0
 :point_right: Since **used** branches are subject to frequent changes,
               the latest version numbers are always be retrieved directly from the `joomla-cms` repository.
 
-For the web server containers, the official Docker Joomla images (e.g., `5.2-php8.3-apache`) are used as a starting point to simplify life.
-Within the container, the source code from the corresponding Joomla Git development branch or tag is copied and a second Joomla installation is run.
-Refer to the [Versions](#versions) section for a list of all usable Joomla versions and Docker images available for each Joomla version.
+For the web server containers, PHP-Apache Docker images (e.g., `php:8.4-apache`) are used as a starting point.
+Within the container, the source code from the corresponding Joomla Git development branch or tag is copied and the Cypress-based Joomla installation from the System Tests is run.
+Refer to the [Versions](#versions) section for a list of all usable Joomla versions.
 
 ### JBT Parallel Installation Environment
 
@@ -657,24 +653,21 @@ docker exec -it jbt-mysql bash -c "mysql --socket=/var/run/mysqld/mysqld.sock -u
 
 ### Switch PHP Version
 
-The Joomla Docker images are available in various PHP versions, from PHP 7.4 to PHP 8.3.
-To check which PHP versions are available, use [scripts/versions](#versions) with the Joomla version as an argument:
+You can choose the PHP version from 7.4 to 8.4 and you should choose a PHP version supported by your Joomla version.
+You can use `highest` PHP version available for a Joomla version. For example PHP 8.4 for Joomla 5.3.
+To check which PHP versions are available use `help` argument:
 ```
-scripts/versions 53
+scripts/php help
 ```
 
 You can switch the PHP version for all installed Joomla instances:
 ```
-scripts/php php8.3
+scripts/php highest
 ```
 Or specify the desired Joomla instances:
 ```
-scripts/php 44 51 php8.1
+scripts/php 54 60 php8.4
 ```
-
-👉 There are no Docker images for Joomla 5.4 and Joomla 6.0 available (as of early May 2025).
-   Instead, the Joomla 5.3 image is being used.
-   This should not cause any issues, as the source code for 5.4 and 6.0 is pulled from the respective GitHub branches and installed over the existing version.
 
 ### Grafting a Joomla Package
 
@@ -902,7 +895,7 @@ is set for you.
 
 ### Versions
 
-Running `scripts/versions` without any arguments will display all available branches and tags with Joomla versions.
+Running `scripts/versions` will display all available branches and tags with Joomla versions.
 These can be used as arguments for the `scripts/create` command:
 ```
 scripts/versions
@@ -918,16 +911,6 @@ scripts/versions
     5.2.0-rc2     5.2.0-rc3     5.2.0-rc4     5.2.1
 ```
 
-To see which Joomla Docker images are available for a specific version – and therefore which PHP versions you can use – run the script with the desired Joomla version:
-```
-scripts/versions 5.2.1
-```
-```
-  5.2-php8.1-apache
-  5.2-php8.2-apache
-  5.2-php8.3-apache
-```
-
 **Usable** Joomla development branches refer to the GitHub [joomla-cms](https://github.com/joomla/joomla-cms) repository, including default, active and stale branches in the format `number.number-dev`. See [joomla-cms/branches](https://github.com/joomla/joomla-cms/branches) for details.
 
 
@@ -941,7 +924,7 @@ scripts/info
 The following example illustrates an IPv6 installation with three Joomla instances:
 * `jbt-310` – Cloned from Joomla 3.10.12 tag and PHP 8.0 running with Xdebug
 * `jbt-51` – Grafted from Joomla 5.1.3 Stable Joomla package, running PHP 8.1 and using MariaDB with driver MySQLi
-* `jbt-53` – Cloned from 5.3-dev branch of version 5.2.0 with additional patches applied, running PHP 8.3scripts/info and using PostgreSQL
+* `jbt-53` – Cloned from 5.3-dev branch of version 5.2.0 with additional patches applied, running PHP 8.3 and using PostgreSQL
 ```
 Joomla Branches Tester (JBT) version 2.0.19
   Docker version 27.2.0 is running with 12 containers and 14 images
