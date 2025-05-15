@@ -4,7 +4,7 @@
 #   setup.sh 53
 #   setup.sh 53 initial pgsql socket https://github.com/Elfangor93/joomla-cms:mod_community_info
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -27,7 +27,7 @@ function help {
     $(random_quote)"
 }
 
-# Defaults to use MariaDB with MySQLi database driver, to use cache and PHP 8.1.
+# Defaults to use MariaDB with MySQLi database driver, to use cache and highest PHP version
 database_variant="mariadbi"
 initial=false
 socket=false
@@ -142,23 +142,49 @@ if $initial; then
   # Starting here with a shallow clone for speed and space; unshallow in 'scripts/patch' if patches are to be applied
   log "jbt-${instance} – Git shallow cloning ${git_repository}:${git_branch} into the 'joomla-${instance}' directory"
   docker exec "jbt-${instance}" bash -c "git clone -b ${git_branch} --depth 1 ${git_repository} /var/www/html"
-
-  log "jbt-${instance} – Git configure '/var/www/html' as safe directory"
-  docker exec "jbt-${instance}" bash -c "git config --global --add safe.directory \"/var/www/html\""
-
-  if (( instance == 310 || instance < 44 )); then
-    # joomla:4.3-php8.1-apache is missing libzip.so.4
-    log "jbt-${instance} – Version < 4.4 detected, installing 'libzip.so.4'"
-    docker exec "jbt-${instance}" bash -c "apt-get install -y libzip4"
-  fi
 fi
 
-# some Joomla Docker images are missing some libraries
-if (( instance != 310 && ( instance == 43 || instance >= 51 ) )); then
-  log "jbt-${instance} – Installing missing libraries"
-  docker exec "jbt-${instance}" bash -c "cd /var/www/html && \
-      apt-get install -y libzip4 libmagickwand-6.q16-6 libmemcached11"
-fi
+log "jbt-${instance} – Git configure '/var/www/html' as safe directory"
+docker exec "jbt-${instance}" bash -c "git config --global --add safe.directory \"/var/www/html\""
+
+log "jbt-${instance} – Installing packages"
+docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
+  libpng-dev \
+  libjpeg-dev \
+  libfreetype6-dev \
+  libwebp-dev \
+  libldap2-dev \
+  libzip-dev \
+  unzip \
+  libonig-dev \
+  libxml2-dev \
+  libicu-dev \
+  libxslt1-dev \
+  git \
+  zlib1g-dev \
+  libpq-dev \
+  postgresql-client \
+  default-mysql-client \
+  && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+  && docker-php-ext-install -j$(nproc) \
+      gd \
+      ldap \
+      zip \
+      pdo \
+      pdo_mysql \
+      mysqli \
+      pdo_pgsql \
+      intl \
+      xsl \
+      opcache \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*'
+
+log "jbt-${instance} – Configure Joomla installation to disable localhost check and enable mod_rewrite"
+docker exec "jbt-${instance}" bash -c '
+  echo "SetEnv JOOMLA_INSTALLATION_DISABLE_LOCALHOST_CHECK 1" > /etc/apache2/conf-available/joomla-env.conf && \
+  a2enconf joomla-env && \
+  a2enmod rewrite'
 
 # Running composer install even if we are not initial - just in case.
 if [ -f "joomla-${instance}/composer.json" ]; then

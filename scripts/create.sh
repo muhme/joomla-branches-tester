@@ -6,7 +6,7 @@
 #   create 52 53 php8.1 recreate
 #   create 52 https://github.com/Elfangor93/joomla-cms:mod_community_info
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -143,7 +143,7 @@ if [ "$recreate" = false ]; then
 
   # Create Docker Compose setup with Joomla web servers for all versions to be installed.
   log "Create 'docker-compose.yml' file for version(s) ${versionsToInstall[*]}, based on ${php_version} PHP version and ${network}"
-  createDockerComposeFile "${versionsToInstall[*]}" "${php_version}" "${network}" "show-warnings"
+  createDockerComposeFile "${versionsToInstall[*]}" "${php_version}" "${network}"
 
   if $no_cache; then
     log "Running 'docker compose build --no-cache'"
@@ -269,7 +269,7 @@ for version in "${versionsToInstall[@]}"; do
       docker compose rm -f "jbt-${instance}" || log "jbt-${instance} – Ignoring failure to remove Docker container"
     fi
 
-    createDockerComposeFile "${instance}" "${php_version}" "${network}" "show-warnings" "append"
+    createDockerComposeFile "${instance}" "${php_version}" "${network}" "append"
 
     log "jbt-${instance} – Building Docker container"
     docker compose build "jbt-${instance}"
@@ -278,24 +278,6 @@ for version in "${versionsToInstall[@]}"; do
     docker compose up -d "jbt-${instance}"
 
   fi
-
-  # If the copying has not yet been completed, then we have to wait, or we will get e.g.
-  # rm: cannot remove '/var/www/html/libraries/vendor': Directory not empty.
-  max_retries=120
-  for ((i = 1; i < max_retries; i++)); do
-    if docker logs "jbt-${instance}" 2>&1 | grep 'This server is now configured to run Joomla!'; then
-      break
-    else
-      log "jbt-${instance} – Waiting for original Joomla installation, attempt ${i} of ${max_retries}"
-      sleep 1
-    fi
-  done
-  if (( i >= max_retries )); then
-    error "jbt-${instance} – Failed after $max_retries attempts. Giving up."
-    exit 1
-  fi
-  log "jbt-${instance} – Deleting original Joomla installation"
-  docker exec "jbt-${instance}" bash -c 'rm -rf /var/www/html/* && rm -rf /var/www/html/.??*'
 
   JBT_INTERNAL=42 bash scripts/setup.sh "initial" "${version}" "${database_variant}" "${socket}" \
                                         "${arg_repository}:${arg_branch}" "${patches[@]}"

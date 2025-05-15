@@ -4,7 +4,7 @@
 #            Also deletes files and directories created by JBT.
 #            Works offline and for earlier JBT version created directories and containers.
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -36,7 +36,7 @@ done
 # Delete all docker containers. The PHP version and network do not affect the deletion process.
 if [[ ! -f "docker-compose.yml" ]]; then
   log "Missing 'docker-compose.yml' file, create one with all branch versions to remove Joomla Branches Tester overall"
-  createDockerComposeFile "$(getAllUsedBranches)" "php8.2" "IPv4" "no-warnings"
+  createDockerComposeFile "$(getAllUsedBranches)" "php8.2" "IPv4"
 fi
 
 log 'Stopping and removing JBT Docker containers, associated Docker networks and volumes'
