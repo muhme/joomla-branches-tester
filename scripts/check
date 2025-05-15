@@ -2,7 +2,7 @@
 #
 # check - Searching a JBT log file for critical issues or selected information.
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -87,6 +87,8 @@ else
     -e 'status-errored' \
     -e "error-logging.ini' to catch all PHP error" \
     -e '_error\.' \
+    -e 'libcom-err2' \
+    -e 'SCSS File compiled.*err' \
     -e 'overrid' "${file}" | \
   grep -i --color=always \
     -e ERR \
