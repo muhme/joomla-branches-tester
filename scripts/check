@@ -86,6 +86,7 @@ else
     -e 'referrer-policy' \
     -e 'status-errored' \
     -e "error-logging.ini' to catch all PHP error" \
+    -e '_error\.' \
     -e 'overrid' "${file}" | \
   grep -i --color=always \
     -e ERR \
