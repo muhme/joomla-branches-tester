@@ -307,10 +307,11 @@ for version in "${versionsToInstall[@]}"; do
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*'
 
-  log "jbt-${instance} – Configure Joomla installation to disable localhost check"
+  log "jbt-${instance} – Configure Joomla installation to disable localhost check and enable mod_rewrite"
   docker exec "jbt-${instance}" bash -c '
     echo "SetEnv JOOMLA_INSTALLATION_DISABLE_LOCALHOST_CHECK 1" > /etc/apache2/conf-available/joomla-env.conf && \
-    a2enconf joomla-env'
+    a2enconf joomla-env && \
+    a2enmod rewrite'
 
   JBT_INTERNAL=42 bash scripts/setup.sh "initial" "${version}" "${database_variant}" "${socket}" \
                                         "${arg_repository}:${arg_branch}" "${patches[@]}"
