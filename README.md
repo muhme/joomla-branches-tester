@@ -1059,10 +1059,10 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
    On `scripts/create`, if you see the log message `Base installation is completed`, you can use the `recreate` option if one Joomla instance fails during installation.
 3. One advantage of Docker and scripting: you can easily start fresh.
    As Roy from The IT Crowd says, *"Have you tried turning it off and on again?"*
-   It takes just 2.5 minutes on a 2024 entry-level MacBook Air to delete everything and
-   create the 10 containers with Joomla 5.2-dev branch and PostgreSQL.
+   It takes just 6 minutes on a entry-level MacBook Air M3 to delete everything and
+   create the 10 containers with Joomla 5.4-dev branch in using Docker Compose `no-cache` to be save.
    ```
-   scripts/create 52 pgsql
+   scripts/create 54 no-cache
    ```
 4. Check the Docker container logs to monitor activity.
    For example, the `jbt-relay` container logs will display information about receiving and delivering emails.
