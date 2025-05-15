@@ -117,7 +117,7 @@ for instance in "${instancesToTest[@]}"; do
       log "jbt-${instance} – Initiating PHP Coding Standards Fixer – php-cs-fixer"
       # 1st To prevent failure, we fix the auto-generated file before
       docker exec "jbt-${instance}" bash -c \
-        'file="administrator/cache/autoload_psr4.php"; [ -f "${file}" ] && libraries/vendor/bin/php-cs-fixer fix "${file}"' || true
+        'file="administrator/cache/autoload_psr4.php"; [ -f "${file}" ] && PHP_CS_FIXER_IGNORE_ENV=true libraries/vendor/bin/php-cs-fixer fix "${file}"' || true
       # 2nd Ignore Joomla Patch Tester
       insert_file="joomla-${instance}/.php-cs-fixer.dist.php"
       insert_line="    ->notPath('/com_patchtester/')"
@@ -132,7 +132,7 @@ for instance in "${instancesToTest[@]}"; do
           cat xx01 >>"${insert_file}" &&
           rm xx00 xx01
       fi
-      if docker exec "jbt-${instance}" bash -c "libraries/vendor/bin/php-cs-fixer fix -vvv --dry-run --diff"; then
+      if docker exec "jbt-${instance}" bash -c "PHP_CS_FIXER_IGNORE_ENV=true libraries/vendor/bin/php-cs-fixer fix -vvv --dry-run --diff"; then
         # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
         successful=$((successful + 1))
         overallSuccessful=$((overallSuccessful + 1))
