@@ -162,6 +162,9 @@ docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
   libxslt1-dev \
   git \
   zlib1g-dev \
+  libpq-dev \
+  postgresql-client \
+  default-mysql-client \
   && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
   && docker-php-ext-install -j$(nproc) \
       gd \
@@ -170,6 +173,7 @@ docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
       pdo \
       pdo_mysql \
       mysqli \
+      pdo_pgsql \
       intl \
       xsl \
       opcache \
