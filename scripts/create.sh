@@ -279,40 +279,6 @@ for version in "${versionsToInstall[@]}"; do
 
   fi
 
-  log "jbt-${instance} – Installing packages"
-  docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    libldap2-dev \
-    libzip-dev \
-    unzip \
-    libonig-dev \
-    libxml2-dev \
-    libicu-dev \
-    libxslt1-dev \
-    git \
-    zlib1g-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) \
-        gd \
-        ldap \
-        zip \
-        pdo \
-        pdo_mysql \
-        mysqli \
-        intl \
-        xsl \
-        opcache \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*'
-
-  log "jbt-${instance} – Configure Joomla installation to disable localhost check and enable mod_rewrite"
-  docker exec "jbt-${instance}" bash -c '
-    echo "SetEnv JOOMLA_INSTALLATION_DISABLE_LOCALHOST_CHECK 1" > /etc/apache2/conf-available/joomla-env.conf && \
-    a2enconf joomla-env && \
-    a2enmod rewrite'
-
   JBT_INTERNAL=42 bash scripts/setup.sh "initial" "${version}" "${database_variant}" "${socket}" \
                                         "${arg_repository}:${arg_branch}" "${patches[@]}"
 

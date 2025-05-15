@@ -5,7 +5,7 @@
 #   scripts/php 51 php8.2
 #   scripts/php 52 53 php8.3
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -60,7 +60,6 @@ changed=0
 for instance in "${instancesToPatch[@]}"; do
 
   din=$(dockerImageName "$instance" "$php_version")
-  checkDockerImageName "${instance}" "${din:7}" # e.g. 'joomla:5.0-php8.2-apache' as '5.0-php8.2-apache'
 
   if [ ! -d "joomla-${instance}" ]; then
     log "jbt-${instance} – There is no directory 'joomla-${instance}', jumped over"
@@ -74,9 +73,9 @@ for instance in "${instancesToPatch[@]}"; do
   docker compose rm -f "jbt-${instance}" || log "jbt-${instance} – Ignoring failure to remove Docker container"
 
   # Change (simplified by comment marker) e.g.
-  # > image: joomla:4.4-php8.1-apache # jbt-44 image
-  # < image: joomla:4.4-php8.3-apache # jbt-44 image
-  search="image: joomla:[0-9].[0-9]-php[0-9].[0-9]-apache # jbt-${instance} image"
+  # > image: php:8.1-apache # jbt-44 image
+  # < image: php:8.3-apache # jbt-44 image
+  search="image: php:[0-9].[0-9]-apache # jbt-${instance} image"
   replace="image: ${din} # jbt-${instance} image"
   log "jbt-${instance} – Change 'docker-compose.yml' to use '${din}' Docker image for jbt-${instance}"
   # Don't use sed inplace editing as it is not supported on macOS's sed.
