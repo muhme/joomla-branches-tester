@@ -89,6 +89,7 @@ else
     -e '_error\.' \
     -e 'libcom-err2' \
     -e 'SCSS File compiled.*err' \
+    -e 'transferring' \
     -e 'overrid' "${file}" | \
   grep -i --color=always \
     -e ERR \
