@@ -15,8 +15,10 @@ source scripts/helper.sh
 function help {
   echo "
     info – Retrieves Joomla Branches Tester status information.
-           The optional 'instance' argument displays Joomla Branches Tester instance details.
-           The optional 'base' argument displays information about the base Docker containers.
+
+           The optional 'instance' argument only shows the Joomla Branches Tester instance details.
+           The optional 'base' argument only shows the details of the base Docker containers.
+           The optional argument ‘history’ only shows the recorded activities of the Joomla branch tester.
            Optional Joomla instance arguments can be one or more of installed: ${allInstalledInstances[*]}.
            The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
            If no argument is provided, all information is displayed.
@@ -28,7 +30,7 @@ allInstalledInstances=($(getAllInstalledInstances))
 
 if [ $# -eq 0 ]; then
   # shellcheck disable=SC2207 # There are no spaces in instance numbers
-  all_todos=("instance" "base" $(getAllInstalledInstances))
+  all_todos=("instance" "base" $(getAllInstalledInstances) "history")
 else
   all_todos=()
 fi
@@ -39,13 +41,16 @@ while [ $# -ge 1 ]; do
     exit 0
   elif [ "$1" = "instance" ]; then
     all_todos+=("$1")
-    shift # Argument is eaten as to show JBT information.
+    shift # Argument is eaten as to show only JBT information.
   elif [ "$1" = "base" ]; then
     all_todos+=("$1")
-    shift # Argument is eaten as to show base containers.
+    shift # Argument is eaten as to show only base containers.
   elif [ -d "joomla-$1" ]; then
     all_todos+=("$1")
     shift # Argument is eaten as one instance.
+  elif [ "$1" = "history" ]; then
+    all_todos+=("$1")
+    shift # Argument is eaten as to show activities only
   else
     help
     error "Argument '$1' is not valid."
@@ -96,7 +101,7 @@ for todo in "${all_todos[@]}"; do
       done
     fi
 
-  else # Installed Joomla instance
+  elif [ "$todo" != "history" ]; then # Installed Joomla instance
 
     instance="$todo"
     branch_name=$(docker exec "jbt-${instance}" bash -c "git branch -r --contains HEAD 2>/dev/null | head -1 | sed 's|[ ]*origin/||'")
@@ -148,20 +153,15 @@ for todo in "${all_todos[@]}"; do
         fi
       fi
 
-      # Handle .js or .mjs from PR https://github.com/joomla/joomla-cms/pull/43676 – [4.4] Move the Cypress Tests to ESM
-      if [ -f "joomla-${instance}/cypress.config.mjs" ]; then
-        config_file="joomla-${instance}/cypress.config.mjs"
-      elif [ -f "joomla-${instance}/cypress.config.js" ]; then
-        config_file="joomla-${instance}/cypress.config.js"
-      fi
-      if [ -f "${config_file}" ]; then
-        db_type=$(grep db_type "${config_file}" | sed 's/db_type//' | tr -d " ,'" | sed 's/://')
-        db_host=$(grep db_host "${config_file}" | sed 's/db_host//' | tr -d " ,'" | sed 's/://')
-        db_port=$(grep db_port "${config_file}" | sed 's/db_port//' | tr -d " ,'" | sed 's/://')
-        echo "  ${db_type}, ${db_host}, ${db_port}"
+      if [ -f "joomla-${instance}/configuration.php" ]; then
+        db_host=$(grep -m 1 "\$host" "joomla-${instance}/configuration.php" | sed 's/.*= *//; s/;.*//')
+        db_name=$(grep -m 1 "\$db " "joomla-${instance}/configuration.php" | sed 's/.*= *//; s/;.*//')
+        db_type=$(grep -m 1 "\$dbtype" "joomla-${instance}/configuration.php" | sed 's/.*= *//; s/;.*//')
+        echo "  Database: Type ${db_type}, Host ${db_host}, Name ${db_name}"
       else
-        echo "  Without Cypress configuration file"
+        echo "  Without configuration.php file?"
       fi
+
 
       echo "  /joomla-${instance}: $(du -ms "joomla-${instance}" | awk '{print $1}')MB"
 
@@ -169,5 +169,13 @@ for todo in "${all_todos[@]}"; do
     else
       echo "  /joomla-${instance} is NOT existing"
     fi
+  else # history
+
+    header "JBT Instance History"
+    for file in logs/*; do
+      head -1 "${file}"
+      tail -1 "${file}"
+      echo " "
+    done
   fi
 done

@@ -913,7 +913,6 @@ scripts/versions
 
 **Usable** Joomla development branches refer to the GitHub [joomla-cms](https://github.com/joomla/joomla-cms) repository, including default, active and stale branches in the format `number.number-dev`. See [joomla-cms/branches](https://github.com/joomla/joomla-cms/branches) for details.
 
-
 ### Info
 
 You can retrieve some interesting Joomla Branches Tester status information.
@@ -921,60 +920,75 @@ If no argument is provided, all information will be displayed:
 ```
 scripts/info
 ```
-The following example illustrates an IPv6 installation with three Joomla instances:
-* `jbt-310` – Cloned from Joomla 3.10.12 tag and PHP 8.0 running with Xdebug
-* `jbt-51` – Grafted from Joomla 5.1.3 Stable Joomla package, running PHP 8.1 and using MariaDB with driver MySQLi
-* `jbt-53` – Cloned from 5.3-dev branch of version 5.2.0 with additional patches applied, running PHP 8.3 and using PostgreSQL
+The following example illustrates an IPv4 installation with three Joomla instances:
+* `jbt-310` – Cloned from Joomla 3.10.12 tag, based on PHP 8.0, using MySQL with PDO driver
+* `jbt-44` – Grafted 4.4.13 Full Joomla package, running PHP 8.2 with xdebug, using MariaDB with MySQLi driver
+* `jbt-54` – Cloned from 5.4-dev branch with additional patches applied, running PHP 8.4 and using PostgreSQL socket
 ```
-Joomla Branches Tester (JBT) version 2.0.19
-  Docker version 27.2.0 is running with 12 containers and 14 images
-  EnableIPv6: true
-Base Containers:
-  jbt-mysql   is running, ports: 3306/tcp -> 0.0.0.0:7011; 3306/tcp -> [::]:7011
-  jbt-madb    is running, ports: 3306/tcp -> 0.0.0.0:7012; 3306/tcp -> [::]:7012
-  jbt-pg      is running, ports: 5432/tcp -> 0.0.0.0:7013; 5432/tcp -> [::]:7013
-  jbt-mya     is running, ports: 80/tcp -> 0.0.0.0:7002; 80/tcp -> [::]:7002
-  jbt-pga     is running, ports: 80/tcp -> 0.0.0.0:7003; 80/tcp -> [::]:7003
-  jbt-cypress is running, ports: 7125/tcp -> 0.0.0.0:7125; 7125/tcp -> [::]:7125
-  jbt-novnc   is running, ports: 8080/tcp -> 0.0.0.0:7005; 8080/tcp -> [::]:7005
-  jbt-relay   is running, ports: 7025/tcp -> 0.0.0.0:7025; 7025/tcp -> [::]:7025
-  jbt-mail    is running, ports: 1025/tcp -> 0.0.0.0:7225; 1025/tcp -> [::]:7225; 1080/tcp -> 0.0.0.0:7004; 1080/tcp -> [::]:7004
+Joomla Branches Tester (JBT) version 2.2.1
+  Docker version 27.4.0 is running with 18 containers and 52 images
+  EnableIPv6: false
+Base Containers
+  jbt-mysql   is running, ports: 3306/tcp -> 0.0.0.0:7011
+  jbt-madb    is running, ports: 3306/tcp -> 0.0.0.0:7012
+  jbt-pg      is running, ports: 5432/tcp -> 0.0.0.0:7013
+  jbt-mya     is running, ports: 80/tcp -> 0.0.0.0:7002
+  jbt-pga     is running, ports: 80/tcp -> 0.0.0.0:7003
+  jbt-mail    is running, ports: 1025/tcp -> 0.0.0.0:7225; 1080/tcp -> 0.0.0.0:7004
+  jbt-novnc   is running, ports: 8080/tcp -> 0.0.0.0:7005
+  jbt-relay   is running, ports: 7025/tcp -> 0.0.0.0:7025
+  jbt-cypress is running, ports: 7125/tcp -> 0.0.0.0:7125
 jbt-310 Tag 3.10.12
   Container jbt-310 is running, ports: 80/tcp -> 0.0.0.0:7310
   Joomla Version: Joomla! 3.10.12 Stable
-  PHP 8.0.30 with Xdebug
-  Without Cypress configuration file
-  /joomla-310: 86MB
+  PHP 8.0.30
+  Database: Type 'pdomysql', Host 'jbt-mysql', Name 'test_joomla_310'
+  /joomla-310: 87MB
   Git Repository joomla-310/
     Remote Origin: https://github.com/joomla/joomla-cms
     Tag: 3.10.12
     Status: 277 changes
-jbt-51 Branch development
-  Container jbt-51 is running, ports: 80/tcp -> 0.0.0.0:7051
-  Joomla Version: Joomla! 5.1.0 Stable
-  PHP 8.1.29
-  MySQLi, jbt-madb,
-  /joomla-51: 393MB
-jbt-53 Branch 5.3-dev
-  Container jbt-53 is running, ports: 80/tcp -> 0.0.0.0:7053
-  Joomla Version: Joomla! 5.3.0 Development
-  PHP 8.3.11
-  PostgreSQL(PDO), jbt-pg,
-  /joomla-53: 525MB
-  Git Repository joomla-53/libraries/vendor/joomla/database/
-    Remote Origin: https://github.com/joomla-framework/database
-    Branch: jbt-merged database-317
-    Status: 0 changes
-  Git Repository joomla-53/
+jbt-44 ¿Grafted?
+  Container jbt-44 is running, ports: 80/tcp -> 0.0.0.0:7044
+  Joomla Version: Joomla! 4.4.13 Stable
+  PHP 8.2.28
+  Database: Type 'mysqli', Host 'jbt-madb', Name 'test_joomla_44'
+  /joomla-44: 372MB
+jbt-54 Tag 5.3.0-83-g2da7e19c0a
+  Container jbt-54 is running, ports: 80/tcp -> 0.0.0.0:7054
+  Joomla Version: Joomla! 5.4.0 Development
+  PHP 8.4.7 with Xdebug
+  Database: Type 'pgsql', Host 'unix:/var/run/postgresql-socket', Name 'test_joomla_54'
+  /joomla-54: 872MB
+  Git Repository joomla-54/
     Remote Origin: https://github.com/joomla/joomla-cms
-    Branch: 5.3-dev
+    Branch: jbt-merged joomla-cms-44910
     Status: 0 changes
+JBT Instance History
+*** 250516 10:03:04 >>> 'scripts/create.sh 3.10.12 44 54 no-cache' started
+*** 250516 10:14:42 <<< 'scripts/create.sh' finished in 11:38
+ 
+*** 250516 10:20:30 >>> 'scripts/database.sh 310 mysql' started
+*** 250516 10:20:44 <<< 'scripts/database.sh' finished in 14 seconds
+ 
+*** 250516 10:44:42 >>> 'scripts/graft.sh 44 /Users/hlu/Downloads/Joomla_4.4.13-Stable-Full_Package.tar.gz' started
+*** 250516 10:45:43 <<< 'scripts/graft.sh' finished in 1:01
+ 
+*** 250516 10:47:27 >>> 'scripts/patch.sh 54 joomla-cms-44910' started
+*** 250516 10:48:00 <<< 'scripts/patch.sh' finished in 33 seconds
+ 
+*** 250516 10:48:11 >>> 'scripts/database.sh 54 pgsql socket' started
+*** 250516 10:48:46 <<< 'scripts/database.sh' finished in 35 seconds
+ 
+*** 250516 10:48:54 >>> 'scripts/xdebug.sh 54 on' started
+*** 250516 10:48:55 <<< 'scripts/xdebug.sh' finished in 1 second
 ```
 
 Optional arguments that can be combined as desired are:
-* `instance` to display Joomla Branches Tester instance information,
-* `base` to display information about all base containers,
-* version number to display information about this version number web server container.
+* `instance` to display Joomla Branches Tester instance information only,
+* `base` to display information about all base containers only,
+* `history` to display JBT activites only,
+* version number to display information about this version number web server container only.
 
 For example, to check only JBT instance and `jbt-44` container information:
 ```

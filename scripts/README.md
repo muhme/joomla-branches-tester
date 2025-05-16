@@ -39,7 +39,7 @@ The following scripts are available and the use is described in [../README.md](.
 | [cypress](cypress.sh) | Running interactive Cypress GUI. | Mandatory argument is the Joomla instance. Optional argument is `local` to use a locally installed Cypress. |
 | [database](database.sh) | Changes database and database driver. | :warning: The overall database content is lost.<br />Mandatory argument is the database variant. Optional arguments are`socket` and Joomla instances. |
 | [graft](graft.sh) | Grafting a Joomla package onto a branch. | :warning: The overall database content is lost.<br />Mandatory argument is the Joomla package. Optional argument is the database variant.|
-| [info](info) | Retrieves Joomla Branches Tester status information. | Optional arguments are `instance`, `base` and Joomla instances. |
+| [info](info) | Retrieves Joomla Branches Tester status information. | Optional arguments are `instance`, `base`, `history` and Joomla instances. |
 | [patch](patch.sh) | Apply Git patches in 'joomla-cms', 'joomla-cypress' or 'joomla-framework/database'. | Arguments are one or multiple patches and optional Joomla instances. |
 | [patchtester](patchtester.sh) | Installs and configures Joomla patch tester component in one or all Joomla instances. | The GitHub token comes from environment variable `JBT_GITHUB_TOKEN` or as mandatory argument. Optional argumenta are the Joomla instances. |
 | [php](php.sh) | Change used PHP version. | Mandatory is the PHP version, e.g. `php8.3`. Optional arguments are the Joomla instances. |
