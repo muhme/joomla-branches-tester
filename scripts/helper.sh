@@ -332,13 +332,18 @@ function isValidVariant() {
 
 # Adjust 'configuration.php' for JBT, e.g. set 'tEstValue' as the secret.
 # As Joomla System Tests do in 'tests/System/integration/install/Installation.cy.js'.
-# Required after running JBT's Joomla installation and joomla-cypress Joomla installation tests.
+# Required after running
+#   - JBT's Joomla installation,
+#   - joomla-cypress Joomla installation tests or
+#   - system tests in using install/Installation.cy.js (where smtpport is overwritten)
 #
 function adjustJoomlaConfigurationForJBT() {
   local instance="$1"
 
   if [ -f "joomla-${instance}/configuration.php" ]; then
-    if ! grep -q 'tEstValue' "joomla-${instance}/configuration.php"; then
+    if ! grep -q 'tEstValue' "joomla-${instance}/configuration.php" || \
+       ! grep -q ' $smtpport = 7025' "joomla-${instance}/configuration.php"; then
+
       log "jbt-${instance} – Adopt configuration.php for JBT"
       # Since we get an access error when changing the ownership, even as root user,
       # we create configuration.php.new and rename it.

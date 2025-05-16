@@ -362,6 +362,10 @@ for instance in "${instancesToTest[@]}"; do
           npx cypress run ${browser} --config-file '${config_file}' --spec '${spec}'"
       fi
       npx_status=$?
+      # If system tests running with 'install/Installation.cy.js' the smptpport is overwritten from Cypress configuration
+      # and we need to adjust it to make mail work again.
+      adjustJoomlaConfigurationForJBT "${instance}"
+      # Check if there are any PHP Deprecated|Notice|Warning|Error in the logs
       if docker logs "jbt-${instance}" --since "${time_before_test}" 2>&1 | grep -Ei "PHP (Notice|Warning|Error|Deprecated)|\[php:(notice|warning|error|deprecated)\]"; then
         error "jbt-${instance} – PHP Deprecated|Notice|Warning|Error found in Joomla Backend"
         npx_status=42
