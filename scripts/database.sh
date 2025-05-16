@@ -10,7 +10,7 @@
 #   joomla-${instance}/cypress.config.[m]js
 #   joomla-${instance}/cypress.config.local.[m]js
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -36,12 +36,13 @@ source scripts/helper.sh
 #   installationPath: '/jbt/joomla-44',
 #
 # Using database host and default port Docker-inside as performance issues are seen in using host.docker.internal
+# Inserting line '/* eslint-disable */' as with 'cypress.config.local.js' we hava a not ignored file name.
 #
 function configureCypressConfig {
   local from="${1}" to="${2}" instance="${3}" baseurl="${4}" dbtype="${5}" dbhost="${6}" dbport="${7}" 
   local smtphost="${8}" smtpport="${9}"
 
-  docker exec "jbt-${instance}" bash -c "sed \
+  docker exec "jbt-${instance}" bash -c "echo '/* eslint-disable */' | cat - '${from}' } | sed \
     -e \"s|db_type: .*|db_type: '${dbtype}',|\" \
     -e \"s|db_name: .*|db_name: 'test_joomla_${instance}',|\" \
     -e \"s|db_prefix: .*|db_prefix: 'jos${instance}_',|\" \
@@ -52,8 +53,7 @@ function configureCypressConfig {
     -e \"s|smtp_host: .*|smtp_host: '${smtphost}',|\" \
     -e \"s|smtp_port: .*|smtp_port: '${smtpport}',|\" \
     -e \"s|instance: .*|instance: '${instance}',|\" \
-    -e \"s|installationPath: .*|installationPath: '/jbt/joomla-${instance}',|\" \
-    '${from}' > '${to}'"
+    -e \"s|installationPath: .*|installationPath: '/jbt/joomla-${instance}',|\" > '${to}'"
 }
 
 function help {
