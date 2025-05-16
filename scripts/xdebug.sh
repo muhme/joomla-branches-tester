@@ -2,7 +2,7 @@
 #
 # xdebug.sh - Switches the PHP installation with or without Xdebug in one or more Web Server containers.
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -62,8 +62,9 @@ with="/usr/local-with-xdebug/"
 without="/usr/local-without-xdebug/"
 for instance in "${instancesToChange[@]}"; do
 
-  if (( instance <= 39 )); then
-    log "jbt-${instance} – No Xdebug available <= Joomla 3.9, jumped over"
+  php_version=$(docker exec "jbt-${instance}" php -r 'echo PHP_VERSION;')
+  if [ "$(printf '%s\n' "8.0.0" "$php_version" | sort -V | head -n1)" != "8.0.0" ]; then
+    log "jbt-${instance} – No Xdebug available for PHP version ${php_version} < 8.0, jumped over"
     continue
   fi
 
@@ -98,7 +99,8 @@ if [ "$todo" = "on" ]; then
     "configurations": [
 EOF
   for instance in "${allInstalledInstances[@]}"; do
-    if (( instance <= 39 )); then
+    php_version=$(docker exec "jbt-${instance}" php -r 'echo PHP_VERSION;')
+    if [ "$(printf '%s\n' "8.0.0" "$php_version" | sort -V | head -n1)" != "8.0.0" ]; then
       continue
     fi
     link=$(docker exec "jbt-${instance}" readlink "/usr/local")

@@ -94,59 +94,6 @@ docker cp 'configs/error-logging.ini' "jbt-${instance}:/usr/local/etc/php/conf.d
 log "jbt-${instance} – Create 'php/conf.d/jbt.ini' to prevent Joomla warnings"
 docker cp 'configs/jbt.ini' "jbt-${instance}:/usr/local/etc/php/conf.d/jbt.ini"
 
-# Needs PHP >= 8.0, therefore not possible for Joomla 3.9 with PHP 7.4, but possible for 3.10 with PHP 8.0
-if (( instance == 310 || instance >= 40 )); then
-  # Create two PHP environments: one with Xdebug and one without.
-  # Manage them by cloning /usr/local, and use symbolic links to toggle between the two installations.
-  log "jbt-${instance} – Configure 'php.ini' for development and set up parallel installation with Xdebug"
-  docker exec "jbt-${instance}" bash -c ' \
-      cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini &&
-      cp -r /usr/local /usr/local-without-xdebug &&
-      pecl install xdebug && \
-      docker-php-ext-enable xdebug'
-  xdebug_path=$(docker exec "jbt-${instance}" bash -c 'find /usr/local/lib/php/extensions/ -name "xdebug.so" | head -n 1')
-  # As port number for 3.10 use 7910
-  docker exec "jbt-${instance}" bash -c "
-  cat <<EOF > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-  zend_extension=${xdebug_path}
-  xdebug.mode=debug
-  xdebug.start_with_request=yes
-  xdebug.client_host=host.docker.internal
-  xdebug.client_port=79${instance: -2}
-  xdebug.log=/var/log/xdebug.log
-  xdebug.discover_client_host=true
-  EOF
-  "
-  docker exec "jbt-${instance}" bash -c ' \
-      mv /usr/local /usr/local-with-xdebug && \
-      ln -s /usr/local-without-xdebug /usr/local'
-  # Apache is not restarted because /var/www/html is then in use, and would cause the following git clone to fail.
-fi
-
-# Installing Node.js v22 and cron for Joomla Task Scheduler
-# Additional having vim, ping, telnet, netstat for comfort
-log "jbt-${instance} – Installing additional Linux packages"
-docker exec "jbt-${instance}" bash -c 'apt-get update -qq && \
-    apt-get upgrade -y && \
-    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
-    apt-get install -y cron git unzip vim nodejs iputils-ping iproute2 telnet net-tools'
-
-if $initial; then
-  if [ -z "${arg_repository}" ]; then
-    git_repository="https://github.com/joomla/joomla-cms"
-    git_branch=$(fullName "${version}")
-  else
-    git_repository="$arg_repository"
-    git_branch="${arg_branch}"
-  fi
-  # Starting here with a shallow clone for speed and space; unshallow in 'scripts/patch' if patches are to be applied
-  log "jbt-${instance} – Git shallow cloning ${git_repository}:${git_branch} into the 'joomla-${instance}' directory"
-  docker exec "jbt-${instance}" bash -c "git clone -b ${git_branch} --depth 1 ${git_repository} /var/www/html"
-fi
-
-log "jbt-${instance} – Git configure '/var/www/html' as safe directory"
-docker exec "jbt-${instance}" bash -c "git config --global --add safe.directory \"/var/www/html\""
-
 log "jbt-${instance} – Installing packages"
 docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
   libpng-dev \
@@ -186,6 +133,65 @@ docker exec "jbt-${instance}" bash -c '
   a2enconf joomla-env && \
   a2enmod rewrite'
 
+# Needs PHP >= 8.0, therefore not possible for Joomla 3.9 with PHP 7.4, but possible for 3.10 with PHP 8.0
+with_xdebug=false
+php_version=$(docker exec "jbt-${instance}" php -r 'echo PHP_VERSION;')
+log "jbt-${instance} – Used PHP version is ${php_version}"
+if [ "$(printf '%s\n' "8.0.0" "$php_version" | sort -V | head -n1)" = "8.0.0" ]; then
+  # Create two PHP environments: one with Xdebug and one without.
+  # Manage them by cloning /usr/local, and use symbolic links to toggle between the two installations.
+  with_xdebug=true
+  log "jbt-${instance} – Configure 'php.ini' for development and set up parallel installation with Xdebug"
+  docker exec "jbt-${instance}" bash -c ' \
+      cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini &&
+      cp -r /usr/local /usr/local-without-xdebug &&
+      pecl install xdebug && \
+      docker-php-ext-enable xdebug'
+  xdebug_path=$(docker exec "jbt-${instance}" bash -c 'find /usr/local/lib/php/extensions/ -name "xdebug.so" | head -n 1')
+  # As port number for 3.10 use 7910
+  docker exec "jbt-${instance}" bash -c "
+  cat <<EOF > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+  zend_extension=${xdebug_path}
+  xdebug.mode=debug
+  xdebug.start_with_request=yes
+  xdebug.client_host=host.docker.internal
+  xdebug.client_port=79${instance: -2}
+  xdebug.log=/var/log/xdebug.log
+  xdebug.discover_client_host=true
+  EOF
+  "
+  docker exec "jbt-${instance}" bash -c ' \
+      mv /usr/local /usr/local-with-xdebug && \
+      ln -s /usr/local-without-xdebug /usr/local'
+  # Apache is not restarted because /var/www/html is then in use, and would cause the following git clone to fail.
+else
+  log "jbt-${instance} – No parallel installation with Xdebug" 
+fi
+
+# Installing Node.js v22 and cron for Joomla Task Scheduler
+# Additional having vim, ping, telnet, netstat for comfort
+log "jbt-${instance} – Installing additional Linux packages"
+docker exec "jbt-${instance}" bash -c 'apt-get update -qq && \
+    apt-get upgrade -y && \
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    apt-get install -y cron git unzip vim nodejs iputils-ping iproute2 telnet net-tools'
+
+if $initial; then
+  if [ -z "${arg_repository}" ]; then
+    git_repository="https://github.com/joomla/joomla-cms"
+    git_branch=$(fullName "${version}")
+  else
+    git_repository="$arg_repository"
+    git_branch="${arg_branch}"
+  fi
+  # Starting here with a shallow clone for speed and space; unshallow in 'scripts/patch' if patches are to be applied
+  log "jbt-${instance} – Git shallow cloning ${git_repository}:${git_branch} into the 'joomla-${instance}' directory"
+  docker exec "jbt-${instance}" bash -c "git clone -b ${git_branch} --depth 1 ${git_repository} /var/www/html"
+fi
+
+log "jbt-${instance} – Git configure '/var/www/html' as safe directory"
+docker exec "jbt-${instance}" bash -c "git config --global --add safe.directory \"/var/www/html\""
+
 # Running composer install even if we are not initial - just in case.
 if [ -f "joomla-${instance}/composer.json" ]; then
   log "jbt-${instance} – Running composer install"
@@ -194,7 +200,7 @@ if [ -f "joomla-${instance}/composer.json" ]; then
     php composer-setup.php && \
     rm composer-setup.php && \
     mv composer.phar /usr/local/bin/composer"
-    if (( instance >= 40 )); then
+    if $with_xdebug; then
       docker exec "jbt-${instance}" bash -c "cd /var/www/html && \
         cp -p /usr/local/bin/composer /usr/local-with-xdebug/bin/composer"
     fi
