@@ -332,6 +332,8 @@ function isValidVariant() {
 
 # Adjust 'configuration.php' for JBT, e.g. set 'tEstValue' as the secret.
 # As Joomla System Tests do in 'tests/System/integration/install/Installation.cy.js'.
+# - Using 'filesystem' as the session handler to prevent logging in again after a few minutes,
+#   for whatever reason this differs from 'database'.
 # Required after running
 #   - JBT's Joomla installation,
 #   - joomla-cypress Joomla installation tests or
@@ -353,6 +355,7 @@ function adjustJoomlaConfigurationForJBT() {
         -e \"s|\(public .mailer =\).*|\1 'smtp';|\" \
         -e \"s|\(public .smtphost =\).*|\1 'host.docker.internal';|\" \
         -e \"s|\(public .smtpport =\).*|\1 7025;|\" \
+        -e \"s|\(public .session_handler =\).*|\1 'filesystem';|\" \
         configuration.php > configuration.php.new && \
         mv configuration.php.new configuration.php && \
         chown www-data:www-data configuration.php && \

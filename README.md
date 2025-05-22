@@ -400,13 +400,16 @@ The Joomla development version installed in the web server container is configur
 - Used language Pack is English (United Kingdom) (`en-GB`).
 - The `/installation` folder remains intact after the installation.
   - Earlier Joomla versions delete the `/installation` folder after setup.
-    If the folder is missing, it is checked out from Git during the next installation.
+    If the folder is missing, it is restored from JBT installation environment backup-copy.
 - Error Reporting is set to `Maximum` in `Global Configuration | Server`.
 - A cron job is configured to run the Joomla Task Scheduler every minute.
 - The 'System - Joomla! Statistics' plugin is disabled to prevent prompting users on the backend Home Dashboard.
-- All the 'Behaviour - Backward Compatibility' plugins are disabled to detect backward compatibility issues (see [installation/disableBC.cy.js](installation/disableBC.cy.js)).
+- All the 'Behaviour - Backward Compatibility' plugins are disabled to detect backward compatibility issues
+  (see [installation/disableBC.cy.js](installation/disableBC.cy.js)).
 - The automatic run of the 'Welcome to Joomla!' guided tour is canceled from Joomla version 5.1 onwards.
 - Not configured for logging, due to deprecation warnings.
+- Using 'filesystem' for session handler to prevent logging in again after a few minutes,
+  for whatever reason this differs from 'database'.
 
 ### Manual Testing
 
