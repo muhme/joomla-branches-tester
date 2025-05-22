@@ -141,9 +141,10 @@ if [ "$(printf '%s\n' "8.0.0" "$php_version" | sort -V | head -n1)" = "8.0.0" ];
   # Create two PHP environments: one with Xdebug and one without.
   # Manage them by cloning /usr/local, and use symbolic links to toggle between the two installations.
   with_xdebug=true
-  log "jbt-${instance} – Configure 'php.ini' for development and set up parallel installation with Xdebug"
+  log "jbt-${instance} – Configure 'php.ini' for development"
+  docker exec "jbt-${instance}" bash -c "cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini"
+  log "Preparing a parallel installation with Xdebug"
   docker exec "jbt-${instance}" bash -c ' \
-      cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini &&
       cp -r /usr/local /usr/local-without-xdebug &&
       pecl install xdebug && \
       docker-php-ext-enable xdebug'
