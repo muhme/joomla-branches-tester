@@ -183,10 +183,8 @@ for instance in "${instancesToChange[@]}"; do
     rm -rf administrator/components/com_patchtester api/components/com_patchtester
     rm -rf media/com_patchtester administrator/cache/autoload_psr4.php"
 
-  if [ ! -d "joomla-${instance}/installation" ]; then
-    log "jbt-${instance} – Missing 'installation' directory, restore it from 'installation/joomla-${instance}'"
-    docker exec "jbt-${instance}" bash -c "cd '/jbt/installation/joomla-${instance}' && cp -r installation /var/www/html"
-  fi
+  # Joomla installation directory if missing – restore it
+  restoreInstallationFolder "${instance}"
 
   log "jbt-${instance} – Cypress-based Joomla installation"
   docker exec jbt-cypress sh -c "cd /jbt/installation && \

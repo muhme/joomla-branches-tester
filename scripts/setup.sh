@@ -143,7 +143,7 @@ if [ "$(printf '%s\n' "8.0.0" "$php_version" | sort -V | head -n1)" = "8.0.0" ];
   with_xdebug=true
   log "jbt-${instance} – Configure 'php.ini' for development"
   docker exec "jbt-${instance}" bash -c "cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini"
-  log "Preparing a parallel installation with Xdebug"
+  log "jbt-${instance} – Preparing a parallel installation with Xdebug"
   docker exec "jbt-${instance}" bash -c ' \
       cp -r /usr/local /usr/local-without-xdebug &&
       pecl install xdebug && \
