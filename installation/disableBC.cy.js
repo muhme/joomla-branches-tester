@@ -3,18 +3,17 @@
  *
  * Used by 'scripts/database'.
  * 
- * Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+ * Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
  * https://github.com/muhme/joomla-branches-tester
  */
 
 import { registerCommands } from "./registerCommands";
 registerCommands();
 
+// Don't disable 'Behaviour - Taggable' or 'Behaviour - Versionable' plugins or you can't use tags/versions
 const plugins = [
   'Behaviour - Backward Compatibility 6', // >= 5.4
   'Behaviour - Backward Compatibility',   // >= 4.4
-  'Behaviour - Taggable',                 // <= 4.3
-  'Behaviour - Versionable'               // <= 4.3
 ];
 
 describe('Disable Behaviour Plugins', () => {
