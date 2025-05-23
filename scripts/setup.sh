@@ -110,6 +110,7 @@ docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
   git \
   zlib1g-dev \
   libpq-dev \
+  libbz2-dev \
   postgresql-client \
   default-mysql-client \
   && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
@@ -124,6 +125,7 @@ docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
       intl \
       xsl \
       opcache \
+      bz2 \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*'
 
@@ -187,7 +189,9 @@ if $initial; then
   fi
   # Starting here with a shallow clone for speed and space; unshallow in 'scripts/patch' if patches are to be applied
   log "jbt-${instance} – Git shallow cloning ${git_repository}:${git_branch} into the 'joomla-${instance}' directory"
-  docker exec "jbt-${instance}" bash -c "git clone -b ${git_branch} --depth 1 ${git_repository} /var/www/html"
+  docker exec "jbt-${instance}" bash -c "\
+    rm -rf /var/www/html/* /var/www/html/.??*; \
+    git clone -b ${git_branch} --depth 1 ${git_repository} /var/www/html"
 fi
 
 log "jbt-${instance} – Git configure '/var/www/html' as safe directory"
