@@ -199,12 +199,21 @@ if [ "$recreate" = false ]; then
     echo 'deb [signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb stable main' | tee /etc/apt/sources.list.d/google-chrome.list && \
     apt-get install -y git vim iputils-ping iproute2 telnet net-tools"
 
-  log "jbt-cypress – JBT 'installation' environment – installing cypress@latest"
-  # First free 652 MB for pre-installed Cypress 13.14.2
-  docker exec "jbt-cypress" bash -c "rm -rf /root/.cache/Cypress && \
-                                     cd /jbt/installation && \
-                                     npm install cypress-file-upload cypress@latest && \
-                                     CYPRESS_CACHE_FOLDER=/jbt/cypress-cache npx cypress@latest install"
+  log "jbt-cypress – JBT 'installation' environment – installing cypress@${JBT_INSTALLATION_CYPRESS_VERSION}"
+  # We install now, but don't delete pre-installed Cypress with rm -rf /root/.cache/Cypress
+  cypress_installation="${CYPRESS_CACHE_FOLDER}/${JBT_INSTALLATION_CYPRESS_VERSION}"
+  docker exec "jbt-cypress" bash -c "cd /jbt/installation && \
+                                     npm install cypress-file-upload cypress@${JBT_INSTALLATION_CYPRESS_VERSION} && \
+                                     export CYPRESS_CACHE_FOLDER=/jbt/cypress-cache && \
+                                     if [ -d ${cypress_installation} ]; then \
+                                       echo 'CONTAINER jbt-cypress: ${cypress_installation} already exists.'; \
+                                     elif [ -d /root/.cache/${JBT_INSTALLATION_CYPRESS_VERSION} ]; then \
+                                       echo 'CONTAINER jbt-cypress: Reusing Cypress binary from image'; \
+                                       mv /root/.cache/${JBT_INSTALLATION_CYPRESS_VERSION} ${cypress_installation}; \
+                                     else \
+                                       echo 'CONTAINER jbt-cypress: Running npx cypress install'; \
+                                       npx cypress install; \
+                                     fi"
 
   # JBT Cypress Installation Environment
   log "jbt-cypress – Adding 'installation/joomla-cypress' module as a Git shallow clone of the main branch"

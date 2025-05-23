@@ -17,7 +17,9 @@ start_time=$(date +%s)
 JBT_TMP_FILE=/tmp/$(basename "$0").$$
 trap 'rm -rf $JBT_TMP_FILE' 0
 
-# The following four arrays are positionally mapped, avoiding associative arrays
+JBT_INSTALLATION_CYPRESS_VERSION="14.4.0"
+
+# The following five arrays are positionally mapped, avoiding associative arrays
 # to ensure compatibility with macOS default Bash 3.2.
 #
 # Database Unix socket paths into the '/var/run' directory
@@ -390,9 +392,13 @@ function createDockerComposeFile() {
       rm xx00 xx01
   else
     if [ "${network}" = "IPv4" ]; then
-      cp 'configs/docker-compose.base.yml' 'docker-compose.new'
+      sed \
+        -e "s/JBT_INSTALLATION_CYPRESS_VERSION/${JBT_INSTALLATION_CYPRESS_VERSION}/" \
+        'configs/docker-compose.base.yml'  > 'docker-compose.new'
     else
-      sed -e 's/enable_ipv6: false/enable_ipv6: true/' \
+      sed \
+        -e "s/JBT_INSTALLATION_CYPRESS_VERSION/${JBT_INSTALLATION_CYPRESS_VERSION}/" \
+        -e 's/enable_ipv6: false/enable_ipv6: true/' \
         -e 's/subnet: "192.168.150.0\/24"/subnet: "fd00::\/8"/' \
         'configs/docker-compose.base.yml' > 'docker-compose.new'
 

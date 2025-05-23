@@ -180,7 +180,7 @@ services:
 
   cypress:
     container_name: jbt-cypress
-    image: cypress/included:14.3.3
+    image: cypress/included:JBT_INSTALLATION_CYPRESS_VERSION
     restart: unless-stopped
     entrypoint: ["sleep", "31536000"] # don't use cypress run, instead sleep one year
     ports:

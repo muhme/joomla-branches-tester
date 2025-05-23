@@ -42,7 +42,7 @@ function configureCypressConfig {
   local from="${1}" to="${2}" instance="${3}" baseurl="${4}" dbtype="${5}" dbhost="${6}" dbport="${7}" 
   local smtphost="${8}" smtpport="${9}"
 
-  docker exec "jbt-${instance}" bash -c "echo '/* eslint-disable */' | cat - '${from}' } | sed \
+  docker exec "jbt-${instance}" bash -c "echo '/* eslint-disable */' | cat - '${from}' | sed \
     -e \"s|db_type: .*|db_type: '${dbtype}',|\" \
     -e \"s|db_name: .*|db_name: 'test_joomla_${instance}',|\" \
     -e \"s|db_prefix: .*|db_prefix: 'jos${instance}_',|\" \
