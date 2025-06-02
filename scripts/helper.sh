@@ -334,8 +334,7 @@ function isValidVariant() {
 
 # Adjust 'configuration.php' for JBT, e.g. set 'tEstValue' as the secret.
 # As Joomla System Tests do in 'tests/System/integration/install/Installation.cy.js'.
-# - Using 'filesystem' as the session handler to prevent logging in again after a few minutes,
-#   for whatever reason this differs from 'database'.
+# Also use the 'filesystem' session handler from 4.0 upwards.
 # Required after running
 #   - JBT's Joomla installation,
 #   - joomla-cypress Joomla installation tests or
@@ -349,6 +348,14 @@ function adjustJoomlaConfigurationForJBT() {
        ! grep -q ' $smtpport = 7025' "joomla-${instance}/configuration.php"; then
 
       log "jbt-${instance} – Adopt configuration.php for JBT"
+
+      # Session handler 'filesystem' is avaialable since 4.0
+      session_handler="database"
+      if (( instance != 310 && instance >= 40 )); then
+        # Using 'filesystem' as the session handler to prevent logging in again after a few minutes,
+        # for whatever reason this differs from default 'database'.
+        session_handler="filesystem"
+      fi
       # Since we get an access error when changing the ownership, even as root user,
       # we create configuration.php.new and rename it.
       docker exec "jbt-${instance}" bash -c "sed \
@@ -357,7 +364,7 @@ function adjustJoomlaConfigurationForJBT() {
         -e \"s|\(public .mailer =\).*|\1 'smtp';|\" \
         -e \"s|\(public .smtphost =\).*|\1 'host.docker.internal';|\" \
         -e \"s|\(public .smtpport =\).*|\1 7025;|\" \
-        -e \"s|\(public .session_handler =\).*|\1 'filesystem';|\" \
+        -e \"s|\(public .session_handler =\).*|\1 '${session_handler}';|\" \
         configuration.php > configuration.php.new && \
         mv configuration.php.new configuration.php && \
         chown www-data:www-data configuration.php && \
