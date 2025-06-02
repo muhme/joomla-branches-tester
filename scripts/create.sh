@@ -272,10 +272,10 @@ for version in "${versionsToInstall[@]}"; do
       # Running?
       if docker ps --format '{{.Names}}' | grep -q "^jbt-${instance}$"; then
         log "jbt-${instance} – Stopping Docker Container"
-        docker compose stop "jbt-${instance}"
+        docker stop "jbt-${instance}"
       fi
       log "jbt-${instance} – Removing Docker container"
-      docker compose rm -f "jbt-${instance}" || log "jbt-${instance} – Ignoring failure to remove Docker container"
+      docker rm -f "jbt-${instance}" || log "jbt-${instance} – Ignoring failure to remove Docker container"
     fi
 
     createDockerComposeFile "${instance}" "${php_version}" "${network}" "append"
