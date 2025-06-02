@@ -90,6 +90,8 @@ else
     -e 'libcom-err2' \
     -e 'SCSS File compiled.*err' \
     -e 'transferring' \
+    -e 'BZ2_bzerror' \
+    -e 'Stopping Docker Container' \
     -e 'overrid' "${file}" | \
   grep -i --color=always \
     -e ERR \
