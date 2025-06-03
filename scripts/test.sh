@@ -239,6 +239,15 @@ for instance in "${instancesToTest[@]}"; do
 
     # Cypress tests?
     if [[ "${actualTest}" =~ ^(system|joomla-cypress)$ ]]; then
+
+      # We start System Tests with 4.4, as there are no Cypress system tests before 4.3 and the rudimentary tests fail in 4.3.
+      if [ "${actualTest}" = "system" ] && ((instance == 310 || instance < 44)); then
+        warning "jbt-${instance} < 44 Skipping Cypress ${actualTest} tests"
+        skipped=$((skipped + 1))
+        overallSkipped=$((overallSkipped + 1))
+        continue
+      fi
+
       spec="${spec_argument}"
       # joomla-cypress' installJoomlaMultilingualSite() test deletes installation directory – restore it
       restoreInstallationFolder "${instance}"
@@ -256,14 +265,6 @@ for instance in "${instancesToTest[@]}"; do
         continue
       fi
       if [ "${actualTest}" = "system" ]; then
-        # No Cypress System Tests and in 4.3 rudimentary tests fail
-        if ((instance == 310 || instance < 44)); then
-          # No tests executed! /  PHP Fatal error:  Uncaught Error: Call to undefined function
-          log "jbt-${instance} < 44 Skipping Cypress ${actualTest} tests"
-          skipped=$((skipped + 1))
-          overallSkipped=$((overallSkipped + 1))
-          continue
-        fi
         # Is there one more argument with a test spec pattern?
         if [ -z "${spec_argument}" ]; then
 
