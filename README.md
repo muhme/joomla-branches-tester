@@ -398,9 +398,11 @@ The Joomla development version installed in the web server container is configur
 
 - Joomla Super User: `ci-admin` with the password `joomla-17082005` (used from CI System Tests).
 - Used language Pack is English (United Kingdom) (`en-GB`).
-- The `/installation` folder remains intact after the installation.
-  - Earlier Joomla versions delete the `/installation` folder after setup.
+- The `installation` folder remains intact after the installation.
+  - Earlier Joomla versions delete the `installation` folder after setup.
     If the folder is missing, it is restored from JBT installation environment backup-copy.
+  - Starting with Joomla version 5.0, a `DEV_STATUS = ‘Stable’` is changed to `DEV_STATUS = ‘JBT’`
+    to avoid being forced to delete the `installation` folder.
 - Error Reporting is set to `Maximum` in `Global Configuration | Server`.
 - A cron job is configured to run the Joomla Task Scheduler every minute.
 - The 'System - Joomla! Statistics' plugin is disabled to prevent prompting users on the backend Home Dashboard.

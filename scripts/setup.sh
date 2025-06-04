@@ -193,8 +193,8 @@ if $initial; then
     rm -rf /var/www/html/* /var/www/html/.??*; \
     git clone -b ${git_branch} --depth 1 ${git_repository} /var/www/html"
 
-  if ((instance != 310 && instance >= 50 && instance < 54)); then
-    version_file="libraries/src/Version.php"
+  if ((instance != 310 && instance >= 50)); then
+    version_file="joomla-${instance}/libraries/src/Version.php"
     log "jbt-${instance} – Set DEV_STATUS to 'JBT' to login even with installation folder"
     sed -e "s/DEV_STATUS = 'Stable'/DEV_STATUS = 'JBT'/" "${version_file}" > "${JBT_TMP_FILE}" && \
     cp "${JBT_TMP_FILE}" "${version_file}"
