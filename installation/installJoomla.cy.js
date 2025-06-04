@@ -45,6 +45,15 @@ describe('Install Joomla', () => {
     if (instance >= 40 && instance != 310) {
       // Using NPM module 'joomla-cypress'
       cy.installJoomla(config);
+      /* Installing from tag (not from branch) we have the 'Congratulations!' screen with
+       * either 'Install Additional Languages', 'Open Site' or 'Open Administrator'.
+       * It is needed to click one of them to complete the installation.
+       */
+      cy.get('body').then($body => {
+        if ($body.find('button[complete-installation]').length > 0) {
+          cy.get('button[complete-installation]').first().click({ force: true })
+        }
+      })
       cy.doAdministratorLogin(config.username, config.password, false);
       if (instance >= 51) {
         // on 4.0 disableStatistics | cy.searchForItem(statisticPlugin) fails with: .filter-search-bar__button not found

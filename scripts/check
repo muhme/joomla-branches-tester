@@ -99,5 +99,6 @@ else
     -e error \
     -e fatal \
     -e stop \
-    -e 'not found'
+    -e 'not found' \
+    -e 'No such file or directory'
 fi
