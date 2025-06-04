@@ -195,9 +195,11 @@ if $initial; then
 
   if ((instance != 310 && instance >= 50)); then
     version_file="joomla-${instance}/libraries/src/Version.php"
-    log "jbt-${instance} – Set DEV_STATUS to 'JBT' to login even with installation folder"
-    sed -e "s/DEV_STATUS = 'Stable'/DEV_STATUS = 'JBT'/" "${version_file}" > "${JBT_TMP_FILE}" && \
-    cp "${JBT_TMP_FILE}" "${version_file}"
+    if grep -q "DEV_STATUS = 'Stable'" "${version_file}"; then
+      log "jbt-${instance} – Change DEV_STATUS from 'Stable' to 'JBT' to login even with installation folder"
+      sed -e "s/DEV_STATUS = 'Stable'/DEV_STATUS = 'JBT'/" "${version_file}" > "${JBT_TMP_FILE}" && \
+        cp "${JBT_TMP_FILE}" "${version_file}"
+    fi
   fi
 fi
 
