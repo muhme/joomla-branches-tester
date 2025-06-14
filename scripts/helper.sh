@@ -17,97 +17,169 @@ start_time=$(date +%s)
 JBT_TMP_FILE=/tmp/$(basename "$0").$$
 trap 'rm -rf $JBT_TMP_FILE' 0
 
-JBT_INSTALLATION_CYPRESS_VERSION="14.4.0"
+declare -r \
+  JBT_INSTALLATION_CYPRESS_VERSION="14.4.0"
 
 # The following five arrays are positionally mapped, avoiding associative arrays
 # to ensure compatibility with macOS default Bash 3.2.
 #
 # Database Unix socket paths into the '/var/run' directory
-JBT_S_MY="mysql-socket/mysqld.sock"
-JBT_S_MA="mariadb-socket/mysqld.sock"
-JBT_S_PG="postgresql-socket"
+declare -r \
+  JBT_S_MY="mysql-socket/mysqld.sock" \
+  JBT_S_MA="mariadb-socket/mysqld.sock" \
+  JBT_S_PG="postgresql-socket"
 #
 # Database and driver variants available for 'dbtype' in 'configuration.php'.
-JBT_DB_VARIANTS=("mysqli" "mysql" "mariadbi" "mariadb" "pgsql")
+declare -ar \
+  JBT_DB_VARIANTS=("mysqli" "mysql" "mariadbi" "mariadb" "pgsql")
 # Database driver mapping for the variants as in Web Installer 'database type'.
-JBT_DB_TYPES=("MySQLi" "MySQL (PDO)" "MySQLi" "MySQL (PDO)" "PostgreSQL (PDO)")
+declare -ar \
+  JBT_DB_TYPES=("MySQLi" "MySQL (PDO)" "MySQLi" "MySQL (PDO)" "PostgreSQL (PDO)")
 # Database server mapping for the variants.
-JBT_DB_HOSTS=("jbt-mysql" "jbt-mysql" "jbt-madb" "jbt-madb" "jbt-pg")
+declare -ar \
+  JBT_DB_HOSTS=("jbt-mysql" "jbt-mysql" "jbt-madb" "jbt-madb" "jbt-pg")
 # Database port mapping for the variants.
-JBT_DB_PORTS=("7011" "7011" "7012" "7012" "7013")
+declare -ar \
+  JBT_DB_PORTS=("7011" "7011" "7012" "7012" "7013")
 # Database Unix socket paths into the '/jbt/run' directory
-JBT_DB_SOCKETS=("${JBT_S_MY}" "${JBT_S_MY}" "${JBT_S_MA}" "${JBT_S_MA}" "${JBT_S_PG}")
+declare -ar \
+  JBT_DB_SOCKETS=("${JBT_S_MY}" "${JBT_S_MY}" "${JBT_S_MA}" "${JBT_S_MA}" "${JBT_S_PG}")
 
 # Valid PHP versions.
 # (not 5.6 - 7.3 as there are problems and for lowest supported Joomla 3.9.0 there is PHP 7.4 available and working)
-JBT_VALID_PHP_VERSIONS=("php7.4" "php8.0" "php8.1" "php8.2" "php8.3" "php8.4" "highest")
+declare -ar \
+  JBT_VALID_PHP_VERSIONS=("php7.4" "php8.0" "php8.1" "php8.2" "php8.3" "php8.4" "highest")
 
-# The highest PHP version for existing official Joomla images (the two arrays correspond via the index).
-JBT_JOOMLA_VERSIONS=("39" "310" "40" "41" "42" "43" "44" "50" "51" "52" "53" "54" "60")
-JBT_PHP_VERSIONS=("7.4" "8.0" "8.0" "8.0" "8.1" "8.2" "8.2" "8.2" "8.3" "8.3" "8.4" "8.4" "8.4")
+# The highest PHP version usable for Joomla major-minor version (the two arrays correspond via the index).
+declare -ar \
+  JBT_JOOMLA_VERSIONS=("39" "310" "40" "41" "42" "43" "44" "50" "51" "52" "53" "54" "60") \
+  JBT_PHP_VERSIONS=("7.4" "8.0" "8.0" "8.0" "8.1" "8.2" "8.2" "8.2" "8.3" "8.3" "8.4" "8.4" "8.4")
 
-# Base Docker containers, eg ("jbt-pga" "jbt-mya" "jbt-mysql" "jbt-madb" "jbt-pg" "jbt-relay" "jbt-mail" "jbt-cypress" "jbt-novnc")
-JBT_BASE_CONTAINERS=()
-while read -r line; do
-  JBT_BASE_CONTAINERS+=("$line")
-done < <(grep 'container_name:' 'configs/docker-compose.base.yml' | awk '{print $2}')
+# Base Docker containers (without the Joomla web server containers), eg
+# ("jbt-pga" "jbt-mya" "jbt-mysql" "jbt-madb" "jbt-pg" "jbt-relay" "jbt-mail" "jbt-cypress" "jbt-novnc")
+# Filled im the end.
+declare -a \
+  JBT_BASE_CONTAINERS=()
+  while read -r line; do
+    JBT_BASE_CONTAINERS+=("$line")
+  done < <(grep 'container_name:' 'configs/docker-compose.base.yml' | awk '{print $2}')
 
 # If the 'unpatched' option is not set and no patch is provided, use the following list:
-# As of early October 2024, the main functionality is working without the need for patches.
+# As of early October 2024, the main functionality is now working without the need for patches as before.
 # shellcheck disable=SC2034 # It is used by other scripts after sourcing
-JBT_DEFAULT_PATCHES=("unpatched")
+declare -a \
+  JBT_DEFAULT_PATCHES=("unpatched")
 
-# Variables that are used by helper.sh only and retrieved on first usage
-# All used tags
-JBT_HELPER_TAGS=()
-# All used branches
-JBT_HELPER_BRANCHES=()
-
-# Determine Joomla valid (>= 3.9) version tags.
-# Returns an array, e.g. ("1.7.3" "2.5.0" ... "5.2.0" "5.2.0-rc1" ...)
+# Determine all Joomla usable version tags.
+# Joomla version >= 3.9, as Joomla Docker images <= 3.8 cannot run 'apt-get update'.
+# These are > 300 tags, e.g. ("3.9.0 3.9.0-alpha" ... "5.3.1-rc1" "5.4.0-alpha1" "6.0.0-alpha1")
 # They are at least 4 chars (e.g. '1.7.3'), not using 'deprecate_eval', '11.2' etc.
-#
-# Joomla Docker images <= 3.8 cannot run 'apt-get update'.
-#
-# Get on first call and stored in JBT_HELPER_TAGS.
-#
-function getAllUsedTags() {
-  if [[ ${#JBT_HELPER_TAGS[@]} -eq 0 ]]; then
-    # get tags | remove dereferenced annotated tag '^{}' lines | \
-    #            remove commit hash and 'refs/tags/' in the lines | only 1-9.* | version sort | replace new line with space
-    # shellcheck disable=SC2162 # Not set -r as 2nd option as it will not work for old Bashes and there are no backslashes here
-    read -a JBT_HELPER_TAGS <<< "$(git ls-remote --tags https://github.com/joomla/joomla-cms | grep -v '\^{}' | \
-                        sed 's/.*\///' | grep '^[1-9]\.' | sort -V | awk -F. '$1 > 3 || ($1 == 3 && $2 >= 9)' | tr '\n' ' ')"
-  fi
-  echo "${JBT_HELPER_TAGS[*]}"
-}
+declare -a \
+  JBT_ALL_USABLE_TAGS=()
+  # get tags | remove dereferenced annotated tag '^{}' lines | \
+  #            remove commit hash and 'refs/tags/' in the lines | only 1-9.* | version sort | replace new line with space
+  # shellcheck disable=SC2162 # Not set -r as 2nd option as it will not work for old Bashes and there are no backslashes here
+  read -a JBT_ALL_USABLE_TAGS <<< "$(git ls-remote --tags https://github.com/joomla/joomla-cms | grep -v '\^{}' | \
+                      sed 's/.*\///' | grep '^[1-9]\.' | sort -V | awk -F. '$1 > 3 || ($1 == 3 && $2 >= 9)' | tr '\n' ' ')"
 
-# Determine the currently used Joomla branches.
-# Returns a space-separated string of branches, e.g. getAllUsedBranches -> "4.4-dev 5.2-dev 5.3-dev 6.0-dev".
-#
+# All currently used Joomla branches.
+# eg. ("4.4-dev" "5.3-dev" "5.4-de"v "6.0-dev").
 # We are using default, active and stale branches.
 # With ugly screen-scraping, because no git command found and GitHub API with token looks too oversized.
-# If we are offline, it returns an empty list.
+# If we are offline, it returns an empty list!
+declare -a \
+  JBT_ALL_USED_BRANCHES=()
+  # Get the JSON data from both the main branches and stale branches URLs
+  json_data=$(curl -s "https://github.com/joomla/joomla-cms/branches")
+  stale_json_data=$(curl -s "https://github.com/joomla/joomla-cms/branches/stale")
+  # Extract the names of the branches, only with grep and sed, so as not to install any dependencies, e.g. jq
+  # Use sed with -E flag to enable extended regular expressions, which is also working with macOS sed.
+  branches=$(echo "$json_data" "$stale_json_data" | grep -o '"name":"[0-9]\+\.[0-9]\+-dev"' |
+              sed -E 's/"name":"([0-9]+\.[0-9]+-dev)"/\1/')
+  # shellcheck disable=SC2162 # Not set -r as 2nd option as it will not work for old Bashes and there are no backslashes here
+  read -a JBT_ALL_USED_BRANCHES <<< "$(echo "${branches}" | tr ' ' '\n' | sort -n | tr '\n' ' ')"
+
+# All highest minor tags, e.g. "3.9.28 3.10.12 4.0.6 ... 5.3.1 5.4.0-alpha1 6.0.0-alpha1"
+# Skip pre-releases like -rc, -alpha or -beta if final release exist
+declare -a \
+  JBT_HIGHEST_MINOR_TAGS=()
+  all_minor_versions=()
+  for tag in "${JBT_ALL_USABLE_TAGS[@]}"; do
+    minor=$(echo "$tag" | sed -E 's/^([0-9]+\.[0-9]+)\..*/\1/')
+    [[ -n "$minor" ]] && all_minor_versions+=("$minor")
+  done
+  # shellcheck disable=SC2207 # There are no spaces in versions for deduplicate and sort
+  all_minor_versions=($(printf '%s\n' "${all_minor_versions[@]}" | sort -u -V))
+  # Find best tag per minor
+  for minor in "${all_minor_versions[@]}"; do
+    matches=()
+    for tag in "${JBT_ALL_USABLE_TAGS[@]}"; do
+      [[ "$tag" == "$minor."* ]] && matches+=("$tag")
+    done
+    stable=()
+    for tag in "${matches[@]}"; do
+      case "$tag" in
+        *-alpha*|*-beta*|*-rc*) ;;  # skip pre-releases
+        *) stable+=("$tag") ;;
+      esac
+    done
+    if [[ ${#stable[@]} -gt 0 ]]; then
+      best=$(printf '%s\n' "${stable[@]}" | sort -V | tail -n1)
+    else
+      best=$(printf '%s\n' "${matches[@]}" | sort -V | tail -n1)
+    fi
+    JBT_HIGHEST_MINOR_TAGS+=("$best")
+  done
+
+# Get all newest Joomla major.minor branch or patch versions.
+# e.g. ("3.9.28" "3.10.12" "4.0.6" "4.1.5" "4.2.9" "4.3.4" "4.4-dev" "5.0.3" "5.1.4" "5.2.6" "5.3-dev" "5.4-dev" "6.0-dev")
 #
-function getAllUsedBranches() {
+declare -a \
+  JBT_HIGHEST_VERSION=()
+  # Get branch list: "4.4-dev" → key="4.4", value="4.4-dev"
+  for branch in "${JBT_ALL_USED_BRANCHES[@]}"; do
+    minor="${branch%-dev}"  # remove '-dev' suffix → "4.4-dev" → "4.4"
+    branch_keys+=("$minor")
+    branch_values+=("$branch")
+  done
+  for version in "${JBT_HIGHEST_MINOR_TAGS[@]}"; do
+    minor=$(echo "$version" | sed -E 's/^([0-9]+\.[0-9]+)\..*/\1/')
+    # Check if minor exists in branch_keys
+    found=false
+    for ((i=0; i<${#branch_keys[@]}; i++)); do
+      if [[ "${branch_keys[i]}" == "$minor" ]]; then
+        JBT_HIGHEST_VERSION+=("${branch_values[i]}")
+        found=true
+        break
+      fi
+    done
+    # Fallback to the tag version if no branch override
+    if [[ "$found" == false ]]; then
+      JBT_HIGHEST_VERSION+=("$version")
+    fi
+  done
 
-  if [[ ${#JBT_HELPER_BRANCHES[@]} -eq 0 ]]; then
-    # Declare all local variables to prevent SC2155 - Declare and assign separately to avoid masking return values.
-    local json_data stale_json_data branches
+# Determine highest Joomla tag for given major minor version.
+# e.g. "39" -> "3.9.28"
+# e.g. "310" -> "3.10.12"
+#
+function getHighestMinorTag() {
 
-    # Get the JSON data from both the main branches and stale branches URLs
-    json_data=$(curl -s "https://github.com/joomla/joomla-cms/branches")
-    stale_json_data=$(curl -s "https://github.com/joomla/joomla-cms/branches/stale")
-
-    # Extract the names of the branches, only with grep and sed, so as not to install any dependencies, e.g. jq
-    # Use sed with -E flag to enable extended regular expressions, which is also working with macOS sed.
-    branches=$(echo "$json_data" "$stale_json_data" | grep -o '"name":"[0-9]\+\.[0-9]\+-dev"' |
-               sed -E 's/"name":"([0-9]+)\.([0-9]+)-dev"/\1\2/')
-
-    # shellcheck disable=SC2162 # Not set -r as 2nd option as it will not work for old Bashes and there are no backslashes here
-    read -a JBT_HELPER_BRANCHES <<< "$(echo "${branches}" | tr ' ' '\n' | sort -n | tr '\n' ' ')"
+  if [ -z "$1" ]; then
+    error "getHighestMinorTag: Missing argument"
   fi
-  echo "${JBT_HELPER_BRANCHES[*]}"
+  local version="$1" major_minor tag
+
+  for tag in "${JBT_HIGHEST_MINOR_TAGS[@]}"; do
+    major_minor=$(echo "$tag" | sed -E 's/^([0-9]+)\.([0-9]+)\..*/\1\2/')
+
+    if [[ "$major_minor" = "${version}" ]]; then
+      echo "${tag}"
+      return
+    fi
+  done
+
+  error "getHighestMinorTag: Nothing found for major minor '${version}'"
 }
 
 # List installed Joomla versions from 'joomla-*' directories.
@@ -144,49 +216,40 @@ getAllInstalledInstances() {
   echo "${final_instances[*]}"
 }
 
-# Check if the given argument is a Joomla used branch or Joomla used tag version.
+# Check if the given argument is a Joomla used branch, tag version or valid major minor.
+# e.g. isValidVersion "310" -> 0
 # e.g. isValidVersion "44" -> 0
-# e,g, isValidVersion "5.2-0-alpha3" -> 0
+# e.g. isValidVersion "5.2-0-alpha3" -> 0
 #
 function isValidVersion() {
+  local version="$1" fullVersion branch versions=()
 
   if [ -z "$1" ]; then
     return 1 # Not a valid version
   fi
-  local version="$1" fullVersion versions=()
-  fullVersion=$(fullName "$1" | awk '{print $1}')
 
-  # Branch? e.g. 5.3-dev
-  # shellcheck disable=SC2207 # There are no spaces in version numbers
-  branches=($(getAllUsedBranches))
-  for branch in "${branches[@]}"; do
-    if [[ "${branch}" == "${version}" || "${branch}" == "${fullVersion}" ]]; then
+  # shellcheck disable=SC2178,2006 # There are no spaces in branches, not doing sub-shell with $() to have global array set
+  for branch in "${JBT_ALL_USED_BRANCHES[@]}"; do
+    # 1. Full branch name? e.g. 5.3-dev
+    if [[ "${branch}" == "${version}" ]]; then
+      return 0 # success
+    fi
+    # 2. Abbreviated branch name? e.g. "60"
+    if [[ `echo "{$branch}" | sed -E 's/([0-9])\.([0-9]+)-dev/\1\2/g'` == "${version}" ]]; then
       return 0 # success
     fi
   done
 
-  # Abbreviated branch name? e.g. "53"
-  # shellcheck disable=SC2207 # There are no spaces in version numbers
-  branches=($(fullName "${branches[*]}"))
-  for branch in "${branches[@]}"; do
-    if [[ "${branch}" == "${version}" || "${branch}" == "${fullVersion}" ]]; then
+  # shellcheck disable=SC2178,2006 # There are no spaces in tags and not doing sub-shell with $() to have global array set
+  for tag in "${JBT_ALL_USABLE_TAGS[@]}"; do
+    # 3. Full Tag name? e.g. "5.2.0"
+    if [[ "${tag}" == "${version}" ]]; then
       return 0 # success
     fi
   done
 
-  # Tag? e.g. "5.2.0"
-  # shellcheck disable=SC2207 # There are no spaces in version numbers
-  tags=($(getAllUsedTags))
-  for tag in "${tags[@]}"; do
-    if [[ "${tag}" == "${version}" || "${tag}" == "${fullVersion}" ]]; then
-      return 0 # success
-    fi
-  done
-
-  # Abbreviated tag name? e.g. "520"
-  # shellcheck disable=SC2207 # There are no spaces in version numbers
-  tags=($(fullName "${tags[*]}"))
-  for tag in "${tags[@]}"; do
+  # 4. Joomla major-minor? e.g. "310"
+  for tag in "${JBT_JOOMLA_VERSIONS[@]}"; do
     if [[ "${tag}" == "${version}" || "${tag}" == "${fullVersion}" ]]; then
       return 0 # success
     fi
@@ -217,30 +280,52 @@ function isValidPHP() {
   return 1 # not valid
 }
 
-# Returns the full Git branch or tag name corresponding for the abbreviation.
-# Works on single entry and space separated lists.
-# e.g. fullName "520-alpha4" -> '5.2.0-alpha4'
-# e.g. fullName "52 53" -> '5.2-dev 5.3-dev'
+# Returns the full Git branch or tag name corresponding for the major minor.
+# If an major minor is given without branch, the highest tag is used.
+# Returns on space separated string, e.g.:
+#   "5.4.0-alpha1" -> "5.4.0-alpha1"
+#   "52"           -> "5.2.6"
+#   "310"          -> "3.10.12"
+#   "60"           -> "6.0-dev"
 #
 function fullName() {
-  if [[ -z "$1" ]]; then
+  local name="$1" tag full_name branch
+
+  if [[ -z "${name}" ]]; then
     error "fullName(): missing version"
+    return
   fi
 
-  local branches=()
-  for version in $1; do
-    if [[ "$version" =~ ^[0-9]{2}$ ]]; then
-      # Two digits branch? e.g. "44" -> "4.4-dev"
-      branches+=("$(echo "$version" | sed -E 's/([0-9])([0-9])/\1.\2-dev/')")
-    elif [[ "$version" =~ ^([0-9])([0-9])([0-9])(.*)$ ]]; then
-      # Three digits tag? e.g. "520-alpha4" to "5.2.0-alpha4"
-      branches+=("${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}${BASH_REMATCH[4]}")
-    else
-      # Keep the original
-      branches+=("$version")
+  # 1. It is already a tag name
+  for tag in "${JBT_ALL_USABLE_TAGS[@]}"; do
+    if [[ "${name}" == "${tag}" ]]; then
+      echo "${name}"
+      return
     fi
   done
-  echo "${branches[*]}"
+
+  # 2. Current branch abbreviation, eg. "60" -> branch "6.0-dev"
+  if [[ "$name" =~ ^[0-9]{2}$ ]]; then
+    # Two digits branch? e.g. "44" -> "4.4-dev"
+    full_name="$(echo "$name" | sed -E 's/([0-9])([0-9])/\1.\2-dev/')"
+    for branch in "${JBT_ALL_USED_BRANCHES[@]}"; do
+      if [[ "${branch}" == "${full_name}" ]]; then
+        echo "${full_name}"
+        return
+      fi
+    done
+  fi
+
+  # 3. major minor, e.g. "310" -> highest tag "3.10.12"
+  highest_version=$(getHighestMinorTag "${name}")
+  major_minor=$(getMajorMinor "${highest_version}")
+  if [[ "${name}" == "${major_minor}" ]]; then
+    echo "${highest_version}"
+    return
+  fi
+
+  # 4. Take the orignal, e.g. "5.3.1"
+  echo "${name}"
 }
 
 # Returns major and minor number from version, used as instance label.
@@ -345,7 +430,7 @@ function adjustJoomlaConfigurationForJBT() {
 
   if [ -f "joomla-${instance}/configuration.php" ]; then
     if ! grep -q 'tEstValue' "joomla-${instance}/configuration.php" || \
-       ! grep -q ' $smtpport = 7025' "joomla-${instance}/configuration.php"; then
+       ! grep -q 'smtpport = 7025' "joomla-${instance}/configuration.php"; then
 
       log "jbt-${instance} – Adopt configuration.php for JBT"
 
@@ -477,7 +562,6 @@ function getJoomlaVersion() {
 
   if [ ! -f "$versions_file" ]; then
     error "There is no file \"${versions_file}\"."
-    exit 1
   fi
 
   # from file content:

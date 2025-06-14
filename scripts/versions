@@ -31,23 +31,18 @@ while [ $# -ge 1 ]; do
   fi
 done
 
-# shellcheck disable=SC2207 # There are no spaces in branches
-branches=($(getAllUsedBranches))
-header "${#branches[@]} Usable Branches from the 'joomla-cms' Repository"
-for ((i = 0; i < ${#branches[@]}; i++)); do
-    fullBranchName=$(fullName "${branches[i]}")
+header "${#JBT_ALL_USED_BRANCHES[@]} Usable Branches from the 'joomla-cms' Repository"
+for branch in "${JBT_ALL_USED_BRANCHES[@]}"; do
     # Pad each entry to 14 chars
-    line+=$(printf "%-14s" "${fullBranchName}")
+    line+=$(printf "%-14s" "${branch}")
 done
 echo "    $line"
 
-# shellcheck disable=SC2207 # There are no spaces in tags
-tags=($(getAllUsedTags))
-header "${#tags[@]} Usable Tags from the 'joomla-cms' Repository"
+header "${#JBT_ALL_USABLE_TAGS[@]} Usable Tags from the 'joomla-cms' Repository"
 line=""
-for ((i = 0; i < ${#tags[@]}; i++)); do
+for ((i = 0; i < "${#JBT_ALL_USABLE_TAGS[@]}"; i++)); do
     # Pad each entry to 14 chars
-    line+=$(printf "%-14s" "${tags[i]}")
+    line+=$(printf "%-14s" "${JBT_ALL_USABLE_TAGS[i]}")
     
     # Print 8 entries per line
     if (( (i + 1) % 8 == 0 )); then

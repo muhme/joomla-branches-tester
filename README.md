@@ -90,10 +90,16 @@ For more details, see the [Testing NPM Module joomla-cypress](#testing-npm-modul
 
 ### Version Naming
 
-With `scripts/create`, Joomla versions need to be specified as a Git branch (e.g., `5.4-dev`) or a Git tag (e.g., `5.1.4-rc3`).
-When creating an instance from a Git branch, either the full branch name or just the major and minor version numbers can be used (e.g., `54` instead of `5.4-dev`).
-Once the Joomla instances are created, all other scripts use only the major and minor version numbers.
-For example, an instance created from the Git tag `3.10.12` runs as `jbt-310`, and you can specify the instance as `310` throughout.
+When using `scripts/create`, Joomla versions are either a Git branch (e.g. `5.4-dev`) or a Git tag (e.g. `5.1.4-rc3`).
+
+You can always provide the full name (e.g. `5.4.0-alpha1`) or simplify with only the major and minor version numbers.
+If a development branch exists for that version (e.g. `5.4-dev` for `54`), it will be used.
+Otherwise, the highest available patch version matching the major and minor will be selected (e.g. `3.9.28` for `39`).
+
+Once the Joomla instances are created, all other scripts refer to them using just the major and minor version (e.g.
+`310` for `3.10.12`), as for each major and minor version number only one Joomla web server container exists. For
+example, an instance created from the Git tag `3.10.12` will run as `jbt-310`, and you can continue to refer to it
+simply as `310`.
 
 <details>
   <summary>See the detailed list of Docker containers.</summary>
@@ -676,14 +682,14 @@ scripts/php 54 60 php8.4
 
 ### Grafting a Joomla Package
 
-Do you have a bundled Joomla package to test? No problem!
+Do you have a prebuilt Joomla package to test? No problem!
 Just like in plant grafting, where a scion is joined to a rootstock,
 you can graft a Joomla package onto the Joomla instance for testing.
 Simply choose the same major and minor version numbers
-and graft the package for a seamless experience:
+and graft the full package for a seamless experience:
 
 ```
-scripts/graft 52 ~/Downloads/Joomla_5.2.0-alpha4-dev-Development-Full_Package.zip
+scripts/graft 60 Joomla_6.0.0-alpha2-dev+pr.43793-Development-Full_Package.tar.zst
 ```
 
 :warning: The content of the file system of the Joomla instance is overwritten.
