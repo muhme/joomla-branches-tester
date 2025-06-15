@@ -2,7 +2,7 @@
 #
 # create.sh - Create Docker containers based on Joomla Git branches.
 #   create
-#   create 51 pgsql socket no-cache
+#   create 51 pgsql socket
 #   create 52 53 php8.1 recreate
 #   create 52 https://github.com/Elfangor93/joomla-cms:mod_community_info
 #
@@ -17,15 +17,18 @@ fi
 source scripts/helper.sh
 
 function help {
+  local valid_versions_without_highest=("${JBT_VALID_PHP_VERSIONS[@]:0:${#JBT_VALID_PHP_VERSIONS[@]}-1}")
+
   echo "
-    create – Creates the base and Joomla web server Docker containers.
-             One or more optional Joomla versions, see 'scripts/versions' (default is ${allUsedBranches[*]}).
+    create – Creates the base and creates or recreates Joomla web server Docker containers.
+             One or more optional Joomla version(s), if not specified, ${JBT_ALL_USED_BRANCHES[*]} are used
+               or use 'all' for: ${JBT_HIGHEST_VERSION[*]}.
+               See 'scripts/versions' for all usable versions.
              The optional database variant can be one of: ${JBT_DB_VARIANTS[*]} (default is mariadbi).
              The optional 'socket' argument configures database access via Unix socket (default is TCP host).
              The optional 'IPv6' argument enables support for IPv6 (default is IPv4).
-             The optional 'no-cache' argument disables Docker build caching (default is enabled).
-             The optional 'recreate' argument creates or recreates specified web server containers.
-             The optional PHP version can be set to one of: ${JBT_VALID_PHP_VERSIONS[0]} ... ${JBT_VALID_PHP_VERSIONS[${#JBT_VALID_PHP_VERSIONS[@]}-2]} (default is highest).
+             The optional 'recreate' argument creates or recreates specified Joomla web server containers.
+             The optional PHP version can be set to one of: ${valid_versions_without_highest[*]} (default is highest).
              The optional 'repository:branch' argument (default repository is https://github.com/joomla/joomla-cms).
              Optionally specify one or more patches (e.g., 'joomla-cypress-36'; default is unpatched).
              The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
@@ -45,9 +48,6 @@ function waitForMySQL {
   # If the MAX_ATTEMPTS are exceeded, simply try to continue.
 }
 
-# shellcheck disable=SC2207 # There are no spaces in version numbers
-allUsedBranches=($(getAllUsedBranches))
-
 # Defaults to use MariaDB with MySQLi database driver, to use cache and PHP 8.1.
 database_variant="mariadbi"
 socket=""
@@ -63,8 +63,11 @@ while [ $# -ge 1 ]; do
     help
     exit 0
   elif isValidVersion "$1"; then
-    versionsToInstall+=("$(fullName "$1" | awk '{print $1}')")
+    versionsToInstall+=("$(fullName "$1")")
     shift # Argument is eaten as one version number.
+  elif [ "$1" = "all" ]; then
+    versionsToInstall=("${JBT_HIGHEST_VERSION[@]}")
+    shift # Argument is eaten as all versions to install.
   elif [ "$1" = "socket" ]; then
     socket="socket"
     shift # Argument is eaten as use database with socket.
@@ -77,9 +80,6 @@ while [ $# -ge 1 ]; do
   elif [ "$1" = "IPv6" ]; then
     network="IPv6"
     shift # Argument is eaten as IPv6 option.
-  elif [ "$1" = "no-cache" ]; then
-    no_cache=true
-    shift # Argument is eaten as no cache option.
   elif isValidPHP "$1"; then
     php_version="$1"
     shift # Argument is eaten as PHP version.
@@ -126,7 +126,7 @@ fi
 
 # If no version was given, use all.
 if [ ${#versionsToInstall[@]} -eq 0 ]; then
-  versionsToInstall=("${allUsedBranches[@]}")
+  versionsToInstall=("${JBT_ALL_USED_BRANCHES[@]}")
 fi
 
 if [ "$unpatched" = true ]; then
@@ -145,10 +145,11 @@ if [ "$recreate" = false ]; then
   log "Create 'docker-compose.yml' file for version(s) ${versionsToInstall[*]}, based on ${php_version} PHP version and ${network}"
   createDockerComposeFile "${versionsToInstall[*]}" "${php_version}" "${network}"
 
-  if $no_cache; then
-    log "Running 'docker compose build --no-cache'"
-    docker compose build --no-cache
-  fi
+  # always use no cache as we have too often seen problems with
+  # volume shadowing and stale mounts from deleted containers, e.g.
+  # "mkdir: cannot create directory '/jbt/installation/joomla-39': File exists"
+  log "Running 'docker compose build --no-cache'"
+  docker compose build --no-cache
 
   log "Running 'docker compose up'"
   docker compose up -d

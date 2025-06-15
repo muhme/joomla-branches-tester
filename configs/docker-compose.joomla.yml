@@ -21,12 +21,23 @@
       - mariadb
       - postgres
       - relay
+    # To prevent volume shadowing and stale mounts of deleted containers, no anonymous volumes are created by defining all volumes.
     volumes:
-      - .:/jbt
-      - ./joomla-XXX:/var/www/html
-      - mysql-socket:/var/run/mysql-socket
-      - mariadb-socket:/var/run/mariadb-socket
-      - postgresql-socket:/var/run/postgresql-socket
+      - type: bind
+        source: .
+        target: /jbt
+      - type: bind
+        source: ./joomla-XXX
+        target: /var/www/html
+      - type: volume
+        source: mysql-socket
+        target: /var/run/mysql-socket
+      - type: volume
+        source: mariadb-socket
+        target: /var/run/mariadb-socket
+      - type: volume
+        source: postgresql-socket
+        target: /var/run/postgresql-socket
     networks:
       jbt-network:
         ipv4_address: 10.0.WWW.VVV
