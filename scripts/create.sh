@@ -67,8 +67,7 @@ while [ $# -ge 1 ]; do
     versionsToInstall+=("$(fullName "$1")")
     shift # Argument is eaten as one version number.
   elif [ "$1" = "all" ]; then
-    # shellcheck disable=SC2207 # There are no spaces in version numbers
-    versionsToInstall=($(getAllVersions))
+    versionsToInstall=("${JBT_HIGHEST_VERSION[@]}")
     shift # Argument is eaten as all versions to install.
   elif [ "$1" = "socket" ]; then
     socket="socket"
