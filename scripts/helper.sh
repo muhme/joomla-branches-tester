@@ -159,29 +159,6 @@ declare -a \
     fi
   done
 
-# Determine highest Joomla tag for given major minor version.
-# e.g. "39" -> "3.9.28"
-# e.g. "310" -> "3.10.12"
-#
-function getHighestMinorTag() {
-
-  if [ -z "$1" ]; then
-    error "getHighestMinorTag: Missing argument"
-  fi
-  local version="$1" major_minor tag
-
-  for tag in "${JBT_HIGHEST_MINOR_TAGS[@]}"; do
-    major_minor=$(echo "$tag" | sed -E 's/^([0-9]+)\.([0-9]+)\..*/\1\2/')
-
-    if [[ "$major_minor" = "${version}" ]]; then
-      echo "${tag}"
-      return
-    fi
-  done
-
-  error "getHighestMinorTag: Nothing found for major minor '${version}'"
-}
-
 # List installed Joomla versions from 'joomla-*' directories.
 # Returns space separated sorted string, e.g. "39 310 40 41 42 43 44 51 52 53 60"
 #
@@ -317,12 +294,13 @@ function fullName() {
   fi
 
   # 3. major minor, e.g. "310" -> highest tag "3.10.12"
-  highest_version=$(getHighestMinorTag "${name}")
-  major_minor=$(getMajorMinor "${highest_version}")
-  if [[ "${name}" == "${major_minor}" ]]; then
-    echo "${highest_version}"
-    return
-  fi
+  for tag in "${JBT_HIGHEST_MINOR_TAGS[@]}"; do
+    major_minor=$(echo "$tag" | sed -E 's/^([0-9]+)\.([0-9]+)\..*/\1\2/')
+    if [[ "${major_minor}" = "${name}" ]]; then
+      echo "${tag}"
+      return
+    fi
+  done
 
   # 4. Take the orignal, e.g. "5.3.1"
   echo "${name}"

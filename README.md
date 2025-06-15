@@ -17,7 +17,7 @@ where we'll explore the numerous options, parameters and configurations that pow
 
 ## Software Architecture
 Within [Docker](https://www.docker.com/) container environment you are able to:
-* Use almost 300 different Joomla versions, based on the Git development branches or Git tags (Joomla 3.9.0 ... 6.0-dev).
+* Use more than 300 different Joomla versions, based on the Git development branches or Git tags (Joomla 3.9.0 ... 6.0-dev).
 * Running one Joomla version or multiple Joomla versions in parallel.
 * Manual testing, including database inspections and email verifications.
 * Running [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System)
