@@ -2,7 +2,7 @@
 #
 # create.sh - Create Docker containers based on Joomla Git branches.
 #   create
-#   create 51 pgsql socket no-cache
+#   create 51 pgsql socket
 #   create 52 53 php8.1 recreate
 #   create 52 https://github.com/Elfangor93/joomla-cms:mod_community_info
 #
@@ -27,7 +27,6 @@ function help {
              The optional database variant can be one of: ${JBT_DB_VARIANTS[*]} (default is mariadbi).
              The optional 'socket' argument configures database access via Unix socket (default is TCP host).
              The optional 'IPv6' argument enables support for IPv6 (default is IPv4).
-             The optional 'no-cache' argument disables Docker build caching (default is enabled).
              The optional 'recreate' argument creates or recreates specified Joomla web server containers.
              The optional PHP version can be set to one of: ${valid_versions_without_highest[*]} (default is highest).
              The optional 'repository:branch' argument (default repository is https://github.com/joomla/joomla-cms).
@@ -81,9 +80,6 @@ while [ $# -ge 1 ]; do
   elif [ "$1" = "IPv6" ]; then
     network="IPv6"
     shift # Argument is eaten as IPv6 option.
-  elif [ "$1" = "no-cache" ]; then
-    no_cache=true
-    shift # Argument is eaten as no cache option.
   elif isValidPHP "$1"; then
     php_version="$1"
     shift # Argument is eaten as PHP version.
@@ -149,10 +145,11 @@ if [ "$recreate" = false ]; then
   log "Create 'docker-compose.yml' file for version(s) ${versionsToInstall[*]}, based on ${php_version} PHP version and ${network}"
   createDockerComposeFile "${versionsToInstall[*]}" "${php_version}" "${network}"
 
-  if $no_cache; then
-    log "Running 'docker compose build --no-cache'"
-    docker compose build --no-cache
-  fi
+  # always use no cache as we have too often seen problems with
+  # volume shadowing and stale mounts from deleted containers, e.g.
+  # "mkdir: cannot create directory '/jbt/installation/joomla-39': File exists"
+  log "Running 'docker compose build --no-cache'"
+  docker compose build --no-cache
 
   log "Running 'docker compose up'"
   docker compose up -d

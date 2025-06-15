@@ -128,7 +128,13 @@ declare -a \
     else
       best=$(printf '%s\n' "${matches[@]}" | sort -V | tail -n1)
     fi
-    JBT_HIGHEST_MINOR_TAGS+=("$best")
+    # npm ci in 5.0.3 has the problem:
+    # ENOENT: no such file or directory, stat '/var/www/html/libraries/vendor/maximebf/debugbar/src/DebugBar/Resources
+    if [[ "${best}" == "5.0.3" ]]; then
+      # Simple use working 5.0.2
+      best="5.0.2"
+    fi
+    JBT_HIGHEST_MINOR_TAGS+=("${best}")
   done
 
 # Get all newest Joomla major.minor branch or patch versions.

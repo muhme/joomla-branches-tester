@@ -186,12 +186,25 @@ services:
     ports:
       - 7125:7125 # smtp-tester port (only available during the test run)
     volumes:
-      - .:/jbt
-      - ~/.Xauthority:/root/.Xauthority:rw
-      - /tmp/.X11-unix:/tmp/.X11-unix
-      - mysql-socket:/var/run/mysql-socket
-      - mariadb-socket:/var/run/mariadb-socket
-      - postgresql-socket:/var/run/postgresql-socket
+      - type: bind
+        source: .
+        target: /jbt
+      - type: bind
+        source: ${HOME}/.Xauthority
+        target: /root/.Xauthority
+        read_only: false
+      - type: bind
+        source: /tmp/.X11-unix
+        target: /tmp/.X11-unix
+      - type: volume
+        source: mysql-socket
+        target: /var/run/mysql-socket
+      - type: volume
+        source: mariadb-socket
+        target: /var/run/mariadb-socket
+      - type: volume
+        source: postgresql-socket
+        target: /var/run/postgresql-socket
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:

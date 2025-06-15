@@ -17,8 +17,8 @@ where we'll explore the numerous options, parameters and configurations that pow
 
 ## Software Architecture
 Within [Docker](https://www.docker.com/) container environment you are able to:
-* Use more than 300 different Joomla versions, based on the Git development branches or Git tags (Joomla 3.9.0 ... 6.0-dev).
-* Running one Joomla version or multiple Joomla versions in parallel.
+* Choose from more than 300 different Joomla versions, based on the Git development branches or Git tags (Joomla 3.9.0 ... 6.0-dev).
+* Working with one Joomla version or up to 13 Joomla versions in parallel.
 * Manual testing, including database inspections and email verifications.
 * Running [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System)
   with [Cypress](https://www.cypress.io/) in interactive mode (GUI) or automated mode (headless or with noVNC).
@@ -61,14 +61,16 @@ Ensure that your current working directory is always the `joomla-branches-tester
         For those with a taste for the finer details, the comments are a gourmet treat."*
 
 By default (without specifying a Joomla version number) `scripts/create` takes all **used** Joomla development branches.
-**Used** Joomla development branches refer to the GitHub [joomla-cms](https://github.com/joomla/joomla-cms) repository, including default, active and stale branches.
-At the beginning of May 2025, these are `4.4-dev`, `5.3-dev`, `5.4-dev` and `6.0-dev`.
+**Used** Joomla development branches refer to the GitHub [joomla-cms](https://github.com/joomla/joomla-cms) repository,
+including default, active and stale branches.
+At the beginning of June 2025, these are `4.4-dev`, `5.3-dev`, `5.4-dev` and `6.0-dev`.
 
 :point_right: Since **used** branches are subject to frequent changes,
               the latest version numbers are always be retrieved directly from the `joomla-cms` repository.
 
 For the web server containers, PHP-Apache Docker images (e.g., `php:8.4-apache`) are used as a starting point.
-Within the container, the source code from the corresponding Joomla Git development branch or tag is copied and the Cypress-based Joomla installation from the System Tests is run.
+Within the container, the source code from the corresponding Joomla Git development branch or tag is copied and
+the Cypress-based Joomla installation from the System Tests is run.
 Refer to the [Versions](#versions) section for a list of all usable Joomla versions.
 
 ### JBT Parallel Installation Environment
@@ -95,7 +97,8 @@ When using `scripts/create`, Joomla versions are either a Git branch (e.g. `5.4-
 You can always provide the full name (e.g. `5.4.0-alpha1`) or simplify with only the major and minor version numbers.
 If a development branch exists for that version (e.g. `5.4-dev` for `54`), it will be used.
 Otherwise, the highest available patch version matching the major and minor will be selected (e.g. `3.9.28` for `39`).
-
+There is one exception, for `50` the patch version `5.0.2` is used, because with `5.0.3` the `npm ci` fails due to
+missing `maximebf/debugbar` package.
 Once the Joomla instances are created, all other scripts refer to them using just the major and minor version (e.g.
 `310` for `3.10.12`), as for each major and minor version number only one Joomla web server container exists. For
 example, an instance created from the Git tag `3.10.12` will run as `jbt-310`, and you can continue to refer to it
@@ -189,7 +192,7 @@ Last tested in early November 2024 with:
 * Windows 11 Pro WSL 2 Ubuntu and
 * Ubuntu 24 Noble Numbat (the absolute minimum, if you also wish to use the Cypress GUI, is a VPS with 2 shared vCPUs and 4 GB RAM).
 
-You can create all base Docker containers and the current (early May 2025)
+You can create all base Docker containers and the current (early June 2025)
 four Joomla dev-branch containers using `scripts/create` without any arguments:
 
 ```
@@ -205,8 +208,8 @@ especially the very first time when the Docker images still need to be downloade
 For this installation with five Joomla web server containers the
 `joomla-branches-tester` folder requires about 2 GB of disc space.
 Docker needs additionally about 20 GB for images and volumes.
-If you are installing for the first time and downloading all necessary Docker images,
-you will need to download approximately 4 GB of data over the network.
+If you are installing for the first time and downloading all the required Docker images,
+you will need to download arround 4 GB of data from the Internet.
 
 <details>
   <summary>Optional <code>scripts/create</code> Parameters</summary>
@@ -215,20 +218,20 @@ you will need to download approximately 4 GB of data over the network.
 
 <img align="right" src="images/joomla-branches-tester.svg" width="400">
 
-*  Install can use multiple Joomla versions, e.g. two tags and two dev-branches `3.9.28 3.10.12 52 60`
-   (your system architecture will look like the picture on the right), defaults to all dev-branches.
-*  The used database and database driver, e.g. `pgsql`, defaults to use MariaDB with MySQLi driver.
-*  The used PHP version. For available PHP versions see [Versions](#versions) section. Defaults to `highest`.
-   See more details in [Switch PHP Version](#switch-php-version).
-*  Instead using `joomla-cms` repository, you can specify a different Git repository and branch.
-   For example, using `https://github.com/Elfangor93/joomla-cms:mod_community_info`.
-   In this case, exactly one version must be provided,
-   and it should match the version of the given `joomla-cms` cloned repository.
-*  The Docker `jbt-network`, used by all containers, defaults to IPv4.
-   To use IPv6, run the script with the `IPv6` option.
-*  The optional `recreate` option is used to create or recreate one Joomla web server container
-   for the specified version. Base containers and unnamed Joomla web server containers remain unchanged.
-*  To force a fresh build with `no-cache`, defaults to build from cache.
+* Install can use multiple Joomla versions, e.g. two tags and two dev-branches `3.9.28 3.10.12 52 60`
+  (your system architecture will look like the picture on the right), defaults to all dev-branches.
+* The used database and database driver, e.g. `pgsql`, defaults to use MariaDB with MySQLi driver.
+* The used PHP version. For available PHP versions see [Versions](#versions) section. Defaults to `highest`.
+  See more details in [Switch PHP Version](#switch-php-version).
+* Instead using `joomla-cms` repository, you can specify a different Git repository and branch.
+  For example, using `https://github.com/Elfangor93/joomla-cms:mod_community_info`.
+  In this case, exactly one version must be provided,
+  and it should match the version of the given `joomla-cms` cloned repository.
+* The Docker `jbt-network`, used by all containers, defaults to IPv4.
+  To use IPv6, run the script with the `IPv6` option.
+* The optional `recreate` option is used to create or recreate one Joomla web server container
+  for the specified version. Base containers and unnamed Joomla web server containers remain unchanged.
+* To see all options and values, use `scripts/create help`.
 
 ---
 
@@ -475,7 +478,7 @@ from the [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/t
 scripts/test system
 ```
 
-:warning: Currently (May 2025) the Joomla System Tests do not work independently.
+:warning: Currently (June 2025) the Joomla System Tests do not work independently.
           A Joomla installation is required before running the test suite again.
           Be aware the entire database content of the Joomla instance will be lost.
           See [Database and File System Consistency](#database-and-file-system-consistency) for more details.
@@ -598,7 +601,7 @@ for running the Cypress GUI locally.
 
 ### Databases
 
-The Joomla Branches Tester includes one container for each of the three supported databases (version numbers as of the beginning of May 2025):
+The Joomla Branches Tester includes one container for each of the three supported databases (version numbers as of the beginning of June 2025):
 * `jbt-mysql` – MySQL version 8.1.0 Community Server
 * `jbt-madb` – MariaDB version 10.4.34
 * `jbt-pg` – PostgreSQL version 15.8
@@ -976,7 +979,7 @@ jbt-54 Tag 5.3.0-83-g2da7e19c0a
     Branch: jbt-merged joomla-cms-44910
     Status: 0 changes
 JBT Instance History
-*** 250516 10:03:04 >>> 'scripts/create.sh 3.10.12 44 54 no-cache' started
+*** 250516 10:03:04 >>> 'scripts/create.sh 3.10.12 44 54' started
 *** 250516 10:14:42 <<< 'scripts/create.sh' finished in 11:38
  
 *** 250516 10:20:30 >>> 'scripts/database.sh 310 mysql' started
@@ -1074,8 +1077,8 @@ directories to prevent issues during the next installation.
 After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patchtester`.
 
 :fairy: *"The first step `Installation.cy.js` of the Cypress based Joomla System Tests is excluded if you run all `system` test specs.
-          But currently (May 2025) the Joomla System Tests do not work independently.
-          A Joomla installation step is required before running the Joomla System Tests again."*
+          But currently (June 2025) the Joomla System Tests do not work independently.
+          A Joomla installation step is required before running the Joomla System Tests a second time."*
 
 ## Trouble-Shooting
 
@@ -1085,9 +1088,9 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
 3. One advantage of Docker and scripting: you can easily start fresh.
    As Roy from The IT Crowd says, *"Have you tried turning it off and on again?"*
    It takes just 6 minutes on a entry-level MacBook Air M3 to delete everything and
-   create the 10 containers with Joomla 5.4-dev branch in using Docker Compose `no-cache` to be save.
+   create the 10 containers with Joomla 5.4-dev branch.
    ```
-   scripts/create 54 no-cache
+   scripts/create 54
    ```
 4. Check the Docker container logs to monitor activity.
    For example, the `jbt-relay` container logs will display information about receiving and delivering emails.
