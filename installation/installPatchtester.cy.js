@@ -3,7 +3,7 @@
  *
  * Used by 'scripts/patchtester'.
  * 
- * Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+ * Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 - 2025 Heiko Lübbe
  * https://github.com/muhme/joomla-branches-tester
  */
 
@@ -48,11 +48,27 @@ describe("Install 'Joomla! Patch Tester' with", () => {
     cy.clickToolbarButton("Save & Close");
   });
 
-  // Fetch the data
-  it("fetch data", () => {
-    cy.doAdministratorLogin();
+  function tryFetchOnce() {
     cy.visit('administrator/index.php?option=com_patchtester&view=pulls');
     cy.get('button.button-sync.btn.btn-primary').click();
-    cy.get('tr', { timeout: Cypress.config('defaultCommandTimeout') * 10 }).should('have.length.greaterThan', 1);
+
+    return cy.wait(Cypress.config('defaultCommandTimeout') * 3).then(() => {
+      return cy.document().then((doc) => {
+        const rows = doc.querySelectorAll('tr');
+        return rows.length > 1;
+      });
+    });
+  }
+  it("fetch data with retry", () => {
+    cy.doAdministratorLogin();
+
+    tryFetchOnce().then((success) => {
+      if (success) return;
+
+      cy.log('First fetch failed, retrying...');
+      tryFetchOnce().then((secondSuccess) => {
+        expect(secondSuccess, 'Second fetch should succeed').to.equal(true);
+      });
+    });
   });
 });
