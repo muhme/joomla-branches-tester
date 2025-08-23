@@ -145,11 +145,12 @@ if [ "$recreate" = false ]; then
   log "Create 'docker-compose.yml' file for version(s) ${versionsToInstall[*]}, based on ${php_version} PHP version and ${network}"
   createDockerComposeFile "${versionsToInstall[*]}" "${php_version}" "${network}"
 
-  # always use no cache as we have too often seen problems with
+  # Always use no cache as we have too often seen problems with
   # volume shadowing and stale mounts from deleted containers, e.g.
   # "mkdir: cannot create directory '/jbt/installation/joomla-39': File exists"
+  # Use --pull to have latest for e.g. dpage/pgadmin4:latest
   log "Running 'docker compose build --no-cache'"
-  docker compose build --no-cache
+  docker compose build --pull --no-cache
 
   log "Running 'docker compose up'"
   docker compose up -d
