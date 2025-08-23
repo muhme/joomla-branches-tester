@@ -43,7 +43,7 @@ services:
   mariadb:
     container_name: jbt-madb
     restart: unless-stopped
-    image: mariadb:10.4
+    image: mariadb:10.6 # using long term release, and not >= 11.0 then mysql binary is removed
     ports:
       - "7012:3306"
     environment:
