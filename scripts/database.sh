@@ -25,7 +25,7 @@ source scripts/helper.sh
 # adopt e.g.:
 #   db_type: 'PostgreSQL (PDO)',
 #   db_name: 'test_joomla_44'
-#   db_prefix: 'jos44_',
+#   db_prefix: 'ajbt44_', # use of 'a' as initial letter for sorting before bak_-tables
 #   db_host: 'jbt-pg',
 #   db_port: '',
 #   baseUrl: 'http://host.docker.internal:7044',
@@ -45,7 +45,7 @@ function configureCypressConfig {
   docker exec "jbt-${instance}" bash -c "echo '/* eslint-disable */' | cat - '${from}' | sed \
     -e \"s|db_type: .*|db_type: '${dbtype}',|\" \
     -e \"s|db_name: .*|db_name: 'test_joomla_${instance}',|\" \
-    -e \"s|db_prefix: .*|db_prefix: 'jos${instance}_',|\" \
+    -e \"s|db_prefix: .*|db_prefix: 'ajbt${instance}_',|\" \
     -e \"s|db_host: .*|db_host: '${dbhost}',|\" \
     -e \"s|db_port: .*|db_port: '${dbport}',|\" \
     -e \"s|baseUrl: .*|baseUrl: '${baseurl}',|\" \
