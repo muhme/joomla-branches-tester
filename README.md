@@ -23,7 +23,7 @@ Within [Docker](https://www.docker.com/) container environment you are able to:
 * Running [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System)
   with [Cypress](https://www.cypress.io/) in interactive mode (GUI) or automated mode (headless or with noVNC).
 * Executing unit tests, verifying coding standards and checking CSS styles and JavaScript standards, just like Drone.
-* Automated [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester) installation.
+* Automated [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester) installation and deinstallation.
 * Apply pull requests (PR) from Git repositories `joomla-cms`, `joomla-cypress` and `joomla-framework/database`.
 * Switching between 10 database variants (MySQL, MariaDB, or PostgreSQL and the two database drivers:
   MySQLi or PHP Data Objects and the option to use Unix sockets, instead of TCP host).
@@ -818,7 +818,19 @@ scripts/patchtester 53 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
 :fairy: *"You will need to reinstall the Joomla Patch Tester if, for example, you switch the database.
         For more details, see [Database and File System Consistency](#database-and-file-system-consistency)."*
 
-:point_right: Alternatively, to apply patches, you can use `scripts/patch`, see [Back to the Future - Patch](#back-to-the-future---patch).
+More options available are:
+* `uninstall` to remove Joomla Patch Tester from Joomla instance.
+* Joomla Patch Tester version number, e.g. `4.4.0`, if you need to install an older version.
+
+⚠️ Currently (August 2025) the following Patch Tester versions are usable:
+* Joomla 4.4 – Patch Tester 4.3.3
+* Joomla 5.3 – Patch Tester 4.4.0
+* Joomla 5.4 – Patch Tester 4.4.0
+* Joomla 6.0 – Patch Tester 5.0.0 (latest)
+
+:point_right: Alternatively, to apply patches, you can use `scripts/patch`,
+              see [Back to the Future - Patch](#back-to-the-future---patch).
+              Or use PRs prebuild full packages with [Grafting a Joomla Package](grafting-a-joomla-package).
 
 ### Back to the Future - Patch
 
