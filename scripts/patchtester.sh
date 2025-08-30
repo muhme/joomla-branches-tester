@@ -21,7 +21,7 @@ function help {
                   Requires a GitHub personal access token as an argument (starting with 'ghp_') or 'JBT_GITHUB_TOKEN' set.
                   The optional Joomla version can be one or more of: ${allInstalledInstances[*]} (default is all).
                   The optional Patchtester version, e.g. 4.3.0 (default is latest).
-                  The optional 'uninstall' argument to delete a Patch Tester installation.
+                  The optional 'uninstall' argument to delete a Patch Tester installation (default is 'install').
                   The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
     $(random_quote)"
 }
@@ -42,9 +42,12 @@ while [ $# -ge 1 ]; do
   elif [[ $1 = ghp_* ]]; then
     token="$1"
     shift # Argument is eaten as GitHub token.
+  elif [[ "$1" = "install" ]]; then
+    uninstall=false
+    shift # Argument is eaten up as (default) installation.
   elif [[ "$1" = "uninstall" ]]; then
     uninstall=true
-    shift # Argument is eaten up as an uninstallation.
+    shift # Argument is eaten up as uninstallation.
   elif [[ "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     LATEST_TAG="$1"
     shift # Argument is eaten as Patch Tester version.

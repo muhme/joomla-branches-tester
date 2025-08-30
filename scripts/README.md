@@ -41,7 +41,7 @@ The following scripts are available and the use is described in [../README.md](.
 | [graft](graft.sh) | Grafting a Joomla package onto a branch. | :warning: The overall database content is lost.<br />Mandatory argument is the Joomla package. Optional argument is the database variant.|
 | [info](info) | Retrieves Joomla Branches Tester status information. | Optional arguments are `instance`, `base`, `history` and Joomla instances. |
 | [patch](patch.sh) | Apply Git patches in 'joomla-cms', 'joomla-cypress' or 'joomla-framework/database'. | Arguments are one or multiple patches and optional Joomla instances. |
-| [patchtester](patchtester.sh) | Installs and configures Joomla patch tester component in one or all Joomla instances. | The GitHub token comes from environment variable `JBT_GITHUB_TOKEN` or as mandatory argument. Optional argumenta are the Joomla instances. |
+| [patchtester](patchtester.sh) | Installs and configures Joomla patch tester component in one or all Joomla instances. | The GitHub token comes from environment variable `JBT_GITHUB_TOKEN` or as mandatory argument. Optional argumenta are the Joomla instances, 'install' (default) or 'uninstall' and the Patch Tester version (default is latest). |
 | [php](php.sh) | Change used PHP version. | Mandatory is the PHP version, e.g. `php8.3`. Optional arguments are the Joomla instances. |
 | [pull](pull.sh) | Running `git pull` and more. | Optional arguments are the Joomla instances. |
 | [test](test.sh) | Running Cypress headless System Tests on one or all branches. | Optional arguments are browser, test specification pattern and the Joomla instances. |

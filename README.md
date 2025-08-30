@@ -801,7 +801,7 @@ The script also sets the GitHub token and fetches the data.
 This can be done without version number for all Joomla instances or for e.g. Joomla 5.3:
 
 ```
-scripts/patchtester 53 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
+scripts/patchtester 53 install ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
 ```
 
 ```
@@ -818,9 +818,9 @@ scripts/patchtester 53 ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
 :fairy: *"You will need to reinstall the Joomla Patch Tester if, for example, you switch the database.
         For more details, see [Database and File System Consistency](#database-and-file-system-consistency)."*
 
-More options available are:
-* `uninstall` to remove Joomla Patch Tester from Joomla instance.
-* Joomla Patch Tester version number, e.g. `4.4.0`, if you need to install an older version.
+Other available options are:
+* `uninstall` to remove Joomla Patch Tester from Joomla instance (default is `install`).
+* Joomla Patch Tester version number, e.g. `4.4.0`, if you need to install an older version (default is latest version).
 
 ⚠️ Currently (August 2025) the following Patch Tester versions are usable:
 * Joomla 4.4 – Patch Tester 4.3.3
@@ -830,7 +830,7 @@ More options available are:
 
 :point_right: Alternatively, to apply patches, you can use `scripts/patch`,
               see [Back to the Future - Patch](#back-to-the-future---patch).
-              Or use PRs prebuild full packages with [Grafting a Joomla Package](grafting-a-joomla-package).
+              Or use PRs prebuild full packages with [Grafting a Joomla Package](#grafting-a-joomla-package).
 
 ### Back to the Future - Patch
 
