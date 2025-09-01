@@ -17,7 +17,7 @@ where we'll explore the numerous options, parameters and configurations that pow
 
 ## Software Architecture
 Within [Docker](https://www.docker.com/) container environment you are able to:
-* Choose from more than 300 different Joomla versions, based on the Git development branches or Git tags (Joomla 3.9.0 ... 6.0-dev).
+* Choose from more than 300 different Joomla versions, based on the Git development branches or Git tags (Joomla 3.9.0 ... 6.1-dev).
 * Working with one Joomla version or up to 13 Joomla versions in parallel.
 * Manual testing, including database inspections and email verifications.
 * Running [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System)
@@ -63,7 +63,7 @@ Ensure that your current working directory is always the `joomla-branches-tester
 By default (without specifying a Joomla version number) `scripts/create` takes all **used** Joomla development branches.
 **Used** Joomla development branches refer to the GitHub [joomla-cms](https://github.com/joomla/joomla-cms) repository,
 including default, active and stale branches.
-At the beginning of June 2025, these are `4.4-dev`, `5.3-dev`, `5.4-dev` and `6.0-dev`.
+At the beginning of September 2025, these are `4.4-dev`, `5.3-dev`, `5.4-dev`, `6.0-dev` and `6.1-dev`.
 
 :point_right: Since **used** branches are subject to frequent changes,
               the latest version numbers are always be retrieved directly from the `joomla-cms` repository.
@@ -127,6 +127,7 @@ The abbreviation `jbt` stands for Joomla Branches Tester.
 | ... | | | | |
 |jbt-54| 10.0.0.54<br />fd00::54 | **[7054](http://host.docker.internal:7054/administrator)** | /joomla-54 | Web Server Joomla e.g. 5.4-dev<br />user ci-admin / joomla-17082005 |
 |jbt-60| 10.0.0.60<br />fd00::60 | **[7060](http://host.docker.internal:7060/administrator)** | /joomla-60 | Web Server Joomla e.g. 6.0-dev<br />user ci-admin / joomla-17082005 |
+|jbt-61| 10.0.0.61<br />fd00::61 | **[7061](http://host.docker.internal:7061/administrator)** | /joomla-61 | Web Server Joomla e.g. 6.1-dev<br />user ci-admin / joomla-17082005 |
 
 :eight_spoked_asterisk: The directories are available on the Docker host inside `/jbt` to:
 * Inspect and change the configuration files (`configuration.php` or `cypress.config.mjs`),
@@ -822,11 +823,12 @@ Other available options are:
 * `uninstall` to remove Joomla Patch Tester from Joomla instance (default is `install`).
 * Joomla Patch Tester version number, e.g. `4.4.0`, if you need to install an older version (default is latest version).
 
-⚠️ Currently (August 2025) the following Patch Tester versions are usable:
+⚠️ Currently (September 2025) the following Patch Tester versions are usable:
 * Joomla 4.4 – Patch Tester 4.3.3
 * Joomla 5.3 – Patch Tester 4.4.0
 * Joomla 5.4 – Patch Tester 4.4.0
 * Joomla 6.0 – Patch Tester 5.0.0 (latest)
+* Joomla 6.1 – Patch Tester 5.0.0 (latest)
 
 :point_right: Alternatively, to apply patches, you can use `scripts/patch`,
               see [Back to the Future - Patch](#back-to-the-future---patch).
