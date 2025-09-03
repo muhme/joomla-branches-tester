@@ -139,30 +139,44 @@ declare -a \
   done
 
 # Get all newest Joomla major.minor branch or patch versions.
-# e.g. ("3.9.28" "3.10.12" "4.0.6" "4.1.5" "4.2.9" "4.3.4" "4.4-dev" "5.0.3" "5.1.4" "5.2.6" "5.3-dev" "5.4-dev" "6.0-dev")
+# e.g. ("3.9.28" "3.10.12" "4.0.6" "4.1.5" "4.2.9" "4.3.4" "4.4-dev" "5.0.3" "5.1.4" "5.2.6" "5.3-dev" "5.4-dev" "6.0-dev" "6.1-dev")
 #
 declare -a \
   JBT_HIGHEST_VERSION=()
   # Get branch list: "4.4-dev" → key="4.4", value="4.4-dev"
   for branch in "${JBT_ALL_USED_BRANCHES[@]}"; do
     minor="${branch%-dev}"  # remove '-dev' suffix → "4.4-dev" → "4.4"
-    branch_keys+=("$minor")
-    branch_values+=("$branch")
+    branch_keys+=("${minor}")
+    branch_values+=("${branch}")
   done
   for version in "${JBT_HIGHEST_MINOR_TAGS[@]}"; do
-    minor=$(echo "$version" | sed -E 's/^([0-9]+\.[0-9]+)\..*/\1/')
+    minor=$(echo "${version}" | sed -E 's/^([0-9]+\.[0-9]+)\..*/\1/')
     # Check if minor exists in branch_keys
     found=false
     for ((i=0; i<${#branch_keys[@]}; i++)); do
-      if [[ "${branch_keys[i]}" == "$minor" ]]; then
+      if [[ "${branch_keys[i]}" == "${minor}" ]]; then
         JBT_HIGHEST_VERSION+=("${branch_values[i]}")
         found=true
         break
       fi
     done
     # Fallback to the tag version if no branch override
-    if [[ "$found" == false ]]; then
-      JBT_HIGHEST_VERSION+=("$version")
+    if [[ "${found}" == false ]]; then
+      JBT_HIGHEST_VERSION+=("${version}")
+    fi
+  done
+  # Final we have to check if we have a new branch without any tag so far
+  for branch in "${JBT_ALL_USED_BRANCHES[@]}"; do
+    # Check if branch exists already
+    found=false
+    for version in "${JBT_HIGHEST_MINOR_TAGS[@]}"; do
+      if [[ "${version}" == "${branch}" ]]; then
+        found=true
+        break
+      fi
+    done
+    if [[ "${found}" == false ]]; then
+      JBT_HIGHEST_VERSION+=("${branch}")
     fi
   done
 

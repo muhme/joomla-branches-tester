@@ -22,7 +22,7 @@
     - after each database change: scripts/test system administrator/components/com_users/User.cy.js
 - Test database, php and info after grafting
 
-We can have thirteen Joomla containers:
+We can have fourteen Joomla containers:
 ```
 scripts/create all
 ```
