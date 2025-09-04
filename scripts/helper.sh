@@ -169,7 +169,7 @@ declare -a \
   for branch in "${JBT_ALL_USED_BRANCHES[@]}"; do
     # Check if branch exists already
     found=false
-    for version in "${JBT_HIGHEST_MINOR_TAGS[@]}"; do
+    for version in "${JBT_HIGHEST_VERSION[@]}"; do
       if [[ "${version}" == "${branch}" ]]; then
         found=true
         break
