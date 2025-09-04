@@ -18,7 +18,7 @@ where we'll explore the numerous options, parameters and configurations that pow
 ## Software Architecture
 Within [Docker](https://www.docker.com/) container environment you are able to:
 * Choose from more than 300 different Joomla versions, based on the Git development branches or Git tags (Joomla 3.9.0 ... 6.1-dev).
-* Working with one Joomla version or up to 13 Joomla versions in parallel.
+* Working with one Joomla version or up to 14 Joomla versions in parallel.
 * Manual testing, including database inspections and email verifications.
 * Running [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System)
   with [Cypress](https://www.cypress.io/) in interactive mode (GUI) or automated mode (headless or with noVNC).
@@ -603,7 +603,7 @@ for running the Cypress GUI locally.
 
 </details>
 
-### Check Network Traffic
+### Inspect Network Traffic
 
 To inspect, intercept, modify or replay Joomla PHP web traffic,
 use the `jbt-proxy` Docker container with [mitmproxy](https://www.mitmproxy.org/).
