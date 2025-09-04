@@ -48,6 +48,9 @@ If you need to investigate a failed test spec, you can easily switch to running 
 The red mail relay container triplicates all emails sent during manual Joomla tests or System Tests.
 The second red mail catcher container makes these emails accessible via a web application for easy review.
 
+The red proxy container is configured in PHP across all Joomla containers, and the SSL/TLS certificate is imported.
+The web-based mitmproxy interface then allows interactive checking and modification of the HTTP traffic.
+
 On the Docker Host system (left side), your red web browser is running.
 On macOS and Ubuntu, the native Cypress GUI is displayed in green.
 
