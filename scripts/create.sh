@@ -52,7 +52,6 @@ function waitForMySQL {
 database_variant="mariadbi"
 socket=""
 network="IPv4"
-no_cache=false
 recreate=false
 php_version="highest"
 versionsToInstall=()

@@ -845,11 +845,12 @@ Other available options are:
 * Joomla Patch Tester version number, e.g. `4.4.0`, if you need to install an older version (default is latest version).
 
 ⚠️ Currently (September 2025) the following Patch Tester versions are usable:
-* Joomla 4.4 – Patch Tester 4.3.3
-* Joomla 5.3 – Patch Tester 4.4.0
-* Joomla 5.4 – Patch Tester 4.4.0
-* Joomla 6.0 – Patch Tester 5.0.0 (latest)
-* Joomla 6.1 – Patch Tester 5.0.0 (latest)
+* Joomla 4.2 ... 4.4 – Patch Tester 4.3.3
+* Joomla 5.0 ... 5.4 – Patch Tester 4.4.0
+* Joomla 6.0 and 6.1 – Patch Tester 5.0.0 (latest)
+
+:fairy: *"If you do not provide the Patch Tester version number, the latest version is installed.
+        If this fails, a second attempt is made with the known working Patch Tester version for your convenience."*
 
 :point_right: Alternatively, to apply patches, you can use `scripts/patch`,
               see [Back to the Future - Patch](#back-to-the-future---patch).
