@@ -94,6 +94,18 @@ docker cp 'configs/error-logging.ini' "jbt-${instance}:/usr/local/etc/php/conf.d
 log "jbt-${instance} – Create 'php/conf.d/jbt.ini' to prevent Joomla warnings"
 docker cp 'configs/jbt.ini' "jbt-${instance}:/usr/local/etc/php/conf.d/jbt.ini"
 
+log "jbt-${instance} – Import jbt-proxy certificate"
+docker exec "jbt-${instance}" bash -c ' \
+  cp /mitm/mitmproxy-ca-cert.pem /usr/local/share/ca-certificates/mitmproxy.crt; \
+  update-ca-certificates'
+
+log "jbt-${instance} – Configure PHP to use jbt-proxy"
+  docker exec "jbt-${instance}" bash -c ' \
+        echo "# Proxy for outbound HTTP(S)"             >> /etc/apache2/envvars; \
+        echo "export http_proxy=http://jbt-proxy:7008"  >> /etc/apache2/envvars; \
+        echo "export https_proxy=http://jbt-proxy:7008" >> /etc/apache2/envvars; \
+        echo "export no_proxy=localhost,127.0.0.1,::1"  >> /etc/apache2/envvars'
+
 log "jbt-${instance} – Installing packages"
 docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
   libpng-dev \

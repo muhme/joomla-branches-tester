@@ -2,7 +2,7 @@
 #                             e.g. 5.2.9   -> 52 for VVV, 0 for WWW,  52 for XXX, 052 for ZZZ and joomla:5.2-php8.3-apache for YYY
 #                             e.g. 3.10.12 -> 10 for VVV, 3 for WWW, 310 for XXX, 310 for ZZZ and joomla:3.10-php8.0-apache for YYY
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 - 2025 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
   jbt-XXX:
@@ -21,6 +21,7 @@
       - mariadb
       - postgres
       - relay
+      - proxy
     # To prevent volume shadowing and stale mounts of deleted containers, no anonymous volumes are created by defining all volumes.
     volumes:
       - type: bind
@@ -38,10 +39,12 @@
       - type: volume
         source: postgresql-socket
         target: /var/run/postgresql-socket
+      - type: volume
+        source: mitm-ca
+        target: /mitm
     networks:
       jbt-network:
         ipv4_address: 10.0.WWW.VVV
         ipv6_address: fd00::XXX
     cap_add:
       - SYS_PTRACE # Allow ptrace in the Docker container to be able to use the strace command
-

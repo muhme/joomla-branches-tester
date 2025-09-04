@@ -34,11 +34,11 @@ Within [Docker](https://www.docker.com/) container environment you are able to:
 * Using IPv6 network.
 * Allows patching and testing of the `joomla-cypress` NPM module.
 
-![Joomla Branches Software Architecture](images/joomla-branches-tester-52.svg)
+![Joomla Branches Software Architecture](images/joomla-branches-tester-54.svg)
 
-The software architecture picture shows the simplest installation with only one Joomla 5.2 web server container plus the 9 base containers.
-You'll notice the one orange Joomla 5.2 Web Server container,
-based on the `joomla-52` folder, which is available inside and outside Docker.
+The software architecture picture shows the simplest installation with only one Joomla 5.4 web server container plus the 10 base containers.
+You'll notice the one orange Joomla 5.4 Web Server container,
+based on the `joomla-54` folder, which is available inside and outside Docker.
 On the right, you can see the three blue containers running the databases: MySQL, MariaDB and PostgreSQL.
 To inspect the databases, two additional blue containers are included: phpMyAdmin (for MySQL and MariaDB) and pgAdmin (for PostgreSQL).
 A green Docker container runs Cypress-based Joomla System Tests, either with a GUI or in headless mode.
@@ -219,7 +219,7 @@ you will need to download arround 4 GB of data from the Internet.
 
 <img align="right" src="images/joomla-branches-tester.svg" width="400">
 
-* Install can use multiple Joomla versions, e.g. two tags and two dev-branches `3.9.28 3.10.12 52 60`
+* Install can use multiple Joomla versions, e.g. two tags and two dev-branches `3.9.28 3.10.12 60 61`
   (your system architecture will look like the picture on the right), defaults to all dev-branches.
 * The used database and database driver, e.g. `pgsql`, defaults to use MariaDB with MySQLi driver.
 * The used PHP version. For available PHP versions see [Versions](#versions) section. Defaults to `highest`.
@@ -425,18 +425,21 @@ The Joomla development version installed in the web server container is configur
 
 ### Manual Testing
 
-From your Docker Host system you can test the Joomla Frontend e.g. for Joomla release 5.2
-with [http://host.docker.internal:7052](http://host.docker.internal:7052) and the backend
-[http://host.docker.internal:7052/administrator](http://host.docker.internal:7052/administrator).
+From your Docker Host system you can test the Joomla Frontend e.g. for Joomla release 5.4
+with [http://host.docker.internal:7054](http://host.docker.internal:7054) and the backend
+[http://host.docker.internal:7054/administrator](http://host.docker.internal:7054/administrator).
 User *ci-admin* and password *joomla-17082005* (Whose birthday is it anyway?) are from Joomla System Tests.
 
 In parallel you can inspect MariaDB and MySQL database with [phpMyAdmin](https://www.phpmyadmin.net/) on
-[http://host.docker.internal:7002](http://host.docker.internal:7002) or PostgreSQL database with [pgAdmin](https://www.pgadmin.org/) on
-[http://host.docker.internal:7003](http://host.docker.internal:7003). And verify all emails from Joomla and the System Tests with
+[http://host.docker.internal:7002](http://host.docker.internal:7002) or PostgreSQL database with
+[pgAdmin](https://www.pgadmin.org/) on [http://host.docker.internal:7003](http://host.docker.internal:7003).
+And verify all emails from Joomla and the System Tests with
 [MailDev](https://github.com/maildev/maildev/blob/master/docs/docker.md) on
 [http://host.docker.internal:7004](http://host.docker.internal:7004).
+Plus inspect the Joomla network traffic with
+[http://host.docker.internal:7009?token=jbtpw](http://host.docker.internal:7009?token=jbtpw).
 
-If you need to inspect files, they are available in the directory `joomla-52` for this Joomla release 5.2 sample.
+If you need to inspect files, they are available in the directory `joomla-54` for this Joomla release 5.4 sample.
 
 ### Drone-like Tests
 
@@ -462,7 +465,7 @@ Some optional arguments are:
 
 For example run the linter tests on three Joomla instances:
 ```
-scripts/test 51 52 53 lint:css lint:js lint:testjs
+scripts/test 54 60 61 lint:css lint:js lint:testjs
 ```
 
 To avoid issues with running `php-cs-fixer`, the auto-generated file `administrator/cache/autoload_psr4.php` is corrected beforehand.
@@ -505,9 +508,9 @@ scripts/test system administrator/components/com_users/Users.cy.js
 :point_right: When specifying a single test spec file,
               you can omit the `tests/System/integration/` path at the beginning.
 
-Test all `site` specs with Microsoft Edge in the Joomla instances 5.1, 5.2 and 5.3 using a pattern:
+Test all `site` specs with Microsoft Edge in the Joomla instances 5.4, 6.0 and 6.1 using a pattern:
 ```
-scripts/test 51 52 53 system edge 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
+scripts/test 54 60 61 system edge 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
 ```
 
 One more optional argument is `novnc`.
@@ -600,6 +603,21 @@ for running the Cypress GUI locally.
 
 </details>
 
+### Check Network Traffic
+
+To inspect, intercept, modify or replay Joomla PHP web traffic,
+use the `jbt-proxy` Docker container with [mitmproxy](https://www.mitmproxy.org/).
+You can access the web interface at
+[http://host.docker.internal:7009?token=jbtpw](http://host.docker.internal:7009?token=jbtpw).
+
+For example, you can check the Auto Update response:
+
+![Joomla Branches Tester – mitmproxy sample](images/mitmproxy.png)
+
+Tips:
+* File > Clear All – Deletes all captured flows.
+* Search > `~src 10.0.0.54` – Filters Joomla 5.4 IPv4 traffic (or use `~src fd00::54` for IPv6).
+
 ### Databases
 
 The Joomla Branches Tester includes one container for each of the three supported databases (version numbers as of the beginning of June 2025):
@@ -632,9 +650,9 @@ Five database and driver combinations are available:
   With a sprinkle of stardust, you can specify the desired database variant,
   and with `recreate` option you're only installing one Joomla version, it will be done in the blink of an eye."*
           
-Use MariaDB with driver MySQLi for Joomla 5.1 and Joomla 5.2:
+Use MariaDB with driver MySQLi for Joomla 5.4 and Joomla 6.0:
 ```
-scripts/database 51 52 mariadbi
+scripts/database 54 60 mariadbi
 ```
 
 Change all Joomla instances to use PostgreSQL:
@@ -881,9 +899,9 @@ Patching `installation/joomla-cypress`:
 scripts/patch installation joomla-cypress-37
 ```
 
-Running `joomla-cypress` Cypress tests headlessly with Joomla version 5.2:
+Running `joomla-cypress` Cypress tests headlessly with Joomla version 5.4:
 ```
-scripts/test 52 joomla-cypress
+scripts/test 54 joomla-cypress
 ```
 
 :warning: Using the `cypress/joomla.cy.js` test spec results in Joomla being installed multiple times and
@@ -930,13 +948,13 @@ scripts/versions
 ```
 ```
 5 Usable Branches from the 'joomla-cms' Repository
-    4.4-dev       5.1-dev       5.2-dev       5.3-dev       6.0-dev
+    4.4-dev       5.3-dev       5.4-dev       6.0-dev       6.1-dev
 
-292 Usable Tags from the 'joomla-cms' Repository
+331 Usable Tags from the 'joomla-cms' Repository
     3.9.0         3.9.0-alpha   3.9.0-beta    3.9.0-beta2   3.9.0-beta3   3.9.0-beta4   3.9.0-rc      3.9.0-rc2
     ...
-    5.2.0         5.2.0-alpha1  5.2.0-alpha2  5.2.0-alpha3  5.2.0-beta1   5.2.0-beta2   5.2.0-beta3   5.2.0-rc1
-    5.2.0-rc2     5.2.0-rc3     5.2.0-rc4     5.2.1
+    5.3.3-rc2     5.4.0-alpha1  5.4.0-alpha2  5.4.0-alpha3  5.4.0-beta1   5.4.0-beta2   6.0.0-alpha1  6.0.0-alpha2
+    6.0.0-alpha3  6.0.0-beta1   6.0.0-beta2
 ```
 
 **Usable** Joomla development branches refer to the GitHub [joomla-cms](https://github.com/joomla/joomla-cms) repository, including default, active and stale branches in the format `number.number-dev`. See [joomla-cms/branches](https://github.com/joomla/joomla-cms/branches) for details.
@@ -953,8 +971,8 @@ The following example illustrates an IPv4 installation with three Joomla instanc
 * `jbt-44` – Grafted 4.4.13 Full Joomla package, running PHP 8.2 with xdebug, using MariaDB with MySQLi driver
 * `jbt-54` – Cloned from 5.4-dev branch with additional patches applied, running PHP 8.4 and using PostgreSQL socket
 ```
-Joomla Branches Tester (JBT) version 2.2.1
-  Docker version 27.4.0 is running with 18 containers and 52 images
+Joomla Branches Tester (JBT) version 2.3.1
+  Docker version 28.3.2 is running with 18 containers and 52 images
   EnableIPv6: false
 Base Containers
   jbt-mysql   is running, ports: 3306/tcp -> 0.0.0.0:7011
@@ -966,6 +984,7 @@ Base Containers
   jbt-novnc   is running, ports: 8080/tcp -> 0.0.0.0:7005
   jbt-relay   is running, ports: 7025/tcp -> 0.0.0.0:7025
   jbt-cypress is running, ports: 7125/tcp -> 0.0.0.0:7125
+  jbt-proxy   is running, ports: 7008/tcp -> 0.0.0.0:7008; 7009/tcp -> 0.0.0.0:7009
 jbt-310 Tag 3.10.12
   Container jbt-310 is running, ports: 80/tcp -> 0.0.0.0:7310
   Joomla Version: Joomla! 3.10.12 Stable
@@ -1147,9 +1166,9 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
 * If IPv6 networking is chosen, it is used only within Docker.
 * The predefined port range run from 7000 to 7960. If another service is already using this range, it may cause a conflict. → [#3](https://github.com/muhme/joomla-branches-tester/issues/3)
 * Usable Joomla Git tags start with `3.9.0` (for earlier versions `apt-get update` does not work so easily).
-* For each Joomla major and minor version (e.g., 5.2, 5.3), only one Docker container is possible.
-  This means you can run containers for versions such as 52 (for Joomla 5.2.) and 53 (for Joomla 5.3.),
-  but you cannot have multiple containers for different patch versions like 5.2.0 and 5.2.1 running in parallel.
+* For each Joomla major and minor version (e.g. 5.4, 6.0), only one Docker container is possible.
+  This means you can run containers for versions such as 54 for Joomla 5.4 and 60 for Joomla 6.0,
+  but you cannot have multiple containers for different patch versions like 5.4.0 and 5.4.1 running in parallel.
 * Tests `phan` and `integration`are not implemented yet. → [#4](https://github.com/muhme/joomla-branches-tester/issues/4)
 
 ## More Information

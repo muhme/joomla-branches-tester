@@ -216,3 +216,25 @@ services:
       - mysql
       - mariadb
       - postgres
+
+  proxy:
+    container_name: jbt-proxy
+    image: mitmproxy/mitmproxy
+    restart: unless-stopped
+    command: >
+      mitmweb
+      --listen-port 7008
+      --web-port 7009
+      --web-host 0.0.0.0
+      --set web_password=jbtpw
+      --set stream_large_bodies=50m
+    networks:
+      jbt-network:
+        ipv4_address: 10.0.0.8
+        ipv6_address: fd00::8
+    ports:
+      - "7008:7008"
+      - "7009:7009"
+    volumes:
+      - mitm-ca:/home/mitmproxy/.mitmproxy
+      - mitm-data:/data

@@ -1,14 +1,19 @@
 # docker-compose.end.yml - Last lines with volumes definition.
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 - 2025 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
-# Create named volumes to share Unix sockets.
-# Used by Cypress, Joomla web servers and databases.
 volumes:
+  # Create named volumes to share Unix sockets.
+  # Used by Cypress, Joomla web servers and databases.
   mysql-socket:
     name: jbt-mysql-socket
   mariadb-socket:
     name: jbt-mariadb-socket
   postgresql-socket:
     name: jbt-postgresql-socket
+  # jbt-proxy certificate
+  mitm-ca:
+    name: jbt-mitma-ca
+  mitm-data:
+    name: jbt-mitma-data
