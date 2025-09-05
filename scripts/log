@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+# log - Simple another name for scripts/check.
+#
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2025 Heiko Lübbe
+# https://github.com/muhme/joomla-branches-tester
+
+scripts/check "$@"

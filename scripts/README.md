@@ -33,13 +33,14 @@ The following scripts are available and the use is described in [../README.md](.
 
 | Script | Description | Additional Info |
 | --- | --- | --- |
-| [check](check) | Searching a JBT log file for critical issues or selected information. | Optional argumenta are `logfile`, `jbt` and `scripts`. |
+| [check](check) | Searching a JBT log file for critical issues or selected information. | Optional argumenta are `jbt`, `scripts` and logfile name (default is latest). |
 | [clean](clean.sh) | Delete all `jbt-*`-Docker containers and the `joomla-branches-tester_default` Docker network and `joomla-*` folders. | Used by `scripts/create` or for you to get rid of all the stuff. |
 | [create](create.sh) | (Re-)Build all docker containers. | Optional arguments are database variant, `socket`, PHP version, `IPv6`, `no-cache` and the Joomla instances. |
 | [cypress](cypress.sh) | Running interactive Cypress GUI. | Mandatory argument is the Joomla instance. Optional argument is `local` to use a locally installed Cypress. |
 | [database](database.sh) | Changes database and database driver. | :warning: The overall database content is lost.<br />Mandatory argument is the database variant. Optional arguments are`socket` and Joomla instances. |
 | [graft](graft.sh) | Grafting a Joomla package onto a branch. | :warning: The overall database content is lost.<br />Mandatory argument is the Joomla package. Optional argument is the database variant.|
 | [info](info) | Retrieves Joomla Branches Tester status information. | Optional arguments are `instance`, `base`, `history` and Joomla instances. |
+| [log](log) | Simple another name for the `check` script. |  |
 | [patch](patch.sh) | Apply Git patches in 'joomla-cms', 'joomla-cypress' or 'joomla-framework/database'. | Arguments are one or multiple patches and optional Joomla instances. |
 | [patchtester](patchtester.sh) | Installs and configures Joomla patch tester component in one or all Joomla instances. | The GitHub token comes from environment variable `JBT_GITHUB_TOKEN` or as mandatory argument. Optional argumenta are the Joomla instances, 'install' (default) or 'uninstall' and the Patch Tester version (default is latest). |
 | [php](php.sh) | Change used PHP version. | Mandatory is the PHP version, e.g. `php8.3`. Optional arguments are the Joomla instances. |

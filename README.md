@@ -1076,6 +1076,8 @@ You can then investigate the JavaScript exception in the log file. For example:
   > Cannot read properties of null (reading 'getAttribute')
 ```
 
+:fairy: *"There is a second name for the script, which is provided with `scripts/log` if you wish."*
+
 ### Cleaning Up
 
 If you want to be rid of all Docker containers and free up multiple gigabytes of disk space from the `joomla-*` and other directories, simply run:
