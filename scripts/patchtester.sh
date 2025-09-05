@@ -119,10 +119,11 @@ for instance in "${instancesToInstall[@]}"; do
       continue
     fi
     if docker exec "jbt-${instance}" bash -c "php cli/joomla.php extension:remove ${id} -n"; then
+      log "jbt-${instance} – Patch Tester has been successfully removed"
       # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
       successful=$((successful + 1))
     else
-      error "jbt-${instance} – Remove com_patchtester id=${id} extension failed"
+      error "jbt-${instance} – Failed to remove the extension com_patchtester with id=${id}"
       failed=$((failed + 1))
     fi
     continue
@@ -130,7 +131,7 @@ for instance in "${instancesToInstall[@]}"; do
 
   # Install Patch Tester
   if (( instance == 310 || instance <= 41 )); then
-    warning "jbt-${instance} – Joomla <= 4.1, jumped over"
+    warning "jbt-${instance} – Joomla <= 4.1, skip the installation of Patch Tester"
     skipped=$((skipped + 1))
     continue
   fi
@@ -139,6 +140,7 @@ for instance in "${instancesToInstall[@]}"; do
   patchtester_url="https://github.com/${REPO}/releases/download/${patchTesterVersion}/com_patchtester_${patchTesterVersion}.tar.bz2"
   log "Using URL '${patchtester_url}'"
   if run_patchtester_install "${instance}" "${patchTesterVersion}" "${token}" "${patchtester_url}"; then
+    log "jbt-${instance} – Patch Tester version ${patchTesterVersion} has been successfully installed"
     # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
     successful=$((successful + 1))
   else
@@ -151,6 +153,7 @@ for instance in "${instancesToInstall[@]}"; do
         # https://github.com/joomla-extensions/patchtester/issues/383
         usePatchTesterVersion="4.4.0"
       else
+        error "jbt-${instance} – Failed to install Patch Tester version ${patchTesterVersion}"
         failed=$((failed + 1))
         continue
       fi
@@ -158,9 +161,11 @@ for instance in "${instancesToInstall[@]}"; do
       patchtester_url="https://github.com/${REPO}/releases/download/${usePatchTesterVersion}/com_patchtester_${usePatchTesterVersion}.tar.bz2"
       log "Using URL '${patchtester_url}'"
       if run_patchtester_install "$instance" "$usePatchTesterVersion" "$token" "${patchtester_url}"; then
+        log "jbt-${instance} – Patch Tester version ${usePatchTesterVersion} has been successfully installed"
         # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
         successful=$((successful + 1))
       else
+        error "jbt-${instance} – The installation of patch tester version ${usePatchTesterVersion} also failed"
         failed=$((failed + 1))
       fi
     else
@@ -175,6 +180,6 @@ if [ ${failed} -eq 0 ] ; then
 else
   error "Completed ${instancesToInstall[*]} with ${failed} failed and ${successful} successful (${skipped} skipped)."
   if $install; then
-    warning "Tip: You can watch this with http://host.docker.internal:7005/vnc.html?autoconnect=true&resize=scale"
+    warning "Tip: You can watch the installation with http://host.docker.internal:7005/vnc.html?autoconnect=true&resize=scale"
   fi
 fi
