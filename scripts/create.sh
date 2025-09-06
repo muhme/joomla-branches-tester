@@ -144,11 +144,11 @@ if [ "$recreate" = false ]; then
   log "Create 'docker-compose.yml' file for version(s) ${versionsToInstall[*]}, based on ${php_version} PHP version and ${network}"
   createDockerComposeFile "${versionsToInstall[*]}" "${php_version}" "${network}"
 
+  log "Running 'docker compose build --no-cache'"
+  # Always attempt to pull a newer version of the image, to have latest for e.g. pgadmin4:latest
   # Always use no cache as we have too often seen problems with
   # volume shadowing and stale mounts from deleted containers, e.g.
   # "mkdir: cannot create directory '/jbt/installation/joomla-39': File exists"
-  # Use --pull to have latest for e.g. dpage/pgadmin4:latest
-  log "Running 'docker compose build --no-cache'"
   docker compose build --pull --no-cache
 
   log "Running 'docker compose up'"
@@ -282,7 +282,9 @@ for version in "${versionsToInstall[@]}"; do
     createDockerComposeFile "${instance}" "${php_version}" "${network}" "append"
 
     log "jbt-${instance} – Building Docker container"
-    docker compose build "jbt-${instance}"
+    # Always attempt to pull a newer version of the image
+    # Do not use cache when building the image
+    docker compose build "jbt-${instance}" --pull --no-cache
 
     log "jbt-${instance} – Starting Docker container"
     docker compose up -d "jbt-${instance}"
