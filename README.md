@@ -1081,7 +1081,28 @@ You can then investigate the JavaScript exception in the log file. For example:
 
 ### Cleaning Up
 
-If you want to be rid of all Docker containers and free up multiple gigabytes of disk space from the `joomla-*` and other directories, simply run:
+#### Stopping JBT
+
+If JBT is your only Docker workload, you can stop Docker entirely (or use Docker Desktop):
+```
+sudo service docker stop
+```
+
+If you only want to stop all the JBT containers, stop the `joomla-branches-tester` project in Docker Desktop or run:
+```
+docker compose -p joomla-branches-tester stop
+```
+
+#### Starting JBT
+
+Start the `joomla-branches-tester` project in Docker Desktop or run:
+```
+docker compose -p joomla-branches-tester start
+````
+
+### Deleting JBT
+
+To remove all JBT containers and free up gigabytes of disk space from `joomla-*` and related directories run:
 
 ```
 scripts/clean
