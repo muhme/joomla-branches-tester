@@ -416,13 +416,14 @@ The Joomla development version installed in the web server container is configur
     If the folder is missing, it is restored from JBT installation environment backup-copy.
   - Starting with Joomla version 5.0, a `DEV_STATUS = ‘Stable’` is changed to `DEV_STATUS = ‘JBT’`
     to avoid being forced to delete the `installation` folder.
-- Error Reporting is set to `Maximum` in `Global Configuration | Server`.
+- 'Error Reporting' is set to `Maximum` in `Global Configuration | Server`.
+  'Debug System' is enabled in `Global Configuration | System` and 'Log Almost Everything'
+  is enabled in `Global Configuration | Logging`. PHP log file is configured as `administration/log/php.log`.
 - A cron job is configured to run the Joomla Task Scheduler every minute.
 - The 'System - Joomla! Statistics' plugin is disabled to prevent prompting users on the backend Home Dashboard.
 - All the 'Behaviour - Backward Compatibility' plugins are disabled to detect backward compatibility issues
   (see [installation/disableBC.cy.js](installation/disableBC.cy.js)).
 - The automatic run of the 'Welcome to Joomla!' guided tour is canceled from Joomla version 5.1 onwards.
-- Not configured for logging, due to deprecation warnings.
 - Using 'filesystem' for session handler to prevent logging in again after a few minutes,
   for whatever reason this differs from 'database'.
 

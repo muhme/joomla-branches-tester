@@ -211,16 +211,17 @@ for instance in "${instancesToChange[@]}"; do
     fi
   fi
 
-  # Not configure Joomla logging as we deprecated and System Tests will fail
-  #
   # Enable Joomla logging
+  log "jbt-${instance} – Configure Joomla with 'Debug System' and 'Log Almost Everything' (but not 'Log Deprecated API')"
+  docker exec "jbt-${instance}" bash -c "cd /var/www/html && sed \
+    -e 's/\$debug = .*/\$debug = true;/' \
+    -e 's/\$log_everything = .*/\$log_everything = 1;/' \
+    configuration.php > configuration.php.tmp && \
+    mv configuration.php.tmp configuration.php"
+  # Not configure Joomla 'Log Deprecated API' as running System Tests 5.4 in Sep 2025 with 574 tests results
+  # in over one million log entries respective nearly 300 MB log file size.
   # log "jbt-${instance} – Configure Joomla with 'Debug System', 'Log Almost Everything' and 'Log Deprecated API'"
-  # docker exec "jbt-${instance}" bash -c "cd /var/www/html && sed \
-  #   -e 's/\$debug = .*/\$debug = true;/' \
-  #   -e 's/\$log_everything = .*/\$log_everything = 1;/' \
-  #   -e 's/\$log_deprecated = .*/\$log_deprecated = 1;/' \
-  #   configuration.php > configuration.php.tmp && \
-  #   mv configuration.php.tmp configuration.php"
+  # -e 's/\$log_deprecated = .*/\$log_deprecated = 1;/' \
 
   log "jbt-${instance} – Changing ownership to www-data for all files and directories (in background)"
   # Following error seen on macOS, we ignore it as it does not matter, these files are 444
