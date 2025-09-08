@@ -19,6 +19,14 @@ networks:
           gateway: "10.0.0.1"
         - subnet: "fd00::/8"
 
+volumes:
+  mysql-socket:
+  mariadb-socket:
+  postgresql-socket:
+  mitm-ca:
+  mitm-data:
+  redis-data:
+
 services:
 
   mysql:
@@ -76,6 +84,47 @@ services:
       jbt-network:
         ipv4_address: 10.0.0.13
         ipv6_address: fd00::13 # Use decimal digits, even if hex value differs
+
+  redis:
+    container_name: jbt-redis
+    restart: unless-stopped
+    image: redis:7-alpine
+    ports:
+      - "7014:6379"
+    environment:
+      - REDIS_PASSWORD=redispass
+    command: redis-server --requirepass redispass --appendonly yes
+    volumes:
+      - redis-data:/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      jbt-network:
+        ipv4_address: 10.0.0.14
+        ipv6_address: fd00::14 # Use decimal digits, even if hex value differs
+
+  redis-commander:
+    container_name: jbt-redis-commander
+    restart: unless-stopped
+    image: rediscommander/redis-commander:latest
+    ports:
+      - "7015:8081"
+    environment:
+      - REDIS_HOSTS=local:jbt-redis:6379:0:redispass
+      - HTTP_USER=admin
+      - HTTP_PASSWORD=admin
+      - REDIS_DEFAULT_HOST=jbt-redis
+      - REDIS_DEFAULT_PORT=6379
+      - REDIS_DEFAULT_PASSWORD=redispass
+      - REDIS_DEFAULT_DB=0
+    depends_on:
+      - redis
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      jbt-network:
+        ipv4_address: 10.0.0.15
+        ipv6_address: fd00::15 # Use decimal digits, even if hex value differs
 
   myadmin:
     container_name: jbt-mya
@@ -216,6 +265,7 @@ services:
       - mysql
       - mariadb
       - postgres
+      - redis
 
   proxy:
     container_name: jbt-proxy
