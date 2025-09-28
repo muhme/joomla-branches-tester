@@ -9,6 +9,7 @@
     container_name: jbt-XXX
     image: YYY # jbt-XXX image
     restart: unless-stopped
+    entrypoint: [ "/bin/bash", "-lc", "/usr/sbin/cron -f & exec apache2-foreground" ]
     ports:
       - 7ZZZ:80
     environment:
