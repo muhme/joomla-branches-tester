@@ -209,6 +209,10 @@ scripts/create
 :point_right: The script can run without `sudo`,
 but depending on the platform, it may ask you to enter your user password for individual sudo actions.
 
+:point_right: It is recommended to set a GitHub token via the environment variables `JBT_GITHUB_TOKEN` (checked first)
+              or `GH_TOKEN` or `GITHUB_TOKEN`. This token will be used in the Joomla web server container,
+              for the `gh` command if you wish to use it, and for Patch Tester installation.
+
 The initial `scripts/create` runs some time,
 especially the very first time when the Docker images still need to be downloaded.
 For this installation with five Joomla web server containers the
@@ -409,7 +413,7 @@ Installing the Joomla Branches Tester on Ubuntu with a user that is able to run 
 
 ### Joomla Configuration
 
-The Joomla development version installed in the web server container is configured with the following settings:
+The Joomla version installed in the web server container is configured with the following settings:
 
 - Joomla Super User: `ci-admin` with the password `joomla-17082005` (used from CI System Tests).
 - Used language Pack is English (United Kingdom) (`en-GB`).
@@ -837,8 +841,8 @@ scripts/patchtester 53 install ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
     ✓ fetch data (6254ms)
 ```
 
-:point_right: The GitHub token can also be given by environment variable `JBT_GITHUB_TOKEN`.
-              And of course the sample token does not work.
+:point_right: The GitHub token can also be provided via the environment variables `JBT_GITHUB_TOKEN` (checked first)
+              or `GH_TOKEN` or `GITHUB_TOKEN`. This sample token, of course, will not work.
 
 :fairy: *"You will need to reinstall the Joomla Patch Tester if, for example, you switch the database.
         For more details, see [Database and File System Consistency](#database-and-file-system-consistency)."*

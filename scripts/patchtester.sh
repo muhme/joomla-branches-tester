@@ -18,7 +18,7 @@ source scripts/helper.sh
 function help {
     echo "
     patchtester – Installs Joomla Patch Tester on all, one or multiple Joomla web server Docker containers.
-                  Requires a GitHub personal access token as an argument (starting with 'ghp_') or 'JBT_GITHUB_TOKEN' set.
+                  Requires a GitHub personal access token as an argument, or env var 'JBT_GITHUB_TOKEN', 'GH_TOKEN' or 'GITHUB_TOKEN' set.
                   The optional Joomla version can be one or more of: ${allInstalledInstances[*]} (default is all).
                   The optional Patchtester version, e.g. 4.3.0 (default is latest).
                   The optional 'uninstall' argument to delete a Patch Tester installation (default is 'install').
@@ -85,6 +85,12 @@ if $install; then
     if [[ "${JBT_GITHUB_TOKEN}" =~ ghp_* ]]; then
       token="${JBT_GITHUB_TOKEN}"
       log "Using GitHub token from the environment variable 'JBT_GITHUB_TOKEN'"
+    elif [[ "${GH_TOKEN}" =~ ghp_* ]]; then
+      token="${GH_TOKEN}"
+      log "Using GitHub token from the environment variable 'GH_TOKEN'"
+    elif [[ "${GITHUB_TOKEN}" =~ ghp_* ]]; then
+      token="${GITHUB_TOKEN}"
+      log "Using GitHub token from the environment variable 'GITHUB_TOKEN'"
     else
       help
       error "Please provide a valid GitHub personal access token starting with 'ghp_'."

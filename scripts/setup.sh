@@ -109,6 +109,8 @@ log "jbt-${instance} – Configure PHP to use jbt-proxy"
         echo "export https_proxy=http://jbt-proxy:7008" >> /etc/apache2/envvars; \
         echo "export no_proxy=localhost,127.0.0.1,::1"  >> /etc/apache2/envvars'
 
+# zip and zstd only to be able to run build
+# gh only to use it for applying GitHub PRs
 log "jbt-${instance} – Installing packages"
 docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
   libpng-dev \
@@ -128,6 +130,9 @@ docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
   libbz2-dev \
   postgresql-client \
   default-mysql-client \
+  zip \
+  zstd \
+  gh \
   && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
   && docker-php-ext-install -j$(nproc) \
       gd \
@@ -143,6 +148,23 @@ docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
       bz2 \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*'
+
+failed=false
+if [[ "${JBT_GITHUB_TOKEN}" =~ ghp_* ]]; then
+  log "jbt-${instance} – Take over environment found JBT_GITHUB_TOKEN as GH_TOKEN into container"
+  docker exec "jbt-${instance}" bash -c "echo \"export GH_TOKEN=$JBT_GITHUB_TOKEN\" >> ~/.bashrc" || failed=true
+elif [[ "${GH_TOKEN}" =~ ghp_* ]]; then
+  log "jbt-${instance} – Take over environment found GH_TOKEN into container"
+  docker exec "jbt-${instance}" bash -c "echo \"export GH_TOKEN=${GH_TOKEN}\" >> ~/.bashrc" || failed=true
+elif [[ "${GITHUB_TOKEN}" =~ ghp_* ]]; then
+  log "jbt-${instance} – Take over environment found GITHUB_TOKEN into container"
+  docker exec "jbt-${instance}" bash -c "echo \"export GH_TOKEN=${GITHUB_TOKEN}\" >> ~/.bashrc" || failed=true
+else
+  warning "jbt-${instance} – GH_TOKEN could not be configured because no environment variable is set (ignored)"
+fi
+if $failed; then
+  warning "jbt-${instance} – Failed configuration of GH_TOKEN (ignored)"
+fi
 
 log "jbt-${instance} – Configure Joomla installation to disable localhost check and enable mod_rewrite"
 docker exec "jbt-${instance}" bash -c '
