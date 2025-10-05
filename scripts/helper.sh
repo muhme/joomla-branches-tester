@@ -18,7 +18,7 @@ JBT_TMP_FILE=/tmp/$(basename "$0").$$
 trap 'rm -rf $JBT_TMP_FILE' 0
 
 declare -r \
-  JBT_INSTALLATION_CYPRESS_VERSION="14.4.0"
+  JBT_INSTALLATION_CYPRESS_VERSION="15.3.0"
 
 # The following five arrays are positionally mapped, avoiding associative arrays
 # to ensure compatibility with macOS default Bash 3.2.

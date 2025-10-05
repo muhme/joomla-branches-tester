@@ -238,10 +238,15 @@ if [ "$recreate" = false ]; then
   # we install PHP 8.4 from Ondřej Surý repository in the Cypress container.
   #
   log "jbt-cypress – Adding PHP 8.4 to be able to execute cli/joomla.php from Joomla System Tests"
-  # Update and install prerequisites; for ignoring apt-get update error, see Google Chrome GPG Key comment above
-  docker exec "jbt-cypress" bash -c "apt-get update >/dev/null 2>&1; apt-get install -y lsb-release apt-transport-https ca-certificates wget gnupg"
   # Add Ondřej Surý repository as PHP source
-  docker exec "jbt-cypress" bash -c 'wget -qO - https://packages.sury.org/php/apt.gpg | apt-key add - && echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
+  docker exec "jbt-cypress" bash -c '
+    set -e
+    apt-get update && apt-get install -y --no-install-recommends apt-transport-https ca-certificates gnupg wget
+    install -d /usr/share/keyrings
+    wget -qO - https://packages.sury.org/php/apt.gpg | gpg --dearmor -o /usr/share/keyrings/sury-php.gpg
+    CODENAME="$(. /etc/os-release && echo "$VERSION_CODENAME")"
+    echo "deb [signed-by=/usr/share/keyrings/sury-php.gpg] https://packages.sury.org/php/ ${CODENAME:-trixie} main" > /etc/apt/sources.list.d/php.list
+    apt-get update'
   # Install PHP 8.4; for ignoring apt-get update error, see Google Chrome GPG Key comment above
   docker exec "jbt-cypress" bash -c "apt-get update >/dev/null 2>&1; apt-get install -y php8.4 php8.4-simplexml php8.4-cli php8.4-common php8.4-curl php8.4-mbstring php8.4-xml php8.4-mysql php8.4-mysqli php8.4-pgsql"
   # Update the default PHP binary to PHP 8.4
