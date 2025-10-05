@@ -92,7 +92,11 @@ else
     -e 'transferring' \
     -e 'BZ2_bzerror' \
     -e 'Stopping Docker Container' \
-    -e 'overrid' "${file}" | \
+    -e 'overrid' "${file}" \
+    -e 'ERROR:dbus/bus.cc' \
+    -e 'ERROR:dbus/object_proxy.cc' \
+    -e 'man7/bash-builtins.7.gz' \
+    -e 'Using PHP error_log = ' | \
   grep -i --color=always \
     -e ERR \
     -e WRN \
