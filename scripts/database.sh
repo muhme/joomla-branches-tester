@@ -186,14 +186,28 @@ for instance in "${instancesToChange[@]}"; do
   # Joomla installation directory if missing – restore it
   restoreInstallationFolder "${instance}"
 
-  log "jbt-${instance} – Cypress-based Joomla installation"
-  docker exec jbt-cypress sh -c "cd /jbt/installation && \
-       CYPRESS_CACHE_FOLDER=/jbt/cypress-cache \
-       DISPLAY=jbt-novnc:0 \
-       ELECTRON_ENABLE_LOGGING=1 \
-       CYPRESS_specPattern='/jbt/installation/installJoomla.cy.js' \
-       npx cypress run --headed \
-                       --config-file '/jbt/installation/joomla-${instance}/cypress.config.js'"
+  # With PHP 8.5 and many deprecation messages, the Cypress-based installation of Joomla sometimes fails.
+  # Let's just try it three times.
+  count=0
+  while (( count < 3 )); do
+    count=$((count + 1))
+    log "jbt-${instance} – Cypress-based Joomla installation ($count attempt)"
+    if docker exec jbt-cypress sh -c "cd /jbt/installation && \
+        CYPRESS_CACHE_FOLDER=/jbt/cypress-cache \
+        DISPLAY=jbt-novnc:0 \
+        ELECTRON_ENABLE_LOGGING=1 \
+        CYPRESS_specPattern='/jbt/installation/installJoomla.cy.js' \
+        npx cypress run --headed \
+                        --config-file '/jbt/installation/joomla-${instance}/cypress.config.js'"; then
+
+      break
+    else
+      if (( count >= 3 )); then
+        error "jbt-${instance} – Cypress-based Joomla installation failed $count times."
+        exit 1
+      fi
+    fi
+  done
 
   # Set 'tEstValue' as secret etc.
   adjustJoomlaConfigurationForJBT "${instance}"

@@ -143,8 +143,8 @@ for todo in "${all_todos[@]}"; do
 
       if ${docker_running}; then
         php_version=$(docker exec "jbt-${instance}" bash -c "php --version")
-        # Extract the PHP version (first line) using sed
-        php_version_number=$(echo "$php_version" | sed -n 's/^PHP \([0-9\.]*\).*/PHP \1/p')
+        # Extract the PHP version (first line) using sed, e.g. 'PHP 8.5.0beta3'
+        php_version_number=$(echo "$php_version" | sed -n 's/^PHP \([^ ]*\) .*/PHP \1/p')
         # Check if Xdebug is included in the PHP version info
         if echo "$php_version" | grep -q "Xdebug"; then
           echo "  $php_version_number with Xdebug"

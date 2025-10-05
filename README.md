@@ -29,7 +29,7 @@ Within [Docker](https://www.docker.com/) container environment you are able to:
 * Apply pull requests (PR) from Git repositories `joomla-cms`, `joomla-cypress` and `joomla-framework/database`.
 * Switching between 10 database variants (MySQL, MariaDB, or PostgreSQL and the two database drivers:
   MySQLi or PHP Data Objects and the option to use Unix sockets, instead of TCP host).
-* Switching between PHP versions (PHP 7.4 ... 8.4).
+* Switching between PHP versions (PHP 7.4 ... 8.4, plus 8.5-rc).
 * Installing Joomla from a cloned 'joomla-cms' Git repository.
 * Grafting a Joomla package.
 * Using Xdebug for PHP debugging.
@@ -192,14 +192,14 @@ Once your system has rebooted, verify the Docker installation by running `docker
 
 ## Installation
 
-Last tested in early November 2024 with:
+Last tested in early October 2025 with:
 * Intel chip macOS 15 Sequoia,
 * Apple silicon macOS 15 Sequoia,
 * Windows 11 Pro WSL 2 Ubuntu and
 * Ubuntu 24 Noble Numbat (the absolute minimum, if you also wish to use the Cypress GUI, is a VPS with 2 shared vCPUs and 4 GB RAM).
 
-You can create all base Docker containers and the current (early June 2025)
-four Joomla dev-branch containers using `scripts/create` without any arguments:
+You can create all base Docker containers and the current (September 2025)
+five Joomla dev-branch containers using `scripts/create` without any arguments:
 
 ```
 git clone https://github.com/muhme/joomla-branches-tester
@@ -492,7 +492,7 @@ from the [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/t
 scripts/test system
 ```
 
-:warning: Currently (June 2025) the Joomla System Tests do not work independently.
+:warning: Currently (October 2025) the Joomla System Tests do not work independently.
           A Joomla installation is required before running the test suite again.
           Be aware the entire database content of the Joomla instance will be lost.
           See [Database and File System Consistency](#database-and-file-system-consistency) for more details.
@@ -696,7 +696,7 @@ docker exec -it jbt-mysql bash -c "mysql --socket=/var/run/mysqld/mysqld.sock -u
 
 ### Switch PHP Version
 
-You can choose the PHP version from 7.4 to 8.4 and you should choose a PHP version supported by your Joomla version.
+You can choose the PHP version from 7.4 to 8.4, plus 8.5-rc and you should choose a PHP version supported by your Joomla version.
 You can use `highest` PHP version available for a Joomla version. For example PHP 8.4 for Joomla 5.3.
 To check which PHP versions are available use `help` argument:
 ```
@@ -709,7 +709,7 @@ scripts/php highest
 ```
 Or specify the desired Joomla instances:
 ```
-scripts/php 54 60 php8.4
+scripts/php 54 60 php8.5-rc
 ```
 
 ### Grafting a Joomla Package
@@ -787,7 +787,7 @@ ready for your exploration.
 
 Joomla web server containers are ready with a second PHP installation for switching to
 [Xdebug](https://github.com/xdebug/xdebug).
-You can switch to the PHP version with Xdebug for example:
+You can switch to the Xdebug-enabled PHP version for example:
 ```
 scripts/xdebug 53 on
 ```

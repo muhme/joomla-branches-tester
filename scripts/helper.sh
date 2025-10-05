@@ -47,8 +47,9 @@ declare -ar \
 
 # Valid PHP versions.
 # (not 5.6 - 7.3 as there are problems and for lowest supported Joomla 3.9.0 there is PHP 7.4 available and working)
+# TODO: 20 Nov 2025 to be changed once PHP 8.5 is released
 declare -ar \
-  JBT_VALID_PHP_VERSIONS=("php7.4" "php8.0" "php8.1" "php8.2" "php8.3" "php8.4" "highest")
+  JBT_VALID_PHP_VERSIONS=("php7.4" "php8.0" "php8.1" "php8.2" "php8.3" "php8.4" "php8.5-rc" "highest")
 
 # The highest PHP version usable for Joomla major-minor version (the two arrays correspond via the index).
 # If a new Joomla version is created and not existing in this list, default is used in dockerImageName().

@@ -144,6 +144,12 @@ if [ "$recreate" = false ]; then
   log "Create 'docker-compose.yml' file for version(s) ${versionsToInstall[*]}, based on ${php_version} PHP version and ${network}"
   createDockerComposeFile "${versionsToInstall[*]}" "${php_version}" "${network}"
 
+  # Make sure all bind source folders exist on the HOST (prevents ghost mounts)
+  for version in "${versionsToInstall[@]}"; do
+    instance=$(getMajorMinor "${version}")
+    mkdir -p "joomla-${instance}" "installation/joomla-${instance}"
+  done
+
   log "Running 'docker compose build --no-cache'"
   # Always attempt to pull a newer version of the image, to have latest for e.g. pgadmin4:latest
   # Always use no cache as we have too often seen problems with

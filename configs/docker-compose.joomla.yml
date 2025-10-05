@@ -31,6 +31,8 @@
       - type: bind
         source: ./joomla-XXX
         target: /var/www/html
+        bind:
+          create_host_path: true
       - type: volume
         source: mysql-socket
         target: /var/run/mysql-socket

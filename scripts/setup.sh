@@ -109,8 +109,11 @@ log "jbt-${instance} – Configure PHP to use jbt-proxy"
         echo "export https_proxy=http://jbt-proxy:7008" >> /etc/apache2/envvars; \
         echo "export no_proxy=localhost,127.0.0.1,::1"  >> /etc/apache2/envvars'
 
+# No 'docker-php-ext-install opache' as with PHP 8.5 it is built in and fails because there’s no module to compile.
+# Alternativly, we could make a difference for <= 8.5, but opcache is only for performance and not a required module.
+#
 # zip and zstd only to be able to run build
-# gh only to use it for applying GitHub PRs
+#
 log "jbt-${instance} – Installing packages"
 docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
   libpng-dev \
@@ -132,7 +135,6 @@ docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
   default-mysql-client \
   zip \
   zstd \
-  gh \
   && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
   && docker-php-ext-install -j$(nproc) \
       gd \
@@ -144,10 +146,26 @@ docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
       pdo_pgsql \
       intl \
       xsl \
-      opcache \
       bz2 \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*'
+
+# gh only to use it for applying GitHub PRs manually
+log "jbt-${instance} – Installing gh command"
+docker exec "jbt-${instance}" bash -c '
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get update
+  apt-get install -y --no-install-recommends ca-certificates curl gnupg
+  curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+    | tee /usr/share/keyrings/githubcli-archive-keyring.gpg >/dev/null
+  chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+  echo "deb [arch=$(dpkg --print-architecture) \
+signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] \
+https://cli.github.com/packages stable main" \
+    > /etc/apt/sources.list.d/github-cli.list
+  apt-get update
+  apt-get install -y --no-install-recommends gh
+  rm -rf /var/lib/apt/lists/*'
 
 failed=false
 if [[ "${JBT_GITHUB_TOKEN}" =~ ghp_* ]]; then
@@ -183,10 +201,24 @@ if [ "$(printf '%s\n' "8.0.0" "$php_version" | sort -V | head -n1)" = "8.0.0" ];
   log "jbt-${instance} – Configure 'php.ini' for development"
   docker exec "jbt-${instance}" bash -c "cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini"
   log "jbt-${instance} – Preparing a parallel installation with Xdebug"
-  docker exec "jbt-${instance}" bash -c ' \
-      cp -r /usr/local /usr/local-without-xdebug &&
-      pecl install xdebug && \
-      docker-php-ext-enable xdebug'
+  docker exec "jbt-${instance}" bash -c 'cp -r /usr/local /usr/local-without-xdebug'
+  # TODO: 20 Nov 2025 to be deleted once PHP 8.5 is released
+  if [[ "$php_version" = "8.5.0beta3" ]]; then
+    # 'pecl install xdebug' requires PHP (version >= 8.0.0, version <= 8.4.99), we have to compile by own
+    docker exec "jbt-${instance}" bash -c '
+      set -eux
+      apt-get update
+      apt-get install -y --no-install-recommends git $PHPIZE_DEPS
+      git clone --depth=1 https://github.com/xdebug/xdebug.git /usr/src/xdebug
+      cd /usr/src/xdebug
+      phpize
+      ./configure --enable-xdebug
+      make -j"$(nproc)"
+      make install'
+  else
+    docker exec "jbt-${instance}" bash -c 'pecl install xdebug'
+  fi
+  docker exec "jbt-${instance}" bash -c 'docker-php-ext-enable xdebug'
   xdebug_path=$(docker exec "jbt-${instance}" bash -c 'find /usr/local/lib/php/extensions/ -name "xdebug.so" | head -n 1')
   # As port number for 3.10 use 7910
   docker exec "jbt-${instance}" bash -c "

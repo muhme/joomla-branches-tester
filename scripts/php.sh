@@ -66,11 +66,12 @@ for instance in "${instancesToPatch[@]}"; do
     continue
   fi
 
+  # Don't use 'docker compose' here, as docker-compose.yml may not contain all Joomla web server instances anymore.
   log "jbt-${instance} – Stopping Docker container"
-  docker compose stop "jbt-${instance}"
+  docker stop "jbt-${instance}"
 
   log "jbt-${instance} – Removing Docker container"
-  docker compose rm -f "jbt-${instance}" || log "jbt-${instance} – Ignoring failure to remove Docker container"
+  docker rm -f "jbt-${instance}" || log "jbt-${instance} – Ignoring failure to remove Docker container"
 
   # Change (simplified by comment marker) e.g.
   # > image: php:8.1-apache # jbt-44 image

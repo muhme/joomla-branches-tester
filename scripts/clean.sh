@@ -40,7 +40,8 @@ if [[ ! -f "docker-compose.yml" ]]; then
 fi
 
 log 'Stopping and removing JBT Docker containers, associated Docker networks and volumes'
-docker compose down -v
+# Also cleans up orphaned containers so mounts reset
+docker compose down -v --remove-orphans
 
 # Old containers existing?
 log "Check for any other Docker containers with names starting with 'jbt-*'"
