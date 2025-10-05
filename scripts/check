@@ -96,7 +96,8 @@ else
     -e 'ERROR:dbus/bus.cc' \
     -e 'ERROR:dbus/object_proxy.cc' \
     -e 'man7/bash-builtins.7.gz' \
-    -e 'Using PHP error_log = ' | \
+    -e 'Using PHP error_log = ' \
+    -e 'libgpg-error' | \
   grep -i --color=always \
     -e ERR \
     -e WRN \
