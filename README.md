@@ -30,7 +30,7 @@ Within [Docker](https://www.docker.com/) container environment you are able to:
 * Switching between 10 database variants (MySQL, MariaDB, or PostgreSQL and the two database drivers:
   MySQLi or PHP Data Objects and the option to use Unix sockets, instead of TCP host).
 * Switching between PHP versions (PHP 7.4 ... 8.4, plus 8.5-rc).
-* Installing Joomla from a cloned 'joomla-cms' Git repository.
+* Installing Joomla from a cloned `joomla-cms` Git repository.
 * Grafting a Joomla package.
 * Using Xdebug for PHP debugging.
 * Using IPv6 network.
@@ -859,9 +859,15 @@ Other available options are:
 :fairy: *"If you do not provide the Patch Tester version number, the latest version is installed.
         If this fails, a second attempt is made with the known working Patch Tester version for your convenience."*
 
-:point_right: Alternatively, to apply patches, you can use `scripts/patch`,
-              see [Back to the Future - Patch](#back-to-the-future---patch).
-              Or use PRs prebuild full packages with [Grafting a Joomla Package](#grafting-a-joomla-package).
+:point_right: Alternatively, to apply patches you can use:
+  * JBTs `scripts/patch` script on development (git cloned) containers,
+    see [Back to the Future - Patch](#back-to-the-future---patch).
+  * Or use PRs prebuild full packages with [Grafting a Joomla Package](#grafting-a-joomla-package).
+    This has the advantage that you do not need to worry about executing `composer install` and/or `npm clean install`.
+  * Or use GitHub command line `gh` command on development (git cloned) containers, e.g.
+```
+docker exec jbt-54 bash -lc 'gh pr checkout 46154'
+```
 
 ### Back to the Future - Patch
 
