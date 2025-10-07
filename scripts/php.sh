@@ -74,9 +74,10 @@ for instance in "${instancesToPatch[@]}"; do
   docker rm -f "jbt-${instance}" || log "jbt-${instance} – Ignoring failure to remove Docker container"
 
   # Change (simplified by comment marker) e.g.
-  # > image: php:8.1-apache # jbt-44 image
-  # < image: php:8.3-apache # jbt-44 image
-  search="image: php:[0-9].[0-9]-apache # jbt-${instance} image"
+  # > image: php:8.5-rc-apache # jbt-54 image
+  # > image: php:8.1-apache # jbt-54 image
+  # < image: php:8.3-apache # jbt-54 image
+  search="image: php:[0-9].[0-9]-.*apache # jbt-${instance} image"
   replace="image: ${din} # jbt-${instance} image"
   log "jbt-${instance} – Change 'docker-compose.yml' to use '${din}' Docker image for jbt-${instance}"
   # Don't use sed inplace editing as it is not supported on macOS's sed.
