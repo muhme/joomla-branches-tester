@@ -59,7 +59,7 @@ fi
 changed=0
 for instance in "${instancesToPatch[@]}"; do
 
-  din=$(dockerImageName "$instance" "$php_version")
+  din=$(dockerImageName "${instance}" "${php_version}")
 
   if [ ! -d "joomla-${instance}" ]; then
     log "jbt-${instance} – There is no directory 'joomla-${instance}', jumped over"
@@ -68,7 +68,7 @@ for instance in "${instancesToPatch[@]}"; do
 
   # Don't use 'docker compose' here, as docker-compose.yml may not contain all Joomla web server instances anymore.
   log "jbt-${instance} – Stopping Docker container"
-  docker stop "jbt-${instance}"
+  docker stop "jbt-${instance}" || warning "jbt-${instance} – Ignoring failure to stop Docker container"
 
   log "jbt-${instance} – Removing Docker container"
   docker rm -f "jbt-${instance}" || log "jbt-${instance} – Ignoring failure to remove Docker container"
@@ -86,15 +86,33 @@ for instance in "${instancesToPatch[@]}"; do
   # Check it
   occurrences=$(grep -cF "${replace}" "docker-compose.yml" || true)
   if [ "$occurrences" -ne 1 ]; then
-      error "The string '${replace}' is not found one times in 'docker-compose.yml' file'."
+      error "jbt-${instance} – The string '${replace}' is not found one times in 'docker-compose.yml' file'."
       exit 1
   fi
 
-  log "jbt-${instance} – Building Docker container"
-  docker compose build "jbt-${instance}"
+  # Pull the image, then recreate the service only if the digest actually changed.
+  # (Needed for PHP 8.5 RC1/RC2/...)
+  #
+  # Get currently cached digest (if any)
+  old_digest="$(docker image inspect --format='{{index .RepoDigests 0}}' "${din}" 2>/dev/null || true)"
 
-  log "jbt-${instance} – Starting Docker container"
-  docker compose up -d "jbt-${instance}"
+  log "jbt-${instance} – Pulling ${din} (manual prepare update)"
+  docker pull "${din}"
+
+  # Get digest after pull
+  new_digest="$(docker image inspect --format='{{index .RepoDigests 0}}' "${din}" 2>/dev/null || true)"
+
+  if [ -z "$new_digest" ]; then
+    error "jbt-${instance} – ERROR: image '${din}' not present after pull"; exit 1
+  fi
+
+  if [ "${old_digest}" = "${new_digest}" ]; then
+    log "jbt-${instance} – Image '${din}' unchanged; skipping recreate"
+    docker compose up -d "jbt-${instance}"
+  else
+    log "jbt-${instance} – Image '${din}' changed; recreating container"
+    docker compose up -d --no-deps --force-recreate --remove-orphans --wait "jbt-${instance}"
+  fi
 
   JBT_INTERNAL=42 scripts/setup.sh "${instance}"
 

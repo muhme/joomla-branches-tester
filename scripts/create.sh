@@ -303,14 +303,36 @@ for version in "${versionsToInstall[@]}"; do
 
     createDockerComposeFile "${instance}" "${php_version}" "${network}" "append"
 
+    # Pull the image, then recreate the service only if the digest actually changed.
+    # (Needed for PHP 8.5 RC1/RC2/...)
+    #
     log "jbt-${instance} – Building Docker container"
-    # Always attempt to pull a newer version of the image
-    # Do not use cache when building the image
-    docker compose build "jbt-${instance}" --pull --no-cache
+
+    din=$(dockerImageName "${instance}" "${php_version}")
+
+    # Get currently cached digest (if any)
+    old_digest="$(docker image inspect --format='{{index .RepoDigests 0}}' "${din}" 2>/dev/null || true)"
+
+    log "jbt-${instance} – Pulling ${din} (manual prepare update)"
+    docker pull "${din}"
+
+    # Get digest after pull
+    new_digest="$(docker image inspect --format='{{index .RepoDigests 0}}' "${din}" 2>/dev/null || true)"
+
+    if [ -z "$new_digest" ]; then
+      error "jbt-${instance} – ERROR: image '${din}' not present after pull"
+      exit 1
+    fi
 
     log "jbt-${instance} – Starting Docker container"
-    docker compose up -d "jbt-${instance}"
 
+    if [ "${old_digest}" = "${new_digest}" ]; then
+      log "jbt-${instance} – Image '${din}' unchanged; skipping recreate"
+      docker compose up -d "jbt-${instance}"
+    else
+      log "jbt-${instance} – Image '${din}' changed; recreating container"
+      docker compose up -d --no-deps --force-recreate --remove-orphans --wait "jbt-${instance}"
+    fi
   fi
 
   JBT_INTERNAL=42 bash scripts/setup.sh "initial" "${version}" "${database_variant}" "${socket}" \
