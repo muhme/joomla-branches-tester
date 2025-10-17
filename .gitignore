@@ -27,3 +27,6 @@ installation/package.json
 installation/package-lock.json
 # Cypress screenshots
 installation/cypress
+
+# SSL certificates
+installation/certs

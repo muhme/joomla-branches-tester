@@ -12,6 +12,7 @@
     entrypoint: [ "/bin/bash", "-lc", "/usr/sbin/cron -f & exec apache2-foreground" ]
     ports:
       - 7ZZZ:80
+      - 7UUU:443
     environment:
       JOOMLA_DB_HOST: mysql
       JOOMLA_DB_PASSWORD: root

@@ -500,6 +500,7 @@ function createDockerComposeFile() {
   for version in "${versions[@]}"; do
     local doit=true
     instance=$(getMajorMinor "${version}")
+    https_port_digits=$(( instance + 100 ))
     din=$(dockerImageName "${version}" "${php_version}")
     padded=$(getMajorMinor "${version}" "pad")
     if [ "${working}" = "append" ]; then
@@ -510,10 +511,17 @@ function createDockerComposeFile() {
     fi
     if $doit; then
       # Add Joomla web server entry.
-      #   e.g. 5.2.9   -> 52 for VVV, 0 for WWW,  52 for XXX, 052 for ZZZ and 5 for YYY
-      #   e.g. 3.10.12 -> 10 for VVV, 3 for WWW, 310 for XXX, 310 for ZZZ and 3 for YYY
+      # - UUU - HTTPS port number last three digits
+      # - VVV - IPv4 address fourth octed
+      # - WWW - IPv4 adress third octed
+      # - XXX - IPv6 address last hextet, Docker image jbt-number and joomla-number directory name
+      # - YYY - Docker image name
+      # - ZZZ - HTTP port number last three digits
+      #   e.g. 5.2.9   -> 152 for UUU, 52 for VVV, 0 for WWW,  52 for XXX, 052 for ZZZ and 5 for YYY
+      #   e.g. 3.10.12 -> 410 for UUU, 10 for VVV, 3 for WWW, 310 for XXX, 310 for ZZZ and 3 for YYY
       log "jbt-${instance} – Adding an entry to 'docker-compose.yml' using the '${din}' image"
       sed -e '/^#/d' \
+          -e "s/UUU/${https_port_digits}/" \
           -e "s/VVV/${padded: -2}/" \
           -e "s/WWW/${padded:0:1}/" \
           -e "s/XXX/${instance}/" \

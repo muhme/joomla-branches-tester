@@ -33,7 +33,8 @@ Within [Docker](https://www.docker.com/) container environment you are able to:
 * Installing Joomla from a cloned `joomla-cms` Git repository.
 * Grafting a Joomla package.
 * Using Xdebug for PHP debugging.
-* Using IPv6 network.
+* Using HTTP and HTTPS.
+* Using IPv4 or IPv6 network.
 * Allows patching and testing of the `joomla-cypress` NPM module.
 
 ![Joomla Branches Software Architecture](images/joomla-branches-tester-54.svg)
@@ -127,12 +128,12 @@ The abbreviation `jbt` stands for Joomla Branches Tester.
 |jbt-mysql| 10.0.0.11<br />fd00::11 :eight_pointed_black_star: | **7011**:3306 | | Database Server MySQL version 8.1 |
 |jbt-madb| 10.0.0.12<br />fd00::12 | **7012**:3306 | | Database Server MariaDB version 10.4 |
 |jbt-pg| 10.0.0.13<br />fd00::13 | **7013**:5432 | | Database Server PostgreSQL version 12.20 |
-|jbt-39| 10.0.0.39<br />fd00::39 | **[7039](http://host.docker.internal:7039/administrator)** | /joomla-39 | Web Server Joomla e.g. tag 3.9.28<br />user ci-admin / joomla-17082005 |
-|jbt-310| 10.0.3.10<br />fd00::310 | **[7310](http://host.docker.internal:7310/administrator)** | /joomla-310 | Web Server Joomla e.g. tag 3.10.12<br />user ci-admin / joomla-17082005 |
+|jbt-39| 10.0.0.39<br />fd00::39 | **[7039](http://host.docker.internal:7039/administrator)**< br/>**[7139](htts://host.docker.internal:7139/administrator)** | /joomla-39 | Web Server Joomla e.g. tag 3.9.28<br />user ci-admin / joomla-17082005 |
+|jbt-310| 10.0.3.10<br />fd00::310 | **[7310](http://host.docker.internal:7310/administrator)**<br />**[7410](https://host.docker.internal:7410/administrator)** | /joomla-310 | Web Server Joomla e.g. tag 3.10.12<br />user ci-admin / joomla-17082005 |
 | ... | | | | |
-|jbt-54| 10.0.0.54<br />fd00::54 | **[7054](http://host.docker.internal:7054/administrator)** | /joomla-54 | Web Server Joomla e.g. 5.4-dev<br />user ci-admin / joomla-17082005 |
-|jbt-60| 10.0.0.60<br />fd00::60 | **[7060](http://host.docker.internal:7060/administrator)** | /joomla-60 | Web Server Joomla e.g. 6.0-dev<br />user ci-admin / joomla-17082005 |
-|jbt-61| 10.0.0.61<br />fd00::61 | **[7061](http://host.docker.internal:7061/administrator)** | /joomla-61 | Web Server Joomla e.g. 6.1-dev<br />user ci-admin / joomla-17082005 |
+|jbt-54| 10.0.0.54<br />fd00::54 | **[7054](http://host.docker.internal:7054/administrator)**<br />**[7154](https://host.docker.internal:7154/administrator)** | /joomla-54 | Web Server Joomla e.g. 5.4-dev<br />user ci-admin / joomla-17082005 |
+|jbt-60| 10.0.0.60<br />fd00::60 | **[7060](http://host.docker.internal:7060/administrator)**<br />**[7160](https://host.docker.internal:7160/administrator)** | /joomla-60 | Web Server Joomla e.g. 6.0-dev<br />user ci-admin / joomla-17082005 |
+|jbt-61| 10.0.0.61<br />fd00::61 | **[7061](http://host.docker.internal:7061/administrator)**<br />**[7161](https://host.docker.internal:7161/administrator)** | /joomla-61 | Web Server Joomla e.g. 6.1-dev<br />user ci-admin / joomla-17082005 |
 
 :eight_spoked_asterisk: The directories are available on the Docker host inside `/jbt` to:
 * Inspect and change the configuration files (`configuration.php` or `cypress.config.mjs`),
@@ -439,6 +440,9 @@ From your Docker Host system you can test the Joomla Frontend e.g. for Joomla re
 with [http://host.docker.internal:7054](http://host.docker.internal:7054) and the backend
 [http://host.docker.internal:7054/administrator](http://host.docker.internal:7054/administrator).
 User *ci-admin* and password *joomla-17082005* (Whose birthday is it anyway?) are from Joomla System Tests.
+
+For HTTPS add 100 to the port number, e.g. for Joomla 5.4 use [https://host.docker.internal:7154](https://host.docker.internal:7154).
+The self-signed certificate can be imported from file `installation/certs/self.crt`.
 
 In parallel you can inspect MariaDB and MySQL database with [phpMyAdmin](https://www.phpmyadmin.net/) on
 [http://host.docker.internal:7002](http://host.docker.internal:7002) or PostgreSQL database with
@@ -1018,16 +1022,14 @@ jbt-44 ¿Grafted?
   PHP 8.2.28
   Database: Type 'mysqli', Host 'jbt-madb', Name 'test_joomla_44'
   /joomla-44: 372MB
-jbt-54 Tag 5.3.0-83-g2da7e19c0a
-  Container jbt-54 is running, ports: 80/tcp -> 0.0.0.0:7054
+jbt-54 Tag 5.4.0-rc1
+  Container jbt-54 is running, ports: 80/tcp -> 0.0.0.0:7054; 443/tcp -> 0.0.0.0:7154
   Joomla Version: Joomla! 5.4.0 Development
   PHP 8.4.7 with Xdebug
   Database: Type 'pgsql', Host 'unix:/var/run/postgresql-socket', Name 'test_joomla_54'
   /joomla-54: 872MB
   Git Repository joomla-54/
     Remote Origin: https://github.com/joomla/joomla-cms
-    Branch: jbt-merged joomla-cms-44910
-    Status: 0 changes
 JBT Instance History
 *** 250516 10:03:04 >>> 'scripts/create.sh 3.10.12 44 54' started
 *** 250516 10:14:42 <<< 'scripts/create.sh' finished in 11:38

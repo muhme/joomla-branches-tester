@@ -184,11 +184,19 @@ if $failed; then
   warning "jbt-${instance} – Failed configuration of GH_TOKEN (ignored)"
 fi
 
-log "jbt-${instance} – Configure Joomla installation to disable localhost check and enable mod_rewrite"
+log "jbt-${instance} – Configure Joomla installation to disable localhost check, enable mod_rewrite and SSL"
 docker exec "jbt-${instance}" bash -c '
   echo "SetEnv JOOMLA_INSTALLATION_DISABLE_LOCALHOST_CHECK 1" > /etc/apache2/conf-available/joomla-env.conf && \
   a2enconf joomla-env && \
-  a2enmod rewrite'
+  a2enmod rewrite ssl'
+
+log "jbt-${instance} – Importing SSL certificate and configuring Apache"
+docker exec "jbt-${instance}" bash -c "
+  cp /jbt/installation/certs/self.crt /usr/local/share/ca-certificates && \
+  update-ca-certificates &&
+  cp /jbt/configs/001-ssl.conf /etc/apache2/sites-available && \
+  cd /etc/apache2/sites-enabled && \
+  ln -s ../sites-available/001-ssl.conf 001-ssl.conf"
 
 # Needs PHP >= 8.0, therefore not possible for Joomla 3.9 with PHP 7.4, but possible for 3.10 with PHP 8.0
 with_xdebug=false

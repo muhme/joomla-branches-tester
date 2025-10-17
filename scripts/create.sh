@@ -206,6 +206,17 @@ if [ "$recreate" = false ]; then
     echo 'deb [signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb stable main' | tee /etc/apt/sources.list.d/google-chrome.list && \
     apt-get install -y git vim iputils-ping iproute2 telnet net-tools"
 
+  log "jbt-cypress – Creating and importing SSL certificates"
+  mkdir -p installation/certs
+  docker exec jbt-cypress sh -c "
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /jbt/installation/certs/self.key \
+            -out /jbt/installation/certs/self.crt -subj '/CN=localhost/O=JBT' \
+            -addext "subjectAltName=DNS:localhost,DNS:host.docker.internal,IP:127.0.0.1" \
+            -addext "keyUsage=digitalSignature,keyEncipherment" \
+            -addext "extendedKeyUsage=serverAuth" && \
+    cp /jbt/installation/certs/self.crt /usr/local/share/ca-certificates && \
+    update-ca-certificates"
+
   log "jbt-cypress – JBT 'installation' environment – installing cypress@${JBT_INSTALLATION_CYPRESS_VERSION}"
   # We install now, but don't delete pre-installed Cypress with rm -rf /root/.cache/Cypress
   cypress_installation="${CYPRESS_CACHE_FOLDER}/${JBT_INSTALLATION_CYPRESS_VERSION}"
