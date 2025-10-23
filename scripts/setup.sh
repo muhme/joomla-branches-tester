@@ -92,7 +92,7 @@ log "jbt-${instance} – Create 'php/conf.d/error-logging.ini' to catch all PHP 
 sed -e "s/JBT_INSTANCE/${instance}/" 'configs/error-logging.ini' > "${JBT_TMP_FILE}"
 docker cp "${JBT_TMP_FILE}" "jbt-${instance}:/usr/local/etc/php/conf.d/error-logging.ini"
 # e.g. "jbt-54 – Using PHP error_log = joomla-54/administrator/logs/php.log"
-log "jbt-${instance} – Using PHP `grep error_log < ${JBT_TMP_FILE} | sed 's|/jbt/||'`"
+log "jbt-${instance} – Using PHP $(grep error_log < "${JBT_TMP_FILE}" | sed 's|/jbt/||')"
 
 log "jbt-${instance} – Create 'php/conf.d/jbt.ini' to prevent Joomla warnings"
 docker cp 'configs/jbt.ini' "jbt-${instance}:/usr/local/etc/php/conf.d/jbt.ini"

@@ -211,9 +211,9 @@ if [ "$recreate" = false ]; then
   docker exec jbt-cypress sh -c "
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /jbt/installation/certs/self.key \
             -out /jbt/installation/certs/self.crt -subj '/CN=localhost/O=JBT' \
-            -addext "subjectAltName=DNS:localhost,DNS:host.docker.internal,IP:127.0.0.1" \
-            -addext "keyUsage=digitalSignature,keyEncipherment" \
-            -addext "extendedKeyUsage=serverAuth" && \
+            -addext 'subjectAltName=DNS:localhost,DNS:host.docker.internal,IP:127.0.0.1' \
+            -addext 'keyUsage=digitalSignature,keyEncipherment' \
+            -addext 'extendedKeyUsage=serverAuth' && \
     cp /jbt/installation/certs/self.crt /usr/local/share/ca-certificates && \
     update-ca-certificates"
 
@@ -288,20 +288,20 @@ fi
 for version in "${versionsToInstall[@]}"; do
   instance=$(getMajorMinor "${version}")
 
-  if [ "$recreate" = true ]; then
+  if [ "${recreate}" = true ]; then
 
     # Container exists?
     if docker ps -a --format '{{.Names}}' | grep -q "^jbt-${instance}$"; then
       # Running?
       if docker ps --format '{{.Names}}' | grep -q "^jbt-${instance}$"; then
         log "jbt-${instance} – Stopping Docker Container"
-        docker stop "jbt-${instance}"
+        docker stop "jbt-${instance}" || warning "jbt-${instance} – Ignoring failure to stop Docker container"
       fi
       log "jbt-${instance} – Removing Docker container"
-      docker rm -f "jbt-${instance}" || log "jbt-${instance} – Ignoring failure to remove Docker container"
+      docker rm -f "jbt-${instance}" || warning "jbt-${instance} – Ignoring failure to remove Docker container"
     fi
 
-    createDockerComposeFile "${instance}" "${php_version}" "${network}" "append"
+    createDockerComposeFile "${instance}" "${php_version}" "${network}" "recreate"
 
     # Pull the image, then recreate the service only if the digest actually changed.
     # (Needed for PHP 8.5 RC1/RC2/...)

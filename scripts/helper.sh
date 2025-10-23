@@ -461,80 +461,109 @@ function adjustJoomlaConfigurationForJBT() {
   fi
 }
 
+# Deletes a service entry in a Docker compose file.
+# Silently ignores if the service does not exist.
+# 1st argument is service name, e.g. "5.4-dev"
+# 2nd argument is composer file name
+#
+deleteService() {
+  local svc="$1" file="$2"
+
+  awk -v svc="$svc" '
+    BEGIN { del = 0 }
+    $0 ~ "^  " svc ":[[:space:]]*$" { del = 1; next }
+    del && $0 ~ /^(  [^[:space:]]+:[[:space:]]*$|[^[:space:]])/ { del = 0 }
+    !del
+  ' "${file}" > "${JBT_TMP_FILE}" || {
+    error "${svc} – delete_service(): awk failed!"
+    exit 1
+  }
+  mv "${JBT_TMP_FILE}" "${file}" || {
+    error "${svc} – delete_service(): mv failed!"
+    exit 1
+  }
+}
+
+# Append a web server entry to Docker compose file, if not already existing
+# 1st argument is e.g. "5.2-dev" or "4.4.1-alpha4"
+# 2nd argument is PHP version, e.g. "php8.1", php8.5-rc" or "highest"
+# 3rd argument is Docker compose file name
+#
+function appendWebServer() {
+  local version="$1" php_version="$2" file="$3" instance https_port_digits din padded
+  instance=$(getMajorMinor "${version}")
+  https_port_digits=$(( instance + 100 ))
+  din=$(dockerImageName "${version}" "${php_version}")
+  padded=$(getMajorMinor "${version}" "pad")
+
+  if grep -q "^  jbt-${instance}" "${file}"; then
+    log "jbt-${instance} – An entry already exists in Docker compose; leave it unmodified"
+  else
+    # Add Joomla web server entry.
+    # - UUU - HTTPS port number last three digits
+    # - VVV - IPv4 address fourth octed
+    # - WWW - IPv4 adress third octed
+    # - XXX - IPv6 address last hextet, Docker image jbt-number and joomla-number directory name
+    # - YYY - Docker image name
+    # - ZZZ - HTTP port number last three digits
+    #   e.g. 5.2.9   -> 152 for UUU, 52 for VVV, 0 for WWW,  52 for XXX, 052 for ZZZ and 5 for YYY
+    #   e.g. 3.10.12 -> 410 for UUU, 10 for VVV, 3 for WWW, 310 for XXX, 310 for ZZZ and 3 for YYY
+    log "jbt-${instance} – Adding a Docker compose entry using the '${din}' image"
+    sed -e '/^#/d' \
+        -e "s/UUU/${https_port_digits}/" \
+        -e "s/VVV/${padded: -2}/" \
+        -e "s/WWW/${padded:0:1}/" \
+        -e "s/XXX/${instance}/" \
+        -e "s/YYY/${din}/" \
+        -e "s/ZZZ/${padded}/" 'configs/docker-compose.joomla.yml' >> "${file}"
+  fi
+}
+
 # Create 'docker-compose.yml' file with one or multiple web servers.
 # 1st argument is e.g. "5.2-dev" or "4.4.1-alpha4 5.1.0"
-# 2nd argument e.g. "php8.1" or "highest"
+# 2nd argument e.g. "php8.1", php8.5-rc" or "highest"
 # 3rd argument is "IPv4" or "IPv6"
-# 4th optional argument is "append", then the web server is inserted before volumes, if it is not already existing.
+# 4th optional argument is "recreate", which replaces or inserts the web server container.
 #
 function createDockerComposeFile() {
-  local php_version="$2"
-  local network="$3"
-  local working="$5"
+  local php_version="$2" network="$3" working="$4" instance
 
   # Declare all local variables to prevent SC2155 - Declare and assign separately to avoid masking return values.
   local version versions=() din
   # shellcheck disable=SC2162 # Not set -r as 2nd option as it will not work for old Bashes and there are no backslashes here
   read -a versions <<< "$(echo "$1" | tr ' ' '\n' | sort -n | tr '\n' ' ')"
 
-  if [ "${working}" = "append" ]; then
+  if [ "${working}" = "recreate" ]; then
     # Cut named volumes, they are added always in the end.
-    csplit 'docker-compose.yml' '/^volumes:/' && \
-      cat xx00 > 'docker-compose.new' && \
-      rm xx00 xx01
+    csplit 'docker-compose.yml' '/^volumes:/'
+    for version in "${versions[@]}"; do
+      instance=$(getMajorMinor "${version}")
+      deleteService "jbt-${instance}" "xx00"
+      appendWebServer "${version}" "${php_version}" xx00
+    done
+    cat xx00 xx01 > docker-compose.yml && rm xx00 xx01
   else
     if [ "${network}" = "IPv4" ]; then
       sed \
         -e "s/JBT_INSTALLATION_CYPRESS_VERSION/${JBT_INSTALLATION_CYPRESS_VERSION}/" \
-        'configs/docker-compose.base.yml'  > 'docker-compose.new'
+        'configs/docker-compose.base.yml'  > 'docker-compose.yml'
     else
       sed \
         -e "s/JBT_INSTALLATION_CYPRESS_VERSION/${JBT_INSTALLATION_CYPRESS_VERSION}/" \
         -e 's/enable_ipv6: false/enable_ipv6: true/' \
         -e 's/subnet: "192.168.150.0\/24"/subnet: "fd00::\/8"/' \
-        'configs/docker-compose.base.yml' > 'docker-compose.new'
-
+        'configs/docker-compose.base.yml' > 'docker-compose.yml'
     fi
+
+    for version in "${versions[@]}"; do
+      appendWebServer "${version}" "${php_version}" 'docker-compose.yml'
+    done
+
+    # Add named volumes definition.
+    sed -e '/^#/d' 'configs/docker-compose.end.yml' >> 'docker-compose.yml'
+
   fi
 
-  for version in "${versions[@]}"; do
-    local doit=true
-    instance=$(getMajorMinor "${version}")
-    https_port_digits=$(( instance + 100 ))
-    din=$(dockerImageName "${version}" "${php_version}")
-    padded=$(getMajorMinor "${version}" "pad")
-    if [ "${working}" = "append" ]; then
-      if grep -q "^  jbt-${instance}" 'docker-compose.new'; then
-        log "jbt-${instance} – An entry already exists in 'docker-compose.yml'; leave it unmodified"
-        doit=false
-      fi
-    fi
-    if $doit; then
-      # Add Joomla web server entry.
-      # - UUU - HTTPS port number last three digits
-      # - VVV - IPv4 address fourth octed
-      # - WWW - IPv4 adress third octed
-      # - XXX - IPv6 address last hextet, Docker image jbt-number and joomla-number directory name
-      # - YYY - Docker image name
-      # - ZZZ - HTTP port number last three digits
-      #   e.g. 5.2.9   -> 152 for UUU, 52 for VVV, 0 for WWW,  52 for XXX, 052 for ZZZ and 5 for YYY
-      #   e.g. 3.10.12 -> 410 for UUU, 10 for VVV, 3 for WWW, 310 for XXX, 310 for ZZZ and 3 for YYY
-      log "jbt-${instance} – Adding an entry to 'docker-compose.yml' using the '${din}' image"
-      sed -e '/^#/d' \
-          -e "s/UUU/${https_port_digits}/" \
-          -e "s/VVV/${padded: -2}/" \
-          -e "s/WWW/${padded:0:1}/" \
-          -e "s/XXX/${instance}/" \
-          -e "s/YYY/${din}/" \
-          -e "s/ZZZ/${padded}/" 'configs/docker-compose.joomla.yml' >> 'docker-compose.new'
-    fi
-  done
-
-  # Add named volumes definition.
-  sed -e '/^#/d' 'configs/docker-compose.end.yml' >> 'docker-compose.new'
-
-  # Finally rename it
-  mv 'docker-compose.new' 'docker-compose.yml'
 }
 
 # Returns existing Docker image name for given Joomla and PHP version.
