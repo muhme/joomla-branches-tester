@@ -130,11 +130,15 @@ declare -a \
     else
       best=$(printf '%s\n' "${matches[@]}" | sort -V | tail -n1)
     fi
-    # npm ci in 5.0.3 has the problem:
+    # npm ci in 5.0.3 and in 5.3.4 meantime has the problem:
     # ENOENT: no such file or directory, stat '/var/www/html/libraries/vendor/maximebf/debugbar/src/DebugBar/Resources
     if [[ "${best}" == "5.0.3" ]]; then
       # Simple use working 5.0.2
       best="5.0.2"
+    fi
+    if [[ "${best}" == "5.3.4" ]]; then
+      # Simple use working 5.3.3
+      best="5.3.3"
     fi
     JBT_HIGHEST_MINOR_TAGS+=("${best}")
   done

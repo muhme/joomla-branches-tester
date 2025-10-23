@@ -69,7 +69,7 @@ Ensure that your current working directory is always the `joomla-branches-tester
 By default (without specifying a Joomla version number) `scripts/create` takes all **used** Joomla development branches.
 **Used** Joomla development branches refer to the GitHub [joomla-cms](https://github.com/joomla/joomla-cms) repository,
 including default, active and stale branches.
-At the beginning of September 2025, these are `4.4-dev`, `5.3-dev`, `5.4-dev`, `6.0-dev` and `6.1-dev`.
+In October 2025, these are `5.4-dev`, `6.0-dev` and `6.1-dev`.
 
 :point_right: Since **used** branches are subject to frequent changes,
               the latest version numbers are always be retrieved directly from the `joomla-cms` repository.
@@ -193,14 +193,14 @@ Once your system has rebooted, verify the Docker installation by running `docker
 
 ## Installation
 
-Last tested in early October 2025 with:
+Last tested in October 2025 with:
 * Intel chip macOS 15 Sequoia,
 * Apple silicon macOS 15 Sequoia,
 * Windows 11 Pro WSL 2 Ubuntu and
 * Ubuntu 24 Noble Numbat (the absolute minimum, if you also wish to use the Cypress GUI, is a VPS with 2 shared vCPUs and 4 GB RAM).
 
-You can create all base Docker containers and the current (September 2025)
-five Joomla dev-branch containers using `scripts/create` without any arguments:
+You can create all base Docker containers and all the
+Joomla dev-branch containers using `scripts/create` without any arguments:
 
 ```
 git clone https://github.com/muhme/joomla-branches-tester
@@ -231,6 +231,9 @@ you will need to download arround 4 GB of data from the Internet.
 
 * Install can use multiple Joomla versions, e.g. two tags and two dev-branches `3.9.28 3.10.12 60 61`
   (your system architecture will look like the picture on the right), defaults to all dev-branches.
+  You can use `all` to create all possible 14+ Joomla web server containers.
+  The highest minor and patch versions are used, with the exception of 5.0.2 for 5.0.3 and
+  5.3.3 for 5.3.4, as npm issues occur during installation.
 * The used database and database driver, e.g. `pgsql`, defaults to use MariaDB with MySQLi driver.
 * The used PHP version. For available PHP versions see [Versions](#versions) section. Defaults to `highest`.
   See more details in [Switch PHP Version](#switch-php-version).
@@ -240,8 +243,8 @@ you will need to download arround 4 GB of data from the Internet.
   and it should match the version of the given `joomla-cms` cloned repository.
 * The Docker `jbt-network`, used by all containers, defaults to IPv4.
   To use IPv6, run the script with the `IPv6` option.
-* The optional `recreate` option is used to create or recreate one Joomla web server container
-  for the specified version. Base containers and unnamed Joomla web server containers remain unchanged.
+* The optional `recreate` option is used to create or recreate one or multiple Joomla web server containers
+  for the specified versions. Base containers and unnamed Joomla web server containers remain unchanged.
 * To see all options and values, use `scripts/create help`.
 
 ---
@@ -895,7 +898,8 @@ scripts/patch 53 database-310
 :warning: Be cautious when applying patches, as we perform a full merge, which could introduce additional changes beyond the original pull request.
           Always pay attention to the number of changed lines. If you encounter merge conflicts, you will need to resolve them or recreate the instance.
 
-While there's no way to remove a patch, you can use the `scripts/create recreate` to *go back in time* and restore the instance to the original state.
+While there's no way to remove a patch, you can use the `scripts/create recreate` to *go back in time* and
+restore the instance to the original state.
 
 :point_right: Alternatively, to apply `joomla-cms` patches, you can use [Joomla Patch Tester](#install-joomla-patch-tester).
 
@@ -1159,7 +1163,8 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
 
 1. To fully grasp the process, it's helpful to both see the diagrams and read the explanations provided.
 2. Simply try running it a second time. All scripts are designed to be run multiple times without issues.<br />
-   On `scripts/create`, if you see the log message `Base installation is completed`, you can use the `recreate` option if one Joomla instance fails during installation.
+   On `scripts/create`, if you see the log message `Base installation is completed`,
+   you can use the `recreate` option if one Joomla instance fails during installation.
 3. One advantage of Docker and scripting: you can easily start fresh.
    As Roy from The IT Crowd says, *"Have you tried turning it off and on again?"*
    It takes just 6 minutes on a entry-level MacBook Air M3 to delete everything and
