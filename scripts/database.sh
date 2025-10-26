@@ -125,11 +125,13 @@ for instance in "${instancesToChange[@]}"; do
   log "jbt-${instance} – Configure Cypress for variant ${dbvariant} (driver '${dbtype}' host '${dbhost}')"
   log "jbt-${instance} – Create 'installation/joomla-${instance}/cypress.config[.local].js' files"
 
+  https_port=$((instance + 100))
+  https_port=$(printf "%03d" "${https_port}")
   # Cypress configs for JBT installation environment
   configureCypressConfig "/jbt/configs/cypress.config.js" \
                          "/jbt/installation/joomla-${instance}/cypress.config.js" \
                          "${instance}" \
-                         "http://host.docker.internal:7$(printf "%03d" "${instance}")/" \
+                         "https://host.docker.internal:7$((${instance} + 100))/" \
                          "${dbtype}" \
                          "${dbhost}" \
                          "" \
@@ -138,7 +140,7 @@ for instance in "${instancesToChange[@]}"; do
   configureCypressConfig "/jbt/configs/cypress.config.js" \
                          "/jbt/installation/joomla-${instance}/cypress.config.local.js" \
                          "${instance}" \
-                         "http://localhost:7$(printf "%03d" "${instance}")/" \
+                         "https://localhost:7$((${instance} + 100))/" \
                          "${dbtype}" \
                          "host.docker.internal" \
                          "${dbport}" \
@@ -156,7 +158,7 @@ for instance in "${instancesToChange[@]}"; do
     configureCypressConfig "cypress.config.dist.${extension}" \
                            "cypress.config.${extension}" \
                            "${instance}" \
-                           "http://host.docker.internal:7$(printf "%03d" "${instance}")/" \
+                           "https://host.docker.internal:7$((${instance} + 100))/" \
                            "${dbtype}" \
                            "${dbhost}" \
                            "" \
@@ -167,7 +169,7 @@ for instance in "${instancesToChange[@]}"; do
     configureCypressConfig "cypress.config.dist.${extension}" \
                            "cypress.config.local.${extension}" \
                            "${instance}" \
-                           "http://localhost:7$(printf "%03d" "${instance}")/" \
+                           "https://localhost:7$((${instance} + 100))/" \
                            "${dbtype}" \
                            "host.docker.internal" \
                            "${dbport}" \
