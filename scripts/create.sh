@@ -206,16 +206,51 @@ if [ "$recreate" = false ]; then
     echo 'deb [signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb stable main' | tee /etc/apt/sources.list.d/google-chrome.list && \
     apt-get install -y git vim iputils-ping iproute2 telnet net-tools"
 
-  log "jbt-cypress – Creating and importing SSL certificate into Linux system trust store"
-  mkdir -p installation/certs
+  mkdir -p certs
+  if [[ -f certs/jbt-ca.key && -f certs/jbt-ca.crt ]]; then
+    log "JBT CA certificate certs/jbt-ca.* already exists and we are using it"
+  else
+    # Create CA for 10 years
+    log "Creating JBT CA certificate certs/jbt-ca.*"
+    docker exec jbt-cypress sh -c "
+      openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+        -keyout /jbt/certs/jbt-ca.key \
+        -out /jbt/certs/jbt-ca.crt \
+        -subj '/CN=JBT Local CA/O=JBT' \
+        -addext 'basicConstraints=critical,CA:TRUE' \
+        -addext 'keyUsage=critical,keyCertSign,cRLSign'"
+  fi
+
+  if [[ -f certs/jbt-server.key && -f certs/jbt-server.crt ]]; then
+    log "JBT server certificate certs/jbt-server.* already exists and we are using it"
+  else
+    log "Creating JBT server certificate"
+    docker exec jbt-cypress sh -c "
+      openssl req -new -nodes -newkey rsa:2048 \
+        -keyout /jbt/certs/jbt-server.key \
+        -out /tmp/jbt-server.csr \
+        -subj '/CN=localhost/O=JBT'"
+    log "Sign the JBT server certificate"
+    docker exec jbt-cypress sh -c "
+      cat >/tmp/jbt-san.cnf <<'EOF'
+  subjectAltName=DNS:localhost,DNS:host.docker.internal,IP:127.0.0.1,IP:::1
+  basicConstraints=CA:FALSE
+  keyUsage=digitalSignature,keyEncipherment
+  extendedKeyUsage=serverAuth
+EOF"
+    docker exec jbt-cypress sh -c "
+      openssl x509 -req -in /tmp/jbt-server.csr \
+        -CA /jbt/certs/jbt-ca.crt \
+        -CAkey /jbt/certs/jbt-ca.key -CAcreateserial \
+        -out /jbt/certs/jbt-server.crt \
+        -days 397 -sha256 -extfile /tmp/jbt-san.cnf"
+  fi
+
+  log "jbt-cypress – JBT CA certificate into Linux system trust store"
   docker exec jbt-cypress sh -c "
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /jbt/installation/certs/self.key \
-            -out /jbt/installation/certs/self.crt -subj '/CN=localhost/O=JBT' \
-            -addext 'subjectAltName=DNS:localhost,DNS:host.docker.internal,IP:127.0.0.1' \
-            -addext 'keyUsage=digitalSignature,keyEncipherment' \
-            -addext 'extendedKeyUsage=serverAuth' && \
-    cp /jbt/installation/certs/self.crt /usr/local/share/ca-certificates && \
+    cp /jbt/certs/jbt-ca.crt /usr/local/share/ca-certificates && \
     update-ca-certificates"
+
   log "jbt-cypress – Creating Firefox enterprice policy and importing SSL certificate"
   docker exec jbt-cypress sh -c "
     mkdir -p /etc/firefox/policies
@@ -224,7 +259,7 @@ if [ "$recreate" = false ]; then
   "policies": {
     "Certificates": {
       "ImportEnterpriseRoots": true,
-      "Install": ["/jbt/installation/certs/self.crt"]
+      "Install": ["/jbt/certs/jbt-ca.crt"]
     }
   }
 }

@@ -190,9 +190,9 @@ docker exec "jbt-${instance}" bash -c '
   a2enconf joomla-env && \
   a2enmod rewrite ssl'
 
-log "jbt-${instance} – Importing SSL certificate and configuring Apache"
+log "jbt-${instance} – Importing JBT CA certificate and configuring Apache"
 docker exec "jbt-${instance}" bash -c "
-  cp /jbt/installation/certs/self.crt /usr/local/share/ca-certificates && \
+  cp /jbt/certs/jbt-ca.crt /usr/local/share/ca-certificates && \
   update-ca-certificates &&
   cp /jbt/configs/001-ssl.conf /etc/apache2/sites-available && \
   cd /etc/apache2/sites-enabled && \

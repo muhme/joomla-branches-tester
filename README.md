@@ -444,8 +444,32 @@ with [http://host.docker.internal:7054](http://host.docker.internal:7054) and th
 [http://host.docker.internal:7054/administrator](http://host.docker.internal:7054/administrator).
 User *ci-admin* and password *joomla-17082005* (Whose birthday is it anyway?) are from Joomla System Tests.
 
-For HTTPS add 100 to the port number, e.g. for Joomla 5.4 use [https://host.docker.internal:7154](https://host.docker.internal:7154).
-The self-signed certificate can be imported from file `installation/certs/self.crt`.
+For HTTPS add 100 to the port number,
+e.g. for Joomla 5.4 use [https://host.docker.internal:7154](https://host.docker.internal:7154).
+<details>
+  <summary>The self-signed certificates can be imported from files in `certs` foder.</summary>
+* On macOS
+  * For Safari, Chrome, Edge and Electron apps use the macOS Keychain:
+    `sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain joomla-branches-tester/certs/jbt-ca.crt`
+  * For Firefox, additionally trust the JBT Certificate Authority (CA):
+    * Open *Preferences*
+    * Goto *Privacy & Security*
+    * Open *View Certificates*
+    * Choose tab *Authorities* and click *Import*
+    * Select `.../joomla-branches-tester/certs/jbt-ca.crt`
+    * Choose: *Trust this CA to identify website*
+    * Click *OK*
+* On Linux
+  * ...
+* On Windows
+  * ...
+
+:point_right: JBT CA certifate is created for 10 years.
+  JBT server certificate is generated for one year,
+  because modern browsers only accept shorter lifetimes for server (leaf) certificates.
+  Certificates generated in the `certs` folder are not deleted when running `scripts/clean` or `scripts/create`.
+  If the certificates already exist, they are re-used automatically to keep browser trust persistent.
+</details>
 
 In parallel you can inspect MariaDB and MySQL database with [phpMyAdmin](https://www.phpmyadmin.net/) on
 [http://host.docker.internal:7002](http://host.docker.internal:7002) or PostgreSQL database with
