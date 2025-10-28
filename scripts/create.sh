@@ -76,6 +76,9 @@ while [ $# -ge 1 ]; do
   elif isValidVariant "$1"; then
     database_variant="$1"
     shift # Argument is eaten as database variant.
+  elif [ "$1" = "IPv4" ]; then
+    network="IPv4"
+    shift # Argument is eaten as (default) IPv4 option.
   elif [ "$1" = "IPv6" ]; then
     network="IPv6"
     shift # Argument is eaten as IPv6 option.
@@ -118,9 +121,20 @@ if [ -n "${git_repository}" ] && [ ${#versionsToInstall[@]} -ne 1 ]; then
   exit 1
 fi
 
-if [ "$recreate" = true ] && [ ! -f docker-compose.yml ]; then
-  error "The 'recreate' option was given, but no 'docker-compose.yml' file exists. Please run 'scripts/create' first."
-  exit 1
+if [ "${recreate}" = true ] ; then
+  if [ ! -f docker-compose.yml ]; then
+    error "The 'recreate' option was given, but no 'docker-compose.yml' file exists. Please run 'scripts/create' first."
+    exit 1
+  fi
+  if grep -q "enable_ipv6: false" docker-compose.yml; then
+    if [ "${network}" = "IPv6" ]; then
+      error "To switch to IPv6 it is needed to run without 'recreate'. Or run with 'recreate' and 'IPv4'."
+      exit 1
+    fi
+  elif [ "${network}" = "IPv4" ]; then
+      error "To switch to IPv4 it is needed to run without 'recreate'. Or run with 'recreate' and 'IPv6'."
+      exit 1
+  fi
 fi
 
 # If no version was given, use all.
