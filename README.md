@@ -125,6 +125,7 @@ The abbreviation `jbt` stands for Joomla Branches Tester.
 |jbt-novnc| 10.0.0.5<br />fd00::5 | **[7005](http://host.docker.internal:7005/vnc.html?autoconnect=true&resize=scale)** | | If you run automated Cypress System Tests with the `novnc` option, you can watch them. |
 |jbt-relay| 10.0.0.6<br />fd00::6 | SMTP **7025**:7025 | | SMTP relay triplicator |
 |jbt-cypress| 10.0.0.7<br />fd00::7 | SMTP :7125 | | Cypress Headless Test Environment<br />SMTP server is only running during test execution<br />PHP 8.4 is installed for `cli/joomla.php` Joomla Command Line Interface, executed from Joomla System Tests |
+|jbt-proxy| 10.0.0.8<br />fd00::8<br />10.0.0.9 | Web interface **[7009]([http://host.docker.internal:7009?token=jbtpw])** | | Network traffic proxy |
 |jbt-mysql| 10.0.0.11<br />fd00::11 :eight_pointed_black_star: | **7011**:3306 | | Database Server MySQL version 8.1 |
 |jbt-madb| 10.0.0.12<br />fd00::12 | **7012**:3306 | | Database Server MariaDB version 10.4 |
 |jbt-pg| 10.0.0.13<br />fd00::13 | **7013**:5432 | | Database Server PostgreSQL version 12.20 |
