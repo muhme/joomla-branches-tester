@@ -829,10 +829,21 @@ install the Joomla Patch Tester, or run Joomla System Tests.
 There is no Git repository, so you cannot run the other tests and `scripts/pull` will be skipped.
 Grafting can also be done multiple times. :smile:
 
-What distinguishes a JBT grafted Joomla from a standard package-installed Joomla?
-A JBT grafted Joomla contains additional files and two directories from the development branch:
-* Files: `cypress.config.*` and `package*.json`
-* Directories: `node_modules` and `tests/System`
+What distinguishes a JBT-grafted Joomla from a standard package-installed Joomla?
+A JBT-grafted Joomla installation differs from a standard Joomla installation created from the full release package
+in the same way that a Git-based Joomla installation does — with a few additional details specific to JBT.
+* The “Testing Sample Data” option is not available during installation or from the administrator backend.
+* The `tests` directory is generally absent,
+  except for two subdirectories that are retained from the previous Git-based installation:
+  * `node_modules`
+  * `tests/System`
+  * These allow running System Tests as needed for Joomla installation, while other test suites are not included.
+* A JBT-grafted Joomla also includes additional configuration files copied from the previous Git-based installation:
+  * `cypress.config.*`
+  * `package*.json`
+
+In short, a JBT-grafted Joomla behaves like a clean, package-based installation but retains just enough from the Git
+source to run the system installation from Cypress Automated System Tests.
 
 ### Syncing from GitHub Repository
 
