@@ -446,29 +446,87 @@ User *ci-admin* and password *joomla-17082005* (Whose birthday is it anyway?) ar
 
 For HTTPS add 100 to the port number,
 e.g. for Joomla 5.4 use [https://host.docker.internal:7154](https://host.docker.internal:7154).
+To eliminate repeated *unsecure connection* warnings, you can import the self-signed certificates
+from the `certs` folder into your operating system and/or your host browsers (Firefox, Safari, Chrome, or Edge).
+
 <details>
-  <summary>The self-signed certificates can be imported from files in `certs` foder.</summary>
-* On macOS
-  * For Safari, Chrome, Edge and Electron apps use the macOS Keychain:
-    `sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain joomla-branches-tester/certs/jbt-ca.crt`
-  * For Firefox, additionally trust the JBT Certificate Authority (CA):
-    * Open *Preferences*
+  <summary>Once imported, HTTPS connections to JBT are recognised as trusted.</summary>
+
+---
+
+**macOS Installation**
+
+* For Safari, Chrome and Edge apps use the macOS key chain:
+  ```bash
+  sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain joomla-branches-tester/certs/jbt-ca.crt
+  ```
+* For Firefox trust the JBT Certificate Authority (CA):
+  * Open *Preferences*
+  * Goto *Privacy & Security*
+  * Open *View Certificates*
+  * Choose tab *Authorities* and click *Import*
+  * Select `.../joomla-branches-tester/certs/jbt-ca.crt`
+  * Choose: *Trust this CA to identify website*
+  * Click *OK*
+
+**Ubuntu Linux Installation**
+
+* System-wide trust (all apps that use the OS store):
+  ```bash
+  # make sure ca-certificates is present
+  sudo apt-get update && sudo apt-get install -y ca-certificates
+
+  # copy your CA (not the server cert) with a .crt extension
+  sudo install -m 0644 joomla-branches-tester/certs/jbt-ca.crt /usr/local/share/ca-certificates/jbt-ca.crt
+
+  # update the trust store
+  sudo update-ca-certificates
+  ```
+* For Chrome or Edge if they not pick up the OS trust via p11-kit after update-ca-certificates, import into the user NSS DB:
+  ```bash
+  sudo apt-get install -y libnss3-tools
+  mkdir -p "$HOME/.pki/nssdb"
+  certutil -d sql:"$HOME/.pki/nssdb" -A -t "C,," -n "JBT Local CA" -i /usr/local/share/ca-certificates/jbt-ca.crt
+  ```
+* For Firefox:
+  * If you’re running the Snap version of Firefox, it confines access to most of $HOME,
+    so Firefox can’t read files outside special locations (like ~/Downloads).
+    ```bash
+    cp joomla-branches-tester/certs/jbt-ca.crt $HOME/Downloads
+    ```
+  * Trust the JBT Certificate Authority (CA):
+    * Open *Settings*
     * Goto *Privacy & Security*
     * Open *View Certificates*
     * Choose tab *Authorities* and click *Import*
-    * Select `.../joomla-branches-tester/certs/jbt-ca.crt`
+    * Select `$HOME/Downloads/certs/jbt-ca.crt`
     * Choose: *Trust this CA to identify website*
     * Click *OK*
-* On Linux
-  * ...
-* On Windows
-  * ...
+
+**Windows Installation**
+
+* System-wide trust (all apps that use the OS store):
+  * Double-click `jbt-ca.crt` in the `certs` folder (search in Linux > Ubuntu > home)
+  * Choose: *Install Certificate* > *Local Machine* > *Next*  
+  * Select: *Place all certificates in the following store* > *Trusted Root Certification Authorities* > *OK*  
+  * Click *Next*, then Finish and restart your browser  
+* For Firefox trust the JBT Certificate Authority (CA):
+  * Open *Settings*
+  * Goto *Privacy & Security*
+  * Open *View Certificates*
+  * Choose tab *Authorities* and click *Import*
+    * Select `.../joomla-branches-tester/certs/jbt-ca.crt` (search in Linux > Ubuntu > home)
+  * Choose: *Trust this CA to identify website*
+  * Click *OK* and restart your browser  
 
 :point_right: JBT CA certifate is created for 10 years.
   JBT server certificate is generated for one year,
   because modern browsers only accept shorter lifetimes for server (leaf) certificates.
   Certificates generated in the `certs` folder are not deleted when running `scripts/clean` or `scripts/create`.
   If the certificates already exist, they are re-used automatically to keep browser trust persistent.
+
+---
+
 </details>
 
 In parallel you can inspect MariaDB and MySQL database with [phpMyAdmin](https://www.phpmyadmin.net/) on
