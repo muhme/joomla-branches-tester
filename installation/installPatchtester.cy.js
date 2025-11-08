@@ -48,6 +48,36 @@ describe("Install 'Joomla! Patch Tester' with", () => {
     cy.clickToolbarButton("Save & Close");
   });
 
+  /* Warm up Patch Tester by hitting the JSON endpoint once to eat deprecation output
+   * See https://github.com/joomla-extensions/patchtester/issues/386
+   */
+  function warmUpPatchtester() {
+    // We assume you already visited the admin page so Joomla is on window.
+    return cy.window().then((win) => {
+      const tokenName = win.Joomla?.getOptions?.('csrf.token');
+      if (!tokenName) {
+        // If token isn't available yet, ensure the page is loaded
+        throw new Error('CSRF token name not found (Joomla.getOptions("csrf.token")). Visit the admin view first.');
+      }
+
+      const qs = {
+        option: 'com_patchtester',
+        tmpl: 'component',
+        format: 'json',
+        task: 'startfetch.startfetch',
+      };
+      qs[tokenName] = 1;
+
+      // Send as an XHR-style request
+      return cy.request({
+        url: 'administrator/index.php',
+        method: 'GET',
+        qs,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      });
+    });
+  }
+
   function tryFetchOnce() {
     cy.visit('administrator/index.php?option=com_patchtester&view=pulls');
     cy.get('button.button-sync.btn.btn-primary').click();
@@ -59,8 +89,13 @@ describe("Install 'Joomla! Patch Tester' with", () => {
       });
     });
   }
+
   it("fetch data with retry", () => {
     cy.doAdministratorLogin();
+    // visit admin to have CSRF token
+    cy.visit('administrator/index.php?option=com_patchtester&view=pulls');
+    // Warm-up call to eat deprecation warnings
+    warmUpPatchtester();
 
     tryFetchOnce().then((success) => {
       if (success) return;
