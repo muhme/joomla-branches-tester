@@ -236,7 +236,7 @@ if [ "$(printf '%s\n' "8.0.0" "$php_version" | sort -V | head -n1)" = "8.0.0" ];
   xdebug.start_with_request=yes
   xdebug.client_host=host.docker.internal
   xdebug.client_port=79${instance: -2}
-  xdebug.log=/var/log/xdebug.log
+  xdebug.log=/var/www/html/administrator/logs/xdebug.log
   xdebug.discover_client_host=true
   EOF
   "

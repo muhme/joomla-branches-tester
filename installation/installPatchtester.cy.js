@@ -69,6 +69,7 @@ describe("Install 'Joomla! Patch Tester' with", () => {
       qs[tokenName] = 1;
 
       // Send as an XHR-style request
+      // e.g. http://localhost:7054/administrator/index.php?option=com_patchtester&tmpl=component&format=json&acffb6e0c84243e73cd487a320caf1aa=1&task=startfetch.startfetch
       return cy.request({
         url: 'administrator/index.php',
         method: 'GET',
