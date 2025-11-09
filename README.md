@@ -1303,7 +1303,6 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
 
 * The different Joomla versions exist in parallel, but the test runs sequentially, as there is the one Cypress container used.
 * Database server versions cannot be changed.
-* The setup does not support HTTPS, secure connections issues are not testable. → [#7](https://github.com/muhme/joomla-branches-tester/issues/7)
 * If IPv6 networking is chosen, it is used only within Docker.
 * The predefined port range run from 7000 to 7960. If another service is already using this range, it may cause a conflict. → [#3](https://github.com/muhme/joomla-branches-tester/issues/3)
 * Usable Joomla Git tags start with `3.9.0` (for earlier versions `apt-get update` does not work so easily).
