@@ -173,6 +173,9 @@ if [ "$recreate" = false ]; then
 
   log "Running 'docker compose up'"
   docker compose up -d
+
+  # Newer version for pgadmin?
+  recreateContainersWhenNecessary "${instance}" "dpage/pgadmin4:latest" "pgadmin"
 fi
 
 # Wait until MySQL database is up and running
@@ -372,29 +375,8 @@ for version in "${versionsToInstall[@]}"; do
 
     din=$(dockerImageName "${instance}" "${php_version}")
 
-    # Get currently cached digest (if any)
-    old_digest="$(docker image inspect --format='{{index .RepoDigests 0}}' "${din}" 2>/dev/null || true)"
+    recreateContainersWhenNecessary "${instance}" "${din}" "jbt-${instance}"
 
-    log "jbt-${instance} – Pulling ${din} (manual prepare update)"
-    docker pull "${din}"
-
-    # Get digest after pull
-    new_digest="$(docker image inspect --format='{{index .RepoDigests 0}}' "${din}" 2>/dev/null || true)"
-
-    if [ -z "$new_digest" ]; then
-      error "jbt-${instance} – ERROR: image '${din}' not present after pull"
-      exit 1
-    fi
-
-    log "jbt-${instance} – Starting Docker container"
-
-    if [ "${old_digest}" = "${new_digest}" ]; then
-      log "jbt-${instance} – Image '${din}' unchanged; skipping recreate"
-      docker compose up -d "jbt-${instance}"
-    else
-      log "jbt-${instance} – Image '${din}' changed; recreating container"
-      docker compose up -d --no-deps --force-recreate --remove-orphans --wait "jbt-${instance}"
-    fi
   fi
 
   JBT_INTERNAL=42 bash scripts/setup.sh "initial" "${version}" "${database_variant}" "${socket}" \

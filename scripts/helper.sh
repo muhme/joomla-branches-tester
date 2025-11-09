@@ -598,6 +598,38 @@ function dockerImageName() {
   echo "${php_to_use}-apache"
 }
 
+# Force recreate Docker image if a newer version is pulled (e.g. for PHP8.5-rc or pgadmin)
+#   e.g. updateContainerNeeded 54 php:8.4-apache jbt-54
+#   e.g. updateContainerNeeded 54 dpage/pgadmin4:latest pgadmin
+#
+function recreateContainersWhenNecessary() {
+  local instance="$1" din="$2" service="$3" old_digest new_digest
+
+  # Get currently cached digest (if any)
+  old_digest="$(docker image inspect --format='{{index .RepoDigests 0}}' "${din}" 2>/dev/null || true)"
+
+  log "jbt-${instance} – Pulling ${din} (manual prepare update)"
+  docker pull "${din}"
+
+  # Get digest after pull
+  new_digest="$(docker image inspect --format='{{index .RepoDigests 0}}' "${din}" 2>/dev/null || true)"
+
+  if [ -z "$new_digest" ]; then
+    error "jbt-${instance} – ERROR: image '${din}' not present after pull"
+    exit 1
+  fi
+
+  log "jbt-${instance} – Starting Docker container"
+
+  if [ "${old_digest}" = "${new_digest}" ]; then
+    log "jbt-${instance} – Image '${din}' unchanged; skipping recreate"
+    docker compose up -d "${service}"
+  else
+    log "jbt-${instance} – Image '${din}' changed; recreating container"
+    docker compose up -d --no-deps --force-recreate --remove-orphans --wait "${service}"
+  fi
+}
+
 # Retrieve the installed Joomla major and minor version from the `libraries/src/Version.php` file in the specified branch directory.
 # e.g. getJoomlaVersion "joomla-51" -> "51"
 #
