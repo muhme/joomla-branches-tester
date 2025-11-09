@@ -249,7 +249,7 @@ if [ "$recreate" = false ]; then
         -subj '/CN=localhost/O=JBT'"
     log "Sign the JBT server certificate"
     docker exec jbt-cypress sh -c "
-      cat >/tmp/jbt-san.cnf <<'EOF'
+      cat >/tmp/jbt-san.cnf <<EOF
   subjectAltName=DNS:localhost,DNS:host.docker.internal,IP:127.0.0.1,IP:::1
   basicConstraints=CA:FALSE
   keyUsage=digitalSignature,keyEncipherment
@@ -268,19 +268,10 @@ EOF"
     cp /jbt/certs/jbt-ca.crt /usr/local/share/ca-certificates && \
     update-ca-certificates"
 
-  log "jbt-cypress – Creating Firefox enterprice policy and importing SSL certificate"
+  log "jbt-cypress – Creating Firefox enterprice policy to import SSL certificate"
   docker exec jbt-cypress sh -c "
     mkdir -p /etc/firefox/policies
-    cat > /etc/firefox/policies/policies.json <<EOF
-{
-  "policies": {
-    "Certificates": {
-      "ImportEnterpriseRoots": true,
-      "Install": ["/jbt/certs/jbt-ca.crt"]
-    }
-  }
-}
-EOF"
+    cp /jbt/configs/policies.json /etc/firefox/policies/policies.json"
 
   log "jbt-cypress – JBT 'installation' environment – installing cypress@${JBT_INSTALLATION_CYPRESS_VERSION}"
   # We install now, but don't delete pre-installed Cypress with rm -rf /root/.cache/Cypress

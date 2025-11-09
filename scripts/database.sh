@@ -131,7 +131,7 @@ for instance in "${instancesToChange[@]}"; do
   configureCypressConfig "/jbt/configs/cypress.config.js" \
                          "/jbt/installation/joomla-${instance}/cypress.config.js" \
                          "${instance}" \
-                         "https://host.docker.internal:7$((${instance} + 100))/" \
+                         "https://host.docker.internal:7$((instance + 100))/" \
                          "${dbtype}" \
                          "${dbhost}" \
                          "" \
@@ -140,7 +140,7 @@ for instance in "${instancesToChange[@]}"; do
   configureCypressConfig "/jbt/configs/cypress.config.js" \
                          "/jbt/installation/joomla-${instance}/cypress.config.local.js" \
                          "${instance}" \
-                         "https://localhost:7$((${instance} + 100))/" \
+                         "https://localhost:7$((instance + 100))/" \
                          "${dbtype}" \
                          "host.docker.internal" \
                          "${dbport}" \
@@ -158,7 +158,7 @@ for instance in "${instancesToChange[@]}"; do
     configureCypressConfig "cypress.config.dist.${extension}" \
                            "cypress.config.${extension}" \
                            "${instance}" \
-                           "https://host.docker.internal:7$((${instance} + 100))/" \
+                           "https://host.docker.internal:7$((instance + 100))/" \
                            "${dbtype}" \
                            "${dbhost}" \
                            "" \
@@ -169,7 +169,7 @@ for instance in "${instancesToChange[@]}"; do
     configureCypressConfig "cypress.config.dist.${extension}" \
                            "cypress.config.local.${extension}" \
                            "${instance}" \
-                           "https://localhost:7$((${instance} + 100))/" \
+                           "https://localhost:7$((instance + 100))/" \
                            "${dbtype}" \
                            "host.docker.internal" \
                            "${dbport}" \
