@@ -565,10 +565,16 @@ function createDockerComposeFile() {
 
     # Add named volumes definition.
     sed -e '/^#/d' 'configs/docker-compose.end.yml' >> 'docker-compose.yml'
-
   fi
 
 }
+
+# docker-compose.yml is complete, check each Joomla Docker image for newest version, e.g. for PHP 8.5-RC4
+for version in "${versions[@]}"; do
+  instance=$(getMajorMinor "${version}")
+  din=$(dockerImageName "${version}" "${php_version}")
+  recreateContainersWhenNecessary "${instance}" "${din}" "jbt-${instance}"
+done
 
 # Returns existing Docker image name for given Joomla and PHP version.
 #   e.g. dockerImageName "4.4-dev" "php8.1" -> "php:8.1-apache"
