@@ -49,7 +49,7 @@ declare -ar \
 # (not 5.6 - 7.3 as there are problems and for lowest supported Joomla 3.9.0 there is PHP 7.4 available and working)
 # TODO: 20 Nov 2025 to be changed once PHP 8.5 is released
 declare -ar \
-  JBT_VALID_PHP_VERSIONS=("php7.4" "php8.0" "php8.1" "php8.2" "php8.3" "php8.4" "php8.5-rc" "highest")
+  JBT_VALID_PHP_VERSIONS=("php7.4" "php8.0" "php8.1" "php8.2" "php8.3" "php8.4" "php8.5" "highest")
 
 # The highest PHP version usable for Joomla major-minor version (the two arrays correspond via the index).
 # If a new Joomla version is created and not existing in this list, default is used in dockerImageName().
@@ -490,7 +490,7 @@ deleteService() {
 
 # Append a web server entry to Docker compose file, if not already existing
 # 1st argument is e.g. "5.2-dev" or "4.4.1-alpha4"
-# 2nd argument is PHP version, e.g. "php8.1", php8.5-rc" or "highest"
+# 2nd argument is PHP version, e.g. "php8.5" or "highest"
 # 3rd argument is Docker compose file name
 #
 function appendWebServer() {
@@ -525,7 +525,7 @@ function appendWebServer() {
 
 # Create 'docker-compose.yml' file with one or multiple web servers.
 # 1st argument is e.g. "5.2-dev" or "4.4.1-alpha4 5.1.0"
-# 2nd argument e.g. "php8.1", php8.5-rc" or "highest"
+# 2nd argument e.g. "php8.5" or "highest"
 # 3rd argument is "IPv4" or "IPv6"
 # 4th optional argument is "recreate", which replaces or inserts the web server container.
 #

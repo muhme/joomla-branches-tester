@@ -210,8 +210,8 @@ if [ "$(printf '%s\n' "8.0.0" "$php_version" | sort -V | head -n1)" = "8.0.0" ];
   docker exec "jbt-${instance}" bash -c "cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini"
   log "jbt-${instance} – Preparing a parallel installation with Xdebug"
   docker exec "jbt-${instance}" bash -c 'cp -r /usr/local /usr/local-without-xdebug'
-  # TODO: 20 Nov 2025 to be deleted once PHP 8.5 is released
-  if [[ $php_version == 8.5.0beta* || $php_version == 8.5.0BETA* || $php_version == 8.5.0rc* || $php_version == 8.5.0RC* ]]; then
+  # TODO: 21 Nov 2025 to be deleted once pecl/xdebug supports PHP 8.5
+  if [[ $php_version == 8.5.* ]]; then
     # 'pecl install xdebug' requires PHP (version >= 8.0.0, version <= 8.4.99), we have to compile by own
     docker exec "jbt-${instance}" bash -c '
       set -eux
