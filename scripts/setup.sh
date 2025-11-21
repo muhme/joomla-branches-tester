@@ -113,6 +113,7 @@ log "jbt-${instance} – Configure PHP to use jbt-proxy"
 # Alternativly, we could make a difference for <= 8.5, but opcache is only for performance and not a required module.
 #
 # zip and zstd only to be able to run build
+# msmtp and msmtp-mta to be able to use email configurations PHP and sendmail too
 #
 log "jbt-${instance} – Installing packages"
 docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
@@ -135,6 +136,8 @@ docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
   default-mysql-client \
   zip \
   zstd \
+  msmtp \
+  msmtp-mta \
   && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
   && docker-php-ext-install -j$(nproc) \
       gd \
@@ -197,6 +200,10 @@ docker exec "jbt-${instance}" bash -c "
   cp /jbt/configs/001-ssl.conf /etc/apache2/sites-available && \
   cd /etc/apache2/sites-enabled && \
   ln -s ../sites-available/001-ssl.conf 001-ssl.conf"
+
+log "jbt-${instance} – Configure msmtp as mail user agent"
+docker cp configs/msmtprc jbt-${instance}:/tmp/msmtprc
+docker exec "jbt-${instance}" bash -c "sed 's/JBT/jbt-${instance}/' /tmp/msmtprc > /etc/msmtprc"
 
 # Needs PHP >= 8.0, therefore not possible for Joomla 3.9 with PHP 7.4, but possible for 3.10 with PHP 8.0
 with_xdebug=false

@@ -453,6 +453,8 @@ function adjustJoomlaConfigurationForJBT() {
         -e \"s|\(public .mailer =\).*|\1 'smtp';|\" \
         -e \"s|\(public .smtphost =\).*|\1 'host.docker.internal';|\" \
         -e \"s|\(public .smtpport =\).*|\1 7025;|\" \
+        -e \"s|\(public .mailfrom =\).*|\1 'jbt-${instance}@test.com';|\" \
+        -e \"s|\(public .fromname =\).*|\1 'JBT jbt-${instance}';|\" \
         -e \"s|\(public .session_handler =\).*|\1 '${session_handler}';|\" \
         configuration.php > configuration.php.new && \
         mv configuration.php.new configuration.php && \
