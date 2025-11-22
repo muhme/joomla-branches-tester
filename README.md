@@ -21,7 +21,8 @@ where we'll explore the numerous options, parameters and configurations that pow
 Within [Docker](https://www.docker.com/) container environment you are able to:
 * Choose from more than 300 different Joomla versions, based on the Git development branches or Git tags (Joomla 3.9.0 ... 6.1-dev).
 * Working with one Joomla version or up to 14 Joomla versions in parallel.
-* Manual testing, including database inspections, network inspections and reading emails.
+* Manual testing, including database and network inspections.
+* Switch between SMTP, Sendmail and PHP Mailer and read all collected emails in MailDev.
 * Running [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/tests/System)
   with [Cypress](https://www.cypress.io/) in interactive mode (GUI) or automated mode (headless or with noVNC).
 * Executing unit tests, verifying coding standards and checking CSS styles and JavaScript standards, just like Drone.
