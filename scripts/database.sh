@@ -44,6 +44,7 @@ function configureCypressConfig {
   local from="${1}" to="${2}" instance="${3}" baseurl="${4}" dbtype="${5}" dbhost="${6}" dbport="${7}" 
   local smtphost="${8}" smtpport="${9}"
 
+  # Using '| name:|'' to exclude 'username:'
   docker exec "jbt-${instance}" bash -c "echo '/* eslint-disable */' | cat - '${from}' | sed \
     -e \"s|db_type: .*|db_type: '${dbtype}',|\" \
     -e \"s|db_name: .*|db_name: 'test_joomla_${instance}',|\" \
@@ -52,7 +53,7 @@ function configureCypressConfig {
     -e \"s|db_port: .*|db_port: '${dbport}',|\" \
     -e \"s|baseUrl: .*|baseUrl: '${baseurl}',|\" \
     -e \"s|db_password: .*|db_password: 'root',|\" \
-    -e \"s|name: .*|name: 'JBT jbt-${instance}',|\" \
+    -e \"s| name: .*| name: 'JBT jbt-${instance}',|\" \
     -e \"s|email: .*|email: 'jbt-${instance}@test.com',|\" \
     -e \"s|smtp_host: .*|smtp_host: '${smtphost}',|\" \
     -e \"s|smtp_port: .*|smtp_port: '${smtpport}',|\" \
