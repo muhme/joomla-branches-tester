@@ -12,8 +12,8 @@ module.exports = defineConfig({
   env: {
     // Standard Joomla System Tests variables
     sitename: 'Joomla CMS Test',
-    name: 'jane doe',
-    email: 'admin@example.com',
+    name: 'set by scripts/database.sh',
+    email: 'set by scripts/database.sh',
     username: 'ci-admin',
     password: 'joomla-17082005',
     db_type: 'set by scripts/database.sh',

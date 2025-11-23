@@ -24,16 +24,18 @@ source scripts/helper.sh
 #
 # adopt e.g.:
 #   db_type: 'PostgreSQL (PDO)',
-#   db_name: 'test_joomla_44'
-#   db_prefix: 'ajbt44_', # use of 'a' as initial letter for sorting before bak_-tables
+#   db_name: 'test_joomla_54'
+#   db_prefix: 'ajbt54_', # use of 'a' as initial letter for sorting before bak_-tables
 #   db_host: 'jbt-pg',
 #   db_port: '',
-#   baseUrl: 'http://host.docker.internal:7044',
+#   baseUrl: 'https://localhost:7154/',
 #   db_password: 'root',
+#   name: 'JBT jbt-54',
+#   email: 'jbt-54@test.com',
 #   smtp_host: 'host.docker.internal',
 #   smtp_port: '7025',
-#   instance: 44,
-#   installationPath: '/jbt/joomla-44',
+#   instance: 54,
+#   installationPath: '/jbt/joomla-54',
 #
 # Using database host and default port Docker-inside as performance issues are seen in using host.docker.internal
 # Inserting line '/* eslint-disable */' as with 'cypress.config.local.js' we hava a not ignored file name.
@@ -50,6 +52,8 @@ function configureCypressConfig {
     -e \"s|db_port: .*|db_port: '${dbport}',|\" \
     -e \"s|baseUrl: .*|baseUrl: '${baseurl}',|\" \
     -e \"s|db_password: .*|db_password: 'root',|\" \
+    -e \"s|name: .*|name: 'JBT jbt-${instance}',|\" \
+    -e \"s|email: .*|email: 'jbt-${instance}@test.com',|\" \
     -e \"s|smtp_host: .*|smtp_host: '${smtphost}',|\" \
     -e \"s|smtp_port: .*|smtp_port: '${smtpport}',|\" \
     -e \"s|instance: .*|instance: '${instance}',|\" \

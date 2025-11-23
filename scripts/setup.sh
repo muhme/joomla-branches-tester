@@ -202,7 +202,7 @@ docker exec "jbt-${instance}" bash -c "
   ln -s ../sites-available/001-ssl.conf 001-ssl.conf"
 
 log "jbt-${instance} – Configure msmtp as mail user agent"
-docker cp configs/msmtprc jbt-${instance}:/tmp/msmtprc
+docker cp configs/msmtprc "jbt-${instance}:/tmp/msmtprc"
 docker exec "jbt-${instance}" bash -c "sed 's/JBT/jbt-${instance}/' /tmp/msmtprc > /etc/msmtprc"
 
 # Needs PHP >= 8.0, therefore not possible for Joomla 3.9 with PHP 7.4, but possible for 3.10 with PHP 8.0
