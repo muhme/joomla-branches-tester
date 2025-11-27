@@ -26,7 +26,6 @@ function help {
                See 'scripts/versions' for all usable versions.
              The optional database variant can be one of: ${JBT_DB_VARIANTS[*]} (default is mariadbi).
              The optional 'socket' argument configures database access via Unix socket (default is TCP host).
-             The optional 'IPv6' argument enables support for IPv6 (default is IPv4).
              The optional 'recreate' argument creates or recreates specified Joomla web server containers.
              The optional PHP version can be set to one of: ${valid_versions_without_highest[*]} (default is highest).
              The optional 'repository:branch' argument (default repository is https://github.com/joomla/joomla-cms).
@@ -51,7 +50,6 @@ function waitForMySQL {
 # Defaults to use MariaDB with MySQLi database driver, to use cache and PHP 8.1.
 database_variant="mariadbi"
 socket=""
-network="IPv4"
 recreate=false
 php_version="highest"
 versionsToInstall=()
@@ -76,12 +74,6 @@ while [ $# -ge 1 ]; do
   elif isValidVariant "$1"; then
     database_variant="$1"
     shift # Argument is eaten as database variant.
-  elif [ "$1" = "IPv4" ]; then
-    network="IPv4"
-    shift # Argument is eaten as (default) IPv4 option.
-  elif [ "$1" = "IPv6" ]; then
-    network="IPv6"
-    shift # Argument is eaten as IPv6 option.
   elif isValidPHP "$1"; then
     php_version="$1"
     shift # Argument is eaten as PHP version.
@@ -126,15 +118,6 @@ if [ "${recreate}" = true ] ; then
     error "The 'recreate' option was given, but no 'docker-compose.yml' file exists. Please run 'scripts/create' first."
     exit 1
   fi
-  if grep -q "enable_ipv6: false" docker-compose.yml; then
-    if [ "${network}" = "IPv6" ]; then
-      error "To switch to IPv6 it is needed to run without 'recreate'. Or run with 'recreate' and 'IPv4'."
-      exit 1
-    fi
-  elif [ "${network}" = "IPv4" ]; then
-      error "To switch to IPv4 it is needed to run without 'recreate'. Or run with 'recreate' and 'IPv6'."
-      exit 1
-  fi
 fi
 
 # If no version was given, use all.
@@ -155,8 +138,8 @@ if [ "$recreate" = false ]; then
   scripts/clean.sh
 
   # Create Docker Compose setup with Joomla web servers for all versions to be installed.
-  log "Create 'docker-compose.yml' file for version(s) ${versionsToInstall[*]}, based on ${php_version} PHP version and ${network}"
-  createDockerComposeFile "${versionsToInstall[*]}" "${php_version}" "${network}"
+  log "Create 'docker-compose.yml' file for version(s) ${versionsToInstall[*]}, based on ${php_version} PHP version"
+  createDockerComposeFile "${versionsToInstall[*]}" "${php_version}"
 
   # Make sure all bind source folders exist on the HOST (prevents ghost mounts)
   for version in "${versionsToInstall[@]}"; do
@@ -357,7 +340,7 @@ for version in "${versionsToInstall[@]}"; do
       docker rm -f "jbt-${instance}" || warning "jbt-${instance} – Ignoring failure to remove Docker container"
     fi
 
-    createDockerComposeFile "${instance}" "${php_version}" "${network}" "recreate"
+    createDockerComposeFile "${instance}" "${php_version}" "recreate"
 
     # Pull the image, then recreate the service only if the digest actually changed.
     # (Needed for PHP 8.5 RC1/RC2/...)

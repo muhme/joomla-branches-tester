@@ -526,11 +526,10 @@ function appendWebServer() {
 # Create 'docker-compose.yml' file with one or multiple web servers.
 # 1st argument is e.g. "5.2-dev" or "4.4.1-alpha4 5.1.0"
 # 2nd argument e.g. "php8.5" or "highest"
-# 3rd argument is "IPv4" or "IPv6"
-# 4th optional argument is "recreate", which replaces or inserts the web server container.
+# 3rd optional argument is "recreate", which replaces or inserts the web server container.
 #
 function createDockerComposeFile() {
-  local php_version="$2" network="$3" working="$4" instance
+  local php_version="$2" working="$3" instance
 
   # Declare all local variables to prevent SC2155 - Declare and assign separately to avoid masking return values.
   local version versions=() din
@@ -547,18 +546,8 @@ function createDockerComposeFile() {
     done
     cat xx00 xx01 > docker-compose.yml && rm xx00 xx01
   else
-    if [ "${network}" = "IPv4" ]; then
-      sed \
-        -e "s/JBT_INSTALLATION_CYPRESS_VERSION/${JBT_INSTALLATION_CYPRESS_VERSION}/" \
-        'configs/docker-compose.base.yml'  > 'docker-compose.yml'
-    else
-      sed \
-        -e "s/JBT_INSTALLATION_CYPRESS_VERSION/${JBT_INSTALLATION_CYPRESS_VERSION}/" \
-        -e 's/enable_ipv6: false/enable_ipv6: true/' \
-        -e 's/subnet: "192.168.150.0\/24"/subnet: "fd00::\/8"/' \
-        'configs/docker-compose.base.yml' > 'docker-compose.yml'
-    fi
-
+    sed -e "s/JBT_INSTALLATION_CYPRESS_VERSION/${JBT_INSTALLATION_CYPRESS_VERSION}/" \
+           'configs/docker-compose.base.yml'  > 'docker-compose.yml'
     for version in "${versions[@]}"; do
       appendWebServer "${version}" "${php_version}" 'docker-compose.yml'
     done

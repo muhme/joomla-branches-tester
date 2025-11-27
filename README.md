@@ -35,7 +35,7 @@ Within [Docker](https://www.docker.com/) container environment you are able to:
 * Grafting a Joomla package.
 * Using Xdebug for PHP debugging.
 * Using HTTP and HTTPS.
-* Using IPv4 or IPv6 network.
+* Using IPv4 and IPv6 network in dual-stack.
 * Allows patching and testing of the `joomla-cypress` NPM module.
 
 ![Joomla Branches Software Architecture](images/joomla-branches-tester-54.svg)
@@ -243,8 +243,6 @@ you will need to download arround 4 GB of data from the Internet.
   For example, using `https://github.com/Elfangor93/joomla-cms:mod_community_info`.
   In this case, exactly one version must be provided,
   and it should match the version of the given `joomla-cms` cloned repository.
-* The Docker `jbt-network`, used by all containers, defaults to IPv4.
-  To use IPv6, run the script with the `IPv6` option.
 * The optional `recreate` option is used to create or recreate one or multiple Joomla web server containers
   for the specified versions. Base containers and unnamed Joomla web server containers remain unchanged.
 * To see all options and values, use `scripts/create help`.
@@ -907,10 +905,9 @@ Enabling Xdebug requires at least PHP 8.0. Used ports are 79xx, for the given ex
 
 ### IPv6
 
-As shown in the [Installation](#installation) chapter,
-you can create the Docker Branches Tester instance using `scripts/create`
-with the `IPv6` option instead of the default IPv4 network.
-IP addresses are fixed from the predefined private, non-routable subnet `fd00::/8`.
+JBT uses IPv4 and IPv6 dual-stack networking.
+IPv4 addresses are fixed from the predefined private, non-routable subnet `10.0.0.0/8`.
+IPv6 addresses are fixed from the predefined private, non-routable subnet `fd00::/8`.
 
 You can use the IPv6 address (instead of the hostname) to open the PostgreSQL interactive terminal:
 ```
@@ -1086,7 +1083,7 @@ If no argument is provided, all information will be displayed:
 ```
 scripts/info
 ```
-The following example illustrates an IPv4 installation with three Joomla instances:
+The following example illustrates an installation with three Joomla instances:
 * `jbt-310` – Cloned from Joomla 3.10.12 tag, based on PHP 8.0, using MySQL with PDO driver
 * `jbt-44` – Grafted 4.4.13 Full Joomla package, running PHP 8.2 with xdebug, using MariaDB with MySQLi driver
 * `jbt-54` – Cloned from 5.4-dev branch with additional patches applied, running PHP 8.4 and using PostgreSQL socket

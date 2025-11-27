@@ -11,7 +11,7 @@ networks:
   jbt-network:
     name: jbt-network
     driver: bridge
-    enable_ipv6: false
+    enable_ipv6: true
     ipam:
       driver: default
       config:

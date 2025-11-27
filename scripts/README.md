@@ -35,7 +35,7 @@ The following scripts are available and the use is described in [../README.md](.
 | --- | --- | --- |
 | [check](check) | Searching a JBT log file for critical issues or selected information. | Optional argumenta are `jbt`, `scripts` and logfile name (default is latest). |
 | [clean](clean.sh) | Delete all `jbt-*`-Docker containers and the `joomla-branches-tester_default` Docker network and `joomla-*` folders. | Used by `scripts/create` or for you to get rid of all the stuff. |
-| [create](create.sh) | (Re-)Build all docker containers. | Optional arguments are database variant, `socket`, PHP version, `IPv6`, `no-cache` and the Joomla instances. |
+| [create](create.sh) | (Re-)Build all docker containers. | Optional arguments are database variant, `socket`, PHP version, `no-cache` and the Joomla instances. |
 | [cypress](cypress.sh) | Running interactive Cypress GUI. | Mandatory argument is the Joomla instance. Optional argument is `local` to use a locally installed Cypress. |
 | [database](database.sh) | Changes database and database driver. | :warning: The overall database content is lost.<br />Mandatory argument is the database variant. Optional arguments are`socket` and Joomla instances. |
 | [graft](graft.sh) | Grafting a Joomla package onto a branch. | :warning: The overall database content is lost.<br />Mandatory argument is the Joomla package. Optional argument is the database variant.|
