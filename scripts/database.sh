@@ -53,7 +53,7 @@ function configureCypressConfig {
     -e \"s|db_port: .*|db_port: '${dbport}',|\" \
     -e \"s|baseUrl: .*|baseUrl: '${baseurl}',|\" \
     -e \"s|db_password: .*|db_password: 'root',|\" \
-    -e \"s| name: .*| name: 'JBT jbt-${instance}',|\" \
+    -e \"s| name: .*| name: 'Super User jbt-${instance}',|\" \
     -e \"s|email: .*|email: 'jbt-${instance}@test.com',|\" \
     -e \"s|smtp_host: .*|smtp_host: '${smtphost}',|\" \
     -e \"s|smtp_port: .*|smtp_port: '${smtpport}',|\" \
