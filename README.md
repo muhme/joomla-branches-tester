@@ -895,6 +895,7 @@ scripts/xdebug 53 on
 A `.vscode/launch.json` file is also prepared for all enabled instances.
 In [Visual Studio Code](https://code.visualstudio.com/),
 select 'Start Debugging' and choose the corresponding entry `Listen jbt-53`.
+This requires at least PHP and Xdebug support, which must be installed as extensions in VS Code.
 
 Finally, it may be reset again to improve performance:
 ```
