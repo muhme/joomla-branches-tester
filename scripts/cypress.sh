@@ -104,6 +104,10 @@ if [ -n "${local}" ]; then
   }
   # Install the Cypress version used in this Joomla instance or installation/joomla-cypress, if needed
   log "Installing required Cypress binary version locally (if needed)"
+  command -v npx >/dev/null 2>&1 || {
+    error "npx command not found, you need to install node first."
+    exit 1
+  }
   npx cypress install 2>/dev/null ||
     sudo bash -c "CYPRESS_CACHE_FOLDER=$CYPRESS_CACHE_FOLDER npx cypress install && chown -R $USER $CYPRESS_CACHE_FOLDER"
 

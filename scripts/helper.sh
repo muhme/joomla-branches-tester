@@ -17,8 +17,9 @@ start_time=$(date +%s)
 JBT_TMP_FILE=/tmp/$(basename "$0").$$
 trap 'rm -rf $JBT_TMP_FILE' 0
 
+# Cypress version 15.7.1 now contains Firefox on ARM images
 declare -r \
-  JBT_INSTALLATION_CYPRESS_VERSION="15.3.0"
+  JBT_INSTALLATION_CYPRESS_VERSION="15.7.1"
 
 # The following five arrays are positionally mapped, avoiding associative arrays
 # to ensure compatibility with macOS default Bash 3.2.

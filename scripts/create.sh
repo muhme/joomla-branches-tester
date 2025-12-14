@@ -277,9 +277,11 @@ EOF"
   docker exec "jbt-cypress" bash -c "cd /jbt/installation && \
                                      git clone --depth 1 https://github.com/joomla-projects/joomla-cypress"
 
-  # Browsers are not preinstalled for ARM images with cypress/included – install Firefox
-  log "jbt-cypress – Installing Firefox (if needed)"
-  docker exec "jbt-cypress" bash -c "apt-get install -y --no-install-recommends firefox-esr && \
+  # Firefox browser is the only one preinstalled for ARM images with cypress/included
+  # Install Chromium as it is easier as Chrome for ARM images and also useful for Intel images
+  log "jbt-cypress – Installing Chromium (if needed)"
+  docker exec "jbt-cypress" bash -c "apt-get update && \
+                                     apt-get install -y --no-install-recommends chromium && \
                                      apt-get clean && \
                                      rm -rf /var/lib/apt/lists/*"
 

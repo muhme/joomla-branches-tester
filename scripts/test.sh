@@ -25,7 +25,7 @@ function help {
     test – Runs tests on one, multiple or all installed Joomla instances.
            The optional Joomla version can be one or more of: ${allInstalledInstances[*]} (default is all).
            The optional 'novnc' argument sets DISPLAY to jbt-novnc:0 (default is headless).
-           Optional browser can be 'chrome', 'edge' or 'firefox' (default is 'electron').
+           Optional browser can be 'chrome', 'chromium', 'edge' or 'firefox' (default is 'electron').
            Specify an optional kind of test from: ${ALL_TESTS[*]}
            (defaults to ${ALL_JOOMLA_TESTS[*]}).
            Optional test spec file pattern for Cypress tests (defaults to all, but for 'system' without the installation step).
@@ -52,7 +52,7 @@ while [ $# -ge 1 ]; do
   elif [ "$1" = "novnc" ]; then
     novnc=true
     shift # Argument is eaten as using NoVNC.
-  elif [[ "$1" =~ ^(chrome|edge|firefox|electron)$ ]]; then
+  elif [[ "$1" =~ ^(chromium|chrome|edge|firefox|electron)$ ]]; then
     browser="--browser $1"
     shift # Argument is eaten as browser to use.
   elif isValidTestName "$1" "${ALL_TESTS[@]}"; then

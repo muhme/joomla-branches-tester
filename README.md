@@ -591,8 +591,11 @@ scripts/test system install/Installation.cy.js
 
 Some more optional arguments for System Tests are:
 
-* Browser to be used: Choose between electron (default), firefox, chrome, or edge.
 * Test spec pattern: All test specs (except the installation) are used by default.
+* Browser to be used: Choose between electron (default), firefox, chrome, chromium or edge.
+
+:point_right: Which browser is available in the Cypress Docker container depends on your platform.
+              You can check this with: `docker exec jbt-cypress cypress info`.
 
 As an example, run all the test specs (except the installation) on 5.1 instance with Mozilla Firefox:
 ```
@@ -648,7 +651,9 @@ scripts/cypress 51 local
 
 The script will automatically install the appropriate Cypress version locally
 for each Joomla instance if it doesn't already exist.
-Using the Cypress container has the advantage of having Chrome, Edge, Electron and Chromium browsers pre-installed.
+Which browsers are available in the Cypress Docker container depends on your platform.
+You can check this with: `docker exec jbt-cypress cypress info`.
+
 If you run Cypress locally, only the browsers installed on your Docker host system will be available.
 
 ### Check Email
