@@ -232,6 +232,22 @@ for instance in "${instancesToChange[@]}"; do
     fi
   fi
 
+  # If you like to test by own use e.g.
+  # CYPRESS_CACHE_FOLDER=cypress-cache CYPRESS_specPattern='installation/snoozeUpdateNotification.cy.js' \
+  #   npx cypress open --config-file installation/joomla-54/cypress.config.js
+  if (( instance == 53 || instance == 54 )); then
+    log "jbt-${instance} – Snooze Joomla 6 notification if present"
+    if ! docker exec jbt-cypress sh -c "cd /jbt/installation && \
+          CYPRESS_CACHE_FOLDER=/jbt/cypress-cache \
+          DISPLAY=jbt-novnc:0 \
+          ELECTRON_ENABLE_LOGGING=1 \
+          CYPRESS_specPattern='/jbt/installation/snoozeUpdateNotification.cy.js' \
+          npx cypress run --headed \
+                          --config-file '/jbt/installation/joomla-${instance}/cypress.config.js'"; then
+      error "jbt-${instance} – Ignoring failed step 'Disable B/C plugin'."
+    fi
+  fi
+
   # Enable Joomla logging
   log "jbt-${instance} – Configure Joomla with 'Debug System' and 'Log Almost Everything' (but not 'Log Deprecated API')"
   docker exec "jbt-${instance}" bash -c "cd /var/www/html && sed \

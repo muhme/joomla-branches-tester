@@ -1,7 +1,7 @@
 /**
  * installJoomla.cy.js - Cypress script to install Joomla 3 ... Joomla 6
  * 
- * Used by 'scripts/database'.
+ * Used by 'scripts/database.sh'.
  * 
  * Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
  * https://github.com/muhme/joomla-branches-tester

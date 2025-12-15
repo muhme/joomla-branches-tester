@@ -1,7 +1,7 @@
 /**
  * disableBC.cy.js - Cypress script to disable 'Behaviour - Backward Compatibility' plugins
  *
- * Used by 'scripts/database'.
+ * Used by 'scripts/database.sh'.
  * 
  * Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
  * https://github.com/muhme/joomla-branches-tester
