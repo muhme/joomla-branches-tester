@@ -17,3 +17,5 @@ volumes:
     name: jbt-mitma-ca
   mitm-data:
     name: jbt-mitma-data
+  redis-data:
+    name: redis-data
