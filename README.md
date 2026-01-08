@@ -930,14 +930,13 @@ docker exec -it jbt-pg bash -c "PGPASSWORD=root psql -h fd00::13 -U root -d post
 
 ### Install Joomla Patch Tester
 
-For your convenience, the latest version of the
-[Joomla Patch Tester](https://github.com/joomla-extensions/patchtester)
+For your convenience, the [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester)
 can be installed on the Joomla instances from version 4.2 onwards.
-The script also sets the GitHub token and fetches the data.
-This can be done without version number for all Joomla instances or for e.g. Joomla 5.3:
+The script also sets the GitHub token, fetches the data and activates the Advanced Mode.
+This can be done without version number for all Joomla instances or for e.g. Joomla 6.0:
 
 ```
-scripts/patchtester 53 install ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
+scripts/patchtester 60 install ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
 ```
 
 ```
@@ -946,10 +945,17 @@ scripts/patchtester 53 install ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
     ✓ install component (7747ms)
     ✓ set GitHub token (2556ms)
     ✓ fetch data (6254ms)
+    ✓ enable Advanced option (ignore RTC) (1711ms)
 ```
 
 :point_right: The GitHub token can also be provided via the environment variables `JBT_GITHUB_TOKEN` (checked first)
               or `GH_TOKEN` or `GITHUB_TOKEN`. This sample token, of course, will not work.
+
+:warning: Since the **Apply** button is hidden for Pull Requests (PRs) labelled **Ready to Commit (RTC)**,
+          the **Advanced mode** is enabled for newer Patch Tester versions.
+          But, this also enables the **Apply** button for PRs that require
+          additional steps (for example, running **Composer** or **NPM** builds).
+          Please use with care and at your own responsibility.
 
 :fairy: *"You will need to reinstall the Joomla Patch Tester if, for example, you switch the database.
         For more details, see [Database and File System Consistency](#database-and-file-system-consistency)."*
@@ -958,7 +964,7 @@ Other available options are:
 * `uninstall` to remove Joomla Patch Tester from Joomla instance (default is `install`).
 * Joomla Patch Tester version number, e.g. `4.4.0`, if you need to install an older version (default is latest version).
 
-⚠️ Currently (September 2025) the following Patch Tester versions are usable:
+:warning: Currently (January 2026) the following Patch Tester versions are usable:
 * Joomla 4.2 ... 4.4 – Patch Tester 4.3.3
 * Joomla 5.0 ... 5.4 – Patch Tester 4.4.0
 * Joomla 6.0 and 6.1 – Patch Tester 5.0.0 (latest)
@@ -966,7 +972,7 @@ Other available options are:
 :fairy: *"If you do not provide the Patch Tester version number, the latest version is installed.
         If this fails, a second attempt is made with the known working Patch Tester version for your convenience."*
 
-:point_right: Alternatively, to apply patches you can use:
+:point_right: Alternatively, to apply pull requests (PRs) you can also use:
   * JBTs `scripts/patch` script on development (git cloned) containers,
     see [Back to the Future - Patch](#back-to-the-future---patch).
   * Or use PRs prebuild full packages with [Grafting a Joomla Package](#grafting-a-joomla-package).

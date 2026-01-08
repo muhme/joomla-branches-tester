@@ -107,4 +107,28 @@ describe("Install 'Joomla! Patch Tester' with", () => {
       });
     });
   });
+
+  it("enable Advanced option (ignore RTC)", () => {
+
+    // Joomla 4.4 works with Patch Tester 4.3.3, but this has no advanced option
+    // patchtester_url e.g. "https://github.com/joomla-extensions/patchtester/releases/download/4.3.3/com_patchtester_4.3.3.tar.bz2"
+    const patchtester_url = Cypress.env("patchtester_url");
+    if (patchtester_url.includes("/4.3.3/")) {
+      cy.log("Skipping Advanced option (not available in Patch Tester 4.3.3)");
+      return;
+    }
+
+    cy.doAdministratorLogin();
+
+    // Open Options
+    cy.visit("administrator/index.php?option=com_patchtester&view=pulls");
+    cy.get("#toolbar-options").click();
+
+    // Enable Advanced mode
+    cy.get('#jform_advanced input[type="radio"][value="1"]')
+      .should("exist")
+      .check({ force: true });
+    cy.clickToolbarButton("Save & Close");
+  });
+
 });
