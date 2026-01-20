@@ -22,6 +22,7 @@
       - mysql
       - mariadb
       - postgres
+      - redis
       - relay
       - proxy
     # To prevent volume shadowing and stale mounts of deleted containers, no anonymous volumes are created by defining all volumes.
@@ -46,6 +47,9 @@
       - type: volume
         source: mitm-ca
         target: /mitm
+      - type: volume
+        source: redis-data
+        target: /data
     networks:
       jbt-network:
         ipv4_address: 10.0.WWW.VVV
