@@ -1315,8 +1315,8 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
 
 * The different Joomla versions exist in parallel, but the test runs sequentially, as there is the one Cypress container used.
 * Database server versions cannot be changed.
-* If IPv6 networking is chosen, it is used only within Docker.
-* The predefined port range run from 7000 to 7960. If another service is already using this range, it may cause a conflict. → [#3](https://github.com/muhme/joomla-branches-tester/issues/3)
+* Dual stack IPv6 networking is used only within Docker.
+* The predefined port range run from 7000 to 7961. If another service is already using this range, it may cause a conflict. → [#3](https://github.com/muhme/joomla-branches-tester/issues/3)
 * Usable Joomla Git tags start with `3.9.0` (for earlier versions `apt-get update` does not work so easily).
 * For each Joomla major and minor version (e.g. 5.4, 6.0), only one Docker container is possible.
   This means you can run containers for versions such as 54 for Joomla 5.4 and 60 for Joomla 6.0,
