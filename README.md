@@ -951,10 +951,10 @@ scripts/patchtester 60 install ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
 :point_right: The GitHub token can also be provided via the environment variables `JBT_GITHUB_TOKEN` (checked first)
               or `GH_TOKEN` or `GITHUB_TOKEN`. This sample token, of course, will not work.
 
-:warning: Since the **Apply** button is hidden for Pull Requests (PRs) labelled **Ready to Commit (RTC)**,
-          the **Advanced mode** is enabled for newer Patch Tester versions.
-          But, this also enables the **Apply** button for PRs that require
-          additional steps (for example, running **Composer** or **NPM** builds).
+:warning: Since the `Apply` button is hidden by default for Pull Requests (PRs) labelled `Ready to Commit (RTC)`,
+          the *Advanced mode* is enabled for newer Patch Tester versions.<br />
+          On the other hand, this also enables the `Apply` button for PRs that require
+          additional steps (for example, running Composer or NPM builds).
           Please use with care and at your own responsibility.
 
 :fairy: *"You will need to reinstall the Joomla Patch Tester if, for example, you switch the database.
@@ -1039,11 +1039,12 @@ scripts/test 54 joomla-cypress
           the entire database content of the Joomla instance will be lost.
           See [Database and File System Consistency](#database-and-file-system-consistency) for more details.
 
-Running `joomla-cypress` Cypress tests without `installLanguage` and `installJoomlaMultiLanguage`
-on Joomla version 6.0 (if language packages are not yet available and tests would fail with error
-`Unable to detect manifest file.`):
+Skipping the Cypress tests `installLanguage` and `installJoomlaMultiLanguage` is required for
+Joomla versions that are not released yet (for example, Joomla 6.1 in January 2026), as the
+language packages are not yet available and the tests would fail with the error
+`Unable to detect manifest file.` Set the environment variable `CYPRESS_SKIP_INSTALL_LANGUAGES=1`:
 ```
-CYPRESS_SKIP_INSTALL_LANGUAGES=1 scripts/test 60 joomla-cypress
+CYPRESS_SKIP_INSTALL_LANGUAGES=1 scripts/test 61 joomla-cypress
 ```
 
 Running only the `user.cy.js` test spec file and watching the progress with NoVNC:
