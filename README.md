@@ -964,10 +964,9 @@ Other available options are:
 * `uninstall` to remove Joomla Patch Tester from Joomla instance (default is `install`).
 * Joomla Patch Tester version number, e.g. `4.4.0`, if you need to install an older version (default is latest version).
 
-:warning: Currently (January 2026) the following Patch Tester versions are usable:
+:point_right: Currently (January 2026) the following Patch Tester versions are usable:
 * Joomla 4.2 ... 4.4 – Patch Tester 4.3.3
-* Joomla 5.0 ... 5.4 – Patch Tester 4.4.0
-* Joomla 6.0 and 6.1 – Patch Tester 5.0.0 (latest)
+* Joomla 5 and 6 – Patch Tester 5.0.1 (latest)
 
 :fairy: *"If you do not provide the Patch Tester version number, the latest version is installed.
         If this fails, a second attempt is made with the known working Patch Tester version for your convenience."*
