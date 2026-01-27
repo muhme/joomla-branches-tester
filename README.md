@@ -419,7 +419,8 @@ Installing the Joomla Branches Tester on Ubuntu with a user that is able to run 
 
 The Joomla version installed in the web server container is configured with the following settings:
 
-- Joomla Super User: `ci-admin` with the password `joomla-17082005` (used from CI System Tests).
+- Joomla Super User *ci-admin* and the password *joomla-17082005*
+  (which includes Joomla!’s initial release date, its birthday) originate from the Continous Integration (CI) Joomla System Tests.
 - Used language Pack is English (United Kingdom) (`en-GB`).
 - The `installation` folder remains intact after the installation.
   - Earlier Joomla versions delete the `installation` folder after setup.
@@ -444,7 +445,7 @@ The Joomla version installed in the web server container is configured with the 
 From your Docker Host system you can test the Joomla Frontend e.g. for Joomla release 5.4
 with [http://host.docker.internal:7054](http://host.docker.internal:7054) and the backend
 [http://host.docker.internal:7054/administrator](http://host.docker.internal:7054/administrator).
-User *ci-admin* and password *joomla-17082005* (Whose birthday is it anyway?) are from Joomla System Tests.
+The Joomla Super User is *ci-admin* with the password *joomla-17082005*.
 
 For HTTPS add 100 to the port number,
 e.g. for Joomla 5.4 use [https://host.docker.internal:7154](https://host.docker.internal:7154).
