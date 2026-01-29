@@ -2,10 +2,9 @@
 #
 # patchtester.sh - Install or uninstall Joomla Patch Tester on all, one or multiple Docker containers, e.g.
 #   scripts/patchtester ghp_42g8n8uCZtplQNnbNrEWsTrFfQgYAU4711Tc
-#   scripts/patchtester 44 ghp_42g8n8uCZtplQNnbNrEWsTrFfQgYAU4711Tc
-#   scripts/patchtester 52 53 ghp_42g8n8uCZtplQNnbNrEWsTrFfQgYAU4711Tc
+#   scripts/patchtester 54 5.0.1
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 - 2025 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 - 2026 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -102,7 +101,7 @@ if $install; then
   if [ -z "${patchTesterVersion}" ]; then
     # Fetch the redirect URL for the latest release
     latest_tag_URL=$(curl -s -I https://github.com/${REPO}/releases/latest | grep -i Location | awk '{print $2}' | tr -d '\r')
-    # e.g. 4.3.3 from https://github.com/joomla-extensions/patchtester/releases/tag/4.3.3
+    # e.g. 5.0.1 from https://github.com/joomla-extensions/patchtester/releases/tag/5.0.1
     patchTesterVersion=$(basename "${latest_tag_URL}")
     log "The latest patch tester release puzzled out as ${patchTesterVersion}"
     patchTesterVersionIsLatest=true
@@ -136,8 +135,8 @@ for instance in "${instancesToInstall[@]}"; do
   fi
 
   # Install Patch Tester
-  if (( instance == 310 || instance <= 41 )); then
-    warning "jbt-${instance} – Joomla <= 4.1, skip the installation of Patch Tester"
+  if (( instance == 310 || instance < 50 )); then
+    warning "jbt-${instance} – Joomla >= 5 needed, skip the installation of Patch Tester"
     skipped=$((skipped + 1))
     continue
   fi
@@ -150,33 +149,7 @@ for instance in "${instancesToInstall[@]}"; do
     # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
     successful=$((successful + 1))
   else
-    # If this a known problem?
-    if $patchTesterVersionIsLatest; then
-      if [[ $instance -ge 42 && $instance -le 44 && "${patchTesterVersion}" != "4.3.3" ]]; then
-        # https://github.com/joomla-extensions/patchtester/issues/378
-        usePatchTesterVersion="4.3.3"
-      elif [[ $instance -ge 50 && $instance -le 54 && "${patchTesterVersion}" != "4.4.0" ]]; then
-        # https://github.com/joomla-extensions/patchtester/issues/383
-        usePatchTesterVersion="4.4.0"
-      else
-        error "jbt-${instance} – Failed to install Patch Tester version ${patchTesterVersion}"
-        failed=$((failed + 1))
-        continue
-      fi
-      warning "jbt-${instance} – Installation with latest Patch Tester version ${patchTesterVersion} failed, trying version ${usePatchTesterVersion}"
-      patchtester_url="https://github.com/${REPO}/releases/download/${usePatchTesterVersion}/com_patchtester_${usePatchTesterVersion}.tar.bz2"
-      log "Using URL '${patchtester_url}'"
-      if run_patchtester_install "$instance" "$usePatchTesterVersion" "$token" "${patchtester_url}"; then
-        log "jbt-${instance} – Patch Tester version ${usePatchTesterVersion} has been successfully installed"
-        # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu
-        successful=$((successful + 1))
-      else
-        error "jbt-${instance} – The installation of patch tester version ${usePatchTesterVersion} also failed"
-        failed=$((failed + 1))
-      fi
-    else
-      failed=$((failed + 1))
-    fi
+    failed=$((failed + 1))
   fi
 
 done

@@ -932,7 +932,7 @@ docker exec -it jbt-pg bash -c "PGPASSWORD=root psql -h fd00::13 -U root -d post
 ### Install Joomla Patch Tester
 
 For your convenience, the [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester)
-can be installed on the Joomla instances from version 4.2 onwards.
+can be installed on Joomla instances running version 5 or later.
 The script also sets the GitHub token, fetches the data and activates the Advanced Mode.
 This can be done without version number for all Joomla instances or for e.g. Joomla 6.0:
 
@@ -963,14 +963,8 @@ scripts/patchtester 60 install ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
 
 Other available options are:
 * `uninstall` to remove Joomla Patch Tester from Joomla instance (default is `install`).
-* Joomla Patch Tester version number, e.g. `4.4.0`, if you need to install an older version (default is latest version).
-
-:point_right: Currently (January 2026) the following Patch Tester versions are usable:
-* Joomla 4.2 ... 4.4 – Patch Tester 4.3.3
-* Joomla 5 and 6 – Patch Tester 5.0.1 (latest)
-
-:fairy: *"If you do not provide the Patch Tester version number, the latest version is installed.
-        If this fails, a second attempt is made with the known working Patch Tester version for your convenience."*
+* Joomla Patch Tester version number (e.g. `5.0.1`), if you need to install a specific version.
+  The default is the latest version.
 
 :point_right: Alternatively, to apply pull requests (PRs) you can also use:
   * JBTs `scripts/patch` script on development (git cloned) containers,
