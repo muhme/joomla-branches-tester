@@ -953,7 +953,7 @@ scripts/patchtester 60 install ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
               or `GH_TOKEN` or `GITHUB_TOKEN`. This sample token, of course, will not work.
 
 :warning: Since the `Apply` button is hidden by default for Pull Requests (PRs) labelled `Ready to Commit (RTC)`,
-          the *Advanced mode* is enabled for newer Patch Tester versions.<br />
+          the *Advanced mode* is enabled.<br />
           On the other hand, this also enables the `Apply` button for PRs that require
           additional steps (for example, running Composer or NPM builds).
           Please use with care and at your own responsibility.
