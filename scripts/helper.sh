@@ -559,13 +559,6 @@ function createDockerComposeFile() {
 
 }
 
-# docker-compose.yml is complete, check each Joomla Docker image for newest version, e.g. for PHP 8.5-RC4
-for version in "${versions[@]}"; do
-  instance=$(getMajorMinor "${version}")
-  din=$(dockerImageName "${version}" "${php_version}")
-  recreateContainersWhenNecessary "${instance}" "${din}" "jbt-${instance}"
-done
-
 # Returns existing Docker image name for given Joomla and PHP version.
 #   e.g. dockerImageName "4.4-dev" "php8.1" -> "php:8.1-apache"
 #   e.g. dockerImageName "3.9" "highest" -> "php:7.4-apache"
@@ -775,7 +768,7 @@ JBT_BOLD="\033[1m"
 JBT_RESET="\033[0m"
 
 # Is the 'NO_COLOR' environment variable set and non-empty?
-if [ -n "${NO_COLOR}" ]; then
+if [ -n "${NO_COLOR:-}" ]; then
   # Do not use color for log messages.
   JBT_UNDERLINE=""
   JBT_GREEN_BG=""

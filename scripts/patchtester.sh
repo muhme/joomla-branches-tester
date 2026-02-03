@@ -44,7 +44,6 @@ function run_patchtester_install() {
 allInstalledInstances=($(getAllInstalledInstances))
 
 patchTesterVersion=""
-patchTesterVersionIsLatest=false
 install=true
 instancesToInstall=()
 while [ $# -ge 1 ]; do
@@ -104,7 +103,6 @@ if $install; then
     # e.g. 5.0.1 from https://github.com/joomla-extensions/patchtester/releases/tag/5.0.1
     patchTesterVersion=$(basename "${latest_tag_URL}")
     log "The latest patch tester release puzzled out as ${patchTesterVersion}"
-    patchTesterVersionIsLatest=true
   else
     log "Using Patch Tester version ${patchTesterVersion}"
   fi
