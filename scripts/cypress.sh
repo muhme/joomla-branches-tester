@@ -5,7 +5,7 @@
 #   scripts/cypress 51 local            # Joomla System Tests on macOS and Ubuntu native
 #   scripts/cypress 52 joomla-cypress   # joomla-cypress tests
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2026 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -21,7 +21,7 @@ function help {
               The mandatory Joomla instance must be one of installed: ${allInstalledInstances[*]}.
               The optional 'local' argument runs Cypress on the Docker host (default: Docker container).
               The optional 'joomla-cypress' argument tests 'joomla-cypress' (default: Joomla System Tests).
-              The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
+              The optional argument 'help' displays this page. For full details see https://bit.ly/JBT--README.
     $(random_quote)"
 }
 

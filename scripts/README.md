@@ -14,7 +14,7 @@ LANG=ja scripts/database help
                The mandatory database variant must be one of: mysqli mysql mariadbi mariadb pgsql.
                The optional 'socket' argument configures database access via Unix socket (default is TCP host).
                Optional Joomla instances can include one or more of the following installed: 39 44 52 53 (default is all).
-               The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
+               The optional argument 'help' displays this page. For full details see https://bit.ly/JBT--README.
 
     "惚れた病に薬なし。", 不明
 

@@ -5,7 +5,7 @@
 #   scripts/graft 52 ~/Downloads/Joomla_5.2.0-alpha4-dev-Development-Full_Package.zip
 #   scripts/graft /tmp/Joomla_5.1.2-Stable-Full_Package.zip 51 pgsql
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2026 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -21,7 +21,7 @@ function help {
             The mandatory Joomla instance must be one of installed: ${allInstalledInstances[*]}.
             The Joomla package file (e.g. 'Joomla_5.1.2-Stable-Full_Package.zip') is also mandatory.
             Optional database variant can be one of: ${JBT_DB_VARIANTS[*]} (default is mariadbi).
-            The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
+            The optional argument 'help' displays this page. For full details see https://bit.ly/JBT--README.
     $(random_quote)"
 }
 

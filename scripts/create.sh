@@ -6,7 +6,7 @@
 #   create 52 53 php8.1 recreate
 #   create 52 https://github.com/Elfangor93/joomla-cms:mod_community_info
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2026 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -30,7 +30,7 @@ function help {
              The optional PHP version can be set to one of: ${valid_versions_without_highest[*]} (default is highest).
              The optional 'repository:branch' argument (default repository is https://github.com/joomla/joomla-cms).
              Optionally specify one or more patches (e.g., 'joomla-cypress-36'; default is unpatched).
-             The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
+             The optional argument 'help' displays this page. For full details see https://bit.ly/JBT--README.
     $(random_quote)"
 }
 

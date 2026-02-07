@@ -21,7 +21,7 @@ function help {
                   The optional Joomla version can be one or more of: ${allInstalledInstances[*]} (default is all).
                   The optional Patchtester version, e.g. 4.3.0 (default is latest).
                   The optional 'uninstall' argument to delete a Patch Tester installation (default is 'install').
-                  The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
+                  The optional argument 'help' displays this page. For full details see https://bit.ly/JBT--README.
     $(random_quote)"
 }
 

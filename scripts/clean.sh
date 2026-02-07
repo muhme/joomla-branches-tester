@@ -4,7 +4,7 @@
 #            Also deletes files and directories created by JBT.
 #            Works offline and for earlier JBT version created directories and containers.
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2026 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -18,7 +18,7 @@ function help {
   echo "
     clean – Stops and removes all JBT Docker containers, associated Docker networks, and Docker volumes.
             Also deletes JBT directories, such as 'run' and all 'joomla-*' directories.
-            The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
+            The optional argument 'help' displays this page. For full details see https://bit.ly/JBT--README.
     $(random_quote)"
 }
 

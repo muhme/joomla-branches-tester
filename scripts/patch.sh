@@ -2,7 +2,7 @@
 #
 # patch.sh - Apply Git patches in the repositories ‘joomla-cms’, ‘joomla-cypress’ or ‘joomla-framework/database’.
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2026 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -19,7 +19,7 @@ function help {
             If 'installation' option is given 'installation/joomla-cypress' is patched.
             The optional Joomla version can be one or more of: ${allInstalledInstances[*]} (default is all).
             Specify one or more patches e.g. 'joomla-cms-43968', 'joomla-cypress-33' or 'database-310'.
-            The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
+            The optional argument 'help' displays this page. For full details see https://bit.ly/JBT--README.
     $(random_quote)"
 }
 

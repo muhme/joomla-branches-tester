@@ -4,7 +4,7 @@
 #   setup.sh 53
 #   setup.sh 53 initial pgsql socket https://github.com/Elfangor93/joomla-cms:mod_community_info
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2026 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -23,7 +23,7 @@ function help {
                Optional initial 'repository:branch', e.g. https://github.com/Elfangor93/joomla-cms:mod_community_info.
                Optional initial 'socket' enables database access via Unix socket (default is TCP host).
                Optional 'unpatched' or one or multiple patches (default: ${JBT_DEFAULT_PATCHES[*]}).
-               The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
+               The optional argument 'help' displays this page. For full details see https://bit.ly/JBT--README.
     $(random_quote)"
 }
 

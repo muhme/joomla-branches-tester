@@ -2,7 +2,7 @@
 #
 # xdebug.sh - Switches the PHP installation with or without Xdebug in one or more Web Server containers.
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2026 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -17,7 +17,7 @@ function help {
     xdebug – Toggles the PHP installation with or without Xdebug in one or more Joomla web server containers.
              Mandatory argument must be 'on' or 'off'.
              The optional Joomla instance can include one or more of installed: ${allInstalledInstances[*]} (default is all).
-             The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
+             The optional argument 'help' displays this page. For full details see https://bit.ly/JBT--README.
     $(random_quote)"
 }
 

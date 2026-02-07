@@ -8,7 +8,7 @@
 #   scripts/test system 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
 #   ELECTRON_ENABLE_LOGGING=1 scripts/test system
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2026 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -29,7 +29,7 @@ function help {
            Specify an optional kind of test from: ${ALL_TESTS[*]}
            (defaults to ${ALL_JOOMLA_TESTS[*]}).
            Optional test spec file pattern for Cypress tests (defaults to all, but for 'system' without the installation step).
-           The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
+           The optional argument 'help' displays this page. For full details see https://bit.ly/JBT--README.
     $(random_quote)"
 }
 

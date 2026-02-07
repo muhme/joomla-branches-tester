@@ -2,7 +2,7 @@
 #
 # info - Retrieves Joomla Branches Tester status information.
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2026 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -20,7 +20,7 @@ function help {
            The optional 'base' argument only shows the details of the base Docker containers.
            The optional argument ‘history’ only shows the recorded activities of the Joomla branch tester.
            Optional Joomla instance arguments can be one or more of installed: ${allInstalledInstances[*]}.
-           The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
+           The optional argument 'help' displays this page. For full details see https://bit.ly/JBT--README.
            If no argument is provided, all information is displayed.
     $(random_quote)"
 }

@@ -5,7 +5,7 @@
 #   scripts/php 51 php8.2
 #   scripts/php 52 53 php8.3
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2026 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -20,7 +20,7 @@ function help {
     php – Changes the PHP version on all, one or multiple Joomla web server Docker containers.
           The mandatory PHP version must be one of: ${JBT_VALID_PHP_VERSIONS[*]}.
           The optional Joomla version can include one or more of installed: ${allInstalledInstances[*]} (default is all).
-          The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
+          The optional argument 'help' displays this page. For full details see https://bit.ly/JBT--README.
     $(random_quote)"
 }
 

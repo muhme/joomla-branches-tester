@@ -10,7 +10,7 @@
 #   joomla-${instance}/cypress.config.[m]js
 #   joomla-${instance}/cypress.config.local.[m]js
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2026 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -67,7 +67,7 @@ function help {
                The mandatory database variant must be one of: ${JBT_DB_VARIANTS[*]}.
                The optional 'socket' argument configures database access via Unix socket (default is TCP host).
                Optional Joomla instances can include one or more of the installed: ${allInstalledInstances[*]} (default is all).
-               The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
+               The optional argument 'help' displays this page. For full details see https://bit.ly/JBT--README.
     $(random_quote)"
 }
 

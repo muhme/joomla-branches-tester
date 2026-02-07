@@ -1,9 +1,8 @@
 #!/bin/bash
 #
 # versions - Displays available Joomla versions from branches and tags.
-
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 202-2025 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2026 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -16,7 +15,7 @@ source scripts/helper.sh
 function help {
   echo "
     versions – Displays available Joomla versions from branches and tags.
-               The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README.
+               The optional argument 'help' displays this page. For full details see https://bit.ly/JBT--README.
     $(random_quote)"
 }
 

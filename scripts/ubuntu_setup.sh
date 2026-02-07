@@ -11,9 +11,9 @@
 #       . usermod -aG sudo user
 #     . use RDP for GUI
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2026 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
-
+#
 # Run as a non-root user:
 #   git clone https://github.com/muhme/joomla-branches-tester
 #   cd joomla-branches-tester
@@ -23,7 +23,7 @@
 
 function help {
     echo "*** ubuntu_setup.sh – Installs all prerequisites for Joomla Branches Tester on Ubuntu"
-    echo "*** The optional argument 'help' displays this page. For full details see https://bit.ly/JBT-README."
+    echo "*** The optional argument 'help' displays this page. For full details see https://bit.ly/JBT--README."
 }
 
 while [ $# -ge 1 ]; do
