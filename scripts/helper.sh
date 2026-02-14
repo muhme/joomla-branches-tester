@@ -2,7 +2,7 @@
 #
 # helper.sh - General-purpose helper functions for various tasks across all bash scripts.
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2026 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ "${BASH_SOURCE[0]}" = "${0}" ]]; then
@@ -18,8 +18,9 @@ JBT_TMP_FILE=/tmp/$(basename "$0").$$
 trap 'rm -rf $JBT_TMP_FILE' 0
 
 # Cypress version 15.7.1 now contains Firefox on ARM images
+# Cypress version 15.10.0 contains Cypress.expose()
 declare -r \
-  JBT_INSTALLATION_CYPRESS_VERSION="15.7.1"
+  JBT_INSTALLATION_CYPRESS_VERSION="15.10.0"
 
 # The following five arrays are positionally mapped, avoiding associative arrays
 # to ensure compatibility with macOS default Bash 3.2.
