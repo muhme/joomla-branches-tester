@@ -114,6 +114,8 @@ log "jbt-${instance} – Configure PHP to use jbt-proxy"
 #
 # zip and zstd only to be able to run build
 # msmtp and msmtp-mta to be able to use email configurations PHP and sendmail too
+# The PHP calendar extension is required for languages that do not use the Gregorian calendar.
+# see https://github.com/joomla/joomla-cms/issues/46922
 #
 log "jbt-${instance} – Installing packages"
 docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
@@ -150,6 +152,7 @@ docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
       intl \
       xsl \
       bz2 \
+      calendar \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*'
 
