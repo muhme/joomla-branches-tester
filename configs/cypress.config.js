@@ -8,28 +8,40 @@
  */
 const { defineConfig } = require('../node_modules/cypress');
 
+const sharedEnv = {
+  // Standard Joomla System Tests variables
+  sitename: 'Joomla CMS Test',
+  name: 'set by scripts/database.sh',
+  email: 'set by scripts/database.sh',
+  username: 'ci-admin',
+  password: 'joomla-17082005',
+  db_type: 'set by scripts/database.sh',
+  db_host: 'set by scripts/database.sh',
+  db_port: 'set by scripts/database.sh',
+  db_name: 'set by scripts/database.sh',
+  db_user: 'root',
+  db_password: 'set by scripts/database.sh',
+  db_prefix: 'set by scripts/database.sh',
+  smtp_host: 'set by scripts/database.sh',
+  smtp_port: 'set by scripts/database.sh',
+  cmsPath: '.',
+  // JBT added variables
+  instance: 'set by scripts/database.sh',
+  installationPath: 'set by scripts/database.sh'
+};
+
 module.exports = defineConfig({
-  env: {
-    // Standard Joomla System Tests variables
-    sitename: 'Joomla CMS Test',
-    name: 'set by scripts/database.sh',
-    email: 'set by scripts/database.sh',
-    username: 'ci-admin',
-    password: 'joomla-17082005',
-    db_type: 'set by scripts/database.sh',
-    db_host: 'set by scripts/database.sh',
-    db_port: 'set by scripts/database.sh',
-    db_name: 'set by scripts/database.sh',
-    db_user: 'root',
-    db_password: 'set by scripts/database.sh',
-    db_prefix: 'set by scripts/database.sh',
-    smtp_host: 'set by scripts/database.sh',
-    smtp_port: 'set by scripts/database.sh',
-    cmsPath: '.',
-    // JBT added variables
-    instance: 'set by scripts/database.sh',
-    installationPath: 'set by scripts/database.sh'
-  },
+ /* 
+   * env is required before Cypress 15.10 and used by JBT (e.g. installJoomla.cy.js).
+   *
+   * expose is required starting with Cypress 15.10 together with
+   * joomla-cypress 2.0.0 and JBT (e.g. installPatchTester.cy.js).
+   *
+   * To be honest, I do not fully understand the exact internal reason,
+   * so we define both to stay compatible with all combinations for the moment.
+   */
+  env: sharedEnv,
+  expose: sharedEnv,
   e2e: {
     baseUrl: 'set by scripts/database.sh',
     supportFile: false,
