@@ -56,8 +56,8 @@ declare -ar \
 # The highest PHP version usable for Joomla major-minor version (the two arrays correspond via the index).
 # If a new Joomla version is created and not existing in this list, default is used in dockerImageName().
 declare -ar \
-  JBT_JOOMLA_VERSIONS=("39" "310" "40" "41" "42" "43" "44" "50" "51" "52" "53" "54" "60" "61") \
-  JBT_PHP_VERSIONS=("7.4" "8.0" "8.0" "8.0" "8.1" "8.2" "8.2" "8.2" "8.3" "8.3" "8.4" "8.4" "8.4" "8.4")
+  JBT_JOOMLA_VERSIONS=("39" "310" "40" "41" "42" "43" "44" "50" "51" "52" "53" "54" "60" "61" "70") \
+  JBT_PHP_VERSIONS=("7.4" "8.0" "8.0" "8.0" "8.1" "8.2" "8.2" "8.2" "8.3" "8.3" "8.4" "8.4" "8.4" "8.4" "8.4")
 
 # Base Docker containers (without the Joomla web server containers), eg
 # ("jbt-pga" "jbt-mya" "jbt-mysql" "jbt-madb" "jbt-pg" "jbt-relay" "jbt-mail" "jbt-cypress" "jbt-novnc")
