@@ -49,15 +49,15 @@ declare -ar \
 
 # Valid PHP versions.
 # (not 5.6 - 7.3 as there are problems and for lowest supported Joomla 3.9.0 there is PHP 7.4 available and working)
-# TODO: 20 Nov 2025 to be changed once PHP 8.5 is released
 declare -ar \
   JBT_VALID_PHP_VERSIONS=("php7.4" "php8.0" "php8.1" "php8.2" "php8.3" "php8.4" "php8.5" "highest")
 
 # The highest PHP version usable for Joomla major-minor version (the two arrays correspond via the index).
 # If a new Joomla version is created and not existing in this list, default is used in dockerImageName().
+# 6 March 2026: Starting with Joomla 5.4 we are now using PHP 8.5
 declare -ar \
-  JBT_JOOMLA_VERSIONS=("39" "310" "40" "41" "42" "43" "44" "50" "51" "52" "53" "54" "60" "61" "70") \
-  JBT_PHP_VERSIONS=("7.4" "8.0" "8.0" "8.0" "8.1" "8.2" "8.2" "8.2" "8.3" "8.3" "8.4" "8.4" "8.4" "8.4" "8.4")
+  JBT_JOOMLA_VERSIONS=("39" "310" "40" "41" "42" "43" "44" "50" "51" "52" "53" "54" "60" "61" "62" "70") \
+  JBT_PHP_VERSIONS=("7.4" "8.0" "8.0" "8.0" "8.1" "8.2" "8.2" "8.2" "8.3" "8.3" "8.4" "8.5" "8.5" "8.5" "8.5" "8.5")
 
 # Base Docker containers (without the Joomla web server containers), eg
 # ("jbt-pga" "jbt-mya" "jbt-mysql" "jbt-madb" "jbt-pg" "jbt-relay" "jbt-mail" "jbt-cypress" "jbt-novnc")
