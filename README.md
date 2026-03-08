@@ -430,7 +430,7 @@ The Joomla version installed in the web server container is configured with the 
 - 'Error Reporting' is set to `Maximum` in `Global Configuration | Server`.
   'Debug System' is enabled in `Global Configuration | System` and 'Log Almost Everything'
   is enabled in `Global Configuration | Logging`. PHP log file is configured as `administration/log/php.log`.
-- A cron job is configured to run the Joomla Task Scheduler every minute.
+- A cron job is configured to run the Joomla Task Scheduler every minute and Lazy Scheduler is disabled.
 - The 'System - Joomla! Statistics' plugin is disabled to prevent prompting users on the backend Home Dashboard.
 - All the 'Behaviour - Backward Compatibility' plugins are disabled to detect backward compatibility issues
   (see [installation/disableBC.cy.js](installation/disableBC.cy.js)).
