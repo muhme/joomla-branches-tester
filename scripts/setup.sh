@@ -367,17 +367,7 @@ if ! docker exec "jbt-${instance}" bash -c "(crontab -l 2>/dev/null || echo '') 
     echo '# Joomla Task Scheduler, ignore exit status e.g. 127 No tasks due!';
     echo \"$cronjob\" ) | crontab -"
 fi
-
-log "jbt-${instance} – Disable Lazy Scheduler"
-if ! docker exec jbt-cypress sh -c "cd /jbt/installation && \
-      CYPRESS_CACHE_FOLDER=/jbt/cypress-cache \
-      DISPLAY=jbt-novnc:0 \
-      ELECTRON_ENABLE_LOGGING=1 \
-      CYPRESS_specPattern='/jbt/installation/disableLazyScheduler.cy.js' \
-      npx cypress run --headed \
-                      --config-file '/jbt/installation/joomla-${instance}/cypress.config.js'"; then
-  error "jbt-${instance} – Ignoring the failed disabling of the lazy scheduler'."
-fi
+# Lazy Scheduler is disabled in database.sh
 
 log "jbt-${instance} – Set container prompt"
 docker exec "jbt-${instance}" bash -c "echo PS1=\'jbt-${instance} \# \' >> ~/.bashrc" || true # Who cares?

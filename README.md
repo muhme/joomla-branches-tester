@@ -432,10 +432,8 @@ The Joomla version installed in the web server container is configured with the 
   is enabled in `Global Configuration | Logging`. PHP log file is configured as `administration/log/php.log`.
 - A cron job is configured to run the Joomla Task Scheduler every minute and Lazy Scheduler is disabled.
 - The 'System - Joomla! Statistics' plugin is disabled to prevent prompting users on the backend Home Dashboard.
-- All the 'Behaviour - Backward Compatibility' plugins are disabled to detect backward compatibility issues
-  (see [installation/disableBC.cy.js](installation/disableBC.cy.js)).
-- Joomla 6 update notification is snoozed for all users, if present
-  (see see [installation/snoozeUpdateNotification.cy.js](installation/snoozeUpdateNotification.cy.js)).
+- All the 'Behaviour - Backward Compatibility' plugins are disabled to detect backward compatibility issues.
+- Joomla 6 update notification is snoozed for all users, if present.
 - The automatic run of the 'Welcome to Joomla!' guided tour is canceled from Joomla version 5.1 onwards.
 - Using 'filesystem' for session handler to prevent logging in again after a few minutes,
   for whatever reason this differs from 'database'.

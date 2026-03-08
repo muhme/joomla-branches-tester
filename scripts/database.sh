@@ -260,6 +260,17 @@ for instance in "${instancesToChange[@]}"; do
   # log "jbt-${instance} – Configure Joomla with 'Debug System', 'Log Almost Everything' and 'Log Deprecated API'"
   # -e 's/\$log_deprecated = .*/\$log_deprecated = 1;/' \
 
+  log "jbt-${instance} – Disable Lazy Scheduler (as we are triggered with native cron)"
+  if ! docker exec jbt-cypress sh -c "cd /jbt/installation && \
+        CYPRESS_CACHE_FOLDER=/jbt/cypress-cache \
+        DISPLAY=jbt-novnc:0 \
+        ELECTRON_ENABLE_LOGGING=1 \
+        CYPRESS_specPattern='/jbt/installation/disableLazyScheduler.cy.js' \
+        npx cypress run --headed \
+                        --config-file '/jbt/installation/joomla-${instance}/cypress.config.js'"; then
+    error "jbt-${instance} – Ignoring the failed disabling of the lazy scheduler'."
+  fi
+
   log "jbt-${instance} – Changing ownership to www-data for all files and directories (in background)"
   # Following error seen on macOS, we ignore it as it does not matter, these files are 444
   # chmod: changing permissions of '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
