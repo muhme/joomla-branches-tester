@@ -260,15 +260,18 @@ for instance in "${instancesToChange[@]}"; do
   # log "jbt-${instance} – Configure Joomla with 'Debug System', 'Log Almost Everything' and 'Log Deprecated API'"
   # -e 's/\$log_deprecated = .*/\$log_deprecated = 1;/' \
 
-  log "jbt-${instance} – Disable Lazy Scheduler (as we are triggered with native cron)"
-  if ! docker exec jbt-cypress sh -c "cd /jbt/installation && \
-        CYPRESS_CACHE_FOLDER=/jbt/cypress-cache \
-        DISPLAY=jbt-novnc:0 \
-        ELECTRON_ENABLE_LOGGING=1 \
-        CYPRESS_specPattern='/jbt/installation/disableLazyScheduler.cy.js' \
-        npx cypress run --headed \
-                        --config-file '/jbt/installation/joomla-${instance}/cypress.config.js'"; then
-    error "jbt-${instance} – Ignoring the failed disabling of the lazy scheduler'."
+  # Starting with Joomla 4.1 disable Lazy Scheduler
+  if (( instance != 310 && instance >= 41 )); then
+    log "jbt-${instance} – Disable Lazy Scheduler (as we are triggered with native cron)"
+    if ! docker exec jbt-cypress sh -c "cd /jbt/installation && \
+          CYPRESS_CACHE_FOLDER=/jbt/cypress-cache \
+          DISPLAY=jbt-novnc:0 \
+          ELECTRON_ENABLE_LOGGING=1 \
+          CYPRESS_specPattern='/jbt/installation/disableLazyScheduler.cy.js' \
+          npx cypress run --headed \
+                          --config-file '/jbt/installation/joomla-${instance}/cypress.config.js'"; then
+      error "jbt-${instance} – Ignoring the failed disabling of the lazy scheduler'."
+    fi
   fi
 
   log "jbt-${instance} – Changing ownership to www-data for all files and directories (in background)"
