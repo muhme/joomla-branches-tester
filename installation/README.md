@@ -11,7 +11,6 @@ The Joomla installation itself and more actions are implemented by Cypress scrip
 | [installJoomla.cy.js](installJoomla.cy.js) | Installs Joomla version 3.19 and higher. | Used by `scripts/database.sh`. |
 | [installPatchtester.cy.js](installPatchtester.cy.js) | Install and configure Joomla Patch Tester component. | Used by `scripts/patchtester.sh`. |
 
-
 * The **node_modules** directory is created initially using `npm ci` for Cypress.
 * The **joomla-cypress** directory is created initially from
   [joomla-cypress](https://github.com/joomla-projects/joomla-cypress) support package as a clone of the `main` branch
@@ -20,13 +19,13 @@ The Joomla installation itself and more actions are implemented by Cypress scrip
 * The **joomla-*** directories contain the JBT installation environment's `cypress.config.js` file and a copy
   of the Joomla `installation` folder. If a Joomla installation folder is deleted it is restored from this place.
 
-  ## Testing
+## Testing
 
-  You can run and watch the Cypress scripts by your own, e.g.
-  ```
-  docker exec jbt-cypress sh -c "cd /jbt/installation && \
-    CYPRESS_CACHE_FOLDER=/jbt/cypress-cache \
-    DISPLAY=jbt-novnc:0 \
-    CYPRESS_specPattern='/jbt/installation/disableLazyScheduler.cy.js' \
-    npx cypress run --headed --config-file '/jbt/installation/joomla-54/cypress.config.js'"
+You can run and watch the Cypress scripts by your own, e.g.
+```
+docker exec jbt-cypress sh -c "cd /jbt/installation && \
+  CYPRESS_CACHE_FOLDER=/jbt/cypress-cache \
+  DISPLAY=jbt-novnc:0 \
+  CYPRESS_specPattern='/jbt/installation/disableLazyScheduler.cy.js' \
+  npx cypress run --headed --config-file '/jbt/installation/joomla-54/cypress.config.js'"
 ```
