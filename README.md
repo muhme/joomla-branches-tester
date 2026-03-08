@@ -19,7 +19,7 @@ where we'll explore the numerous options, parameters and configurations that pow
 
 ## Software Architecture
 Within [Docker](https://www.docker.com/) container environment you are able to:
-* Choose from more than 300 different Joomla versions, based on the Git development branches or Git tags (Joomla 3.9.0 ... 6.1-dev).
+* Choose from more than 300 different Joomla versions, based on the Git development branches or Git tags (Joomla 3.9.0 ... 7.0-dev).
 * Working with one Joomla version or up to 14 Joomla versions in parallel.
 * Manual testing, including database and network inspections.
 * Switch between SMTP, Sendmail and PHP Mailer and read all collected emails in MailDev.
@@ -70,7 +70,7 @@ Ensure that your current working directory is always the `joomla-branches-tester
 By default (without specifying a Joomla version number) `scripts/create` takes all **used** Joomla development branches.
 **Used** Joomla development branches refer to the GitHub [joomla-cms](https://github.com/joomla/joomla-cms) repository,
 including default, active and stale branches.
-In October 2025, these are `5.4-dev`, `6.0-dev` and `6.1-dev`.
+In March 2026, these are `5.4-dev`, `6.0-dev`, `6.1-dev`, `6.2-dev` and `7.0-dev`.
 
 :point_right: Since **used** branches are subject to frequent changes,
               the latest version numbers are always be retrieved directly from the `joomla-cms` repository.
@@ -134,8 +134,8 @@ The abbreviation `jbt` stands for Joomla Branches Tester.
 |jbt-310| 10.0.3.10<br />fd00::310 | **[7310](http://host.docker.internal:7310/administrator)**<br />**[7410](https://host.docker.internal:7410/administrator)** | /joomla-310 | Web Server Joomla e.g. tag 3.10.12<br />user ci-admin / joomla-17082005 |
 | ... | | | | |
 |jbt-54| 10.0.0.54<br />fd00::54 | **[7054](http://host.docker.internal:7054/administrator)**<br />**[7154](https://host.docker.internal:7154/administrator)** | /joomla-54 | Web Server Joomla e.g. 5.4-dev<br />user ci-admin / joomla-17082005 |
-|jbt-60| 10.0.0.60<br />fd00::60 | **[7060](http://host.docker.internal:7060/administrator)**<br />**[7160](https://host.docker.internal:7160/administrator)** | /joomla-60 | Web Server Joomla e.g. 6.0-dev<br />user ci-admin / joomla-17082005 |
-|jbt-61| 10.0.0.61<br />fd00::61 | **[7061](http://host.docker.internal:7061/administrator)**<br />**[7161](https://host.docker.internal:7161/administrator)** | /joomla-61 | Web Server Joomla e.g. 6.1-dev<br />user ci-admin / joomla-17082005 |
+| ... | | | | |
+|jbt-70| 10.0.0.70<br />fd00::70 | **[7070](http://host.docker.internal:7070/administrator)**<br />**[7170](https://host.docker.internal:7170/administrator)** | /joomla-70 | Web Server Joomla e.g. 7.0-dev<br />user ci-admin / joomla-17082005 |
 
 :eight_spoked_asterisk: The directories are available on the Docker host inside `/jbt` to:
 * Inspect and change the configuration files (`configuration.php` or `cypress.config.mjs`),
@@ -611,9 +611,9 @@ scripts/test system administrator/components/com_users/Users.cy.js
 :point_right: When specifying a single test spec file,
               you can omit the `tests/System/integration/` path at the beginning.
 
-Test all `site` specs with Microsoft Edge in the Joomla instances 5.4, 6.0 and 6.1 using a pattern:
+Test all `site` specs with Microsoft Edge in the Joomla instances 5.4, 6.1 and 7.0 using a pattern:
 ```
-scripts/test 54 60 61 system edge 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
+scripts/test 54 61 70 system edge 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
 ```
 
 One more optional argument is `novnc`.
@@ -1032,7 +1032,7 @@ scripts/test 54 joomla-cypress
           See [Database and File System Consistency](#database-and-file-system-consistency) for more details.
 
 Skipping the Cypress tests `installLanguage` and `installJoomlaMultiLanguage` is required for
-Joomla versions that are not released yet (for example, Joomla 6.1 in January 2026), as the
+Joomla versions that are not released yet (for example, Joomla 7.0 in March 2026), as the
 language packages are not yet available and the tests would fail with the error
 `Unable to detect manifest file.` Set the environment variable `CYPRESS_SKIP_INSTALL_LANGUAGES=1`:
 ```
