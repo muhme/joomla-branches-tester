@@ -19,6 +19,7 @@ function help {
     setup.sh – Sets up the web server Docker container internally, used by 'scripts/create' and 'scripts/php'.
                Please specify a Joomla version. Choose one of the available versions listed in 'scripts/version'.
                Optional 'initial' argument for first-time installation.
+               Optional 'empty' argument for no Joomla installation.
                Optional initial database variant: ${JBT_DB_VARIANTS[*]} (default is mariadbi).
                Optional initial 'repository:branch', e.g. https://github.com/Elfangor93/joomla-cms:mod_community_info.
                Optional initial 'socket' enables database access via Unix socket (default is TCP host).
@@ -30,6 +31,7 @@ function help {
 # Defaults to use MariaDB with MySQLi database driver, to use cache and highest PHP version
 database_variant="mariadbi"
 initial=false
+empty=false
 socket=false
 unpatched=false
 patches=()
@@ -44,6 +46,9 @@ while [ $# -ge 1 ]; do
   elif [ "$1" = "initial" ]; then
     initial=true
     shift # Argument is eaten as to install first time.
+  elif [ "$1" = "empty" ]; then
+    empty=true
+    shift # Argument is eaten as option empty.
   elif [ "$1" = "socket" ]; then
     socket=true
     shift # Argument is eaten as use database with socket.
@@ -266,82 +271,86 @@ docker exec "jbt-${instance}" bash -c 'apt-get update -qq && \
     curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt-get install -y cron git unzip vim nodejs iputils-ping iproute2 telnet net-tools'
 
-if $initial; then
-  if [ -z "${arg_repository}" ]; then
-    git_repository="https://github.com/joomla/joomla-cms"
-    git_branch=$(fullName "${version}")
-  else
-    git_repository="$arg_repository"
-    git_branch="${arg_branch}"
-  fi
-  # Starting here with a shallow clone for speed and space; unshallow in 'scripts/patch' if patches are to be applied
-  log "jbt-${instance} – Git shallow cloning ${git_repository}:${git_branch} into the 'joomla-${instance}' directory"
-  docker exec "jbt-${instance}" bash -c "\
-    rm -rf /var/www/html/* /var/www/html/.??*; \
-    git clone -b ${git_branch} --depth 1 ${git_repository} /var/www/html"
+if $empty; then
+  log "jbt-${instance} – Skipping Joomla clone"
+else
+  if $initial; then
+    if [ -z "${arg_repository}" ]; then
+      git_repository="https://github.com/joomla/joomla-cms"
+      git_branch=$(fullName "${version}")
+    else
+      git_repository="$arg_repository"
+      git_branch="${arg_branch}"
+    fi
+    # Starting here with a shallow clone for speed and space; unshallow in 'scripts/patch' if patches are to be applied
+    log "jbt-${instance} – Git shallow cloning ${git_repository}:${git_branch} into the 'joomla-${instance}' directory"
+    docker exec "jbt-${instance}" bash -c "\
+      rm -rf /var/www/html/* /var/www/html/.??*; \
+      git clone -b ${git_branch} --depth 1 ${git_repository} /var/www/html"
 
-  if ((instance != 310 && instance >= 50)); then
-    version_file="joomla-${instance}/libraries/src/Version.php"
-    if grep -q "DEV_STATUS = 'Stable'" "${version_file}"; then
-      log "jbt-${instance} – Change DEV_STATUS from 'Stable' to 'JBT' to login even with installation folder"
-      sed -e "s/DEV_STATUS = 'Stable'/DEV_STATUS = 'JBT'/" "${version_file}" > "${JBT_TMP_FILE}" && \
-        cp "${JBT_TMP_FILE}" "${version_file}"
+    if ((instance != 310 && instance >= 50)); then
+      version_file="joomla-${instance}/libraries/src/Version.php"
+      if grep -q "DEV_STATUS = 'Stable'" "${version_file}"; then
+        log "jbt-${instance} – Change DEV_STATUS from 'Stable' to 'JBT' to login even with installation folder"
+        sed -e "s/DEV_STATUS = 'Stable'/DEV_STATUS = 'JBT'/" "${version_file}" > "${JBT_TMP_FILE}" && \
+          cp "${JBT_TMP_FILE}" "${version_file}"
+      fi
     fi
   fi
-fi
 
-log "jbt-${instance} – Git configure '/var/www/html' as safe directory"
-docker exec "jbt-${instance}" bash -c "git config --global --add safe.directory \"/var/www/html\""
+  log "jbt-${instance} – Git configure '/var/www/html' as safe directory"
+  docker exec "jbt-${instance}" bash -c "git config --global --add safe.directory \"/var/www/html\""
 
-# Running composer install even if we are not initial - just in case.
-if [ -f "joomla-${instance}/composer.json" ]; then
-  log "jbt-${instance} – Running composer install"
-  docker exec "jbt-${instance}" bash -c "cd /var/www/html && \
-    php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\" && \
-    php composer-setup.php && \
-    rm composer-setup.php && \
-    mv composer.phar /usr/local/bin/composer"
-    if $with_xdebug; then
-      docker exec "jbt-${instance}" bash -c "cd /var/www/html && \
-        cp -p /usr/local/bin/composer /usr/local-with-xdebug/bin/composer"
+  # Running composer install even if we are not initial - just in case.
+  if [ -f "joomla-${instance}/composer.json" ]; then
+    log "jbt-${instance} – Running composer install"
+    docker exec "jbt-${instance}" bash -c "cd /var/www/html && \
+      php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\" && \
+      php composer-setup.php && \
+      rm composer-setup.php && \
+      mv composer.phar /usr/local/bin/composer"
+      if $with_xdebug; then
+        docker exec "jbt-${instance}" bash -c "cd /var/www/html && \
+          cp -p /usr/local/bin/composer /usr/local-with-xdebug/bin/composer"
+      fi
+    docker exec "jbt-${instance}" bash -c "cd /var/www/html && composer install" ||
+      (log 'composer install failed on the first attempt; give it a second try' &&
+        docker exec "jbt-${instance}" bash -c "cd /var/www/html && composer install")
+    # There is a race condition (perhaps with the parallel downloads), some times composer install fails:
+    # "Failed to open directory: No such file or directory"
+    # As the second run was always successful, we try it directly.
+  fi
+
+  if $initial; then
+    # npm clean install only initial, with switching PHP version nothing changed for JavaScript
+    if [ -f "joomla-${instance}/package.json" ]; then
+      log "jbt-${instance} – Running npm clean install"
+      docker exec "jbt-${instance}" bash -c 'cd /var/www/html && npm ci'
     fi
-  docker exec "jbt-${instance}" bash -c "cd /var/www/html && composer install" ||
-    (log 'composer install failed on the first attempt; give it a second try' &&
-      docker exec "jbt-${instance}" bash -c "cd /var/www/html && composer install")
-  # There is a race condition (perhaps with the parallel downloads), some times composer install fails:
-  # "Failed to open directory: No such file or directory"
-  # As the second run was always successful, we try it directly.
-fi
 
-if $initial; then
-  # npm clean install only initial, with switching PHP version nothing changed for JavaScript
-  if [ -f "joomla-${instance}/package.json" ]; then
-    log "jbt-${instance} – Running npm clean install"
-    docker exec "jbt-${instance}" bash -c 'cd /var/www/html && npm ci'
+    if [ "$unpatched" = true ]; then
+      log "jbt-${instance} – Installation remains unpatched"
+    else
+      log "jbt-${instance} – Patching the installation with ${patches[*]}"
+      scripts/patch.sh "${instance}" "${patches[@]}"
+    fi
   fi
 
-  if [ "$unpatched" = true ]; then
-    log "jbt-${instance} – Installation remains unpatched"
-  else
-    log "jbt-${instance} – Patching the installation with ${patches[*]}"
-    scripts/patch.sh "${instance}" "${patches[@]}"
+  # Needed on Windows WSL2 Ubuntu to be able to run Joomla Web Installer
+  log "jbt-${instance} – Changing ownership to 'www-data' for all files and directories"
+  # Following error seen on macOS, we ignore it as it does not matter, these files are 444
+  # chmod: changing permissions of
+  #   '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
+  docker exec "jbt-${instance}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true'
+
+  if [[ -d "joomla-${instance}/installation" && ! -d "installation/joomla-${instance}/installation" ]]; then
+    # Save the Joomla 'installation' directory to preserve it for the next Joomla installation,
+    # e.g. switching the database after grafting.
+    log "jbt-${instance} – Creating a backup of the Joomla 'installation' directory into 'installation/joomla-${instance}'"
+    docker exec "jbt-${instance}" bash -c "\
+      mkdir -p '/jbt/installation/joomla-${instance}' && \
+      cp -r installation /jbt/installation/joomla-${instance}"
   fi
-fi
-
-# Needed on Windows WSL2 Ubuntu to be able to run Joomla Web Installer
-log "jbt-${instance} – Changing ownership to 'www-data' for all files and directories"
-# Following error seen on macOS, we ignore it as it does not matter, these files are 444
-# chmod: changing permissions of
-#   '/var/www/html/.git/objects/pack/pack-b99d801ccf158bb80276c7a9cf3c15217dfaeb14.pack': Permission denied
-docker exec "jbt-${instance}" bash -c 'chown -R www-data:www-data /var/www/html >/dev/null 2>&1 || true'
-
-if [[ -d "joomla-${instance}/installation" && ! -d "installation/joomla-${instance}/installation" ]]; then
-  # Save the Joomla 'installation' directory to preserve it for the next Joomla installation,
-  # e.g. switching the database after grafting.
-  log "jbt-${instance} – Creating a backup of the Joomla 'installation' directory into 'installation/joomla-${instance}'"
-  docker exec "jbt-${instance}" bash -c "\
-    mkdir -p '/jbt/installation/joomla-${instance}' && \
-    cp -r installation /jbt/installation/joomla-${instance}"
 fi
 
 # Joomla container needs to be restarted
@@ -350,11 +359,14 @@ docker restart "jbt-${instance}"
 
 # Configure and install Joomla with desired database variant
 if $initial; then
+  database_script_args=("${instance}" "${database_variant}")
   if [ "${socket}" = true ]; then
-    scripts/database.sh "${instance}" "${database_variant}" "socket"
-  else
-    scripts/database.sh "${instance}" "${database_variant}"
+    database_script_args+=("socket")
   fi
+  if [ "${empty}" = true ]; then
+    database_script_args+=("empty")
+  fi
+  scripts/database.sh "${database_script_args[@]}"
 fi
 
 # Define the cron job entry

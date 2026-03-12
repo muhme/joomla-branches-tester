@@ -467,6 +467,23 @@ function adjustJoomlaConfigurationForJBT() {
   fi
 }
 
+# Enable Joomla logging and debug
+#
+function configureJoomlaDebugAndLog() {
+  local instance="$1"
+
+  log "jbt-${instance} – Configure Joomla with 'Debug System' and 'Log Almost Everything' (but not 'Log Deprecated API')"
+  docker exec "jbt-${instance}" bash -c "cd /var/www/html && sed \
+    -e 's/\$debug = .*/\$debug = true;/' \
+    -e 's/\$log_everything = .*/\$log_everything = 1;/' \
+    configuration.php > configuration.php.tmp && \
+    mv configuration.php.tmp configuration.php"
+  # Not configure Joomla 'Log Deprecated API' as running System Tests 5.4 in Sep 2025 with 574 tests results
+  # in over one million log entries respective nearly 300 MB log file size.
+  # log "jbt-${instance} – Configure Joomla with 'Debug System', 'Log Almost Everything' and 'Log Deprecated API'"
+  # -e 's/\$log_deprecated = .*/\$log_deprecated = 1;/' \
+}
+
 # Deletes a service entry in a Docker compose file.
 # Silently ignores if the service does not exist.
 # 1st argument is service name, e.g. "5.4-dev"
@@ -763,7 +780,7 @@ function random_quote() {
 #
 JBT_UNDERLINE="\033[4m"
 JBT_GREEN_BG="\033[42m"
-JBT_ORANGE="\033[38;5;208m"
+JBT_ORANGE="\033[38;5;130m"
 JBT_RED="\033[0;31m"
 JBT_BOLD="\033[1m"
 JBT_RESET="\033[0m"

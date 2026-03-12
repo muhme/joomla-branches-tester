@@ -66,12 +66,14 @@ function help {
     database – Changes the database and driver for all, one or multiple Joomla web server containers.
                The mandatory database variant must be one of: ${JBT_DB_VARIANTS[*]}.
                The optional 'socket' argument configures database access via Unix socket (default is TCP host).
+               The optional 'empty' argument skips Cypress Joomla installation and configuration.
                Optional Joomla instances can include one or more of the installed: ${allInstalledInstances[*]} (default is all).
                The optional argument 'help' displays this page. For full details see https://bit.ly/JBT--README.
     $(random_quote)"
 }
 
 socket=false
+empty=false
 instancesToChange=()
 # shellcheck disable=SC2207 # There are no spaces in version numbers
 allInstalledInstances=($(getAllInstalledInstances))
@@ -91,6 +93,9 @@ while [ $# -ge 1 ]; do
       dbport=""
     fi
     shift # Argument is eaten as use database vwith socket.
+  elif [ "$1" = "empty" ]; then
+    empty=true
+    shift # Argument is eaten as option empty.
   elif isValidVariant "$1"; then
     dbvariant="$1"
     dbtype=$(dbTypeForVariant "${dbvariant}")
@@ -182,6 +187,11 @@ for instance in "${instancesToChange[@]}"; do
                            "7325"
   fi
 
+  if [ "${empty}" = true ]; then
+    log "jbt-${instance} – Joomla installation and configuration skipped"
+    continue
+  fi
+
   # Since the database will be new, we clean up autoload classes cache file and
   # all com_patchtester directories to prevent the next installation to be fail.
   # Again in Docker container as www-data user.
@@ -248,17 +258,7 @@ for instance in "${instancesToChange[@]}"; do
     fi
   fi
 
-  # Enable Joomla logging
-  log "jbt-${instance} – Configure Joomla with 'Debug System' and 'Log Almost Everything' (but not 'Log Deprecated API')"
-  docker exec "jbt-${instance}" bash -c "cd /var/www/html && sed \
-    -e 's/\$debug = .*/\$debug = true;/' \
-    -e 's/\$log_everything = .*/\$log_everything = 1;/' \
-    configuration.php > configuration.php.tmp && \
-    mv configuration.php.tmp configuration.php"
-  # Not configure Joomla 'Log Deprecated API' as running System Tests 5.4 in Sep 2025 with 574 tests results
-  # in over one million log entries respective nearly 300 MB log file size.
-  # log "jbt-${instance} – Configure Joomla with 'Debug System', 'Log Almost Everything' and 'Log Deprecated API'"
-  # -e 's/\$log_deprecated = .*/\$log_deprecated = 1;/' \
+  configureJoomlaDebugAndLog "${instance}"
 
   # Starting with Joomla 4.1 disable Lazy Scheduler
   if (( instance != 310 && instance >= 41 )); then

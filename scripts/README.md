@@ -39,6 +39,7 @@ The following scripts are available and the use is described in [../README.md](.
 | [cypress](cypress.sh) | Running interactive Cypress GUI. | Mandatory argument is the Joomla instance. Optional argument is `local` to use a locally installed Cypress. |
 | [database](database.sh) | Changes database and database driver. | :warning: The overall database content is lost.<br />Mandatory argument is the database variant. Optional arguments are`socket` and Joomla instances. |
 | [graft](graft.sh) | Grafting a Joomla package onto a branch. | :warning: The overall database content is lost.<br />Mandatory argument is the Joomla package. Optional argument is the database variant.|
+| [import](import.sh) | Import a Joomla instance from a ZIP package and an SQL dump. | Arguments are one `.zip` and one `.sql` file. |
 | [info](info) | Retrieves Joomla Branches Tester status information. | Optional arguments are `instance`, `base`, `history` and Joomla instances. |
 | [log](log) | Simple another name for the `check` script. |  |
 | [patch](patch.sh) | Apply Git patches in 'joomla-cms', 'joomla-cypress' or 'joomla-framework/database'. | Arguments are one or multiple patches and optional Joomla instances. |

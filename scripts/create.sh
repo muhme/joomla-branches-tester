@@ -27,6 +27,7 @@ function help {
              The optional database variant can be one of: ${JBT_DB_VARIANTS[*]} (default is mariadbi).
              The optional 'socket' argument configures database access via Unix socket (default is TCP host).
              The optional 'recreate' argument creates or recreates specified Joomla web server containers.
+             The optional 'empty' argument skips initial Joomla clone and setup.
              The optional PHP version can be set to one of: ${valid_versions_without_highest[*]} (default is highest).
              The optional 'repository:branch' argument (default repository is https://github.com/joomla/joomla-cms).
              Optionally specify one or more patches (e.g., 'joomla-cypress-36'; default is unpatched).
@@ -51,6 +52,7 @@ function waitForMySQL {
 database_variant="mariadbi"
 socket=""
 recreate=false
+empty=false
 php_version="highest"
 versionsToInstall=()
 unpatched=false
@@ -71,6 +73,9 @@ while [ $# -ge 1 ]; do
   elif [ "$1" = "recreate" ]; then
     recreate=true
     shift # Argument is eaten as option recreate.
+  elif [ "$1" = "empty" ]; then
+    empty=true
+    shift # Argument is eaten as option empty.
   elif isValidVariant "$1"; then
     database_variant="$1"
     shift # Argument is eaten as database variant.
@@ -355,8 +360,11 @@ for version in "${versionsToInstall[@]}"; do
 
   fi
 
-  JBT_INTERNAL=42 bash scripts/setup.sh "initial" "${version}" "${database_variant}" "${socket}" \
-                                        "${arg_repository}:${arg_branch}" "${patches[@]}"
+  setup_args=("initial" "${version}" "${database_variant}" "${socket}" "${arg_repository}:${arg_branch}" "${patches[@]}")
+  if [ "${empty}" = true ]; then
+    setup_args=("empty" "${setup_args[@]}")
+  fi
+  JBT_INTERNAL=42 bash scripts/setup.sh "${setup_args[@]}"
 
   log "jbt-${instance} – Installing Joomla required Cypress binary version (if needed)"
   docker exec "jbt-cypress" bash -c "cd '/jbt/joomla-${instance}' && \

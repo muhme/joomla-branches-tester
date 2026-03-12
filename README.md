@@ -32,6 +32,7 @@ Within [Docker](https://www.docker.com/) container environment you are able to:
   MySQLi or PHP Data Objects and the option to use Unix sockets, instead of TCP host).
 * Switching between PHP versions (PHP 7.4 ... 8.5).
 * Installing Joomla from a cloned `joomla-cms` Git repository.
+* Import a Joomla instance from a ZIP package and an SQL dump.
 * Grafting a Joomla package.
 * Using Xdebug for PHP debugging.
 * Using HTTP and HTTPS.
@@ -806,6 +807,32 @@ Or specify the desired Joomla instances:
 ```
 scripts/php 54 60 php8.5
 ```
+
+### Importing a Joomla Instance
+
+Do you want to test a Joomla update using data from an existing Joomla site?
+Export the database as a `.sql` file and package all site files as a `.zip`,
+then import them with:
+
+```
+scripts/import site.sql site.zip
+```
+
+The Joomla version and database variant (MySQL, MariaDB or PostgreSQL) are detected automatically.
+If a container for the detected Joomla major and minor version already exists,
+it will be overwritten. Otherwise a new container will be created.
+
+After the import, you can use most JBT features, for example:
+
+- Switch the PHP version
+- Install the Patch Tester
+- Inspect the database
+- view captured emails
+- Analyse network traffic
+- Run Xdebug
+
+If an `HTTP_HOST` `RewriteCond` is detected in the `.htaccess` file, it will automatically be commented out.
+An Joomla Super User *ci-admin* with the password *joomla-17082005* is created automatically.
 
 ### Grafting a Joomla Package
 
