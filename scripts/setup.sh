@@ -372,12 +372,12 @@ fi
 # Define the cron job entry
 cronjob="* * * * * /usr/local/bin/php /var/www/html/cli/joomla.php scheduler:run --all --no-interaction --quiet || true"
 # Check if the cron job already exists
-if ! docker exec "jbt-${instance}" bash -c "(crontab -l 2>/dev/null || echo '') | grep -F \"$cronjob\" > /dev/null"; then
+if ! docker exec "jbt-${instance}" bash -c "(crontab -l 2>/dev/null || echo '') | grep -F \"${cronjob}\" > /dev/null"; then
   log "jbt-${instance} – Adding cron job for Joomla Task Scheduler"
   docker exec "jbt-${instance}" bash -c "
     ( ( crontab -l 2>/dev/null || echo "" );
-    echo '# Joomla Task Scheduler, ignore exit status e.g. 127 No tasks due!';
-    echo \"$cronjob\" ) | crontab -"
+    echo '# JBT – Joomla Task Scheduler with ignoring exit status e.g. 127 No tasks due';
+    echo \"${cronjob}\" ) | crontab -"
 fi
 # Lazy Scheduler is disabled in database.sh
 
