@@ -254,7 +254,7 @@ EOF"
     cp /jbt/certs/jbt-ca.crt /usr/local/share/ca-certificates && \
     update-ca-certificates"
 
-  log "jbt-cypress – Creating Firefox enterprice policy to import SSL certificate"
+  log "jbt-cypress – Creating Firefox enterprise policy to import SSL certificate"
   docker exec jbt-cypress sh -c "
     mkdir -p /etc/firefox/policies
     cp /jbt/configs/policies.json /etc/firefox/policies/policies.json"
