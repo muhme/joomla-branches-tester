@@ -109,7 +109,7 @@ if [ -n "${local}" ]; then
     exit 1
   }
   npx cypress install 2>/dev/null ||
-    sudo bash -c "CYPRESS_CACHE_FOLDER=$CYPRESS_CACHE_FOLDER npx cypress install && chown -R $USER $CYPRESS_CACHE_FOLDER"
+    sudo bash -c "CYPRESS_CACHE_FOLDER=${CYPRESS_CACHE_FOLDER} npx cypress install && chown -R ${USER} ${CYPRESS_CACHE_FOLDER}"
 
   # For installExtensionFromFolder() in joomla-cypress/cypress/extensions.cy.js needed
   # to find 'mod_hello_world' folder. And we can not use 'fixturesFolder' as this is

@@ -73,18 +73,18 @@ done
 
 # Clean up joomla directories if existing
 for dir in joomla-*; do
-  if [ -d "$dir" ]; then
+  if [ -d "${dir}" ]; then
     log "Removing directory '${dir}'"
     # sudo is needed on Windows WSL Ubuntu
-    rm -rf "$dir" 2>/dev/null || sudo rm -rf "$dir"
+    rm -rf "${dir}" 2>/dev/null || sudo rm -rf "${dir}"
   fi
 done
 
 # Branch directories with underscore, before JBT 2.0.5?
 for dir in branch_*; do
-  if [ -d "$dir" ]; then
+  if [ -d "${dir}" ]; then
     log "Removing old directory '${dir}'"
-    rm -rf "$dir" 2>/dev/null || sudo rm -rf "$dir"
+    rm -rf "${dir}" 2>/dev/null || sudo rm -rf "${dir}"
   fi
 done
 

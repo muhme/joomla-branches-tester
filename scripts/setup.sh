@@ -78,13 +78,13 @@ if [ "${JBT_INTERNAL}" != "42" ]; then
   exit 1
 fi
 
-if [ -z "$version" ]; then
+if [ -z "${version}" ]; then
   help
   error "Please specify a Joomla version. Choose one of the available versions listed in 'scripts/version'."
   exit 1
 fi
 
-if [ "$unpatched" = true ]; then
+if ${unpatched}; then
   patches=("unpatched")
 elif [ ${#patches[@]} -eq 0 ]; then
   patches=("${JBT_DEFAULT_PATCHES[@]}")
@@ -191,7 +191,7 @@ elif [[ "${GITHUB_TOKEN}" =~ ghp_* ]]; then
 else
   warning "jbt-${instance} – GH_TOKEN could not be configured because no environment variable is set (ignored)"
 fi
-if $failed; then
+if ${failed}; then
   warning "jbt-${instance} – Failed configuration of GH_TOKEN (ignored)"
 fi
 
@@ -217,7 +217,7 @@ docker exec "jbt-${instance}" bash -c "sed 's/JBT/jbt-${instance}/' /tmp/msmtprc
 with_xdebug=false
 php_version=$(docker exec "jbt-${instance}" php -r 'echo PHP_VERSION;')
 log "jbt-${instance} – Used PHP version is ${php_version}"
-if [ "$(printf '%s\n' "8.0.0" "$php_version" | sort -V | head -n1)" = "8.0.0" ]; then
+if [ "$(printf '%s\n' "8.0.0" "${php_version}" | sort -V | head -n1)" = "8.0.0" ]; then
   # Create two PHP environments: one with Xdebug and one without.
   # Manage them by cloning /usr/local, and use symbolic links to toggle between the two installations.
   with_xdebug=true
@@ -226,12 +226,12 @@ if [ "$(printf '%s\n' "8.0.0" "$php_version" | sort -V | head -n1)" = "8.0.0" ];
   log "jbt-${instance} – Preparing a parallel installation with Xdebug"
   docker exec "jbt-${instance}" bash -c 'cp -r /usr/local /usr/local-without-xdebug'
   # TODO: 21 Nov 2025 to be deleted once pecl/xdebug supports PHP 8.5
-  if [[ $php_version == 8.5.* ]]; then
+  if [[ ${php_version} == 8.5.* ]]; then
     # 'pecl install xdebug' requires PHP (version >= 8.0.0, version <= 8.4.99), we have to compile by own
     docker exec "jbt-${instance}" bash -c '
       set -eux
       apt-get update
-      apt-get install -y --no-install-recommends git $PHPIZE_DEPS
+      apt-get install -y --no-install-recommends git ${PHPIZE_DEPS}
       git clone --depth=1 https://github.com/xdebug/xdebug.git /usr/src/xdebug
       cd /usr/src/xdebug
       phpize
@@ -271,15 +271,15 @@ docker exec "jbt-${instance}" bash -c 'apt-get update -qq && \
     curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt-get install -y cron git unzip vim nodejs iputils-ping iproute2 telnet net-tools'
 
-if $empty; then
+if ${empty}; then
   log "jbt-${instance} – Skipping Joomla clone"
 else
-  if $initial; then
+  if ${initial}; then
     if [ -z "${arg_repository}" ]; then
       git_repository="https://github.com/joomla/joomla-cms"
       git_branch=$(fullName "${version}")
     else
-      git_repository="$arg_repository"
+      git_repository="${arg_repository}"
       git_branch="${arg_branch}"
     fi
     # Starting here with a shallow clone for speed and space; unshallow in 'scripts/patch' if patches are to be applied
@@ -309,7 +309,7 @@ else
       php composer-setup.php && \
       rm composer-setup.php && \
       mv composer.phar /usr/local/bin/composer"
-      if $with_xdebug; then
+      if ${with_xdebug}; then
         docker exec "jbt-${instance}" bash -c "cd /var/www/html && \
           cp -p /usr/local/bin/composer /usr/local-with-xdebug/bin/composer"
       fi
@@ -321,14 +321,14 @@ else
     # As the second run was always successful, we try it directly.
   fi
 
-  if $initial; then
+  if ${initial}; then
     # npm clean install only initial, with switching PHP version nothing changed for JavaScript
     if [ -f "joomla-${instance}/package.json" ]; then
       log "jbt-${instance} – Running npm clean install"
       docker exec "jbt-${instance}" bash -c 'cd /var/www/html && npm ci'
     fi
 
-    if [ "$unpatched" = true ]; then
+    if ${unpatched}; then
       log "jbt-${instance} – Installation remains unpatched"
     else
       log "jbt-${instance} – Patching the installation with ${patches[*]}"
@@ -358,12 +358,12 @@ log "jbt-${instance} – Restarting container"
 docker restart "jbt-${instance}"
 
 # Configure and install Joomla with desired database variant
-if $initial; then
+if ${initial}; then
   database_script_args=("${instance}" "${database_variant}")
-  if [ "${socket}" = true ]; then
+  if ${socket}; then
     database_script_args+=("socket")
   fi
-  if [ "${empty}" = true ]; then
+  if ${empty}; then
     database_script_args+=("empty")
   fi
   scripts/database.sh "${database_script_args[@]}"

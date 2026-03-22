@@ -132,8 +132,8 @@ fi
 # TODO This should be unified over all scripts
 username="ci-admin"
 password='joomla-17082005'
-name="Super User jbt-$instance"
-email="jbt-$instance@test.com"
+name="Super User jbt-${instance}"
+email="jbt-${instance}@test.com"
 
 log "jbt-${instance} – Clean up files"
 rm -rf "joomla-${instance}"/* "joomla-${instance}"/.??* || sudo rm -rf "joomla-${instance}"/* "joomla-${instance}"/.??*

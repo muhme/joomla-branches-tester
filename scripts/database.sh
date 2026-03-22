@@ -99,7 +99,7 @@ while [ $# -ge 1 ]; do
   elif isValidVariant "$1"; then
     dbvariant="$1"
     dbtype=$(dbTypeForVariant "${dbvariant}")
-    if $socket; then
+    if ${socket}; then
       # Use Unix socket
       dbhost=$(dbSocketForVariant "${dbvariant}")
       dbport=""
@@ -116,7 +116,7 @@ while [ $# -ge 1 ]; do
   fi
 done
 
-if [ -z "$dbvariant" ] ; then
+if [ -z "${dbvariant}" ] ; then
   help
   error "Mandatory database variant is missing. Please use one of: ${JBT_DB_VARIANTS[*]}."
   exit 1

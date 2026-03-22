@@ -77,7 +77,7 @@ if [ ${#instancesToInstall[@]} -eq 0 ]; then
   instancesToInstall=("${allInstalledInstances[@]}")
 fi
 
-if $install; then
+if ${install}; then
   # Check if the given token looks like a GitHub personal access token
   if [ -z "${token}" ]; then
     if [[ "${JBT_GITHUB_TOKEN}" =~ ghp_* ]]; then
@@ -113,7 +113,7 @@ skipped=0
 successful=0
 for instance in "${instancesToInstall[@]}"; do
 
-  if ! $install; then
+  if ! ${install}; then
     # Uninstall Patch Tester
     id=$(docker exec "jbt-${instance}" bash -c "php cli/joomla.php extension:list --type=component | awk '/com_patchtester/ {print \$2}'")
     if [ -z "${id}" ]; then
@@ -156,7 +156,7 @@ if [ ${failed} -eq 0 ] ; then
   log "Completed ${instancesToInstall[*]} with ${successful} successful (${skipped} skipped)"
 else
   error "Completed ${instancesToInstall[*]} with ${failed} failed and ${successful} successful (${skipped} skipped)."
-  if $install; then
+  if ${install}; then
     warning "Tip: You can watch the installation with http://host.docker.internal:7005/vnc.html?autoconnect=true&resize=scale"
   fi
 fi

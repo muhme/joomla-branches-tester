@@ -63,32 +63,32 @@ without="/usr/local-without-xdebug/"
 for instance in "${instancesToChange[@]}"; do
 
   php_version=$(docker exec "jbt-${instance}" php -r 'echo PHP_VERSION;')
-  if [ "$(printf '%s\n' "8.0.0" "$php_version" | sort -V | head -n1)" != "8.0.0" ]; then
+  if [ "$(printf '%s\n' "8.0.0" "${php_version}" | sort -V | head -n1)" != "8.0.0" ]; then
     log "jbt-${instance} – No Xdebug available for PHP version ${php_version} < 8.0, jumped over"
     continue
   fi
 
   link=$(docker exec "jbt-${instance}" readlink "/usr/local")
-  if [ "$todo" = "on" ]; then
-    if [ "$link" = "$with" ]; then
+  if [ "${todo}" = "on" ]; then
+    if [ "${link}" = "${with}" ]; then
       log "jbt-${instance} – Xdebug is already enabled"
     else
       log "jbt-${instance} – Switching to Xdebug-enabled PHP installation and restarting container"
-      docker exec "jbt-${instance}" bash -c "rm -f /usr/local && ln -s $with /usr/local"
+      docker exec "jbt-${instance}" bash -c "rm -f /usr/local && ln -s ${with} /usr/local"
       docker restart "jbt-${instance}"
     fi
   else
-    if [ "$link" = "$without" ]; then
+    if [ "${link}" = "${without}" ]; then
       log "jbt-${instance} – Xdebug is not currently enabled"
     else
       log "jbt-${instance} – Switching to PHP installation without Xdebug and restarting container"
-      docker exec "jbt-${instance}" bash -c "rm -f /usr/local && ln -s $without /usr/local"
+      docker exec "jbt-${instance}" bash -c "rm -f /usr/local && ln -s ${without} /usr/local"
       docker restart "jbt-${instance}"
     fi
   fi
 done
 
-if [ "$todo" = "on" ]; then
+if [ "${todo}" = "on" ]; then
   log "Creating File '.vscode/launch.json'"
   launch_json=".vscode/launch.json"
   dir=$(dirname "${launch_json}")
@@ -100,11 +100,11 @@ if [ "$todo" = "on" ]; then
 EOF
   for instance in "${allInstalledInstances[@]}"; do
     php_version=$(docker exec "jbt-${instance}" php -r 'echo PHP_VERSION;')
-    if [ "$(printf '%s\n' "8.0.0" "$php_version" | sort -V | head -n1)" != "8.0.0" ]; then
+    if [ "$(printf '%s\n' "8.0.0" "${php_version}" | sort -V | head -n1)" != "8.0.0" ]; then
       continue
     fi
     link=$(docker exec "jbt-${instance}" readlink "/usr/local")
-    if [ "$link" = "$with" ]; then
+    if [ "${link}" = "${with}" ]; then
       log "jbt-${instance} – Adding entry 'Listen jbt-${instance}'"
       # As port number for 3.10 use 7910
       cat >>"${launch_json}" <<EOF

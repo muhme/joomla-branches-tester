@@ -40,8 +40,8 @@ function help {
 function waitForMySQL {
   MAX_ATTEMPTS=60
   attempt=1
-  until docker exec jbt-mysql mysqladmin ping -h"127.0.0.1" --silent || [ $attempt -eq $MAX_ATTEMPTS ]; do
-    log "Waiting for MySQL to be ready, attempt $attempt of $MAX_ATTEMPTS"
+  until docker exec jbt-mysql mysqladmin ping -h"127.0.0.1" --silent || [ ${attempt} -eq ${MAX_ATTEMPTS} ]; do
+    log "Waiting for MySQL to be ready, attempt ${attempt} of ${MAX_ATTEMPTS}"
     attempt=$((attempt + 1))
     sleep 1
   done
@@ -102,12 +102,12 @@ done
 
 # Zeroth check host.docker.internal entry
 HOSTS_FILE="/etc/hosts"
-if grep -Eq "127.0.0.1[[:space:]]+host.docker.internal" "$HOSTS_FILE"; then
+if grep -Eq "127.0.0.1[[:space:]]+host.docker.internal" "${HOSTS_FILE}"; then
   log "Entry '127.0.0.1 host.docker.internal' already exists in the file '${HOSTS_FILE}'"
 else
   log "Adding entry '127.0.0.1 host.docker.internal' to the file '${HOSTS_FILE}'"
-  sudo sh -c "echo '127.0.0.1 host.docker.internal' >> $HOSTS_FILE"
-  if ! grep -Eq "127.0.0.1[[:space:]]+host.docker.internal" "$HOSTS_FILE"; then
+  sudo sh -c "echo '127.0.0.1 host.docker.internal' >> ${HOSTS_FILE}"
+  if ! grep -Eq "127.0.0.1[[:space:]]+host.docker.internal" "${HOSTS_FILE}"; then
     error "Please add entry '127.0.0.1 host.docker.internal' to the file '${HOSTS_FILE}'."
     exit 1
   fi
@@ -118,7 +118,7 @@ if [ -n "${git_repository}" ] && [ ${#versionsToInstall[@]} -ne 1 ]; then
   exit 1
 fi
 
-if [ "${recreate}" = true ] ; then
+if ${recreate}; then
   if [ ! -f docker-compose.yml ]; then
     error "The 'recreate' option was given, but no 'docker-compose.yml' file exists. Please run 'scripts/create' first."
     exit 1
@@ -130,14 +130,14 @@ if [ ${#versionsToInstall[@]} -eq 0 ]; then
   versionsToInstall=("${JBT_ALL_USED_BRANCHES[@]}")
 fi
 
-if [ "$unpatched" = true ]; then
+if ${unpatched}; then
   patches=("unpatched")
 elif [ ${#patches[@]} -eq 0 ]; then
   patches=("${JBT_DEFAULT_PATCHES[@]}")
 fi
 # else: patches are already filled in the array
 
-if [ "$recreate" = false ]; then
+if ! ${recreate}; then
 
   # Delete all docker containers and branches_* directories.
   scripts/clean.sh
@@ -170,7 +170,7 @@ fi
 # (This isn't accurate when using MariaDB or PostgreSQL, but so far it's working with the delay from MySQL.)
 waitForMySQL
 
-if [ "$recreate" = false ]; then
+if ! ${recreate}; then
 
   # Disable MySQL binary logging to prevent waste of space
   # see https://github.com/joomla-docker/docker-joomla/issues/197
@@ -194,10 +194,8 @@ if [ "$recreate" = false ]; then
   docker exec jbt-pg sh -c "\
   psql -U postgres -c \"CREATE USER root WITH PASSWORD 'root';\" && \
   psql -U postgres -c \"ALTER USER root WITH SUPERUSER;\""
-fi
 
-# Performing additional version-independent configurations to complete the base installation.
-if [ "$recreate" = false ]; then
+  # Performing additional version-independent configurations to complete the base installation.
   log "jbt-cypress – Installing git, vim, ping, ip, telnet and netstat"
   # 17 February 2025 "apt-get update" Error "Missing Google Chrome GPG Key" with current cypress/included image
   #   -> Add the missing key manually and update Chrome repo before "apt-get update"
@@ -301,7 +299,7 @@ EOF"
     apt-get update && apt-get install -y --no-install-recommends apt-transport-https ca-certificates gnupg wget
     install -d /usr/share/keyrings
     wget -qO - https://packages.sury.org/php/apt.gpg | gpg --dearmor -o /usr/share/keyrings/sury-php.gpg
-    CODENAME="$(. /etc/os-release && echo "$VERSION_CODENAME")"
+    CODENAME="$(. /etc/os-release && echo "${VERSION_CODENAME}")"
     echo "deb [signed-by=/usr/share/keyrings/sury-php.gpg] https://packages.sury.org/php/ ${CODENAME:-trixie} main" > /etc/apt/sources.list.d/php.list
     apt-get update'
   # Install PHP 8.4; for ignoring apt-get update error, see Google Chrome GPG Key comment above

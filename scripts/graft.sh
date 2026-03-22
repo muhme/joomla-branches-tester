@@ -62,11 +62,11 @@ if [ -z "${package}" ]; then
 fi
 
 # Convert relative path to absolute path if necessary, as we need to change the working directory. 
-if [[ "$package" != /* ]]; then
+if [[ "${package}" != /* ]]; then
     # It's a relative path.
-    package="$(pwd)/$package"
+    package="$(pwd)/${package}"
 fi
-if [ ! -f "$package" ]; then
+if [ ! -f "${package}" ]; then
     error "Given '${package}' package is not a file. Please check."
     exit 1
 fi
@@ -89,15 +89,15 @@ rm -rf "joomla-${instance}-TMP" 2>/dev/null || sudo rm -rf "joomla-${instance}-T
 
 log "Extracting package file '${package}'"
 cd "joomla-${instance}"
-case "$package" in
+case "${package}" in
   *.zip)
-    unzip "$package" -d . 2>/dev/null || sudo unzip "$package" -d .
+    unzip "${package}" -d . 2>/dev/null || sudo unzip "${package}" -d .
     ;;
   *.tar.zst)
-    tar --use-compress-program=unzstd -xvf "$package" -C . 2>/dev/null || sudo tar --use-compress-program=unzstd -xvf "$package" -C . 
+    tar --use-compress-program=unzstd -xvf "${package}" -C . 2>/dev/null || sudo tar --use-compress-program=unzstd -xvf "${package}" -C .
     ;;
   *.tar.gz|*.tar.bz2)
-    tar -xvf "$package" -C . 2>/dev/null || sudo tar -xvf "$package" -C .
+    tar -xvf "${package}" -C . 2>/dev/null || sudo tar -xvf "${package}" -C .
     ;;
   *)
     error "Unsupported file type. Please use one of the following: .zip, .tar.gz, .tar.bz2, or .tar.zst."

@@ -58,7 +58,7 @@ if [ ${#patches[@]} -eq 0 ]; then
 fi
 
 # Patching 'installation/joomla-cypress'
-if [[ "$installation" == true ]]; then
+if ${installation}; then
   # Without instance number
   if [ ${#instancesToPatch[@]} -ne 0 ]; then
     help
@@ -68,7 +68,7 @@ if [[ "$installation" == true ]]; then
   # Without other patches
   for patch in "${patches[@]}"; do
     repo="${patch%-*}" # 'joomla-cms', 'database' or 'joomla-cypress'
-    if [[ "$repo" = "joomla-cms" || "$repo" = "database" ]]; then
+    if [[ "${repo}" = "joomla-cms" || "${repo}" = "database" ]]; then
       help
       error "Patching 'installation/joomla-cypress' cannot be combined with '${patch}'."
       exit 1

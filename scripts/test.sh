@@ -106,7 +106,7 @@ for instance in "${instancesToTest[@]}"; do
 
   for actualTest in "${testsToRun[@]}"; do
 
-    if [ "$actualTest" = "php-cs-fixer" ]; then
+    if [ "${actualTest}" = "php-cs-fixer" ]; then
       if ((instance == 310 || instance < 44)); then
         # In Finder.php line 592: The "/var/www/html/installation" directory does not exist.
         log "jbt-${instance} < 44 Skipping PHP Coding Standards Fixer – php-cs-fixer"
@@ -144,7 +144,7 @@ for instance in "${instancesToTest[@]}"; do
       fi
     fi
 
-    if [ "$actualTest" = "phpcs" ]; then
+    if [ "${actualTest}" = "phpcs" ]; then
       if ((instance == 310 || instance < 42)); then
         # ERROR: the "ruleset.xml" coding standard is not installed.
         log "jbt-${instance} < 42 Skipping PHP Coding Sniffer – phpcs"
@@ -177,7 +177,7 @@ for instance in "${instancesToTest[@]}"; do
 
     # TODO phan
 
-    if [ "$actualTest" = "unit" ]; then
+    if [ "${actualTest}" = "unit" ]; then
       if ((instance == 310 || instance < 42)); then
         # No tests executed! /  PHP Fatal error:  Uncaught Error: Call to undefined function
         log "jbt-${instance} < 42 Skipping PHP Testsuite Unit – unit"
@@ -344,20 +344,20 @@ for instance in "${instancesToTest[@]}"; do
 
       time_before_test=$(date '+%Y-%m-%dT%H:%M:%S')
 
-      if [[ "$novnc" == true ]]; then
+      if ${novnc}; then
         log "jbt-${instance} – Initiating ${actualTest} tests with NoVNC and ${spec}"
         # Currently (May 2025) the test order is important as the System Tests are not independent.
         # We can not use 'CYPRESS_specPattern' env var because it sorts the tests alphabetically.
         # We have to use --spec to execute the tests in the given order.
         docker exec jbt-cypress sh -c "cd '${cypress_dir}' && export DISPLAY=jbt-novnc:0 && \
-          CYPRESS_SKIP_INSTALL_LANGUAGES=$CYPRESS_SKIP_INSTALL_LANGUAGES \
+          CYPRESS_SKIP_INSTALL_LANGUAGES=${CYPRESS_SKIP_INSTALL_LANGUAGES} \
           CYPRESS_CACHE_FOLDER=/jbt/cypress-cache \
           ${electron_enable_logging_env} ${cypress_paths} \
           npx cypress run --headed ${browser} --config-file '${config_file}' --spec '${spec}'"
       else
         log "jbt-${instance} – Initiating headless ${actualTest} tests with ${spec}"
         docker exec jbt-cypress sh -c "cd '${cypress_dir}' && unset DISPLAY && \
-          CYPRESS_SKIP_INSTALL_LANGUAGES=$CYPRESS_SKIP_INSTALL_LANGUAGES \
+          CYPRESS_SKIP_INSTALL_LANGUAGES=${CYPRESS_SKIP_INSTALL_LANGUAGES} \
           CYPRESS_CACHE_FOLDER=/jbt/cypress-cache \
           ${electron_enable_logging_env} ${cypress_paths} \
           npx cypress run ${browser} --config-file '${config_file}' --spec '${spec}'"

@@ -45,7 +45,7 @@ while [ $# -ge 1 ]; do
   fi
 done
 
-if [ -z "$php_version" ]; then
+if [ -z "${php_version}" ]; then
   help
   error "Mandatory PHP version is missing. Please use one of: ${JBT_VALID_PHP_VERSIONS[*]}."
   exit 1
@@ -85,7 +85,7 @@ for instance in "${instancesToPatch[@]}"; do
   cp "${JBT_TMP_FILE}" "docker-compose.yml" || sudo cp "${JBT_TMP_FILE}" "docker-compose.yml"
   # Check it
   occurrences=$(grep -cF "${replace}" "docker-compose.yml" || true)
-  if [ "$occurrences" -ne 1 ]; then
+  if [ "${occurrences}" -ne 1 ]; then
       error "jbt-${instance} – The string '${replace}' is not found one times in 'docker-compose.yml' file'."
       exit 1
   fi

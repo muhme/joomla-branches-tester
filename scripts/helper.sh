@@ -15,7 +15,7 @@ start_time=$(date +%s)
 
 # ${JBT_TMP_FILE} file can be used in the scripts without any worries
 JBT_TMP_FILE=/tmp/$(basename "$0").$$
-trap 'rm -rf $JBT_TMP_FILE' 0
+trap 'rm -rf ${JBT_TMP_FILE}' 0
 
 # Cypress version 15.7.1 now contains Firefox on ARM images
 # Cypress version 15.10.0 contains Cypress.expose()
@@ -65,7 +65,7 @@ declare -ar \
 declare -a \
   JBT_BASE_CONTAINERS=()
   while read -r line; do
-    JBT_BASE_CONTAINERS+=("$line")
+    JBT_BASE_CONTAINERS+=("${line}")
   done < <(grep 'container_name:' 'configs/docker-compose.base.yml' | awk '{print $2}')
 
 # If the 'unpatched' option is not set and no patch is provided, use the following list:
@@ -98,7 +98,7 @@ declare -a \
   stale_json_data=$(curl -s "https://github.com/joomla/joomla-cms/branches/stale")
   # Extract the names of the branches, only with grep and sed, so as not to install any dependencies, e.g. jq
   # Use sed with -E flag to enable extended regular expressions, which is also working with macOS sed.
-  branches=$(echo "$json_data" "$stale_json_data" | grep -o '"name":"[0-9]\+\.[0-9]\+-dev"' |
+  branches=$(echo "${json_data}" "${stale_json_data}" | grep -o '"name":"[0-9]\+\.[0-9]\+-dev"' |
               sed -E 's/"name":"([0-9]+\.[0-9]+-dev)"/\1/')
   # shellcheck disable=SC2162 # Not set -r as 2nd option as it will not work for old Bashes and there are no backslashes here
   read -a JBT_ALL_USED_BRANCHES <<< "$(echo "${branches}" | tr ' ' '\n' | sort -n | tr '\n' ' ')"
@@ -109,8 +109,8 @@ declare -a \
   JBT_HIGHEST_MINOR_TAGS=()
   all_minor_versions=()
   for tag in "${JBT_ALL_USABLE_TAGS[@]}"; do
-    minor=$(echo "$tag" | sed -E 's/^([0-9]+\.[0-9]+)\..*/\1/')
-    [[ -n "$minor" ]] && all_minor_versions+=("$minor")
+    minor=$(echo "${tag}" | sed -E 's/^([0-9]+\.[0-9]+)\..*/\1/')
+    [[ -n "${minor}" ]] && all_minor_versions+=("${minor}")
   done
   # shellcheck disable=SC2207 # There are no spaces in versions for deduplicate and sort
   all_minor_versions=($(printf '%s\n' "${all_minor_versions[@]}" | sort -u -V))
@@ -118,13 +118,13 @@ declare -a \
   for minor in "${all_minor_versions[@]}"; do
     matches=()
     for tag in "${JBT_ALL_USABLE_TAGS[@]}"; do
-      [[ "$tag" == "$minor."* ]] && matches+=("$tag")
+      [[ "${tag}" == "${minor}."* ]] && matches+=("${tag}")
     done
     stable=()
     for tag in "${matches[@]}"; do
-      case "$tag" in
+      case "${tag}" in
         *-alpha*|*-beta*|*-rc*) ;;  # skip pre-releases
-        *) stable+=("$tag") ;;
+        *) stable+=("${tag}") ;;
       esac
     done
     if [[ ${#stable[@]} -gt 0 ]]; then
@@ -195,11 +195,11 @@ getAllInstalledInstances() {
   # Loop over directories that match the pattern joomla-*
   for dir in joomla-*; do
       # Check if it's a directory and extract the version part
-      if [[ -d "$dir" ]]; then
+      if [[ -d "${dir}" ]]; then
           instance="${dir#joomla-}"
           # e.g."39" -> "309"
           [[ ${#instance} -eq 2 ]] && instance="${instance:0:1}0${instance:1:1}"
-          instances+=("$instance")
+          instances+=("${instance}")
       fi
   done
 
@@ -211,10 +211,10 @@ getAllInstalledInstances() {
   # shellcheck disable=SC2068 # Intentionally using individual array elements
   for instance in ${sorted_instances[@]}; do
       # Check if the instance has three digits with '0' as the middle digit
-      if [[ $instance == ?0? ]]; then
+      if [[ ${instance} == ?0? ]]; then
           final_instances+=("${instance:0:1}${instance:2:1}")
       else
-          final_instances+=("$instance")
+          final_instances+=("${instance}")
       fi
   done
 
@@ -278,7 +278,7 @@ function isValidPHP() {
     return 0 # is valid
   fi
   for p in "${JBT_VALID_PHP_VERSIONS[@]}"; do
-    if [ "$p" = "$php_version" ]; then
+    if [ "${p}" = "${php_version}" ]; then
       return 0 # is valid
     fi
   done
@@ -310,9 +310,9 @@ function fullName() {
   done
 
   # 2. Current branch abbreviation, eg. "60" -> branch "6.0-dev"
-  if [[ "$name" =~ ^[0-9]{2}$ ]]; then
+  if [[ "${name}" =~ ^[0-9]{2}$ ]]; then
     # Two digits branch? e.g. "44" -> "4.4-dev"
-    full_name="$(echo "$name" | sed -E 's/([0-9])([0-9])/\1.\2-dev/')"
+    full_name="$(echo "${name}" | sed -E 's/([0-9])([0-9])/\1.\2-dev/')"
     for branch in "${JBT_ALL_USED_BRANCHES[@]}"; do
       if [[ "${branch}" == "${full_name}" ]]; then
         echo "${full_name}"
@@ -323,7 +323,7 @@ function fullName() {
 
   # 3. major minor, e.g. "310" -> highest tag "3.10.12"
   for tag in "${JBT_HIGHEST_MINOR_TAGS[@]}"; do
-    major_minor=$(echo "$tag" | sed -E 's/^([0-9]+)\.([0-9]+)\..*/\1\2/')
+    major_minor=$(echo "${tag}" | sed -E 's/^([0-9]+)\.([0-9]+)\..*/\1\2/')
     if [[ "${major_minor}" = "${name}" ]]; then
       echo "${tag}"
       return
@@ -416,7 +416,7 @@ function dbPortForVariant() {
 function isValidVariant() {
   local variant="$1"
   for v in "${JBT_DB_VARIANTS[@]}"; do
-    if [[ "$v" == "$variant" ]]; then
+    if [[ "${v}" == "${variant}" ]]; then
       return 0 # success
     fi
   done
@@ -492,7 +492,7 @@ function configureJoomlaDebugAndLog() {
 deleteService() {
   local svc="$1" file="$2"
 
-  awk -v svc="$svc" '
+  awk -v svc="${svc}" '
     BEGIN { del = 0 }
     $0 ~ "^  " svc ":[[:space:]]*$" { del = 1; next }
     del && $0 ~ /^(  [^[:space:]]+:[[:space:]]*$|[^[:space:]])/ { del = 0 }
@@ -621,7 +621,7 @@ function recreateContainersWhenNecessary() {
   # Get digest after pull
   new_digest="$(docker image inspect --format='{{index .RepoDigests 0}}' "${din}" 2>/dev/null || true)"
 
-  if [ -z "$new_digest" ]; then
+  if [ -z "${new_digest}" ]; then
     error "jbt-${instance} – ERROR: image '${din}' not present after pull"
     exit 1
   fi
@@ -643,21 +643,21 @@ function recreateContainersWhenNecessary() {
 function getJoomlaVersion() {
   local versions_file="$1/libraries/src/Version.php"
 
-  if [ ! -f "$versions_file" ]; then
+  if [ ! -f "${versions_file}" ]; then
     error "There is no file \"${versions_file}\"."
   fi
 
   # from file content:
   #     public const MAJOR_VERSION = 5;
   #     public const MINOR_VERSION = 1;
-  version=$(grep -E 'const MAJOR_VERSION|const MINOR_VERSION' "$versions_file" | sed -e 's/.*= //' | tr -d ';\n')
+  version=$(grep -E 'const MAJOR_VERSION|const MINOR_VERSION' "${versions_file}" | sed -e 's/.*= //' | tr -d ';\n')
 
   # Two digits?
-  if [[ ! $version =~ ^[0-9]{2}$ ]]; then
+  if [[ ! ${version} =~ ^[0-9]{2}$ ]]; then
     error "Could not find Joomla major and minor number in file \"${versions_file}\"."
   fi
 
-  echo "$version"
+  echo "${version}"
 }
 
 # Check if a test name is valid.
@@ -669,7 +669,7 @@ isValidTestName() {
   local all_tests=("$@") # Remaining arguments are the ALL_TESTS array
 
   for valid_test in "${all_tests[@]}"; do
-    if [[ "$test" == "$valid_test" ]]; then
+    if [[ "${test}" == "${valid_test}" ]]; then
       return 0 # Yes, test name is valid
     fi
   done
@@ -712,13 +712,13 @@ runningTime() {
   seconds=$((elapsed_time % 60))
 
   # Having seconds also formatted with a leading zero
-  formatted_seconds=$(printf "%02d" $seconds)
+  formatted_seconds=$(printf "%02d" ${seconds})
 
   # Human readable output
-  if [ $minutes -gt 0 ]; then
+  if [ ${minutes} -gt 0 ]; then
     echo "${minutes}:${formatted_seconds}"
   else
-    if [ $seconds -eq 1 ]; then
+    if [ ${seconds} -eq 1 ]; then
       echo "1 second"
     else
       echo "${seconds} seconds"
@@ -742,12 +742,12 @@ function random_quote() {
   fi
 
   # Check the LANG environment variable
-  lang_code=$(echo "$LANG" | cut -c1-2 | tr '[:upper:]' '[:lower:]')
+  lang_code=$(echo "${LANG}" | cut -c1-2 | tr '[:upper:]' '[:lower:]')
 
   # Use one of the supported languages or default to English
-  case "$lang_code" in
+  case "${lang_code}" in
   de | es | ja | uk)
-    language=$lang_code
+    language=${lang_code}
     ;;
   *)
     language="en"
@@ -759,16 +759,16 @@ function random_quote() {
 
   # Extract the quote
   # Sometimes \r and \n are included and deleted respective replaced
-  quote=$(echo "$json" | sed -n 's/.*"quote":"\([^"]*\)".*/\1/p' | sed 's/\\r//g' | sed 's/\\n/ /g')
+  quote=$(echo "${json}" | sed -n 's/.*"quote":"\([^"]*\)".*/\1/p' | sed 's/\\r//g' | sed 's/\\n/ /g')
 
   # Extract the author's name
-  author=$(echo "$json" | sed -n 's/.*"authorName":"\([^"]*\)".*/\1/p')
-  authorID=$(echo "$json" | sed -n 's/.*"authorId":\([0-9]*\).*/\1/p')
+  author=$(echo "${json}" | sed -n 's/.*"authorName":"\([^"]*\)".*/\1/p')
+  authorID=$(echo "${json}" | sed -n 's/.*"authorId":\([0-9]*\).*/\1/p')
 
   # If we are offline, we have no quote :(
   if [ "${quote}" != "" ]; then
     # Print the author only if it's not "Unknown" with authorID 0
-    if [ "$authorID" != "0" ]; then
+    if [ "${authorID}" != "0" ]; then
       printf "\\n    \"%s\", %s\\n \\n" "${quote}" "${author}"
     else
       printf "\\n    \"%s\"\\n \\n" "${quote}"
@@ -860,7 +860,7 @@ errorHandler() {
   trap - EXIT
   exit 1
 }
-trap 'errorHandler $LINENO' ERR
+trap 'errorHandler ${LINENO}' ERR
 
 # This is the end.
 #
