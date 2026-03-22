@@ -223,7 +223,7 @@ For this installation with five Joomla web server containers the
 `joomla-branches-tester` folder requires about 2 GB of disc space.
 Docker needs additionally about 20 GB for images and volumes.
 If you are installing for the first time and downloading all the required Docker images,
-you will need to download arround 4 GB of data from the Internet.
+you will need to download around 4 GB of data from the Internet.
 
 <details>
   <summary>Optional <code>scripts/create</code> Parameters</summary>
@@ -421,7 +421,7 @@ Installing the Joomla Branches Tester on Ubuntu with a user that is able to run 
 The Joomla version installed in the web server container is configured with the following settings:
 
 - Joomla Super User *ci-admin* and the password *joomla-17082005*
-  (which includes Joomla!’s initial release date, its birthday) originate from the Continous Integration (CI) Joomla System Tests.
+  (which includes Joomla!’s initial release date, its birthday) originate from the Continuous Integration (CI) Joomla System Tests.
 - Used language Pack is English (United Kingdom) (`en-GB`).
 - The `installation` folder remains intact after the installation.
   - Earlier Joomla versions delete the `installation` folder after setup.
@@ -521,7 +521,7 @@ from the `certs` folder into your operating system and/or your host browsers (Fi
   * Choose: *Trust this CA to identify website*
   * Click *OK* and restart your browser  
 
-:point_right: JBT CA certifate is created for 10 years.
+:point_right: JBT CA certificate is created for 10 years.
   JBT server certificate is generated for one year,
   because modern browsers only accept shorter lifetimes for server (leaf) certificates.
   Certificates generated in the `certs` folder are not deleted when running `scripts/clean` or `scripts/create`.
@@ -1183,7 +1183,7 @@ JBT Instance History
 Optional arguments that can be combined as desired are:
 * `instance` to display Joomla Branches Tester instance information only,
 * `base` to display information about all base containers only,
-* `history` to display JBT activites only,
+* `history` to display JBT activities only,
 * version number to display information about this version number web server container only.
 
 For example, to check only JBT instance and `jbt-44` container information:
