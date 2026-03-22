@@ -440,7 +440,7 @@ function adjustJoomlaConfigurationForJBT() {
 
       log "jbt-${instance} – Adopt configuration.php for JBT"
 
-      # Session handler 'filesystem' is avaialable since 4.0
+      # Session handler 'filesystem' is available since 4.0
       session_handler="database"
       if (( instance != 310 && instance >= 40 )); then
         # Using 'filesystem' as the session handler to prevent logging in again after a few minutes,
@@ -525,7 +525,7 @@ function appendWebServer() {
     # Add Joomla web server entry.
     # - UUU - HTTPS port number last three digits
     # - VVV - IPv4 address fourth octed
-    # - WWW - IPv4 adress third octed
+    # - WWW - IPv4 address third octed
     # - XXX - IPv6 address last hextet, Docker image jbt-number and joomla-number directory name
     # - YYY - Docker image name
     # - ZZZ - HTTP port number last three digits
