@@ -38,7 +38,7 @@ source scripts/helper.sh
 #   installationPath: '/jbt/joomla-54',
 #
 # Using database host and default port Docker-inside as performance issues are seen in using host.docker.internal
-# Inserting line '/* eslint-disable */' as with 'cypress.config.local.js' we hava a not ignored file name.
+# Inserting line '/* eslint-disable */' as with 'cypress.config.local.js' we have a not ignored file name.
 #
 function configureCypressConfig {
   local from="${1}" to="${2}" instance="${3}" baseurl="${4}" dbtype="${5}" dbhost="${6}" dbport="${7}" 
