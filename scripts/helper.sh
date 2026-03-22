@@ -330,7 +330,7 @@ function fullName() {
     fi
   done
 
-  # 4. Take the orignal, e.g. "5.3.1"
+  # 4. Take the original, e.g. "5.3.1"
   echo "${name}"
 }
 
