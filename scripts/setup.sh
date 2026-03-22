@@ -115,7 +115,7 @@ log "jbt-${instance} – Configure PHP to use jbt-proxy"
         echo "export no_proxy=localhost,127.0.0.1,::1"  >> /etc/apache2/envvars'
 
 # No 'docker-php-ext-install opache' as with PHP 8.5 it is built in and fails because there’s no module to compile.
-# Alternativly, we could make a difference for <= 8.5, but opcache is only for performance and not a required module.
+# Alternatively, we could make a difference for <= 8.5, but opcache is only for performance and not a required module.
 #
 # zip and zstd only to be able to run build
 # msmtp and msmtp-mta to be able to use email configurations PHP and sendmail too
