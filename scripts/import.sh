@@ -141,6 +141,9 @@ rm -rf "joomla-${instance}"/* "joomla-${instance}"/.??* || sudo rm -rf "joomla-$
 log "jbt-${instance} – Extracting files"
 ( cd "joomla-${instance}" ; unzip -q "${zip_archive}" )
 
+log "jbt-${instance} – Changing ownership to 'www-data' for all files and directories"
+docker exec "jbt-${instance}" bash -c 'chown -R www-data:www-data /var/www/html'
+
 database="test_joomla_${instance}"
 
 if [ "${dbhost}" = "jbt-pg" ]; then
