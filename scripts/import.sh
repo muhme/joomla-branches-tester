@@ -193,13 +193,17 @@ docker exec "jbt-${instance}" bash -c "sed \
 
 configureJoomlaDebugAndLog "${instance}"
 
-log "jbt-${instance} – Creating Joomla super user 'ci-admin'"
-docker exec "jbt-${instance}" bash -c "php cli/joomla.php user:add \
-    --username='${username}' \
-    --name='${name}' \
-    --password='${password}' \
-    --email='${email}' \
-    --usergroup='Super Users'"
+if docker exec "jbt-${instance}" php cli/joomla.php user:list | grep -q "${username}.*Super Users"; then
+  log "jbt-${instance} – Joomla super user '${username}' already exists, skipping creation"
+else
+  log "jbt-${instance} – Creating Joomla super user '${username}' with password '${password}'"
+  docker exec "jbt-${instance}" bash -c "php cli/joomla.php user:add \
+      --username='${username}' \
+      --name='${name}' \
+      --password='${password}' \
+      --email='${email}' \
+      --usergroup='Super Users'"
+fi
 
 if [ -f "joomla-${instance}/.htaccess" ]; then
   warning "jbt-${instance} – File 'joomla-${instance}/.htaccess' exists'"
