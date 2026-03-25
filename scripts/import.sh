@@ -129,11 +129,8 @@ if [ ! -d "joomla-${instance}" ]; then
   scripts/create.sh recreate empty "${instance}" "${database_variant}"
 fi
 
-# TODO This should be unified over all scripts
-username="ci-admin"
-password='joomla-17082005'
-name="Super User jbt-${instance}"
-email="jbt-${instance}@test.com"
+name="$(superUserName "${instance}")"
+email="$(superUserEmail "${instance}")"
 
 log "jbt-${instance} – Clean up files"
 rm -rf "joomla-${instance}"/* "joomla-${instance}"/.??* || sudo rm -rf "joomla-${instance}"/* "joomla-${instance}"/.??*
@@ -196,14 +193,14 @@ docker exec "jbt-${instance}" bash -c "sed \
 
 configureJoomlaDebugAndLog "${instance}"
 
-if docker exec "jbt-${instance}" php cli/joomla.php user:list | grep -q "${username}.*Super Users"; then
-  log "jbt-${instance} – Joomla super user '${username}' already exists, skipping creation"
+if docker exec "jbt-${instance}" php cli/joomla.php user:list | grep -q "${JBT_SUPERUSER_USERNAME}.*Super Users"; then
+  log "jbt-${instance} – Joomla super user '${JBT_SUPERUSER_USERNAME}' already exists, skipping creation"
 else
-  log "jbt-${instance} – Creating Joomla super user '${username}' with password '${password}'"
+  log "jbt-${instance} – Creating Joomla super user '${JBT_SUPERUSER_USERNAME}' with password '${JBT_SUPERUSER_PASSWORD}'"
   docker exec "jbt-${instance}" bash -c "php cli/joomla.php user:add \
-      --username='${username}' \
+      --username='${JBT_SUPERUSER_USERNAME}' \
       --name='${name}' \
-      --password='${password}' \
+      --password='${JBT_SUPERUSER_PASSWORD}' \
       --email='${email}' \
       --usergroup='Super Users'"
 fi
