@@ -43,6 +43,8 @@ source scripts/helper.sh
 function configureCypressConfig {
   local from="${1}" to="${2}" instance="${3}" baseurl="${4}" dbtype="${5}" dbhost="${6}" dbport="${7}" 
   local smtphost="${8}" smtpport="${9}"
+  local superuser_name="$(superUserName "${instance}")"
+  local superuser_email="$(superUserEmail "${instance}")"
 
   # Using '| name:|'' to exclude 'username:'
   docker exec "jbt-${instance}" bash -c "echo '/* eslint-disable */' | cat - '${from}' | sed \
@@ -53,8 +55,10 @@ function configureCypressConfig {
     -e \"s|db_port: .*|db_port: '${dbport}',|\" \
     -e \"s|baseUrl: .*|baseUrl: '${baseurl}',|\" \
     -e \"s|db_password: .*|db_password: 'root',|\" \
-    -e \"s| name: .*| name: 'Super User jbt-${instance}',|\" \
-    -e \"s|email: .*|email: 'jbt-${instance}@test.com',|\" \
+    -e \"s|username: .*|username: '${JBT_SUPERUSER_USERNAME}',|\" \
+    -e \"s| password: .*| password: '${JBT_SUPERUSER_PASSWORD}',|\" \
+    -e \"s| name: .*| name: '${superuser_name}',|\" \
+    -e \"s|email: .*|email: '${superuser_email}',|\" \
     -e \"s|smtp_host: .*|smtp_host: '${smtphost}',|\" \
     -e \"s|smtp_port: .*|smtp_port: '${smtpport}',|\" \
     -e \"s|instance: .*|instance: '${instance}',|\" \

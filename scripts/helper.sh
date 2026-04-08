@@ -22,6 +22,24 @@ trap 'rm -rf ${JBT_TMP_FILE}' 0
 declare -r \
   JBT_INSTALLATION_CYPRESS_VERSION="15.10.0"
 
+# Joomla Super User credentials for scripts and Cypress configs are the same as those used in the System Tests.
+# Can be overridden via environment variables.
+declare -r \
+  JBT_SUPERUSER_USERNAME="${JBT_SUPERUSER_USERNAME:-ci-admin}" \
+  JBT_SUPERUSER_PASSWORD="${JBT_SUPERUSER_PASSWORD:-joomla-17082005}"
+
+# e.g. "Super User jbt-54"
+function superUserName() {
+  local instance="$1"
+  echo "Super User jbt-${instance}"
+}
+
+# e.g. "jbt-54@test.com"
+function superUserEmail() {
+  local instance="$1"
+  echo "jbt-${instance}@test.com"
+}
+
 # The following five arrays are positionally mapped, avoiding associative arrays
 # to ensure compatibility with macOS default Bash 3.2.
 #
