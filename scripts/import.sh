@@ -142,6 +142,8 @@ log "jbt-${instance} – Extracting files"
 ( cd "joomla-${instance}" ; unzip -q "${zip_archive}" )
 
 log "jbt-${instance} – Changing ownership to 'www-data' for all files and directories"
+# The ‘configuration.php’ file must be writable; otherwise, changing the ownership within the container may fail
+chmod 644 "joomla-${instance}/configuration.php" 2>/dev/null || sudo chmod 644 "joomla-${instance}/configuration.php"
 docker exec "jbt-${instance}" bash -c 'chown -R www-data:www-data /var/www/html'
 
 database="test_joomla_${instance}"
