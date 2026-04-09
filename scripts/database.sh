@@ -30,7 +30,7 @@ source scripts/helper.sh
 #   db_port: '',
 #   baseUrl: 'https://localhost:7154/',
 #   db_password: 'root',
-#   name: 'JBT jbt-54',
+#   name: 'Super User jbt-54',
 #   email: 'jbt-54@test.com',
 #   smtp_host: 'host.docker.internal',
 #   smtp_port: '7025',
@@ -43,8 +43,10 @@ source scripts/helper.sh
 function configureCypressConfig {
   local from="${1}" to="${2}" instance="${3}" baseurl="${4}" dbtype="${5}" dbhost="${6}" dbport="${7}" 
   local smtphost="${8}" smtpport="${9}"
-  local superuser_name="$(superUserName "${instance}")"
-  local superuser_email="$(superUserEmail "${instance}")"
+  local superuser_name superuser_email
+
+  superuser_name="$(superUserName "${instance}")"
+  superuser_email="$(superUserEmail "${instance}")"
 
   # Using '| name:|'' to exclude 'username:'
   docker exec "jbt-${instance}" bash -c "echo '/* eslint-disable */' | cat - '${from}' | sed \
