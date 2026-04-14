@@ -542,19 +542,22 @@ Plus inspect the Joomla network traffic with
 
 If you need to inspect files, they are available in the directory `joomla-54` for this Joomla release 5.4 sample.
 
-### Drone-like Tests
+### CI-like Tests
 
-A subset of seven tests from the full Joomla [Drone](https://www.drone.io/) CI test suite has been implemented:
+A subset of eight tests from the current Joomla
+[GitHub](https://github.com/joomla/joomla-cms/blob/5.4-dev/.github/workflows/ci.yml) CI test suite,
+as well as the previous [Drone](https://www.drone.io/) CI setup, has been implemented:
 
 * `php-cs-fixer` – PHP Coding Standards Fixer (dry-run)
 * `phpcs` – PHP Coding Sniffer
+* `phpstan` – PHP Static Analysis Tool
 * `unit` - PHP Testsuite Unit
 * `lint:css` - CSS Linter
 * `lint:js` - JS Linter
 * `lint:testjs` – JS Linter for Tests
 * `system` – System Tests
 
-Running all seven tests on all instances is simple with the following command:
+Running all eight tests on all instances is simple with the following command:
 ```
 scripts/test
 ```
@@ -570,10 +573,13 @@ scripts/test 54 60 61 lint:css lint:js lint:testjs
 ```
 
 To avoid issues with running `php-cs-fixer`, the auto-generated file `administrator/cache/autoload_psr4.php` is corrected beforehand.
-And the configurations for `php-cs-fixer` and `phpcs` has been extended to exclude the `com_patchtester` component.
+Additionally, the configurations for `php-cs-fixer`, `phpcs` and `phpstan` have been extended to exclude the `com_patchtester` component, if Patch Tester is installed.
 
 :point_right: The PHP Unit Test Suite integration and the Phan static analyzer for PHP have not been implemented.
               Additionally, the tests are not configured to run on multiple PHP versions, as Drone typically does in the Joomla CI environment.
+
+:point_right: Not all tests are available in every Joomla version.
+              If a test is unavailable, it is counted as skipped.
 
 ### Cypress Automated System Tests
 

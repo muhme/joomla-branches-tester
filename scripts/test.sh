@@ -36,7 +36,7 @@ function help {
 # shellcheck disable=SC2207 # There are no spaces in version numbers
 allInstalledInstances=($(getAllInstalledInstances))
 
-ALL_JOOMLA_TESTS=("php-cs-fixer" "phpcs" "unit" "lint:css" "lint:js" "lint:testjs" "system")
+ALL_JOOMLA_TESTS=("php-cs-fixer" "phpcs" "phpstan" "unit" "lint:css" "lint:js" "lint:testjs" "system")
 ALL_TESTS=("${ALL_JOOMLA_TESTS[@]}" "joomla-cypress")
 testsToRun=()
 novnc=false
@@ -153,7 +153,7 @@ for instance in "${instancesToTest[@]}"; do
         continue
       fi
       log "jbt-${instance} – Initiating PHP Coding Sniffer – phpcs"
-      # 1st Ignore Joomla Patch Tester
+      # Ignore errors from Joomla Patch Tester if installed
       insert_file="joomla-${instance}/ruleset.xml"
       insert_line='    <exclude-pattern type="relative">^administrator/components/com_patchtester/*</exclude-pattern>'
       if [ -d "joomla-${instance}/administrator/components/com_patchtester" ] &&
@@ -172,6 +172,39 @@ for instance in "${instancesToTest[@]}"; do
         failed=$((failed + 1))
         overallFailed=$((overallFailed + 1))
         error "jbt-${instance} – phpcs failed."
+      fi
+    fi
+
+    if [ "${actualTest}" = "phpstan" ]; then
+      if [ ! -f "joomla-${instance}/phpstan.neon" ]; then
+        # 'phpstan.neon' configuration file was introduced in Joomla 5.2
+        log "jbt-${instance} There is no 'phpstan.neon' file – skipping PHPStan"
+        skipped=$((skipped + 1))
+        overallSkipped=$((overallSkipped + 1))
+        continue
+      fi
+      # Ignore errors from Joomla Patch Tester, if installed
+      insert_file="joomla-${instance}/phpstan.neon"
+      insert_line=$'\t'$'\t'"- administrator/components/com_patchtester"
+      if [ -d "joomla-${instance}/administrator/components/com_patchtester" ] &&
+         [ -f "${insert_file}" ] && ! grep -qF "${insert_line}" "${insert_file}"; then
+        # It's not ideal to modify the Git-managed file ‘phpstan.neon’, but there is no way to ignore additional paths
+        # via the command line, and we want to prevent PHPStan from failing due to Joomla Patch Tester errors.
+        log "jbt-${instance} – Patch Tester installation found, excluding from PHPStan"
+        csplit "${insert_file}" '/[[:blank:]]excludePaths:/+1' &&
+          cat xx00 >"${insert_file}" &&
+          echo "${insert_line}" >>"${insert_file}" &&
+          cat xx01 >>"${insert_file}" &&
+          rm xx00 xx01
+      fi
+      if docker exec "jbt-${instance}" bash -c "libraries/vendor/bin/phpstan --error-format=github"; then
+        successful=$((successful + 1))
+        overallSuccessful=$((overallSuccessful + 1))
+        log "jbt-${instance} – phpstan passed successfully"
+      else
+        failed=$((failed + 1))
+        overallFailed=$((overallFailed + 1))
+        error "jbt-${instance} – phpstan failed"
       fi
     fi
 
