@@ -178,7 +178,14 @@ for instance in "${instancesToTest[@]}"; do
     if [ "${actualTest}" = "phpstan" ]; then
       if [ ! -f "joomla-${instance}/phpstan.neon" ]; then
         # 'phpstan.neon' configuration file was introduced in Joomla 5.2
-        log "jbt-${instance} There is no 'phpstan.neon' file – skipping PHPStan"
+        log "jbt-${instance} Missing 'phpstan.neon' file – skipping PHPStan"
+        skipped=$((skipped + 1))
+        overallSkipped=$((overallSkipped + 1))
+        continue
+      fi
+      if [ ! -d "joomla-${instance}/installation" ]; then
+        # e.g. after patch level update from web
+        log "jbt-${instance} Missing 'installation' directory – skipping PHPStan"
         skipped=$((skipped + 1))
         overallSkipped=$((overallSkipped + 1))
         continue
