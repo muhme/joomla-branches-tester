@@ -380,7 +380,9 @@ else
     log "jbt-${instance} – Adding cron job for Joomla Task Scheduler"
     docker exec "jbt-${instance}" bash -c "
       ( ( crontab -l 2>/dev/null || echo "" );
-      echo '# JBT – Joomla Task Scheduler with ignoring exit status e.g. 127 No tasks due';
+      echo \"MAILTO=root@jbt-${instance}.com\";
+      echo \"MAILFROM=root@jbt-${instance}.com\";
+      echo '# JBT - Joomla Task Scheduler with ignoring exit status e.g. 127 No tasks due';
       echo \"${cronjob}\" ) | crontab -"
   fi
   # Lazy Scheduler is disabled in database.sh
