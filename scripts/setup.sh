@@ -370,16 +370,21 @@ if ${initial}; then
 fi
 
 # Define the cron job entry
-cronjob="* * * * * /usr/local/bin/php /var/www/html/cli/joomla.php scheduler:run --all --no-interaction --quiet || true"
-# Check if the cron job already exists
-if ! docker exec "jbt-${instance}" bash -c "(crontab -l 2>/dev/null || echo '') | grep -F \"${cronjob}\" > /dev/null"; then
-  log "jbt-${instance} – Adding cron job for Joomla Task Scheduler"
-  docker exec "jbt-${instance}" bash -c "
-    ( ( crontab -l 2>/dev/null || echo "" );
-    echo '# JBT – Joomla Task Scheduler with ignoring exit status e.g. 127 No tasks due';
-    echo \"${cronjob}\" ) | crontab -"
+if ((instance == 310 || instance <= 40)); then
+  # 'cli/joomla.php scheduler:run' is only available since Joomla 4.1
+  warning "jbt-${instance} – Skipping Task Scheduler cron job (CLI scheduler not available)"
+else
+  cronjob="* * * * * /usr/local/bin/php /var/www/html/cli/joomla.php scheduler:run --all --no-interaction --quiet || true"
+  # Check if the cron job already exists
+  if ! docker exec "jbt-${instance}" bash -c "(crontab -l 2>/dev/null || echo '') | grep -F \"${cronjob}\" > /dev/null"; then
+    log "jbt-${instance} – Adding cron job for Joomla Task Scheduler"
+    docker exec "jbt-${instance}" bash -c "
+      ( ( crontab -l 2>/dev/null || echo "" );
+      echo '# JBT – Joomla Task Scheduler with ignoring exit status e.g. 127 No tasks due';
+      echo \"${cronjob}\" ) | crontab -"
+  fi
+  # Lazy Scheduler is disabled in database.sh
 fi
-# Lazy Scheduler is disabled in database.sh
 
 log "jbt-${instance} – Set container prompt"
 docker exec "jbt-${instance}" bash -c "echo PS1=\'jbt-${instance} \# \' >> ~/.bashrc" || true # Who cares?
