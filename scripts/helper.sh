@@ -123,6 +123,8 @@ declare -a \
 
 # All highest minor tags, e.g. "3.9.28 3.10.12 4.0.6 ... 5.3.1 5.4.0-alpha1 6.0.0-alpha1"
 # Skip pre-releases like -rc, -alpha or -beta if final release exist
+# Skip automated updates test versions, e.g. 5.4.100, 5.4.101, ... as they are created from older versions and not the highest
+#
 declare -a \
   JBT_HIGHEST_MINOR_TAGS=()
   all_minor_versions=()
@@ -136,8 +138,18 @@ declare -a \
   for minor in "${all_minor_versions[@]}"; do
     matches=()
     for tag in "${JBT_ALL_USABLE_TAGS[@]}"; do
-      [[ "${tag}" == "${minor}."* ]] && matches+=("${tag}")
+      if [[ "${tag}" == "${minor}."* ]]; then
+        patch=$(echo "${tag}" | sed -E 's/^[0-9]+\.[0-9]+\.([0-9]+).*/\1/')
+        # Ignore automated updates test versions, e.g. 5.4.100, 5.4.101, ...
+        if [[ "${patch}" =~ ^[0-9]+$ ]] && (( patch >= 100 )); then
+          continue
+        fi
+        matches+=("${tag}")
+      fi
     done
+    # Just in case, no usable tag left for this minor after filtering?
+    [[ ${#matches[@]} -eq 0 ]] && continue
+
     stable=()
     for tag in "${matches[@]}"; do
       case "${tag}" in
