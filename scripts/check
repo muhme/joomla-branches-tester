@@ -98,7 +98,9 @@ else
     -e 'man7/bash-builtins.7.gz' \
     -e 'Using PHP error_log = ' \
     -e 'libgpg-error' \
-    -e 'DeprecationWarning' | \
+    -e 'DeprecationWarning' \
+    -e ' \[error-pages\]' \
+    -e ' \[error-pages::build\]' | \
   grep -i --color=always \
     -e ERR \
     -e WRN \
