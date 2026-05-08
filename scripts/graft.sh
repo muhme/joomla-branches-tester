@@ -106,6 +106,13 @@ case "${package}" in
 esac
 cd ..
 
+package_version=$(getJoomlaVersion "joomla-${instance}")
+if [ "${instance}" != "${package_version}" ]; then
+  warning "jbt-${instance} – Joomla major/minor mismatch: package files imply '${package_version}'. Continuing anyway."
+else
+  log "jbt-${instance} – Joomla major/minor version '${package_version}' from package files matches instance"
+fi
+
 # Joomla container needs to be restarted to access the new folder.
 log "Restarting Docker containers"
 docker restart "jbt-${instance}" "jbt-cypress"

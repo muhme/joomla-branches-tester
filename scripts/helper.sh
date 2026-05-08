@@ -668,7 +668,7 @@ function recreateContainersWhenNecessary() {
 }
 
 # Retrieve the installed Joomla major and minor version from the `libraries/src/Version.php` file in the specified branch directory.
-# e.g. getJoomlaVersion "joomla-51" -> "51"
+# e.g. getJoomlaVersion "joomla-51" -> "51", getJoomlaVersion "joomla-310" -> "310"
 #
 function getJoomlaVersion() {
   local versions_file="$1/libraries/src/Version.php"
@@ -682,8 +682,8 @@ function getJoomlaVersion() {
   #     public const MINOR_VERSION = 1;
   version=$(grep -E 'const MAJOR_VERSION|const MINOR_VERSION' "${versions_file}" | sed -e 's/.*= //' | tr -d ';\n')
 
-  # Two digits?
-  if [[ ! ${version} =~ ^[0-9]{2}$ ]]; then
+  # One or more digits (e.g. 51 or 310)
+  if [[ ! ${version} =~ ^[0-9]+$ ]]; then
     error "Could not find Joomla major and minor number in file \"${versions_file}\"."
   fi
 
