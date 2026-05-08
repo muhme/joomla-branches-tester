@@ -71,7 +71,7 @@ Ensure that your current working directory is always the `joomla-branches-tester
 By default (without specifying a Joomla version number) `scripts/create` takes all **used** Joomla development branches.
 **Used** Joomla development branches refer to the GitHub [joomla-cms](https://github.com/joomla/joomla-cms) repository,
 including default, active and stale branches.
-In March 2026, these are `5.4-dev`, `6.0-dev`, `6.1-dev`, `6.2-dev` and `7.0-dev`.
+In May 2026, these are `5.4-dev`, `6.1-dev`, `6.2-dev` and `7.0-dev`.
 
 :point_right: Since **used** branches are subject to frequent changes,
               the latest version numbers are always be retrieved directly from the `joomla-cms` repository.
@@ -590,7 +590,7 @@ from the [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/t
 scripts/test system
 ```
 
-:warning: Currently (October 2025) the Joomla System Tests do not work independently.
+:warning: Currently (May 2026) the Joomla System Tests do not work independently.
           A Joomla installation is required before running the test suite again.
           Be aware the entire database content of the Joomla instance will be lost.
           See [Database and File System Consistency](#database-and-file-system-consistency) for more details.
@@ -733,10 +733,10 @@ Tips:
 
 ### Databases
 
-The Joomla Branches Tester includes one container for each of the three supported databases (version numbers as of the beginning of June 2025):
+The Joomla Branches Tester includes one container for each of the three supported databases (version numbers as of the beginning of May 2026):
 * `jbt-mysql` – MySQL version 8.1.0 Community Server
-* `jbt-madb` – MariaDB version 10.4.34
-* `jbt-pg` – PostgreSQL version 15.8
+* `jbt-madb` – MariaDB version 10.6.25
+* `jbt-pg` – PostgreSQL version 15.16
 
 You can set the desired database and database driver using `scripts/create` or switch them later with `scripts/database`.
 
@@ -763,9 +763,9 @@ Five database and driver combinations are available:
   With a sprinkle of stardust, you can specify the desired database variant,
   and with `recreate` option you're only installing one Joomla version, it will be done in the blink of an eye."*
           
-Use MariaDB with driver MySQLi for Joomla 5.4 and Joomla 6.0:
+Use MariaDB with driver MySQLi for Joomla 5.4 and Joomla 6.1:
 ```
-scripts/database 54 60 mariadbi
+scripts/database 54 61 mariadbi
 ```
 
 Change all Joomla instances to use PostgreSQL:
@@ -843,14 +843,16 @@ An Joomla Super User *ci-admin* with the password *joomla-17082005* is created a
 
 ### Grafting a Joomla Package
 
-Do you have a prebuilt Joomla package to test? No problem!
+Do you have a prebuilt Joomla package to test? From a PR prebuild, a released version or a nightly build? No problem!
 Just like in plant grafting, where a scion is joined to a rootstock,
-you can graft a Joomla package onto the Joomla instance for testing.
-Simply choose the same major and minor version numbers
+you can graft a Joomla package onto an existing Joomla instance for testing.
+Simply choose matching major and minor version numbers
 and graft the full package for a seamless experience:
 
 ```
-scripts/graft 60 Joomla_6.0.0-alpha2-dev+pr.43793-Development-Full_Package.tar.zst
+scripts/graft 54 Joomla_5.4.5-dev+pr.47448-Development-Full_Package.zip
+scripts/graft 61 Joomla_6.1.0-Stable-Full_Package.zip
+scripts/graft 62 Joomla_6.2.0-alpha1-dev-Development-Full_Package.zip
 ```
 
 :warning: The content of the file system of the Joomla instance is overwritten.
@@ -966,10 +968,10 @@ docker exec -it jbt-pg bash -c "PGPASSWORD=root psql -h fd00::13 -U root -d post
 For your convenience, the [Joomla Patch Tester](https://github.com/joomla-extensions/patchtester)
 can be installed on Joomla instances running version 5 or later.
 The script also sets the GitHub token, fetches the data and activates the Advanced Mode.
-This can be done without version number for all Joomla instances or for e.g. Joomla 6.0:
+This can be done without version number for all Joomla instances or for e.g. Joomla 5.4:
 
 ```
-scripts/patchtester 60 install ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
+scripts/patchtester 54 install ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
 ```
 
 ```
@@ -977,7 +979,7 @@ scripts/patchtester 60 install ghp_4711n8uCZtp17nbNrEWsTrFfQgYAU18N542
     Install 'Joomla! Patch Tester' with
     ✓ install component (7747ms)
     ✓ set GitHub token (2556ms)
-    ✓ fetch data (6254ms)
+    ✓ fetch data with retry (6254ms)
     ✓ enable Advanced option (ignore RTC) (1711ms)
 ```
 
@@ -1066,7 +1068,7 @@ scripts/test 54 joomla-cypress
           See [Database and File System Consistency](#database-and-file-system-consistency) for more details.
 
 Skipping the Cypress tests `installLanguage` and `installJoomlaMultiLanguage` is required for
-Joomla versions that are not released yet (for example, Joomla 7.0 in March 2026), as the
+Joomla versions that are not released yet (for example, Joomla 7.0 in May 2026), as the
 language packages are not yet available and the tests would fail with the error
 `Unable to detect manifest file.` Set the environment variable `CYPRESS_SKIP_INSTALL_LANGUAGES=1`:
 ```
@@ -1105,14 +1107,13 @@ These can be used as arguments for the `scripts/create` command:
 scripts/versions
 ```
 ```
-5 Usable Branches from the 'joomla-cms' Repository
-    4.4-dev       5.3-dev       5.4-dev       6.0-dev       6.1-dev
+4 Usable Branches from the 'joomla-cms' Repository
+    5.4-dev       6.1-dev       6.2-dev       7.0-dev 
 
-331 Usable Tags from the 'joomla-cms' Repository
+383 Usable Tags from the 'joomla-cms' Repository
     3.9.0         3.9.0-alpha   3.9.0-beta    3.9.0-beta2   3.9.0-beta3   3.9.0-beta4   3.9.0-rc      3.9.0-rc2
     ...
-    5.3.3-rc2     5.4.0-alpha1  5.4.0-alpha2  5.4.0-alpha3  5.4.0-beta1   5.4.0-beta2   6.0.0-alpha1  6.0.0-alpha2
-    6.0.0-alpha3  6.0.0-beta1   6.0.0-beta2
+    6.1.0-alpha3  6.1.0-beta1   6.1.0-beta2   6.1.0-beta3   6.1.0-rc1     6.1.0-rc2     6.1.0-rc3
 ```
 
 **Usable** Joomla development branches refer to the GitHub [joomla-cms](https://github.com/joomla/joomla-cms) repository, including default, active and stale branches in the format `number.number-dev`. See [joomla-cms/branches](https://github.com/joomla/joomla-cms/branches) for details.
@@ -1289,7 +1290,7 @@ directories to prevent issues during the next installation.
 After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patchtester`.
 
 :fairy: *"The first step `Installation.cy.js` of the Cypress based Joomla System Tests is excluded if you run all `system` test specs.
-          But currently (June 2025) the Joomla System Tests do not work independently.
+          But currently (May 2026) the Joomla System Tests do not work independently.
           A Joomla installation step is required before running the Joomla System Tests a second time."*
 
 ## Trouble-Shooting
@@ -1345,10 +1346,10 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
 * Dual stack IPv6 networking is used only within Docker.
 * The predefined port range run from 7000 to 7961. If another service is already using this range, it may cause a conflict. → [#3](https://github.com/muhme/joomla-branches-tester/issues/3)
 * Usable Joomla Git tags start with `3.9.0` (for earlier versions `apt-get update` does not work so easily).
-* For each Joomla major and minor version (e.g. 5.4, 6.0), only one Docker container is possible.
-  This means you can run containers for versions such as 54 for Joomla 5.4 and 60 for Joomla 6.0,
-  but you cannot have multiple containers for different patch versions like 5.4.0 and 5.4.1 running in parallel.
-* Tests `phan` and `integration`are not implemented yet. → [#4](https://github.com/muhme/joomla-branches-tester/issues/4)
+* For each Joomla major and minor version (e.g. 5.4, 6.1), only one Docker container is possible.
+  This means you can run containers for versions such as 54 for Joomla 5.4 and 61 for Joomla 6.1,
+  but you cannot have multiple containers for different patch versions like 5.4.0 and 5.4.5 running in parallel.
+* Tests `phan` and `integration` are not implemented yet. → [#4](https://github.com/muhme/joomla-branches-tester/issues/4)
 
 ## More Information
 
