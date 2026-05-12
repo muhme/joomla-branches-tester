@@ -298,8 +298,13 @@ else
     fi
   fi
 
+  # Prevent dubious ownership in repository
   log "jbt-${instance} – Git configure '/var/www/html' as safe directory"
   docker exec "jbt-${instance}" bash -c "git config --global --add safe.directory \"/var/www/html\""
+
+  # Just to be save
+  log "jbt-${instance} – Git set no-push for cloned joomla-cms repository"
+  docker exec "jbt-${instance}" sh -c "git remote set-url origin --push no-push"
 
   # Running composer install even if we are not initial - just in case.
   if [ -f "joomla-${instance}/composer.json" ]; then
