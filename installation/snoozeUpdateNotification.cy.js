@@ -3,6 +3,12 @@
  *
  * Used by 'scripts/database.sh'.
  * 
+ *  Can be single tested and watched e.g.:
+ *    docker exec jbt-cypress sh -c "cd /jbt/installation && \
+ *      CYPRESS_CACHE_FOLDER=/jbt/cypress-cache && \
+ *      DISPLAY=jbt-novnc:0 CYPRESS_specPattern=/jbt/installation/snoozeUpdateNotification.cy.js \
+ *      npx cypress run --headed --config-file /jbt/installation/joomla-54/cypress.config.js"
+ *
  * Distributed under the GNU General Public License version 2 or later, Copyright (c) 2025 Heiko Lübbe
  * https://github.com/muhme/joomla-branches-tester
  */
