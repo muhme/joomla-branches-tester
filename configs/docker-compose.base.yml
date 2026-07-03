@@ -77,6 +77,19 @@ services:
         ipv4_address: 10.0.0.13
         ipv6_address: fd00::13 # Use decimal digits, even if hex value differs
 
+  redis:
+    container_name: jbt-redis
+    restart: unless-stopped
+    image: redis:7-alpine
+    ports:
+      - "7014:6379"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      jbt-network:
+        ipv4_address: 10.0.0.14
+        ipv6_address: fd00::14 # Use decimal digits, even if hex value differs
+
   myadmin:
     container_name: jbt-mya
     image: phpmyadmin/phpmyadmin

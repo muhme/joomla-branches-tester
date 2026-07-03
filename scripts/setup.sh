@@ -161,6 +161,10 @@ docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*'
 
+# redis is a PECL extension and not available via docker-php-ext-install, needed for scripts/redis.
+log "jbt-${instance} – Installing Redis PHP extension"
+docker exec "jbt-${instance}" bash -c 'pecl install redis && docker-php-ext-enable redis'
+
 # gh only to use it for applying GitHub PRs manually
 log "jbt-${instance} – Installing gh command"
 docker exec "jbt-${instance}" bash -c '
