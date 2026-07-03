@@ -75,13 +75,17 @@ for instance in "${instancesToChange[@]}"; do
       log "jbt-${instance} – Redis cache is already enabled"
     else
       log "jbt-${instance} – Enabling Redis cache handler (host '${JBT_REDIS_HOST}', port ${JBT_REDIS_PORT})"
+      # Field names as used by Joomla in 'configuration.php', see 'installation/configuration.php-dist':
+      #   Cache:   $caching, $cache_handler, $redis_server_host, $redis_server_port
+      #   Session: $session_redis_server_host, $session_redis_server_port
+      #            (only used if $session_handler is separately set to 'redis', not changed here)
       docker exec "jbt-${instance}" bash -c "sed \
-        -e \"s|\(public .caching =\).*|\1 '1';|\" \
+        -e \"s|\(public .caching =\).*|\1 1;|\" \
         -e \"s|\(public .cache_handler =\).*|\1 'redis';|\" \
-        -e \"s|\(public .redis_persistent =\).*|\1 '0';|\" \
-        -e \"s|\(public .redis_host =\).*|\1 '${JBT_REDIS_HOST}';|\" \
-        -e \"s|\(public .redis_port =\).*|\1 '${JBT_REDIS_PORT}';|\" \
-        -e \"s|\(public .redis_db =\).*|\1 '0';|\" \
+        -e \"s|\(public .redis_server_host =\).*|\1 '${JBT_REDIS_HOST}';|\" \
+        -e \"s|\(public .redis_server_port =\).*|\1 ${JBT_REDIS_PORT};|\" \
+        -e \"s|\(public .session_redis_server_host =\).*|\1 '${JBT_REDIS_HOST}';|\" \
+        -e \"s|\(public .session_redis_server_port =\).*|\1 ${JBT_REDIS_PORT};|\" \
         configuration.php > configuration.php.new && \
         mv configuration.php.new configuration.php && \
         chown www-data:www-data configuration.php && \
@@ -93,8 +97,12 @@ for instance in "${instancesToChange[@]}"; do
     else
       log "jbt-${instance} – Disabling Redis, switching back to file cache handler"
       docker exec "jbt-${instance}" bash -c "sed \
-        -e \"s|\(public .caching =\).*|\1 '0';|\" \
+        -e \"s|\(public .caching =\).*|\1 0;|\" \
         -e \"s|\(public .cache_handler =\).*|\1 'file';|\" \
+        -e \"s|\(public .redis_server_host =\).*|\1 'localhost';|\" \
+        -e \"s|\(public .redis_server_port =\).*|\1 6379;|\" \
+        -e \"s|\(public .session_redis_server_host =\).*|\1 'localhost';|\" \
+        -e \"s|\(public .session_redis_server_port =\).*|\1 6379;|\" \
         configuration.php > configuration.php.new && \
         mv configuration.php.new configuration.php && \
         chown www-data:www-data configuration.php && \
