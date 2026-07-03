@@ -5,8 +5,9 @@
 #   scripts/redis 62 on
 #   scripts/redis 53 60 off
 #
-# Uses the always running 'jbt-redis' base Docker container (see configs/docker-compose.base.yml)
-# and the 'redis' PHP extension installed for every Joomla web server container (see scripts/setup.sh).
+# Uses the 'jbt-redis' base Docker container (see configs/docker-compose.base.yml), started and stopped
+# on demand by this script, and the 'redis' PHP extension installed for every Joomla web server
+# container (see scripts/setup.sh).
 #
 # Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2026 Heiko Lübbe
 # https://github.com/muhme/joomla-branches-tester
@@ -63,6 +64,12 @@ if [ ${#instancesToChange[@]} -eq 0 ]; then
   instancesToChange=("${allInstalledInstances[@]}")
 fi
 
+# jbt-redis is only needed while at least one instance actually uses it, so it is started/stopped on demand.
+if [ "${todo}" = "on" ]; then
+  log "jbt-redis – Starting container"
+  docker start jbt-redis > /dev/null
+fi
+
 for instance in "${instancesToChange[@]}"; do
 
   if [ ! -f "joomla-${instance}/configuration.php" ]; then
@@ -116,3 +123,21 @@ for instance in "${instancesToChange[@]}"; do
     fi
   fi
 done
+
+if [ "${todo}" = "off" ]; then
+  # Check across *all* installed instances, not only the ones just changed, whether Redis is still
+  # in use anywhere, since jbt-redis is one shared base container (see configs/docker-compose.base.yml).
+  stillUsed=false
+  for instance in "${allInstalledInstances[@]}"; do
+    if [ -f "joomla-${instance}/configuration.php" ] && grep -q "cache_handler = 'redis'" "joomla-${instance}/configuration.php"; then
+      stillUsed=true
+      break
+    fi
+  done
+  if [ "${stillUsed}" = false ]; then
+    log "jbt-redis – Stopping container, no Joomla instance is using it anymore"
+    docker stop jbt-redis > /dev/null
+  else
+    log "jbt-redis – Keeping container running, still used by instance '${instance}'"
+  fi
+fi
