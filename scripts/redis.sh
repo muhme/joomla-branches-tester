@@ -90,6 +90,10 @@ for instance in "${instancesToChange[@]}"; do
         mv configuration.php.new configuration.php && \
         chown www-data:www-data configuration.php && \
         chmod 0444 configuration.php"
+      # Apache worker processes (and, if enabled, PHP OPcache) may have already loaded the old
+      # 'configuration.php' into memory, so a graceful reload is needed for the change to take effect.
+      log "jbt-${instance} – Reloading Apache to pick up the new 'configuration.php'"
+      docker exec "jbt-${instance}" bash -c "apache2ctl graceful"
     fi
   else
     if docker exec "jbt-${instance}" bash -c "grep -q \"cache_handler = 'file'\" configuration.php"; then
@@ -107,6 +111,8 @@ for instance in "${instancesToChange[@]}"; do
         mv configuration.php.new configuration.php && \
         chown www-data:www-data configuration.php && \
         chmod 0444 configuration.php"
+      log "jbt-${instance} – Reloading Apache to pick up the new 'configuration.php'"
+      docker exec "jbt-${instance}" bash -c "apache2ctl graceful"
     fi
   fi
 done
