@@ -31,6 +31,7 @@ Within [Docker](https://www.docker.com/) container environment you are able to:
 * Switching between 10 database variants (MySQL, MariaDB, or PostgreSQL and the two database drivers:
   MySQLi or PHP Data Objects and the option to use Unix sockets, instead of TCP host).
 * Switching between PHP versions (PHP 7.4 ... 8.5).
+* Optional use Redis in-memory cache.
 * Installing Joomla from a cloned `joomla-cms` Git repository.
 * Import a Joomla instance from a ZIP package and an SQL dump.
 * Grafting a Joomla package.
@@ -132,7 +133,7 @@ The abbreviation `jbt` stands for Joomla Branches Tester.
 |jbt-mysql| 10.0.0.11<br />fd00::11 :eight_pointed_black_star: | **7011**:3306 | | Database Server MySQL version 8.1 |
 |jbt-madb| 10.0.0.12<br />fd00::12 | **7012**:3306 | | Database Server MariaDB version 10.4 |
 |jbt-pg| 10.0.0.13<br />fd00::13 | **7013**:5432 | | Database Server PostgreSQL version 12.20 |
-|jbt-redis| 10.0.0.14<br />fd00::14 | **7014**:6379 | | Redis Server, used as optional Joomla cache handler, see `scripts/redis` |
+|jbt-redis| 10.0.0.14<br />fd00::14 | **7014**:6379 | | Redis Server, used as optional Joomla in-memory cache |
 |jbt-39| 10.0.0.39<br />fd00::39 | **[7039](http://host.docker.internal:7039/administrator)**<br />**[7139](htts://host.docker.internal:7139/administrator)** | /joomla-39 | Web Server Joomla e.g. tag 3.9.28<br />user ci-admin / joomla-17082005 |
 |jbt-310| 10.0.3.10<br />fd00::310 | **[7310](http://host.docker.internal:7310/administrator)**<br />**[7410](https://host.docker.internal:7410/administrator)** | /joomla-310 | Web Server Joomla e.g. tag 3.10.12<br />user ci-admin / joomla-17082005 |
 | ... | | | | |
@@ -948,15 +949,15 @@ Enabling Xdebug requires at least PHP 8.0. Used ports are 79xx, for the given ex
 
 ### Redis Cache
 
-JBT provides an always running `jbt-redis` base container ([Redis](https://redis.io/)) and installs the
-`redis` PHP extension in every Joomla web server container.
+JBT provides the `jbt-redis` base container ([Redis](https://redis.io/)) and installs the
+`redis` PHP extension in every Joomla >= 4.0 web server container.
 You can switch one or more Joomla instances to use Redis as the Joomla cache handler, for example:
 ```
 scripts/redis 62 on
 ```
 
 This enables caching and configures Joomla's `configuration.php` to use the `redis` cache handler with
-host `jbt-redis` and port `6379`.
+host `jbt-redis`, port `6379` and the next free Redis database number.
 
 Switch back to Joomla's default file-based cache for example:
 ```
@@ -1385,6 +1386,15 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
 Distributed under the GNU General Public License version 2 or later, see [LICENSE](LICENSE)
 
 If it is used, I would like to pass it on to the Joomla! project.
+
+## Acknowledgements
+
+Many thanks to everyone who supports this project by contributing code, testing, reporting bugs,
+suggesting improvements and providing valuable feedback. Your help makes JBT better for everyone.
+
+Many thanks to all contributors, especially:
+* @brianteeman
+* @alikon
 
 ## Contact
 

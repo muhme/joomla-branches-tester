@@ -9,7 +9,8 @@
 # on demand by this script, and the 'redis' PHP extension installed for every Joomla web server
 # container (see scripts/setup.sh).
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2026 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later
+# Copyright (c) 2024 - 2026 Heiko Lübbe and contributors
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -64,6 +65,48 @@ if [ ${#instancesToChange[@]} -eq 0 ]; then
   instancesToChange=("${allInstalledInstances[@]}")
 fi
 
+# Track Redis DB indexes already used by instances with Redis enabled.
+declare -a usedRedisDbs=()
+
+function findFirstFreeRedisDb {
+  local candidate
+  for ((candidate = 0; candidate <= 15; candidate++)); do
+    if [ "${usedRedisDbs[${candidate}]}" != "true" ]; then
+      echo "${candidate}"
+      return 0
+    fi
+  done
+  return 1
+}
+
+for instance in "${allInstalledInstances[@]}"; do
+  configFile="joomla-${instance}/configuration.php"
+
+  if [ ! -f "${configFile}" ]; then
+    continue
+  fi
+
+  if grep -q "cache_handler = 'redis'" "${configFile}"; then
+    dbInUse=$(sed -n "s|.*public \$redis_server_db = \([^;]*\);.*|\1|p" "${configFile}" | head -n 1 | tr -d '[:space:]')
+
+    if [ -z "${dbInUse}" ]; then
+      dbInUse=0
+    fi
+
+    if [[ ! "${dbInUse}" =~ ^-?[0-9]+$ ]]; then
+      error "jbt-${instance} – Redis DB '${dbInUse}' is not an integer. Please fix 'joomla-${instance}/configuration.php'."
+      exit 1
+    fi
+
+    if ((dbInUse < 0 || dbInUse > 15)); then
+      error "jbt-${instance} – Redis DB '${dbInUse}' is out of range 0..15. Please fix 'joomla-${instance}/configuration.php'."
+      exit 1
+    fi
+
+    usedRedisDbs[dbInUse]=true
+  fi
+done
+
 # jbt-redis is only needed while at least one instance actually uses it, so it is started/stopped on demand.
 if [ "${todo}" = "on" ]; then
   log "jbt-redis – Starting container"
@@ -78,21 +121,32 @@ for instance in "${instancesToChange[@]}"; do
   fi
 
   if [ "${todo}" = "on" ]; then
-    if docker exec "jbt-${instance}" bash -c "grep -q \"cache_handler = 'redis'\" configuration.php"; then
+    if ((instance == 310 || instance < 40)); then
+      warning "jbt-${instance} – Redis cache is only supported for Joomla >= 4.0, skipped over"
+    elif docker exec "jbt-${instance}" bash -c "grep -q \"cache_handler = 'redis'\" configuration.php"; then
       log "jbt-${instance} – Redis cache is already enabled"
     else
-      log "jbt-${instance} – Enabling Redis cache handler (host '${JBT_REDIS_HOST}', port ${JBT_REDIS_PORT})"
+      redisDb=$(findFirstFreeRedisDb)
+      if [ -z "${redisDb}" ]; then
+        error "jbt-${instance} – No free Redis DB left in range 0..15. Please disable Redis on another instance first."
+        exit 1
+      fi
+      usedRedisDbs[redisDb]=true
+
+      log "jbt-${instance} – Enabling Redis cache handler (host '${JBT_REDIS_HOST}', port ${JBT_REDIS_PORT}, db ${redisDb})"
       # Field names as used by Joomla in 'configuration.php', see 'installation/configuration.php-dist':
-      #   Cache:   $caching, $cache_handler, $redis_server_host, $redis_server_port
-      #   Session: $session_redis_server_host, $session_redis_server_port
+      #   Cache:   $caching, $cache_handler, $redis_server_host, $redis_server_port, $redis_server_db
+      #   Session: $session_redis_server_host, $session_redis_server_port, $session_redis_server_db
       #            (only used if $session_handler is separately set to 'redis', not changed here)
       docker exec "jbt-${instance}" bash -c "sed \
         -e \"s|\(public .caching =\).*|\1 1;|\" \
         -e \"s|\(public .cache_handler =\).*|\1 'redis';|\" \
         -e \"s|\(public .redis_server_host =\).*|\1 '${JBT_REDIS_HOST}';|\" \
         -e \"s|\(public .redis_server_port =\).*|\1 ${JBT_REDIS_PORT};|\" \
+        -e \"s|\(public .redis_server_db =\).*|\1 ${redisDb};|\" \
         -e \"s|\(public .session_redis_server_host =\).*|\1 '${JBT_REDIS_HOST}';|\" \
         -e \"s|\(public .session_redis_server_port =\).*|\1 ${JBT_REDIS_PORT};|\" \
+        -e \"s|\(public .session_redis_server_db =\).*|\1 ${redisDb};|\" \
         configuration.php > configuration.php.new && \
         mv configuration.php.new configuration.php && \
         chown www-data:www-data configuration.php && \
