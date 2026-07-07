@@ -4,7 +4,8 @@
 #   setup.sh 53
 #   setup.sh 53 initial pgsql socket https://github.com/Elfangor93/joomla-cms:mod_community_info
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2026 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later
+# Copyright (c) 2024 - 2026 Heiko Lübbe and contributors
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then
@@ -161,10 +162,11 @@ docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*'
 
-# redis is a PECL extension and not available via docker-php-ext-install, needed for scripts/redis.
-log "jbt-${instance} – Installing Redis PHP extension"
-docker exec "jbt-${instance}" bash -c 'pecl install redis && docker-php-ext-enable redis'
-
+if ((instance != 310 && instance >= 40)); then
+  # redis is a PECL extension and not available via docker-php-ext-install, needed for scripts/redis.
+  log "jbt-${instance} – Installing Redis PHP extension"
+  docker exec "jbt-${instance}" bash -c 'pecl install redis && docker-php-ext-enable redis'
+fi
 # gh only to use it for applying GitHub PRs manually
 log "jbt-${instance} – Installing gh command"
 docker exec "jbt-${instance}" bash -c '
