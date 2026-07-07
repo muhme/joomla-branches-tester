@@ -3,7 +3,8 @@
 # import.sh - Imports Joomla export.
 #   import site.sql site.zip
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2026 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later
+# Copyright (c) 2024 - 2026 Heiko Lübbe and contributors
 # https://github.com/muhme/joomla-branches-tester
 
 set -Eeuo pipefail

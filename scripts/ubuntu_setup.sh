@@ -11,7 +11,8 @@
 #       . usermod -aG sudo user
 #     . use RDP for GUI
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2026 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later
+# Copyright (c) 2024 - 2026 Heiko Lübbe and contributors
 # https://github.com/muhme/joomla-branches-tester
 #
 # Run as a non-root user:

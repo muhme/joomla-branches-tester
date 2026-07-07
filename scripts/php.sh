@@ -5,7 +5,8 @@
 #   scripts/php 51 php8.2
 #   scripts/php 52 53 php8.3
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2026 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later
+# Copyright (c) 2024 - 2026 Heiko Lübbe and contributors
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then

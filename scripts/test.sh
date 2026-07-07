@@ -8,7 +8,8 @@
 #   scripts/test system 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
 #   ELECTRON_ENABLE_LOGGING=1 scripts/test system
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2026 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later
+# Copyright (c) 2024 - 2026 Heiko Lübbe and contributors
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ $(dirname "$0") != "scripts" || ! -f "scripts/helper.sh" ]]; then

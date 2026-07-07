@@ -2,6 +2,10 @@
  * Custom implementation of registerCommands() tailored for JBT-based installations and testing with joomla-cypress.
  *
  * This implementation is adapted from joomla-cypress/src/index.js, with direct imports of source files.
+ * 
+ * Distributed under the GNU General Public License version 2 or later
+ * Copyright (c) 2024 - 2026 Heiko Lübbe and contributors
+ * https://github.com/muhme/joomla-branches-tester
  */
 
 

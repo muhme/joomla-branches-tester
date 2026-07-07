@@ -3,7 +3,8 @@
  *
  * Used by scripts/database to create instance-specific Cypress installation/joomla-.../cypress.config[.local].js files
  * 
- * Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
+ * Distributed under the GNU General Public License version 2 or later
+ * Copyright (c) 2024 - 2026 Heiko Lübbe and contributors
  * https://github.com/muhme/joomla-branches-tester
  */
 const { defineConfig } = require('../node_modules/cypress');

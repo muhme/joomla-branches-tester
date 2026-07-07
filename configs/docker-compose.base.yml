@@ -1,6 +1,7 @@
 # docker-compose.base.yml - Base with all Docker containers except the Joomla web servers.
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later
+# Copyright (c) 2024 - 2026 Heiko Lübbe and contributors
 # https://github.com/muhme/joomla-branches-tester
 
 # Defining 10.0.0.0/8 for IPv4 subnet to keep addresses simple and easy to remember. Same goes for fd00::/8 in IPv6.
@@ -82,7 +83,7 @@ services:
     restart: unless-stopped
     image: redis:7-alpine
     ports:
-      - "7014:6379"
+      - "7014:6379" # Exposed port 7014 only needed if you like to connect from host tools
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:

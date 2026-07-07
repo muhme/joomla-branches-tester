@@ -9,7 +9,8 @@
  *      DISPLAY=jbt-novnc:0 CYPRESS_specPattern=/jbt/installation/snoozeUpdateNotification.cy.js \
  *      npx cypress run --headed --config-file /jbt/installation/joomla-54/cypress.config.js"
  *
- * Distributed under the GNU General Public License version 2 or later, Copyright (c) 2025 Heiko Lübbe
+ * Distributed under the GNU General Public License version 2 or later
+ * Copyright (c) 2024 - 2026 Heiko Lübbe and contributors
  * https://github.com/muhme/joomla-branches-tester
  */
 

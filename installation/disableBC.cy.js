@@ -3,7 +3,8 @@
  *
  * Used by 'scripts/database.sh'.
  * 
- * Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2025 Heiko Lübbe
+ * Distributed under the GNU General Public License version 2 or later
+ * Copyright (c) 2024 - 2026 Heiko Lübbe and contributors
  * https://github.com/muhme/joomla-branches-tester
  */
 

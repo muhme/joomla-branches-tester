@@ -2,7 +2,8 @@
 #
 # test - Logger frame for test.sh.
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later
+# Copyright (c) 2024 - 2026 Heiko Lübbe and contributors
 # https://github.com/muhme/joomla-branches-tester
 
 log_file="logs/$(date '+%Y-%m-%d-%H%M%S')-test.txt"

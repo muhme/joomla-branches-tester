@@ -6,7 +6,8 @@
 #   TARGET_HOST_0 ... TARGET_HOST_9
 #   TARGET_PORT_0 ... TARGET_PORT_9 (defaults to 25)
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later
+# Copyright (c) 2024 - 2026 Heiko Lübbe and contributors
 # https://github.com/muhme/joomla-branches-tester
 
 import os

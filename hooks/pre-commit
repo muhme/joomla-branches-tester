@@ -3,7 +3,8 @@
 # hooks/pre-commit - Increment the patch version within the git commit.
 #                    Copy this file to .git/hooks
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later
+# Copyright (c) 2024 Heiko Lübbe and contributers
 # https://github.com/muhme/joomla-branches-tester
 
 VERSION_FILE="VERSION"

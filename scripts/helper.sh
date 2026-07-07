@@ -2,7 +2,8 @@
 #
 # helper.sh - General-purpose helper functions for various tasks across all bash scripts.
 #
-# Distributed under the GNU General Public License version 2 or later, Copyright (c) 2024-2026 Heiko Lübbe
+# Distributed under the GNU General Public License version 2 or later
+# Copyright (c) 2024 - 2026 Heiko Lübbe and contributors
 # https://github.com/muhme/joomla-branches-tester
 
 if [[ "${BASH_SOURCE[0]}" = "${0}" ]]; then
