@@ -1393,8 +1393,8 @@ Many thanks to everyone who supports this project by contributing code, testing,
 suggesting improvements and providing valuable feedback. Your help makes JBT better for everyone.
 
 Many thanks to all contributors, especially:
-* @brianteeman
-* @alikon
+* [@brianteeman](https://github.com/brianteeman)
+* [@alikon](https://github.com/alikon)
 
 ## Contact
 
