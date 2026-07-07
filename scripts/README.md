@@ -46,6 +46,7 @@ The following scripts are available and the use is described in [../README.md](.
 | [patchtester](patchtester.sh) | Installs and configures Joomla patch tester component in one or all Joomla instances. | The GitHub token comes from environment variable `JBT_GITHUB_TOKEN` or as mandatory argument. Optional argumenta are the Joomla instances, 'install' (default) or 'uninstall' and the Patch Tester version (default is latest). |
 | [php](php.sh) | Change used PHP version. | Mandatory is the PHP version, e.g. `php8.3`. Optional arguments are the Joomla instances. |
 | [pull](pull.sh) | Running `git pull` and more. | Optional arguments are the Joomla instances. |
+| [redis](redis.sh) | Switching the Joomla cache handler between Redis and file cache. | Mandatory argument is `on` or `off`. Optional arguments are the Joomla instances. |
 | [test](test.sh) | Running Cypress headless System Tests on one or all branches. | Optional arguments are browser, test specification pattern and the Joomla instances. |
 | [ubuntu_setup.sh](ubuntu_setup.sh) | Helper script for Ubuntu Linux (native or in Windows WSL 2) based installation. | |
 | [xdebug](xdebug.sh) | Switching PHP in web container to installation with or without Xdebug. | Mandatory argument is `on` or `off`. Optional arguments are the the Joomla instances. |
