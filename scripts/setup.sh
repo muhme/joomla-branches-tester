@@ -146,6 +146,7 @@ docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
   zstd \
   msmtp \
   msmtp-mta \
+  libmemcached-dev \
   && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
   && docker-php-ext-install -j$(nproc) \
       gd \
