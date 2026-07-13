@@ -24,6 +24,7 @@
       - mariadb
       - postgres
       - redis
+      - memcached
       - relay
       - proxy
     # To prevent volume shadowing and stale mounts of deleted containers, no anonymous volumes are created by defining all volumes.
