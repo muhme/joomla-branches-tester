@@ -1374,6 +1374,7 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
 * For each Joomla major and minor version (e.g. 5.4, 6.1), only one Docker container is possible.
   This means you can run containers for versions such as 54 for Joomla 5.4 and 61 for Joomla 6.1,
   but you cannot have multiple containers for different patch versions like 5.4.0 and 5.4.5 running in parallel.
+  → [#25](https://github.com/muhme/joomla-branches-tester/issues/25)
 * Tests `phan` and `integration` are not implemented yet. → [#4](https://github.com/muhme/joomla-branches-tester/issues/4)
 
 ## More Information
