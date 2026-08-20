@@ -146,6 +146,7 @@ docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
   zstd \
   msmtp \
   msmtp-mta \
+  zlib1g-dev \
   libmemcached-dev \
   && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
   && docker-php-ext-install -j$(nproc) \
@@ -160,6 +161,8 @@ docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
       xsl \
       bz2 \
       calendar \
+  && pecl install memcached \
+  && docker-php-ext-enable memcached \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*'
 

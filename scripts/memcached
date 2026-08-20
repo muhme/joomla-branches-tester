@@ -1,0 +1,13 @@
+#!/bin/bash -e
+#
+# memcached - Logger frame for memcached.sh.
+#
+# Distributed under the GNU General Public License version 2 or later
+# Copyright (c) 2024 - 2026 Heiko Lübbe and contributors
+# https://github.com/muhme/joomla-branches-tester
+
+log_file="logs/$(date '+%Y-%m-%d-%H%M%S')-memcached.txt"
+mkdir -p logs 2>/dev/null || (sudo mkdir -p logs && sudo chmod 777 logs)
+echo "*** Using log file: ${log_file}"
+scripts/memcached.sh "$@" 2>&1 | tee -a "${log_file}"
+echo "*** Log file used: ${log_file}"

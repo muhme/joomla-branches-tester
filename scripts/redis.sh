@@ -158,7 +158,7 @@ for instance in "${instancesToChange[@]}"; do
     fi
   else
     if docker exec "jbt-${instance}" bash -c "grep -q \"cache_handler = 'file'\" configuration.php"; then
-      log "jbt-${instance} – Redis cache is already disabled"
+      log "jbt-${instance} – Cache handler is already 'file'"
     else
       log "jbt-${instance} – Disabling Redis, switching back to file cache handler"
       docker exec "jbt-${instance}" bash -c "sed \
