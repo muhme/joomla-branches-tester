@@ -71,6 +71,12 @@ declare -ar \
 declare -r \
   JBT_REDIS_HOST="jbt-redis" \
   JBT_REDIS_PORT="6379"
+  
+# Memcached base container used as Joomla cache handler, see scripts/memcached.
+# shellcheck disable=SC2034 # It is used by other scripts after sourcing
+declare -r \
+  JBT_REDIS_HOST="jbt-memcached" \
+  JBT_REDIS_PORT="11211"
 
 # Valid PHP versions.
 # (not 5.6 - 7.3 as there are problems and for lowest supported Joomla 3.9.0 there is PHP 7.4 available and working)
