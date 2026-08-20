@@ -41,14 +41,14 @@ function superUserEmail() {
   echo "jbt-${instance}@test.com"
 }
 
-# The following five arrays are positionally mapped, avoiding associative arrays
-# to ensure compatibility with macOS default Bash 3.2.
-#
 # Database Unix socket paths into the '/var/run' directory
 declare -r \
   JBT_S_MY="mysql-socket/mysqld.sock" \
   JBT_S_MA="mariadb-socket/mysqld.sock" \
   JBT_S_PG="postgresql-socket"
+
+# The following five arrays are positionally mapped, avoiding associative arrays
+# to ensure compatibility with macOS default Bash 3.2.
 #
 # Database and driver variants available for 'dbtype' in 'configuration.php'.
 declare -ar \
