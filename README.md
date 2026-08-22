@@ -31,12 +31,11 @@ Within [Docker](https://www.docker.com/) container environment you are able to:
 * Switching between 10 database variants (MySQL, MariaDB, or PostgreSQL and the two database drivers:
   MySQLi or PHP Data Objects and the option to use Unix sockets, instead of TCP host).
 * Switching between PHP versions (PHP 7.4 ... 8.5).
-* Optional use Redis in-memory cache.
 * Installing Joomla from a cloned `joomla-cms` Git repository.
 * Import a Joomla instance from a ZIP package and an SQL dump.
 * Grafting a Joomla package.
 * Using Xdebug for PHP debugging.
-* Switching the Joomla cache handler to Redis, or back to file cache.
+* Switching the Joomla cache handler between Redis, Memecached or back to file cache.
 * Using HTTP and HTTPS.
 * Using IPv4 and IPv6 network in dual-stack.
 * Allows patching and testing of the `joomla-cypress` NPM module.
@@ -134,7 +133,7 @@ The abbreviation `jbt` stands for Joomla Branches Tester.
 |jbt-madb| 10.0.0.12<br />fd00::12 | **7012**:3306 | | Database Server MariaDB version 10.4 |
 |jbt-pg| 10.0.0.13<br />fd00::13 | **7013**:5432 | | Database Server PostgreSQL version 12.20 |
 |jbt-redis| 10.0.0.14<br />fd00::14 | **7014**:6379 | | Redis Server, used as optional Joomla in-memory cache |
-|jbt-memcached| 10.0.0.15<br />fd00::15 | **7015**:11211 | | Memcached Server, used as optional Joomla cache handler, see `scripts/memcached` |
+|jbt-memcached| 10.0.0.15<br />fd00::15 | **7015**:11211 | | Memcached Server, used as optional Joomla cache handler |
 |jbt-39| 10.0.0.39<br />fd00::39 | **[7039](http://host.docker.internal:7039/administrator)**<br />**[7139](htts://host.docker.internal:7139/administrator)** | /joomla-39 | Web Server Joomla e.g. tag 3.9.28<br />user ci-admin / joomla-17082005 |
 |jbt-310| 10.0.3.10<br />fd00::310 | **[7310](http://host.docker.internal:7310/administrator)**<br />**[7410](https://host.docker.internal:7410/administrator)** | /joomla-310 | Web Server Joomla e.g. tag 3.10.12<br />user ci-admin / joomla-17082005 |
 | ... | | | | |
@@ -971,6 +970,31 @@ scripts/redis on
 ```
 
 👉 Switching Redis on or off only edits `configuration.php` and does not affect database or file system consistency.
+
+### Memcached
+
+JBT provides the `jbt-memcached` base container ([Memcached](https://memcached.org/)) and installs the
+`memcached` PHP extension in every Joomla >= 4.0 web server container.
+You can switch one or more Joomla instances to use Memcached as the Joomla cache handler, for example:
+```
+scripts/memcached 62 on
+```
+
+This enables caching and configures Joomla's `configuration.php` to use the `memcached` cache handler with
+host `jbt-memcached` and port `11211`.
+
+Switch back to Joomla's default file-based cache for example:
+```
+scripts/memcached 62 off
+```
+
+Without a Joomla instance given, all installed instances are changed:
+```
+scripts/memcached on
+```
+
+👉 Switching Memcached on or off only edits `configuration.php`, restarts Apache server and
+   does not affect database or file system consistency.
 
 ### IPv6
 
