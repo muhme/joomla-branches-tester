@@ -146,8 +146,6 @@ docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
   zstd \
   msmtp \
   msmtp-mta \
-  zlib1g-dev \
-  libmemcached-dev \
   && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
   && docker-php-ext-install -j$(nproc) \
       gd \
@@ -161,8 +159,6 @@ docker exec "jbt-${instance}" bash -c 'apt-get update && apt-get install -y \
       xsl \
       bz2 \
       calendar \
-  && pecl install memcached \
-  && docker-php-ext-enable memcached \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*'
 
@@ -170,6 +166,12 @@ if ((instance != 310 && instance >= 40)); then
   # redis is a PECL extension and not available via docker-php-ext-install, needed for scripts/redis.
   log "jbt-${instance} – Installing Redis PHP extension"
   docker exec "jbt-${instance}" bash -c 'pecl install redis && docker-php-ext-enable redis'
+  # Memcached
+  log "jbt-${instance} – Installing Memcached PHP extension"
+  docker exec "jbt-${instance}" bash -c 'apt-get update \
+    && apt-get install -y zlib1g-dev libmemcached-dev \
+    && pecl install memcached \
+    && docker-php-ext-enable memcached'
 fi
 # gh only to use it for applying GitHub PRs manually
 log "jbt-${instance} – Installing gh command"
