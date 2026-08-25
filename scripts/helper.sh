@@ -71,7 +71,7 @@ declare -ar \
 declare -r \
   JBT_REDIS_HOST="jbt-redis" \
   JBT_REDIS_PORT="6379"
-  
+
 # Memcached base container used as Joomla cache handler, see scripts/memcached.
 # shellcheck disable=SC2034 # It is used by other scripts after sourcing
 declare -r \
@@ -87,8 +87,8 @@ declare -ar \
 # If a new Joomla version is created and not existing in this list, default is used in dockerImageName().
 # 6 March 2026: Starting with Joomla 5.4 we are now using PHP 8.5
 declare -ar \
-  JBT_JOOMLA_VERSIONS=("39" "310" "40" "41" "42" "43" "44" "50" "51" "52" "53" "54" "60" "61" "62" "70") \
-  JBT_PHP_VERSIONS=("7.4" "8.0" "8.0" "8.0" "8.1" "8.2" "8.2" "8.2" "8.3" "8.3" "8.4" "8.5" "8.5" "8.5" "8.5" "8.5")
+  JBT_JOOMLA_VERSIONS=("39" "310" "40" "41" "42" "43" "44" "50" "51" "52" "53" "54" "60" "61" "62" "63" "70") \
+  JBT_PHP_VERSIONS=("7.4" "8.0" "8.0" "8.0" "8.1" "8.2" "8.2" "8.2" "8.3" "8.3" "8.4" "8.5" "8.5" "8.5" "8.5" "8.5" "8.5")
 
 # Base Docker containers (without the Joomla web server containers), eg
 # ("jbt-pga" "jbt-mya" "jbt-mysql" "jbt-madb" "jbt-pg" "jbt-relay" "jbt-mail" "jbt-cypress" "jbt-novnc")
