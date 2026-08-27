@@ -42,27 +42,36 @@ Within [Docker](https://www.docker.com/) container environment you are able to:
 
 ![Joomla Branches Software Architecture](images/joomla-branches-tester-54.svg)
 
-The software architecture picture shows the simplest installation with only one Joomla 5.4 web server container plus the 10 base containers.
-You'll notice the one orange Joomla 5.4 Web Server container,
-based on the `joomla-54` folder, which is available inside and outside Docker.
-On the right, you can see the three blue containers running the databases: MySQL, MariaDB and PostgreSQL.
-To inspect the databases, two additional blue containers are included: phpMyAdmin (for MySQL and MariaDB) and pgAdmin (for PostgreSQL).
-A green Docker container runs Cypress-based Joomla System Tests, either with a GUI or in headless mode.
-The green noVNC container enables real-time viewing of automated Cypress System Tests.
-If you need to investigate a failed test spec, you can easily switch to running Cypress with the interactive GUI.
+The software architecture diagram shows the simplest JBT setup,
+with a single Joomla 5.4 web server container plus the 12 base containers.
 
-The red mail relay container triplicates all emails sent during manual Joomla tests or System Tests.
-The second red mail catcher container makes these emails accessible via a web application for easy review.
+The orange Joomla 5.4 Web Server container is based on the `joomla-54` folder,
+which is accessible from both inside and outside Docker.
 
-The red proxy container is configured in PHP across all Joomla containers, and the SSL/TLS certificate is imported.
-The web-based mitmproxy interface then allows interactive checking and modification of the HTTP traffic.
+On the right, three blue containers provide the supported databases: MySQL, MariaDB and PostgreSQL.
+Two additional blue containers allow you to inspect these databases: phpMyAdmin for MySQL and MariaDB,
+and pgAdmin for PostgreSQL.
 
-On the Docker Host system (left side), your red web browser is running.
-On macOS and Ubuntu, the native Cypress GUI is displayed in green.
+A green Docker container runs the Cypress-based Joomla System Tests, either interactively with a GUI or in headless mode.
+The green noVNC container allows you to watch automated Cypress System Tests in real time.
+When investigating a failed test spec, you can easily switch to the interactive Cypress GUI.
+
+The red Mail Relay container triplicates all emails sent during manual Joomla tests or automated System Tests.
+A second red Mail Catcher container makes these emails accessible through a web interface for easy inspection.
+
+The red Proxy container provides mitmproxy.
+All Joomla containers are configured to use the proxy in PHP, with the required SSL/TLS certificate installed.
+The web-based mitmproxy interface allows you to interactively inspect and modify HTTP network traffic.
+
+Two further red containers provide Redis and Memcached,
+meaning that for Joomla instances running Joomla 4.0 or later, one of the two cache back-ends can be enabled.
+
+On the Docker host system, shown on the left, your web Browser runs natively.
+On macOS and Ubuntu, the native Cypress GUI can also be used.
 
 Everything is fully scripted and can be easily parameterised for maximum flexibility.
-The `/scripts` folder serves as the source of JBT functionality.
-Ensure that your current working directory is always the `joomla-branches-tester` directory.
+The `/scripts` folder contains the core JBT functionality.
+Make sure your current working directory is always the `joomla-branches-tester` directory when running JBT scripts.
 
 :point_right: For the complete list of all scripts see [scripts/README.md](scripts/README.md).
 
