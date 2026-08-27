@@ -32,6 +32,22 @@ function run_patchtester_install() {
   local token="$3"
   local url="$4"
 
+  # Workaround to get all PR entries until
+  # https://github.com/joomla-extensions/patchtester/issues/393 is fixed
+  if [ -f "joomla-${instance}/configuration.php" ]; then
+
+    log "jbt-${instance} – Set error_reporting none temporary to get all entries"
+
+    # Since we get an access error when changing the ownership, even as root user,
+    # we create configuration.php.new and rename it.
+    docker exec "jbt-${instance}" bash -c "cp -p configuration.php /tmp/configuration.php && \
+      sed -e \"s|\(public .error_reporting =\).*|\1 'none';|\" \
+      configuration.php > configuration.php.new && \
+      mv configuration.php.new configuration.php && \
+      chown www-data:www-data configuration.php && \
+      chmod 0444 configuration.php"
+  fi
+
   log "jbt-${instance} – Installing Joomla Patch Tester version ${patchTesterVersion}"
 
   docker exec jbt-cypress sh -c "
@@ -39,6 +55,16 @@ function run_patchtester_install() {
     DISPLAY=jbt-novnc:0 \
     CYPRESS_specPattern='/jbt/installation/installPatchtester.cy.js' \
     cypress run --headed --env patchtester_url=${url},token=${token}"
+
+  # Revert workaround
+  if [ -f "joomla-${instance}/configuration.php" ]; then
+    log "jbt-${instance} – Restore configuration.php"
+    docker exec "jbt-${instance}" bash -c "chmod 644 configuration.php && \
+      cp -p /tmp/configuration.php configuration.php && \
+      chown www-data:www-data configuration.php && \
+      chmod 0444 configuration.php"
+  fi
+
 }
 
 # shellcheck disable=SC2207 # There are no spaces in version numbers
