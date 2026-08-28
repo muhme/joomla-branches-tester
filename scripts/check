@@ -101,7 +101,8 @@ else
     -e 'libgpg-error' \
     -e 'DeprecationWarning' \
     -e ' \[error-pages\]' \
-    -e ' \[error-pages::build\]' | \
+    -e ' \[error-pages::build\]' \
+    -e 'Set error_reporting' | \
   grep -i --color=always \
     -e ERR \
     -e WRN \
