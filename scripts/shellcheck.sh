@@ -10,7 +10,7 @@
 # Copyright (c) 2024 - 2026 Heiko Lübbe and contributors
 # https://github.com/muhme/joomla-branches-tester
 
-find scripts -type f | grep -v -e .md -e .py | while read -r file; do
+find scripts -type f | grep -v -e .md -e .py -e .DS_Store | while read -r file; do
     echo "FILE ${file}"
     shellcheck -x "${file}"
 done
