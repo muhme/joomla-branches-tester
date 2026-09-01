@@ -25,7 +25,7 @@ function help {
              One or more optional Joomla version(s), if not specified, ${JBT_ALL_USED_BRANCHES[*]} are used
                or use 'all' for: ${JBT_HIGHEST_VERSION[*]}.
                See 'scripts/versions' for all usable versions.
-             The optional database variant can be one of: ${JBT_DB_VARIANTS[*]} (default is mariadbi).
+             The optional database variant can be one of: $(databaseVariantsForHelp) (default is mariadbi).
              The optional 'socket' argument configures database access via Unix socket (default is TCP host).
              The optional 'recreate' argument creates or recreates specified Joomla web server containers.
              The optional 'empty' argument skips initial Joomla clone and setup.
@@ -78,7 +78,7 @@ while [ $# -ge 1 ]; do
     empty=true
     shift # Argument is eaten as option empty.
   elif isValidVariant "$1"; then
-    database_variant="$1"
+    database_variant="$(canonicalDatabaseVariant "$1")"
     shift # Argument is eaten as database variant.
   elif isValidPHP "$1"; then
     php_version="$1"

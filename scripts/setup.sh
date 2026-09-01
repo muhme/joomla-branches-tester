@@ -21,7 +21,7 @@ function help {
                Please specify a Joomla version. Choose one of the available versions listed in 'scripts/version'.
                Optional 'initial' argument for first-time installation.
                Optional 'empty' argument for no Joomla installation.
-               Optional initial database variant: ${JBT_DB_VARIANTS[*]} (default is mariadbi).
+               Optional initial database variant: $(databaseVariantsForHelp) (default is mariadbi).
                Optional initial 'repository:branch', e.g. https://github.com/Elfangor93/joomla-cms:mod_community_info.
                Optional initial 'socket' enables database access via Unix socket (default is TCP host).
                Optional 'unpatched' or one or multiple patches (default: ${JBT_DEFAULT_PATCHES[*]}).
@@ -54,7 +54,7 @@ while [ $# -ge 1 ]; do
     socket=true
     shift # Argument is eaten as use database with socket.
   elif isValidVariant "$1"; then
-    database_variant="$1"
+    database_variant="$(canonicalDatabaseVariant "$1")"
     shift # Argument is eaten as database variant.
   elif [[ "$1" == *:* ]]; then
     # Split into repository and branch.

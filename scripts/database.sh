@@ -3,7 +3,7 @@
 # database.sh - Change the database and database driver for all, one or multiple Joomla containers.
 #   scripts/database mysqli socket
 #   scripts/database 44 mariadb
-#   scripts/database 53 60 pgsql
+#   scripts/database 53 60 postgres
 #
 # Creates three Cypress configuration files:
 #   installation/joomla-${instance}/cypress.config.js
@@ -71,7 +71,7 @@ function configureCypressConfig {
 function help {
     echo "
     database – Changes the database and driver for all, one or multiple Joomla web server containers.
-               The mandatory database variant must be one of: ${JBT_DB_VARIANTS[*]}.
+               The mandatory database variant must be one of: $(databaseVariantsForHelp).
                The optional 'socket' argument configures database access via Unix socket (default is TCP host).
                The optional 'empty' argument skips Cypress Joomla installation and configuration.
                Optional Joomla instances can include one or more of the installed: ${allInstalledInstances[*]} (default is all).
@@ -104,7 +104,7 @@ while [ $# -ge 1 ]; do
     empty=true
     shift # Argument is eaten as option empty.
   elif isValidVariant "$1"; then
-    dbvariant="$1"
+    dbvariant="$(canonicalDatabaseVariant "$1")"
     dbtype=$(dbTypeForVariant "${dbvariant}")
     if ${socket}; then
       # Use Unix socket
@@ -125,7 +125,7 @@ done
 
 if [ -z "${dbvariant}" ] ; then
   help
-  error "Mandatory database variant is missing. Please use one of: ${JBT_DB_VARIANTS[*]}."
+  error "Mandatory database variant is missing. Please use one of: $(databaseVariantsForHelp)."
   exit 1
 fi
 

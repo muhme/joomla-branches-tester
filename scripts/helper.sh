@@ -453,17 +453,48 @@ function dbPortForVariant() {
   error "No database port found for '$1' database variant."
 }
 
+# Returns database variants for help text, using "postgres" as the preferred PostgreSQL name.
+#
+function databaseVariantsForHelp() {
+  local variant variants=()
+
+  for variant in "${JBT_DB_VARIANTS[@]}"; do
+    if [[ "${variant}" == "pgsql" ]]; then
+      variants+=("postgres")
+    else
+      variants+=("${variant}")
+    fi
+  done
+
+  echo "${variants[*]}"
+}
+
+# Returns the canonical database variant.
+# Ignores uppercase and lowercase.
+# e.g. canonicalDatabaseVariant "PostgreSQL" -> "pgsql"
+#
+function canonicalDatabaseVariant() {
+  local variant
+  variant="$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')"
+
+  case "${variant}" in
+    mysqli|mysql|mariadbi|mariadb)
+      printf '%s\n' "${variant}"
+      ;;
+    postgres|postgresql|pg|pgsql)
+      printf '%s\n' "pgsql"
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
 # Check if the given argument is a valid database variant.
 # e.g. isValidVariant "Ingres" -> 1
 #
 function isValidVariant() {
-  local variant="$1"
-  for v in "${JBT_DB_VARIANTS[@]}"; do
-    if [[ "${v}" == "${variant}" ]]; then
-      return 0 # success
-    fi
-  done
-  return 1 # nope
+  canonicalDatabaseVariant "$1" >/dev/null
 }
 
 # Adjust 'configuration.php' for JBT, e.g. set 'tEstValue' as the secret.

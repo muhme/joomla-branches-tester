@@ -11,7 +11,7 @@ LANG=ja scripts/database help
 *** 241109 16:00:10 >>> 'scripts/database.sh help' started.
 
     database – Changes the database and driver for all, one or multiple Joomla web server containers.
-               The mandatory database variant must be one of: mysqli mysql mariadbi mariadb pgsql.
+               The mandatory database variant must be one of: mysqli mysql mariadbi mariadb postgres.
                The optional 'socket' argument configures database access via Unix socket (default is TCP host).
                Optional Joomla instances can include one or more of the following installed: 39 44 52 53 (default is all).
                The optional argument 'help' displays this page. For full details see https://bit.ly/JBT--README.

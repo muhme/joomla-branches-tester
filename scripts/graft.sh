@@ -21,7 +21,7 @@ function help {
     graft – Places a Joomla package onto an existing instance, similar to plant grafting, where a scion joins a rootstock.
             The mandatory Joomla instance must be one of installed: ${allInstalledInstances[*]}.
             The Joomla package file (e.g. 'Joomla_5.1.2-Stable-Full_Package.zip') is also mandatory.
-            Optional database variant can be one of: ${JBT_DB_VARIANTS[*]} (default is mariadbi).
+            Optional database variant can be one of: $(databaseVariantsForHelp) (default is mariadbi).
             The optional argument 'help' displays this page. For full details see https://bit.ly/JBT--README.
     $(random_quote)"
 }
@@ -38,7 +38,7 @@ while [ $# -ge 1 ]; do
     instance="$1"
     shift # Argument is eaten as the instance number.
   elif isValidVariant "$1"; then
-    database_variant="$1"
+    database_variant="$(canonicalDatabaseVariant "$1")"
     shift # Argument is eaten as database variant.
   elif [[ "$1" =~ \.(zip|tar|tar\.zst|tar\.gz|tar\.bz2)$ ]]; then
     package="$1"

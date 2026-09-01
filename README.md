@@ -761,7 +761,7 @@ Secondly, a Joomla installation is performed with the Joomla System Tests.
 Five database and driver combinations are available:
 * mariadbi – MariaDB with MySQLi (improved)
 * mariadb – MariaDB with MySQL PDO (PHP Data Objects)
-* pgsql - PostgreSQL PDO (PHP Data Objects)
+* postgres - PostgreSQL PDO (PHP Data Objects)
 * mysqli – MySQL with MySQLi (improved)
 * mysql – MySQL with MySQL PDO (PHP Data Objects)
 
@@ -780,7 +780,7 @@ scripts/database 54 61 mariadbi
 
 Change all Joomla instances to use PostgreSQL:
 ```
-scripts/database pgsql
+scripts/database postgres
 ```
 
 #### Database Unix Sockets
@@ -872,7 +872,7 @@ Mandatory arguments are the Joomla instance version and the local package file.
 Supported file formats are .zip, .tar, .tar.zst, .tar.gz and .tar.bz2.
 An optional argument is the database variant, such as PostgreSQL in the following example:
 ```
-scripts/graft 51 pgsql ~/Downloads/Joomla_5.1.3-Stable-Full_Package.zip
+scripts/graft 51 postgres ~/Downloads/Joomla_5.1.3-Stable-Full_Package.zip
 ```
 
 After grafting, you can still switch the database variant, change the PHP version,
