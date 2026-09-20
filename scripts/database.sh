@@ -105,7 +105,6 @@ while [ $# -ge 1 ]; do
     shift # Argument is eaten as option empty.
   elif isValidVariant "$1"; then
     dbvariant="$(canonicalDatabaseVariant "$1")"
-    dbtype=$(dbTypeForVariant "${dbvariant}")
     if ${socket}; then
       # Use Unix socket
       dbhost=$(dbSocketForVariant "${dbvariant}")
@@ -135,6 +134,7 @@ if [ ${#instancesToChange[@]} -eq 0 ]; then
 fi
 
 for instance in "${instancesToChange[@]}"; do
+  dbtype=$(dbTypeForVariant "${dbvariant}" "${instance}")
 
   docker exec "jbt-${instance}" bash -c "mkdir -p '/jbt/installation/joomla-${instance}' && \
                                          rm -f '/jbt/joomla-${instance}/configuration.php'"
