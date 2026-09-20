@@ -53,9 +53,10 @@ declare -r \
 # Database and driver variants available for 'dbtype' in 'configuration.php'.
 declare -ar \
   JBT_DB_VARIANTS=("mysqli" "mysql" "mariadbi" "mariadb" "pgsql")
-# Database driver mapping for the variants as in Web Installer 'database type'.
+# Using option values (mysqli, mysql, pgsql) instead of display text, which changed in Joomla 6.2
+# from e.g. "MySQLi" to "MariaDB or MySQL (MySQLi)". cy.select() matches by value or text.
 declare -ar \
-  JBT_DB_TYPES=("MySQLi" "MySQL (PDO)" "MySQLi" "MySQL (PDO)" "PostgreSQL (PDO)")
+  JBT_DB_TYPES=("mysqli" "mysql" "mysqli" "mysql" "pgsql")
 # Database server mapping for the variants.
 declare -ar \
   JBT_DB_HOSTS=("jbt-mysql" "jbt-mysql" "jbt-madb" "jbt-madb" "jbt-pg")
