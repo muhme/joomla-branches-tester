@@ -24,7 +24,7 @@ source scripts/helper.sh
 # Configure cypress.config.*js
 #
 # adopt e.g.:
-#   db_type: 'PostgreSQL (PDO)',
+#   db_type: 'pgsql',
 #   db_name: 'test_joomla_54'
 #   db_prefix: 'ajbt54_', # use of 'a' as initial letter for sorting before bak_-tables
 #   db_host: 'jbt-pg',
