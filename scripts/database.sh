@@ -24,7 +24,7 @@ source scripts/helper.sh
 # Configure cypress.config.*js
 #
 # adopt e.g.:
-#   db_type: 'PostgreSQL (PDO)',
+#   db_type: 'pgsql',
 #   db_name: 'test_joomla_54'
 #   db_prefix: 'ajbt54_', # use of 'a' as initial letter for sorting before bak_-tables
 #   db_host: 'jbt-pg',
@@ -134,7 +134,7 @@ if [ ${#instancesToChange[@]} -eq 0 ]; then
 fi
 
 for instance in "${instancesToChange[@]}"; do
-  dbtype=$(dbTypeForVariant "${dbvariant}" "${instance}")
+  dbtype=$(dbTypeForVariant "${dbvariant}")
 
   docker exec "jbt-${instance}" bash -c "mkdir -p '/jbt/installation/joomla-${instance}' && \
                                          rm -f '/jbt/joomla-${instance}/configuration.php'"

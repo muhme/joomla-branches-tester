@@ -53,9 +53,9 @@ declare -r \
 # Database and driver variants available for 'dbtype' in 'configuration.php'.
 declare -ar \
   JBT_DB_VARIANTS=("mysqli" "mysql" "mariadbi" "mariadb" "pgsql")
-# Database driver mapping for the variants as in Web Installer 'database type'.
+# Internal database option values for the variants as in Web Installer 'database type'.
 declare -ar \
-  JBT_DB_TYPES=("MySQLi" "MySQL (PDO)" "MySQLi" "MySQL (PDO)" "PostgreSQL (PDO)")
+  JBT_DB_TYPES=("mysqli" "mysql" "mysqli" "mysql" "pgsql")
 # Database server mapping for the variants.
 declare -ar \
   JBT_DB_HOSTS=("jbt-mysql" "jbt-mysql" "jbt-madb" "jbt-madb" "jbt-pg")
@@ -398,37 +398,12 @@ function getMajorMinor() {
   fi
 }
 
-# Returns the database type for a given database variant and Joomla instance.
-# Reads the installer label when available, retaining the legacy label otherwise.
-# e.g. dbTypeForVariant "mysql" "54" -> "MySQL (PDO)"
-# e.g. dbTypeForVariant "mysql" "62" -> "MariaDB or MySQL (PDO)"
+# Returns the internal database option value for a given database variant.
+# e.g. dbTypeForVariant "mysql" -> "mysql"
+# e.g. dbTypeForVariant "mariadbi" -> "mysqli"
 #
 function dbTypeForVariant() {
-  local variant=$1 instance=$2 key label language_file
-
-  if [[ -n "${instance}" ]]; then
-    case "${variant}" in
-      mysql|mariadb)
-        key="MYSQL"
-        ;;
-      mysqli|mariadbi)
-        key="MYSQLI"
-        ;;
-      pgsql)
-        key="PGSQL" # not! POSTGRESQL
-        ;;
-    esac
-    language_file="joomla-${instance}/installation/language/en-GB/joomla.ini"
-    if [[ -n "${key}" && -f "${language_file}" ]]; then
-      label=$(sed -n -E "s/^${key}=\"([^\"]*)\"$/\1/p" "${language_file}" | head -n 1)
-      if [[ -n "${label}" ]]; then
-        echo "${label}"
-        return
-      fi
-    fi
-  fi
-
-  # Fallback to legacy labels if no installer label is found
+  local variant=$1
   for i in "${!JBT_DB_VARIANTS[@]}"; do
     if [ "${JBT_DB_VARIANTS[$i]}" = "$variant" ]; then
       echo "${JBT_DB_TYPES[$i]}"
