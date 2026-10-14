@@ -30,3 +30,6 @@ installation/cypress
 
 # SSL certificates
 certs
+
+# Directory for Joomla exports created by scripts/export
+exports

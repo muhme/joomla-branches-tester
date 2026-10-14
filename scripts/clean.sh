@@ -98,6 +98,11 @@ if [ -d "logs" ]; then
   xargs -r rm -f -- <"${JBT_TMP_FILE}" 2>/dev/null || sudo bash -c "xargs -r rm -f -- <\"${JBT_TMP_FILE}\""
 fi
 
+# Warn about the exports directory, it is not deleted
+if [ -d "exports" ]; then
+  warning "Folder 'exports' is existing with $(find exports -type f | wc -l | tr -d ' ') files and $(du -sm exports | cut -f1) MB, it is not deleted"
+fi
+
 # Checking Cypress global binary cache for macOS and Linux
 for dir in "${HOME}/Library/Caches/Cypress" "${HOME}/.cache/Cypress"; do
   # $dir exists and contains at least one directory

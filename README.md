@@ -32,7 +32,8 @@ Within [Docker](https://www.docker.com/) container environment you are able to:
   MySQLi or PHP Data Objects and the option to use Unix sockets, instead of TCP host).
 * Switching between PHP versions (PHP 7.4 ... 8.5).
 * Installing Joomla from a cloned `joomla-cms` Git repository.
-* Import a Joomla instance from a ZIP package and an SQL dump.
+* Import from any Joomla instance with a ZIP package and an SQL dump.
+* Export a JBT Joomla instance to save your configuration and time.
 * Grafting a Joomla package.
 * Using Xdebug for PHP debugging.
 * Switching the Joomla cache handler between Redis, Memecached or back to file cache.
@@ -824,6 +825,19 @@ Or specify the desired Joomla instances:
 ```
 scripts/php 54 60 php8.5
 ```
+
+### Exporting a Joomla Instance
+
+Do you want to take the data of a JBT Joomla instance with you, or hand it over for analysis?
+Export it, the opposite of the import, with the Joomla version number as argument:
+
+```
+scripts/export 54
+```
+
+The database dump (MySQL, MariaDB or PostgreSQL) and all files of the instance are written into
+the `exports` directory, e.g. `exports/54-261014.sql` and `exports/54-261014.zip`.
+The result can be imported again with `scripts/import`.
 
 ### Importing a Joomla Instance
 
