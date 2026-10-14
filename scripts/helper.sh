@@ -804,12 +804,12 @@ runningTime() {
 #
 function random_quote() {
 
-  if [ "${JBT_SHOW_QUOTE}" = "false" ] || [ "${JBT_SHOW_QUOTE}" = "0" ]; then
+  if [ "${JBT_SHOW_QUOTE:-}" = "false" ] || [ "${JBT_SHOW_QUOTE:-}" = "0" ]; then
     return 0
   fi
 
   # Check the LANG environment variable
-  lang_code=$(echo "${LANG}" | cut -c1-2 | tr '[:upper:]' '[:lower:]')
+  lang_code=$(echo "${LANG:-}" | cut -c1-2 | tr '[:upper:]' '[:lower:]')
 
   # Use one of the supported languages or default to English
   case "${lang_code}" in
