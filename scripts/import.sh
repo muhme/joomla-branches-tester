@@ -137,7 +137,9 @@ log "jbt-${instance} – Clean up files"
 rm -rf "joomla-${instance}"/* "joomla-${instance}"/.??* || sudo rm -rf "joomla-${instance}"/* "joomla-${instance}"/.??*
 
 log "jbt-${instance} – Extracting files"
-( cd "joomla-${instance}" ; unzip -q "${zip_archive}" )
+# Relative ZIP file name must be made absolute as unzip runs in the instance directory
+zip_archive_abs="$(cd "$(dirname "${zip_archive}")" && pwd)/$(basename "${zip_archive}")"
+( cd "joomla-${instance}" ; unzip -q "${zip_archive_abs}" )
 
 log "jbt-${instance} – Changing ownership to 'www-data' for all files and directories"
 # The ‘configuration.php’ file must be writable; otherwise, changing the ownership within the container may fail
