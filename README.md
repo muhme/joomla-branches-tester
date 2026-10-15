@@ -82,7 +82,7 @@ Make sure your current working directory is always the `joomla-branches-tester` 
 By default (without specifying a Joomla version number) `scripts/create` takes all **used** Joomla development branches.
 **Used** Joomla development branches refer to the GitHub [joomla-cms](https://github.com/joomla/joomla-cms) repository,
 including default, active and stale branches.
-In May 2026, these are `5.4-dev`, `6.1-dev`, `6.2-dev` and `7.0-dev`.
+In October 2026, these are `5.4-dev`, `6.2-dev`, `6.3-dev` and `7.0-dev`.
 
 :point_right: Since **used** branches are subject to frequent changes,
               the latest version numbers are always be retrieved directly from the `joomla-cms` repository.
@@ -601,7 +601,7 @@ from the [Joomla System Tests](https://github.com/joomla/joomla-cms//blob/HEAD/t
 scripts/test system
 ```
 
-:warning: Currently (May 2026) the Joomla System Tests do not work independently.
+:warning: Currently (October 2026) the Joomla System Tests do not work independently.
           A Joomla installation is required before running the test suite again.
           Be aware the entire database content of the Joomla instance will be lost.
           See [Database and File System Consistency](#database-and-file-system-consistency) for more details.
@@ -630,9 +630,9 @@ scripts/test system administrator/components/com_users/Users.cy.js
 :point_right: When specifying a single test spec file,
               you can omit the `tests/System/integration/` path at the beginning.
 
-Test all `site` specs with Microsoft Edge in the Joomla instances 5.4, 6.1 and 7.0 using a pattern:
+Test all `site` specs with Microsoft Edge in the Joomla instances 5.4, 6.3 and 7.0 using a pattern:
 ```
-scripts/test 54 61 70 system edge 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
+scripts/test 54 63 70 system edge 'tests/System/integration/site/**/*.cy.{js,jsx,ts,tsx}'
 ```
 
 One more optional argument is `novnc`.
@@ -744,10 +744,10 @@ Tips:
 
 ### Databases
 
-The Joomla Branches Tester includes one container for each of the three supported databases (version numbers as of the beginning of May 2026):
-* `jbt-mysql` – MySQL version 8.1.0 Community Server
-* `jbt-madb` – MariaDB version 10.6.25
-* `jbt-pg` – PostgreSQL version 15.16
+The Joomla Branches Tester includes one container for each of the three supported databases (version numbers as of the beginning of October 2026):
+* `jbt-mysql` – MySQL version 8.1 Community Server
+* `jbt-madb` – MariaDB version 10.6
+* `jbt-pg` – PostgreSQL version 15.8
 
 You can set the desired database and database driver using `scripts/create` or switch them later with `scripts/database`.
 
@@ -774,9 +774,9 @@ Five database and driver combinations are available:
   With a sprinkle of stardust, you can specify the desired database variant,
   and with `recreate` option you're only installing one Joomla version, it will be done in the blink of an eye."*
           
-Use MariaDB with driver MySQLi for Joomla 5.4 and Joomla 6.1:
+Use MariaDB with driver MySQLi for Joomla 5.4 and Joomla 6.3:
 ```
-scripts/database 54 61 mariadbi
+scripts/database 54 63 mariadbi
 ```
 
 Change all Joomla instances to use PostgreSQL:
@@ -869,7 +869,7 @@ An Joomla Super User *ci-admin* with the password *joomla-17082005* is created a
 
 Do you have a prebuilt Joomla package to test? From a PR prebuild, a released version or a nightly build? No problem!
 Just like in plant grafting, where a scion is joined to a rootstock,
-you can graft a Joomla package onto an existing Joomla instance for testing.
+you can graft a Joomla package onto an existing JBT Joomla Docker container for testing.
 Simply choose matching major and minor version numbers
 and graft the full package for a seamless experience:
 
@@ -1148,7 +1148,7 @@ scripts/test 54 joomla-cypress
           See [Database and File System Consistency](#database-and-file-system-consistency) for more details.
 
 Skipping the Cypress tests `installLanguage` and `installJoomlaMultiLanguage` is required for
-Joomla versions that are not released yet (for example, Joomla 7.0 in May 2026), as the
+Joomla versions that are not released yet (for example, Joomla 7.0 in October 2026), as the
 language packages are not yet available and the tests would fail with the error
 `Unable to detect manifest file.` Set the environment variable `CYPRESS_SKIP_INSTALL_LANGUAGES=1`:
 ```
@@ -1188,12 +1188,12 @@ scripts/versions
 ```
 ```
 4 Usable Branches from the 'joomla-cms' Repository
-    5.4-dev       6.1-dev       6.2-dev       7.0-dev 
+    5.4-dev       6.2-dev       6.3-dev       7.0-dev
 
-383 Usable Tags from the 'joomla-cms' Repository
+414 Usable Tags from the 'joomla-cms' Repository
     3.9.0         3.9.0-alpha   3.9.0-beta    3.9.0-beta2   3.9.0-beta3   3.9.0-beta4   3.9.0-rc      3.9.0-rc2
     ...
-    6.1.0-alpha3  6.1.0-beta1   6.1.0-beta2   6.1.0-beta3   6.1.0-rc1     6.1.0-rc2     6.1.0-rc3
+    6.2.0-alpha3  6.2.0-beta1   6.2.0-beta2   6.2.0-beta3   6.2.0-rc1     6.2.0-rc2
 ```
 
 **Usable** Joomla development branches refer to the GitHub [joomla-cms](https://github.com/joomla/joomla-cms) repository, including default, active and stale branches in the format `number.number-dev`. See [joomla-cms/branches](https://github.com/joomla/joomla-cms/branches) for details.
@@ -1330,7 +1330,7 @@ docker compose -p joomla-branches-tester stop
 Start the `joomla-branches-tester` project in Docker Desktop or run:
 ```
 docker compose -p joomla-branches-tester start
-````
+```
 
 ### Deleting JBT
 
@@ -1351,6 +1351,7 @@ The following operations will break database and file system consistency,
 as the Joomla database will be recreated:
 * `scripts/database`
 * `scripts/create` and `scripts/create recreate`
+* `scripts/import`
 * `scripts/test` running `Installation.cy.js` from Joomla System tests or `joomla-cypress`
 * `scripts/cypress` running `Installation.cy.js` from Joomla System tests or `joomla-cypress`
 
@@ -1370,7 +1371,7 @@ directories to prevent issues during the next installation.
 After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patchtester`.
 
 :fairy: *"The first step `Installation.cy.js` of the Cypress based Joomla System Tests is excluded if you run all `system` test specs.
-          But currently (May 2026) the Joomla System Tests do not work independently.
+          But currently (October 2026) the Joomla System Tests do not work independently.
           A Joomla installation step is required before running the Joomla System Tests a second time."*
 
 ## Trouble-Shooting
@@ -1426,8 +1427,8 @@ After that, you'll need to reinstall the Joomla Patch Tester using `scripts/patc
 * Dual stack IPv6 networking is used only within Docker.
 * The predefined port range run from 7000 to 7961. If another service is already using this range, it may cause a conflict. → [#3](https://github.com/muhme/joomla-branches-tester/issues/3)
 * Usable Joomla Git tags start with `3.9.0` (for earlier versions `apt-get update` does not work so easily).
-* For each Joomla major and minor version (e.g. 5.4, 6.1), only one Docker container is possible.
-  This means you can run containers for versions such as 54 for Joomla 5.4 and 61 for Joomla 6.1,
+* For each Joomla major and minor version (e.g. 5.4, 6.3), only one Docker container is possible.
+  This means you can run containers for versions such as 54 for Joomla 5.4 and 70 for Joomla 7.0,
   but you cannot have multiple containers for different patch versions like 5.4.0 and 5.4.5 running in parallel.
   → [#25](https://github.com/muhme/joomla-branches-tester/issues/25)
 * Tests `phan` and `integration` are not implemented yet. → [#4](https://github.com/muhme/joomla-branches-tester/issues/4)
