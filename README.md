@@ -36,7 +36,7 @@ Within [Docker](https://www.docker.com/) container environment you are able to:
 * Export a JBT Joomla instance to save your configuration and time.
 * Grafting a Joomla package.
 * Using Xdebug for PHP debugging.
-* Switching the Joomla cache handler between Redis, Memecached or back to file cache.
+* Switching the Joomla cache handler between Redis, Memcached or back to file cache.
 * Using HTTP and HTTPS.
 * Using IPv4 and IPv6 network in dual-stack.
 * Allows patching and testing of the `joomla-cypress` NPM module.
