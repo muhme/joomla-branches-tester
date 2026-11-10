@@ -30,6 +30,7 @@ function help {
            Specify an optional kind of test from: ${ALL_TESTS[*]}
            (defaults to ${ALL_JOOMLA_TESTS[*]}).
            Optional test spec file pattern for Cypress tests (defaults to all, but for 'system' without the installation step).
+           The optional 'count' argument (only valid with System Tests) counts database objects before and after tests.
            The optional argument 'help' displays this page. For full details see https://bit.ly/JBT--README.
     $(random_quote)"
 }
@@ -42,6 +43,7 @@ ALL_TESTS=("${ALL_JOOMLA_TESTS[@]}" "joomla-cypress")
 testsToRun=()
 novnc=false
 browser=""
+count_db=false
 instancesToTest=()
 while [ $# -ge 1 ]; do
   if [[ "$1" =~ ^(help|-h|--h|-help|--help|-\?)$ ]]; then
@@ -53,6 +55,9 @@ while [ $# -ge 1 ]; do
   elif [ "$1" = "novnc" ]; then
     novnc=true
     shift # Argument is eaten as using NoVNC.
+  elif [ "$1" = "count" ]; then
+    count_db=true
+    shift # Argument is eaten as database counting flag.
   elif [[ "$1" =~ ^(chromium|chrome|edge|firefox|electron)$ ]]; then
     browser="--browser $1"
     shift # Argument is eaten as browser to use.
@@ -87,6 +92,16 @@ fi
 # If no test name was given, use all.
 if [ ${#testsToRun[@]} -eq 0 ]; then
   testsToRun=("${ALL_JOOMLA_TESTS[@]}")
+fi
+
+# Validate count argument - only valid with system tests
+if [ "${count_db}" = true ]; then
+  if ! isValidTestName "system" "${testsToRun[@]}"; then
+    error "The 'count' argument is only valid with System Tests."
+    exit 1
+  fi
+  # Source database counting script
+  JBT_INTERNAL=42 source scripts/database-count.sh
 fi
 
 # Pass through the environment variable to show 'console.log()' messages
@@ -310,7 +325,7 @@ for instance in "${instancesToTest[@]}"; do
         if [ -z "${spec_argument}" ]; then
 
           # It is a nice idea to create the test list from the system,
-          # but currently (May 2025) the order of the tests is important as the system tests are not independent.
+          # but currently (May 2025) the order of the tests is important as the System Tests are not independent.
           #
           # # Create spec pattern list without installation spec
           # all=$(grep "tests/System/integration/" "joomla-${instance}/cypress.config.${extension}" |
@@ -385,6 +400,12 @@ for instance in "${instancesToTest[@]}"; do
 
       time_before_test=$(date '+%Y-%m-%dT%H:%M:%S')
 
+      # Count database objects before System Tests if requested
+      db_count_file=""
+      if [ "${count_db}" = true ] && [ "${actualTest}" = "system" ]; then
+        db_count_file=$(countBeforeTest "${instance}") || db_count_file=""
+      fi
+
       if ${novnc}; then
         log "jbt-${instance} – Initiating ${actualTest} tests with NoVNC and ${spec}"
         # Currently (May 2025) the test order is important as the System Tests are not independent.
@@ -404,7 +425,7 @@ for instance in "${instancesToTest[@]}"; do
           npx cypress run ${browser} --config-file '${config_file}' --spec '${spec}'"
       fi
       npx_status=$?
-      # If system tests running with 'install/Installation.cy.js' the smptpport is overwritten from Cypress configuration
+      # If System Tests running with 'install/Installation.cy.js' the smptpport is overwritten from Cypress configuration
       # and we need to adjust it to make mail work again.
       adjustJoomlaConfigurationForJBT "${instance}"
       # Check if there are any PHP Deprecated|Notice|Warning|Error in the logs
@@ -412,6 +433,12 @@ for instance in "${instancesToTest[@]}"; do
         error "jbt-${instance} – PHP Deprecated|Notice|Warning|Error found in Joomla Backend"
         npx_status=42
       fi
+
+      # Count database objects after System Tests if requested
+      if [ "${count_db}" = true ] && [ "${actualTest}" = "system" ] && [ -n "${db_count_file}" ]; then
+        countAfterTest "${instance}" "${db_count_file}"
+      fi
+
       # shellcheck disable=SC2181 # Check either Cypress headed or headless status
       if [ ${npx_status} -eq 0 ]; then
         # Don't use ((successful++)) as it returns 1 and the script fails with -e on Windows WSL Ubuntu

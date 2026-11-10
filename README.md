@@ -613,6 +613,8 @@ Some more optional arguments for System Tests are:
 
 * Test spec pattern: All test specs (except the installation) are used by default.
 * Browser to be used: Choose between electron (default), firefox, chrome, chromium or edge.
+* `count`: Compare estimated database table row counts before and after the system tests.
+  Action logs, history, sessions and finder tables are excluded; unchanged counts do not guarantee unchanged data.
 
 :point_right: Which browser is available in the Cypress Docker container depends on your platform.
               You can check this with: `docker exec jbt-cypress cypress info`.

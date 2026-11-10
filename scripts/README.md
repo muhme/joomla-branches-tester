@@ -48,7 +48,7 @@ The following scripts are available and the use is described in [../README.md](.
 | [php](php.sh) | Change used PHP version. | Mandatory is the PHP version, e.g. `php8.3`. Optional arguments are the Joomla instances. |
 | [pull](pull.sh) | Running `git pull` and more. | Optional arguments are the Joomla instances. |
 | [redis](redis.sh) | Switching the Joomla cache handler between Redis and file cache. | Mandatory argument is `on` or `off`. Optional arguments are the Joomla instances. |
-| [test](test.sh) | Running Cypress headless System Tests on one or all branches. | Optional arguments are browser, test specification pattern and the Joomla instances. |
+| [test](test.sh) | Running tests on one or all branches. | Optional arguments include browser, test specification pattern, Joomla instances and `count`. |
 | [ubuntu_setup.sh](ubuntu_setup.sh) | Helper script for Ubuntu Linux (native or in Windows WSL 2) based installation. | |
 | [xdebug](xdebug.sh) | Switching PHP in web container to installation with or without Xdebug. | Mandatory argument is `on` or `off`. Optional arguments are the the Joomla instances. |
 
@@ -77,6 +77,7 @@ The following scripts are for internal usage only:
 
 | File | Description | Additional Info |
 | --- | --- | --- |
+| [database-count.sh](database-count.sh) | Compare database table row counts around system tests. | Sourced by `scripts/test.sh` when `count` is specified. |
 | [helper.sh](helper.sh) | Some commonly used bash script functions and definitions. | Sourced and used by other Bash scripts within the project. |
 | [repos.sh](repos.sh) | Get information about Git repositories. | Used by `scripts/info` and running inside Docker container. |
 | [setup.sh](setup.sh) | Install and configure Docker web server containers. | Used by `scripts/create` and `scripts/php`. |

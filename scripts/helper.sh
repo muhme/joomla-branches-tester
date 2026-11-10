@@ -16,7 +16,6 @@ start_time=$(date +%s)
 
 # ${JBT_TMP_FILE} file can be used in the scripts without any worries
 JBT_TMP_FILE=/tmp/$(basename "$0").$$
-trap 'rm -rf ${JBT_TMP_FILE}' 0
 
 # Cypress version 15.7.1 now contains Firefox on ARM images
 # Cypress version 15.10.0 contains Cypress.expose()
@@ -921,10 +920,15 @@ red() {
 # With -e set, the script exits immediately on command failure.
 # Show a red error message with the script name and line number.
 #
+cleanupTemporaryFiles() {
+  rm -rf "${JBT_TMP_FILE}" "${JBT_TMP_FILE}.db-count"
+}
+
 errorHandler() {
   error "An error occurred, probably in script '$(basename "$0")' in line $1."
   error '<<<' "Script '$(basename "$0")' failed after $(runningTime)."
   trap - EXIT
+  cleanupTemporaryFiles
   exit 1
 }
 trap 'errorHandler ${LINENO}' ERR
@@ -932,7 +936,13 @@ trap 'errorHandler ${LINENO}' ERR
 # This is the end.
 #
 theEnd() {
-  if [ $? -ne 0 ]; then
+  # Preserve the original exit status
+  local exit_status=$?
+
+  # Clean up temporary files created by database counting feature
+  cleanupTemporaryFiles
+
+  if [ ${exit_status} -ne 0 ]; then
     error "'$0' failed after $(runningTime)."
   else
     log "<<<" "'$0' finished in $(runningTime)"
