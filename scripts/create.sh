@@ -310,13 +310,13 @@ EOF"
 
   log "Add bash for Alpine containers"
   for container in "jbt-pga" "jbt-mail"; do
-    docker exec -u root ${container} apk add bash || true # Who cares?
+    docker exec -u root ${container} apk add bash || warning "Failed to add bash to ${container}"
   done
 
   log "Set container prompts for base containers"
   for container in "${JBT_BASE_CONTAINERS[@]}"; do
     docker exec -u root "${container}" sh -c \
-      "echo PS1=\'${container} \# \' >> ~/.bashrc" || true # Who cares?
+      "echo PS1=\'${container} \# \' >> ~/.bashrc" || warning "Failed to set prompt for ${container}"
   done
 
   # pgpass file must me only pgadmin user read & writable
