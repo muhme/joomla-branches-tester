@@ -84,7 +84,7 @@ services:
     image: redis:7-alpine
     command: >
       sh -c 'chown redis:redis /var/run/redis-socket &&
-      exec /usr/bin/setpriv --reuid redis --regid redis --clear-groups redis-server --unixsocket /var/run/redis-socket/redis.sock --unixsocketperm 777'
+      exec setpriv --reuid redis --regid redis --clear-groups redis-server --unixsocket /var/run/redis-socket/redis.sock --unixsocketperm 777'
     ports:
       - "7014:6379" # Exposed port 7014 only needed if you like to connect from host tools
     extra_hosts:
